@@ -15,8 +15,6 @@ import com.microsoft.z3.Solver;
 import com.microsoft.z3.Version;
 import com.microsoft.z3.Z3Exception;
 
-import disjoint.analysis.ValueTransfomer;
-
 public class Test {
 
 	/**
@@ -40,6 +38,7 @@ public class Test {
 		System.out.println(Scene.v().getSootClassPath() +  " " + System.getProperty("java.class.path"));
 		Scene.v().setSootClassPath(Scene.v().getSootClassPath()+":"+System.getProperty("java.class.path") 
 				+ ":" + System.getProperty("sun.boot.class.path"));
+		System.out.println(Scene.v().getSootClassPath());
 		//run soot
 		soot.Main.main(sootArgs);
 	}
