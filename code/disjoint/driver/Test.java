@@ -2,9 +2,7 @@ package disjoint.driver;
 
 import java.util.HashMap;
 
-import soot.PackManager;
 import soot.Scene;
-import soot.Transform;
 
 import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.BoolExpr;
