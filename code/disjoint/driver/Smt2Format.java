@@ -12,8 +12,8 @@ import java.util.Scanner;
 
 public class Smt2Format {
 	
-	private static String resultsPath = "dfaWSolver/ExperimentData/results/";
-	private static String smt2FilesPath = "dfaWSolver/ExperimentData/smt2Files/";
+	private static String resultsPath = "ExperimentData/results/";
+	private static String smt2FilesPath = "ExperimentData/smt2Files/";
 
 	/**
 	 * @param args
@@ -24,9 +24,9 @@ public class Smt2Format {
 		//String file2Name = "dfaWSolver/disjoint/domain/test2.txt";
 		
 		//String[] classNames = {"test.BinarySearch"};
-		String[] classNames = {"test.Class13"};
+		String[] classNames = {"test.Base64"};
 		//String[] domainNames = {"dom3.txt", "dom2.txt"};
-		String[] domainNames = {"dom9.txt","dom8.txt"};
+		String[] domainNames = {"dom4.txt","dom5_4.txt"};
 		String[] symbolicOn = {"sN","sY"};
 		//String[] symbolicOn = {"sN"};
 		
