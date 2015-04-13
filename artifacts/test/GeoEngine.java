@@ -448,94 +448,96 @@ public class GeoEngine
 	 * @param tz
 	 * @return True if char can move to (tx,ty,tz)
 	 */
-//	private static double nCanMoveNext(int x, int y, int z, int tx, int ty, int tz, byte type, short inShort)
-//	{
-//		short region = getRegionOffset(x, y);
-//		int blockX = getBlock(x);
-//		int blockY = getBlock(y);
-//		int cellX, cellY;
-//		short NSWE = 0;
-//		int index = 0;
-////		// Geodata without index - it is just empty so index can be calculated on the fly
-////		if (_geodataIndex.get(region) == null) {
-////			index = ((blockX << 8) + blockY) * 3;
-////		// Get Index for current block of current region geodata
-////		} else {
-////			index = _geodataIndex.get(region).get((blockX << 8) + blockY);
-////		}
-////		// Buffer that Contains current Region GeoData
-////		ByteBuffer geo = _geodata.get(region);
-////		if (geo == null)
-////		{
-////			if (Config.DEBUG) {
-////				_log.warning("Geo Region - Region Offset: " + region + " dosnt exist!!");
-////			}
-////			return z;
-////		}
-//		// Read current block type: 0-flat,1-complex,2-multilevel
-//		index++;
-//		if (type == 0) {
-//			return z;
-//		} else if (type == 1) // complex
-//		{
-//			cellX = getCell(x);
-//			cellY = getCell(y);
-//			index += (cellX << 3) + cellY << 1;
-//			short height = inShort; //geo.getShort(index);
-//			NSWE = (short) (height & 0x0F);
-//			height = (short) (height & 0x0fff0);
-//			height = (short) (height >> 1); // height / 2
-//			if (checkNSWE(NSWE, x, y, tx, ty)) {
-//				return height;
-//			} else {
-//				return Double.MIN_VALUE;
+	private static double nCanMoveNext(int x, int y, int z, int tx, int ty, int tz, byte type, short inShort, Object o)
+	{
+		short region = getRegionOffset(x, y);
+		int blockX = getBlock(x);
+		int blockY = getBlock(y);
+		int cellX, cellY;
+		short NSWE = 0;
+		int index = 0;
+		// Geodata without index - it is just empty so index can be calculated on the fly
+		//if (_geodataIndex.get(region) == null) {
+		if (o == null) {
+			index = ((blockX << 8) + blockY) * 3;
+		// Get Index for current block of current region geodata
+		} else {
+			//index = _geodataIndex.get(region).get((blockX << 8) + blockY);
+			index = (int)Math.random()*100 + blockY;
+		}
+		// Buffer that Contains current Region GeoData
+		ByteBuffer geo = (ByteBuffer)o;//_geodata.get(region);
+		if (geo == null)
+		{
+//			if (Config.DEBUG) {
+//				_log.warning("Geo Region - Region Offset: " + region + " dosnt exist!!");
 //			}
-//		}
-//		else
-//		// multilevel, type == 2
-//		{
-//			cellX = getCell(x);
-//			cellY = getCell(y);
-//			int offset = (cellX << 3) + cellY;
-//			while (offset > 0) // iterates (too many times?) to get to layer count
-//			{
-//				short lc = inShort;
-//				index += (lc << 1) + 1;
-//				offset--;
-//			}
-//			int layers = (int) Math.random()*100;
-//			// _log.warning("layers"+layers);
-//			index++;
-//			short height = -1;
-//			if (layers <= 0 || layers > 125)
-//			{
-//				_log.warning("Broken geofile (case3), region: " + region + " - invalid layer count: " + layers + " at: " + x + " " + y);
-//				return z;
-//			}
-//			short tempz = Short.MIN_VALUE;
-//			while (layers > 0)
-//			{
-//				height = inShort;
-//				height = (short) (height & 0x0fff0);
-//				height = (short) (height >> 1); // height / 2
-//				// searches the closest layer to current z coordinate
-//				if ((z - tempz) * (z - tempz) > (z - height) * (z - height))
-//				{
-//					// layercurr = layers;
-//					tempz = height;
-//					NSWE = inShort;
-//					NSWE = (short) (NSWE & 0x0F);
-//				}
-//				layers--;
-//				index += 2;
-//			}
-//			if (checkNSWE(NSWE, x, y, tx, ty)) {
-//				return tempz;
-//			} else {
-//				return Double.MIN_VALUE;
-//			}
-//		}
-//	}
+			return z;
+		}
+		// Read current block type: 0-flat,1-complex,2-multilevel
+		index++;
+		if (type == 0) {
+			return z;
+		} else if (type == 1) // complex
+		{
+			cellX = getCell(x);
+			cellY = getCell(y);
+			index += (cellX << 3) + cellY << 1;
+			short height = inShort; //geo.getShort(index);
+			NSWE = (short) (height & 0x0F);
+			height = (short) (height & 0x0fff0);
+			height = (short) (height >> 1); // height / 2
+			if (checkNSWE(NSWE, x, y, tx, ty)) {
+				return height;
+			} else {
+				return Double.MIN_VALUE;
+			}
+		}
+		else
+		// multilevel, type == 2
+		{
+			cellX = getCell(x);
+			cellY = getCell(y);
+			int offset = (cellX << 3) + cellY;
+			while (offset > 0) // iterates (too many times?) to get to layer count
+			{
+				short lc = inShort;
+				index += (lc << 1) + 1;
+				offset--;
+			}
+			int layers = (int) Math.random()*100;
+			// _log.warning("layers"+layers);
+			index++;
+			short height = -1;
+			if (layers <= 0 || layers > 125)
+			{
+				_log.warning("Broken geofile (case3), region: " + region + " - invalid layer count: " + layers + " at: " + x + " " + y);
+				return z;
+			}
+			short tempz = Short.MIN_VALUE;
+			while (layers > 0)
+			{
+				height = inShort;
+				height = (short) (height & 0x0fff0);
+				height = (short) (height >> 1); // height / 2
+				// searches the closest layer to current z coordinate
+				if ((z - tempz) * (z - tempz) > (z - height) * (z - height))
+				{
+					// layercurr = layers;
+					tempz = height;
+					NSWE = inShort;
+					NSWE = (short) (NSWE & 0x0F);
+				}
+				layers--;
+				index += 2;
+			}
+			if (checkNSWE(NSWE, x, y, tx, ty)) {
+				return tempz;
+			} else {
+				return Double.MIN_VALUE;
+			}
+		}
+	}
 
 	/**
 	 * @param x
