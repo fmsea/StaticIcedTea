@@ -89,6 +89,9 @@ public class SolverWrapperZ3 {
 		try {
 			Solver solver = ctx.MkSolver();
 			solver.Assert(z3Formula);
+//			if(disjoint.analysis.ValueAnalysis.debug){
+//				System.out.println(z3Formula);
+//			}
 			Status result = solver.Check();
 			if(result.equals(Status.SATISFIABLE)){
 				ret = true;

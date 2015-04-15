@@ -73,6 +73,8 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 	List<State> states;
 
 	int disjointDomainIndex;
+	
+	//public static boolean debug = false;
 
 	/*
 	 * Maps a domain to its index in the list of bitvectors
@@ -325,7 +327,8 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 		Stmt s = (Stmt) u;
 //		System.out.println("---------------------------------------");
 //		System.out.println("In state \t" + in + " " + in.isFeasible());
-//		System.out.println("Stmt " + s + " " + s.getClass());
+		//System.out.println("Stmt " + s + " " + s.getClass());
+		//debug = s.toString().equals("if i2 != 16 goto $r9 = new java.lang.String");
 		AbstractState inState = in;
 		AbstractState ifStmtTrue = inState.copy(); //instantiated in ifStmt only; outBranch
 		AbstractState ifStmtFalse = inState.copy();//fallIn; out
@@ -362,8 +365,8 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 	private void processIfStmt(IfStmt s, AbstractState inState,
 			AbstractState ifStmtFalse, AbstractState ifStmtTrue) {
 		ConditionExpr condExpr = (ConditionExpr)s.getCondition();
-		Value rhs = condExpr.getOp1();
-		Value lhs = condExpr.getOp2();
+		Value lhs = condExpr.getOp1();
+		Value rhs = condExpr.getOp2();
 		//make sure this is an integer conditional stmt
 		if(isAnyIntType(lhs)){
 //			System.out.println("IfStmt " + s + " " + lhs + " " + rhs + " " + condExpr.getClass());
@@ -399,6 +402,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 			symbState = new GAndExpr(symbState, be);
 			symbNotState = new GAndExpr(symbNotState,be);
 		}
+	
 		//at this point we have precondition set
 		//make sure lhs is not a constant
 		if(lhs instanceof JimpleLocal){
@@ -416,8 +420,6 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 			updateStateCond(rhs, symbNotState, negate(condExpr), ifStmtFalse,s );
 			track.add(rhs);
 		}
-
-
 		//created the negated one
 		//DNotExpr notExpr = new DNotExpr(condExpr);
 

@@ -8,12 +8,14 @@ import disjoint.domain.Domain;
 import soot.Body;
 import soot.BodyTransformer;
 import soot.Local;
+import soot.SootClass;
 import soot.toolkits.graph.ExceptionalUnitGraph;
 
 public class ValueTransfomer extends BodyTransformer {
 	
 	List<Domain> domains;
 	boolean symbolicOn;
+	int methodId = 16;
 	
 	//later can pass the domain info there is no
 	//need for it to be initialized here
@@ -27,6 +29,7 @@ public class ValueTransfomer extends BodyTransformer {
 	@Override
 	protected void internalTransform(Body b, String phaseName, Map options) {
 		String methodName = b.getMethod().getName();
+		if(b.getMethod().getDeclaringClass().getMethods().get(methodId).equals(b.getMethod())){
 		//System.out.println("method " + methodName);
 		//if method's does not have a single local int variable
 		//the skip it
@@ -38,11 +41,12 @@ public class ValueTransfomer extends BodyTransformer {
 			}
 		}
 		if(!methodName.equals("<clinit>") && hasIntLocals){
+			//System.out.println(b.getMethod().getDeclaringClass() + "\t" + b.getMethod().getDeclaringClass().getMethods().indexOf(b.getMethod()) + "\t" + b.getMethod());
 			System.out.println("analyzing " + b.getMethod().getSignature());
 			System.gc();
 			ValueAnalysis va = new ValueAnalysis(new ExceptionalUnitGraph(b), domains, symbolicOn);
 		}
 
 	}
-
+	}
 }
