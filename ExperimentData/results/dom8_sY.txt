@@ -94556,7 +94556,7 @@ $i46->(or (and (> $i46 36) (<= $i46 100) (> $i46 49))
     (and (> $i46 36) (> $i46 100)))
 15 i1 = 0:<test.MapViewer: void paintRoutes(java.awt.Graphics,int,java.lang.Object[][])>
 i1->(and (= i1 0) (<= i1 21) (> i1 (- 1)))
-24 i2 = virtualinvoke r5.<java.lang.String: int indexOf(java.lang.String)>("routeBegin"):<test.MapViewer: void paintRoutes(java.awt.Graphics,int,java.lang.Object[][])>
+24 i2 = virtualinvoke r5.<java.lang.String: int indexOf(java.lang.String)>('routeBegin'):<test.MapViewer: void paintRoutes(java.awt.Graphics,int,java.lang.Object[][])>
 i2->(or (<= i2 (- 12))
     (and (<= i2 21) (> i2 (- 1)))
     (and (<= i2 44) (> i2 1))
@@ -94571,7 +94571,7 @@ i2->(or (<= i2 (- 12))
     (and (> i2 (- 10)) (<= i2 (- 1)))
     (= i2 1)
     (> i2 100))
-25 i3 = virtualinvoke r5.<java.lang.String: int indexOf(java.lang.String)>("routeCity"):<test.MapViewer: void paintRoutes(java.awt.Graphics,int,java.lang.Object[][])>
+25 i3 = virtualinvoke r5.<java.lang.String: int indexOf(java.lang.String)>('routeCity'):<test.MapViewer: void paintRoutes(java.awt.Graphics,int,java.lang.Object[][])>
 i3->(or (<= i3 (- 12))
     (and (<= i3 21) (> i3 (- 1)))
     (and (<= i3 44) (> i3 1))
@@ -94586,7 +94586,7 @@ i3->(or (<= i3 (- 12))
     (and (> i3 (- 10)) (<= i3 (- 1)))
     (= i3 1)
     (> i3 100))
-26 i5 = virtualinvoke r5.<java.lang.String: int indexOf(java.lang.String)>("routeLeg"):<test.MapViewer: void paintRoutes(java.awt.Graphics,int,java.lang.Object[][])>
+26 i5 = virtualinvoke r5.<java.lang.String: int indexOf(java.lang.String)>('routeLeg'):<test.MapViewer: void paintRoutes(java.awt.Graphics,int,java.lang.Object[][])>
 i5->(or (<= i5 (- 12))
     (and (<= i5 21) (> i5 (- 1)))
     (and (<= i5 44) (> i5 1))
@@ -94601,7 +94601,7 @@ i5->(or (<= i5 (- 12))
     (and (> i5 (- 10)) (<= i5 (- 1)))
     (= i5 1)
     (> i5 100))
-27 i4 = virtualinvoke r5.<java.lang.String: int indexOf(java.lang.String)>("routeEnd"):<test.MapViewer: void paintRoutes(java.awt.Graphics,int,java.lang.Object[][])>
+27 i4 = virtualinvoke r5.<java.lang.String: int indexOf(java.lang.String)>('routeEnd'):<test.MapViewer: void paintRoutes(java.awt.Graphics,int,java.lang.Object[][])>
 i4->(or (<= i4 (- 12))
     (and (<= i4 21) (> i4 (- 1)))
     (and (<= i4 44) (> i4 1))
@@ -95042,7 +95042,7 @@ i39->(or (<= i39 (- 12))
     (and (> i39 (- 10)) (<= i39 (- 1)))
     (= i39 1)
     (> i39 100))
-149 if i5 >= i3 goto $i11 = virtualinvoke r5.<java.lang.String: int indexOf(java.lang.String)>("routeEnd"):<test.MapViewer: void paintRoutes(java.awt.Graphics,int,java.lang.Object[][])>
+149 if i5 >= i3 goto $i11 = virtualinvoke r5.<java.lang.String: int indexOf(java.lang.String)>('routeEnd'):<test.MapViewer: void paintRoutes(java.awt.Graphics,int,java.lang.Object[][])>
 i3->(or (and (and (> i3 (- 47)) (< i3 0)) (<= i3 (- 10)) (> i3 (- 12)))
     (and (> i3 36) (<= i3 100) (> i3 49))
     (and (= i3 0) (and (<= i3 21) (> i3 (- 1))))
@@ -95966,7 +95966,7 @@ i49f->(or (and (and (> i49 (- 47)) (< i49 0)) (<= i49 (- 10)) (> i49 (- 12)))
     (and (and (> i49 (- 47)) (< i49 0)) (> i49 (- 10)) (<= i49 (- 1)))
     (and (> i49 36) (> i49 100))
     (and (= i49 1) (and (<= i49 21) (> i49 (- 1)))))
-331 if i47 <= i48 goto $i11 = virtualinvoke r5.<java.lang.String: int indexOf(java.lang.String)>("routeEnd"):<test.MapViewer: void paintRoutes(java.awt.Graphics,int,java.lang.Object[][])>
+331 if i47 <= i48 goto $i11 = virtualinvoke r5.<java.lang.String: int indexOf(java.lang.String)>('routeEnd'):<test.MapViewer: void paintRoutes(java.awt.Graphics,int,java.lang.Object[][])>
 i47->(or (and (and (> i47 (- 47)) (< i47 0)) (<= i47 (- 10)) (> i47 (- 12)))
     (and (> i47 36) (<= i47 100) (> i47 49))
     (and (= i47 0) (and (<= i47 21) (> i47 (- 1))))
@@ -96064,7 +96064,7 @@ i49f->(or (and (and (> i49 (- 47)) (< i49 0)) (<= i49 (- 10)) (> i49 (- 12)))
     (and (and (> i49 (- 47)) (< i49 0)) (> i49 (- 10)) (<= i49 (- 1)))
     (and (> i49 36) (> i49 100))
     (and (= i49 1) (and (<= i49 21) (> i49 (- 1)))))
-359 if i44 != i46 goto $i11 = virtualinvoke r5.<java.lang.String: int indexOf(java.lang.String)>("routeEnd"):<test.MapViewer: void paintRoutes(java.awt.Graphics,int,java.lang.Object[][])>
+359 if i44 != i46 goto $i11 = virtualinvoke r5.<java.lang.String: int indexOf(java.lang.String)>('routeEnd'):<test.MapViewer: void paintRoutes(java.awt.Graphics,int,java.lang.Object[][])>
 i44->(or (and (and (> i44 (- 47)) (< i44 0)) (<= i44 (- 10)) (> i44 (- 12)))
     (and (> i44 36) (<= i44 100) (> i44 49))
     (and (= i44 0) (and (<= i44 21) (> i44 (- 1))))
@@ -96211,7 +96211,7 @@ i45f->(or (and (and (> i45 (- 47)) (< i45 0)) (<= i45 (- 10)) (> i45 (- 12)))
     (and (and (> i45 (- 47)) (< i45 0)) (> i45 (- 10)) (<= i45 (- 1)))
     (and (> i45 36) (> i45 100))
     (and (= i45 1) (and (<= i45 21) (> i45 (- 1)))))
-400 $i11 = virtualinvoke r5.<java.lang.String: int indexOf(java.lang.String)>("routeEnd"):<test.MapViewer: void paintRoutes(java.awt.Graphics,int,java.lang.Object[][])>
+400 $i11 = virtualinvoke r5.<java.lang.String: int indexOf(java.lang.String)>('routeEnd'):<test.MapViewer: void paintRoutes(java.awt.Graphics,int,java.lang.Object[][])>
 $i11->(or (<= $i11 (- 12))
     (and (<= $i11 21) (> $i11 (- 1)))
     (and (<= $i11 44) (> $i11 1))
@@ -96226,7 +96226,7 @@ $i11->(or (<= $i11 (- 12))
     (and (> $i11 (- 10)) (<= $i11 (- 1)))
     (= $i11 1)
     (> $i11 100))
-401 if $i11 != -1 goto r4[2] = "":<test.MapViewer: void paintRoutes(java.awt.Graphics,int,java.lang.Object[][])>
+401 if $i11 != -1 goto r4[2] = '':<test.MapViewer: void paintRoutes(java.awt.Graphics,int,java.lang.Object[][])>
 $i11->(and (> $i11 (- 47)) (< $i11 0) (> $i11 (- 10)) (<= $i11 (- 1)))
 $i11f->(or (and (and (> $i11 (- 47)) (< $i11 0)) (<= $i11 (- 10)) (> $i11 (- 12)))
     (and (> $i11 36) (<= $i11 100) (> $i11 49))
