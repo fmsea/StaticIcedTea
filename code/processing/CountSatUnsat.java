@@ -20,14 +20,16 @@ public class CountSatUnsat {
 //						"Class11", "Class13", "OneTcas"
 //				};
 		
-		String[] classes = {"Base64"};
+		//String[] classes = {"Base64"};
+		String domless = "dom6";
+		String dommore = "dom7_6";
 
 		Map<String, List<Integer>> methodToData = new HashMap<String,List<Integer>>();
 		String[] fileNames = {"res1", "res2", "res3", "res4", "res5"};
-		for(String className : classes){
+		//for(String className : classes){
 			for(int dataFile =0 ; dataFile < fileNames.length; dataFile ++) {
 				int offset = dataFile *4;
-				String path = "ExperimentData/z3Results/"+className+"/dom4dom5_4/";
+				String path = "ExperimentData/z3Results/"+domless + "_" + dommore +"/";
 				String fileName = fileNames[dataFile];
 				//System.out.println("fileName " + fileName);
 				File file = new File(path+fileName);
@@ -38,7 +40,7 @@ public class CountSatUnsat {
 
 					//if line start with a number
 					if(line.matches("^[0-9].*")){
-						//System.out.println(line);
+						//System.out.println(fileName + "\t " + line);
 						//then get the method signature
 						String methodSig = "<"+line.split(":<")[1];
 						//System.out.println(methodSig);
@@ -89,7 +91,7 @@ public class CountSatUnsat {
 				}
 				scanner.close();
 			}//end reading datafile
-		}//end of class
+	//	}//end of class
 		//Total methods
 		System.out.println("methods " + methodToData.keySet().size());
 		//print the map

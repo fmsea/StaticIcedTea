@@ -1,4 +1,5 @@
 package processing;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -13,10 +14,13 @@ import java.util.List;
 public class CountTime {
 
 	public static void main(String[] args) throws FileNotFoundException {
+		
+		String more = "8";
+		String less = "9";
 
 		Map<String, List<Integer>> methodToData = new HashMap<String,List<Integer>>();
-				String path = "FSEData/";
-				String fileName = "timeDatadom9dom8";
+				String path = "ExperimentData/results/";
+				String fileName = "timeData1";
 				//System.out.println("fileName " + fileName);
 				File file = new File(path+fileName);
 				Scanner scanner = new Scanner(new FileReader(file));
@@ -24,15 +28,18 @@ public class CountTime {
 				while(scanner.hasNext()){
 					String line = scanner.nextLine();
 					String[] tabs = line.split("\\t");
-					String key = tabs[0]+"\t"+tabs[1];
+					//String key = tabs[0]+"\t"+tabs[1];
+					String key = tabs[1];
 					if(!methodToData.containsKey(key)){
 						//create a list of size 4 for it
 						//index 0 -> dom5sN
 						//index 1 -> dom5sY
 						//index 2 -> dom4sN
 						//index 3 -> dom4Sy
+						//index 4 -> dom54sN
+						//index 5 -> dom54sY
 						count = new ArrayList<Integer>();
-						for(int i=0; i< 4; i++){// 5 files, each with 4 counts
+						for(int i=0; i< 6; i++){//6 elements
 							count.add(0);
 						}
 						methodToData.put(key, count);
@@ -40,72 +47,27 @@ public class CountTime {
 						count = methodToData.get(key);
 					}
 					int index = -1;
-					if(tabs[2].equals("dom9_sN")){
+					//System.out.println("tab2 " + tabs[2]);
+					if(tabs[2].equals("dom"+less+"_sN")){
 						index = 0;
-					} else if (tabs[2].equals("dom9_sY")){
+					} else if (tabs[2].equals("dom" + less+"_sY")){
 						index = 1;
-					} else if(tabs[2].equals("dom8_sN")){
+					} else if(tabs[2].equals("dom"+more+"_sN")){
 						index = 2;
-					} else if(tabs[2].equals("dom8_sY")){
+					} else if(tabs[2].equals("dom"+more+"_sY")){
 						index = 3;
-					}else {
+					}else if(tabs[2].equals("dom"+less+"_"+more+"_sN")){
+						index = 4;
+					}else if(tabs[2].equals("dom"+less+"_"+more+"_sY")){
+						index = 5;
+					} else {
 						System.out.println("Something wrong1");
-						System.exit(2);
+						//System.exit(2);
+						continue;
 					}
 					int val = Integer.valueOf(tabs[3]);
 					incrementAt(index, val, count);
-					//System.out.println(tabs[0] + " " + tabs[2]);
-//					//if line start with a number
-//					if(line.matches("^[0-9].*")){
-//						//System.out.println(line);
-//						//then get the method signature
-//						String methodSig = "<"+line.split(":<")[1];
-//						//System.out.println(methodSig);
-//						if(!methodToData.containsKey(methodSig)){
-//							//create a list of size 4 for it
-//							//index 0 -> sat/sat
-//							//index 1 -> unsat/sat
-//							//index 2 -> sat/unsat
-//							//index 3 -> unsat/unsat
-//							count = new ArrayList<Integer>();
-//							for(int i=0; i< 20; i++){// 5 files, each with 4 counts
-//								count.add(0);
-//							}
-//							methodToData.put(methodSig, count);
-//						} else {
-//							count = methodToData.get(methodSig);
-//						}
-//					} else {
-//						if(line.equals("sat")){
-//							//read the next line
-//							String line2 = scanner.nextLine();
-//							if(line2.equals("sat")){
-//								//add to index 0
-//								incrementAt(0+offset, count);
-//							} else if (line2.equals("unsat")){
-//								//add to index 2
-//								incrementAt(2+offset,count);
-//							} else {
-//								System.out.println("Something wrong1");
-//								System.exit(2);
-//							}
-//						} else if (line.equals("unsat")){
-//							//read the next line
-//							String line2 = scanner.nextLine();
-//							//System.out.println(line + " " + line2);
-//							if(line2.equals("sat")){
-//								//add to index 1
-//								incrementAt(1+offset, count);
-//							} else if (line2.equals("unsat")){
-//								//add to index 3
-//								incrementAt(3+offset,count);
-//							} else {
-//								System.out.println("Something wrong2");
-//								System.exit(2);
-//							}
-//						}
-//					}
-				}
+			}
 				scanner.close();
 		//Total methods
 		System.out.println("methods " + methodToData.keySet().size());
