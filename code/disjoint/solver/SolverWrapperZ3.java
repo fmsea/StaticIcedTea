@@ -61,6 +61,9 @@ public class SolverWrapperZ3 {
 	}
 	
 	public boolean equals(BinopExpr expr1, BinopExpr expr2){
+		//System.out.println("Expr 1 " + expr1);
+		//System.out.println("Expr 2 " + expr2);
+			
 		BoolExpr z3Formula1 = generate(expr1);
 		BoolExpr z3Formula2 = generate(expr2);
 		BoolExpr z3Formula = null;;

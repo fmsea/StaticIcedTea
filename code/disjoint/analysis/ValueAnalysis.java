@@ -1,6 +1,11 @@
 package disjoint.analysis;
 
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.CharBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
@@ -60,7 +65,7 @@ import soot.util.Chain;
 
 import disjoint.domain.BaseElement;
 import disjoint.domain.Domain;
-import disjoint.driver.StartAnalysis;
+import disjoint.driver.StartAnalysisKestrel;
 import disjoint.solver.SolverWrapperZ3;
 import disjoint.state.*;
 
@@ -244,14 +249,22 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 		long end = System.currentTimeMillis();
 		System.out.println("Done in \n" + (end - start));
 		String timeData = graph.getBody().getMethod().getDeclaringClass() + "\t" +graph.getBody().getMethod().getSignature()+
-				"\t" + StartAnalysis.analysisType + "\t"+ (end - start)+"\n";
+				"\t" + StartAnalysisKestrel.analysisType + "\t"+ (end - start)+"\n";
 		try {
-			StartAnalysis.timeDataFile.append(timeData);
+			//StartAnalysisKestrel.timeDataFile.append(timeData);
+			RandomAccessFile rf = new RandomAccessFile(StartAnalysisKestrel.timeDataFile, "rwd");
+			FileChannel fileChannel = rf.getChannel();
+			FileLock lock = fileChannel.lock();
+			fileChannel.position(fileChannel.size());
+			fileChannel.write(Charset.defaultCharset().encode(CharBuffer.wrap(timeData)));
+			fileChannel.force(false);
+			lock.release();
+			fileChannel.close();
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		if(StartAnalysis.print){
+		if(StartAnalysisKestrel.print){
 		Iterator<Unit> iter = graph.getBody().getUnits().iterator();
 		int stmtCount = 0;
 		//File to write the output to
@@ -311,7 +324,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 				}
 				//write the string to the file
 				try {
-					StartAnalysis.fileToWrite.write(output);
+					StartAnalysisKestrel.fileToWrite.write(output);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

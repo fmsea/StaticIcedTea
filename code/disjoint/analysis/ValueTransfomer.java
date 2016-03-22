@@ -20,10 +20,11 @@ public class ValueTransfomer extends BodyTransformer {
 	//later can pass the domain info there is no
 	//need for it to be initialized here
 	
-	public ValueTransfomer(List<Domain> setDomains, boolean symbolicOn){
+	public ValueTransfomer(List<Domain> setDomains, int methodId, boolean symbolicOn){
 		super();
 		domains=setDomains;
 		this.symbolicOn = symbolicOn;
+		this.methodId = methodId;
 	}
 
 	@Override
