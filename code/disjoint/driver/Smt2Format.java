@@ -26,7 +26,7 @@ public class Smt2Format {
 		//String[] classNames = {"test.BinarySearch"};
 		String[] classNames = {"test.Base64"};
 		//String[] domainNames = {"dom3.txt", "dom2.txt"};
-		String[] domainNames = {"dom4.txt","dom5_4.txt"};
+		String[] domainNames = {"dom5.txt","dom4.txt"};
 		String[] symbolicOn = {"sN","sY"};
 		//String[] symbolicOn = {"sN"};
 		
