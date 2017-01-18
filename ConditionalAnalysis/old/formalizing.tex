@@ -1,0 +1,96 @@
+%reuse as much technical machinery from Conway as makes sense
+
+%we want to include as much analytical content as possible, since
+%this reduces the expectation for empirical evaluation.  Specifically
+%we want to discuss
+%\begin{itemize}
+%\item prove that state-specific conditions are insufficient to express
+%input-related conditions, but that input-related conditions are sufficient
+%\item define the conditions under which path and predicate encodings are
+%equivalen
+%\item anything else that makes sense
+%\end{itemize}
+Similarly to the previous section in this section we first present the traditional monotone framework for data flow analysis followed by the discussion of the necessary changes that extend it to a conditional data flow framework. This section also outlines the approach of composing the unconditional result from conditional ones.
+
+We use the data flow analysis framework as presented in~\cite{Nielson:1999} where an analysis $\mathcal{A}$ is defined by the following parameters. 
+\begin{itemize}
+\item The complete lattice $D_\mathcal{A}$ that describes the abstract domain of $\mathcal{A}$.
+\item $CFG_P$ for a program $P$.
+\item  A set of monotone transfer functions $\mathcal{F}_\mathcal{A}$ for each statement $l \in CFG_P$ that maps an element of $D_\mathcal{A}$ to itself, i.e., $f_l \in \mathcal{F}_\mathcal{A} : D_\mathcal{A} \mapsto D_\mathcal{A}$.
+\item Entry statements $E$ in $CFG_P$.
+\item An initial value $\iota\in D_\mathcal{A}$ for statements in $E$.
+\end{itemize}
+
+Then the set of equations for forward $\mathcal{A}$ is defined as follows on entry and exit of each statement $l\in CFG_P$:
+\begin{eqnarray*}
+\mathcal{A}_{in}(l) &= &\bigsqcup\{\mathcal{A}_{out}(l') \;|\; (l',l)\in CFG_P\}\sqcup \iota_E^l\\
+ &  & \text{ where } \iota_E^l = \left\{ \begin{array}{rl}
+ \iota &\mbox{ if $l\in E$} \\
+  \bot &\mbox{ if $l\not\in E$}
+       \end{array}\right. \\
+\mathcal{A}_{out}(l) & = & f_l(\mathcal{A}_{in}(l))     
+\end{eqnarray*}
+where $\sqcup$ is the least upper bound operator, $\bot$ is the bottom element of $D_{\mathcal{A}}$ for which $\forall d\in D_\mathcal{A} : \bot\sqcup d = d$ and $\forall l\in CFG_P :  f_l(\bot)=\bot$. For the safety properties $\bot$ corresponds to the empty set of concrete values and $\top$ to the set containing all concrete values. The value of $\iota$ is assigned to $\top$, i.e., the analysis considers all possible input values for a program. The solution of the above set of equations provides is the result of the analysis for $P$.
+
+Recall that a condition for data flow analysis can be expressed as a predicate $\phi$ over the input values or as $\pi$ -- condition that identifies the set of paths to be analyzed. Since $\phi$ and $\pi$ are incomparable the overall condition $\theta$ for a conditional data flow analysis $\mathcal{A}^\theta$ is described by a tuple of $\phi$ and $\pi$, i.e., $\mathcal{A}^{(\phi,\pi)}$.
+
+%We express $\pi$ as a regular language with the alphabet $\Sigma_\pi$  over branch outcomes of conditional statements $b_l$. We refer to it as {\em path language}. If $b_l$ has $l'$ and $l''$ its true and false targets, respectively then the symbols $S_\pi\subset \Sigma_\pi$ of the regular expression representing $\pi$ can contain $(b_l,l')$, or $(b_l,l'')$, or none of them. Also we require that $S_\pi$ appear in $\pi$ in their topological ordering of $CFG_P$. Thus $\pi = .^*;(b_l,l');.^*$ describes a set of paths that execute the true branch of $b_l$. In this case when $\mathcal{A}^{(\phi,\pi)}$ encounters $b_l$ on the false edge $(b_l, l'')$ it sets the variable values incoming to $l''$ to $\bot$. For brevity  we denote the case when $\forall i : x_i = \bot$ as $\bot$.  When none of the edges are present in $\pi$ then the analysis treats them in its usual manner, i.e., propagates the information through both branches. 
+
+We have chosen $\pi$ to be represented by the set of branch edges in $CFG_P$, at most one for each conditional statement $l$,  which the analysis must include while excluding their counterparts. If $l$ has $l'$ and $l''$ as its true and false targets, respectively, then $\pi$ can contain  the edge $(l,l')$, or the edge $(l,l'')$, or none of them. To capture the relation between the opposite branches of $l$ we designate $(l,l')=\neg (l,l'')$ and the vice versa $(l,l'') = \neg (l,l')$. If $(l,l') \in \pi$ then the values of all variables $x_i$ incoming to the target  of its opposite edge $l''$, i.e., along edge $\neg (l,l')$, will be set to $\bot$. For brevity  we denote such case, i.e., when $\forall i : x_i = \bot$, as $\bot$ state.The same principle applies when $(l,l'') \in \pi$.   When none of the edges are present in $\pi$ then the analysis treats them in its usual manner, i.e., propagates the information through both branches.
+
+For a set of input variables $x_i$ $\phi$ can be represented as an assignment of $x_i$ to its initial values from $d_i \in D_\mathcal{A}\setminus\{\bot\}$. In the traditional data flow analysis all $x_i$ are set to $\top$ element of  $D_\mathcal{A}$. For shortness we refer to such condition as $\top$.
+
+Thus a traditional data flow analysis $\mathcal{A} = \mathcal{A}^{(\top,\emptyset)}$, for a conditional analysis with predicate-based condition $\mathcal{A}^{(\phi,\emptyset)}$ and so on. In the related work on the conditional model checking a condition $\theta$ also consists of two parts. In the case when a model checker runs out of resources it outputs the set of predicates describing analyzed paths, which is equivalent to $\phi$ predicate-based condition. In the case when a model checker cannot reason about some set of paths it records them in a structural way which is similar to $\pi$ path-based condition.
+
+%We have two type of constraints name it $\phi$ and $\pi$ which describe the restriction on the initial conditions (note that it is different from $\mathcal{I}$ and $\pi$ describes the set of branches of conditional statement to exclude form the execution. This type of composition is also present in the related work. The idea in conditional model checking is that $\phi$ is used when an analysis able to reason about the set of path it analyzed but run out of resources and the structural description when it cannot crate such description thus an universal description is taken. (See also reasoning below).
+
+%In conditional model checking the condition $\theta$ for which the results holds consists of two parts. When a model checker runs out of resources it describes the part of the state space it has been analyzed as logical formula over predicates, we call it $\phi$. But, when the model checker encounters a conditional statement it cannot reason about then obviously it is unable to express the path containing that predicate as a logical formula anymore. Instead it uses a structural, i.e., CFG path-based, description of that path. Thus for an arbitrary of conditional model checker the condition $\theta$ consists of two parts: $\phi$ -- the predicate-based encoding of covered input state space and $\pi$ -- the path-based encoding of the assumed paths.
+
+%Similarly a condition of data flow analysis can also have such dual representation. In that case predicate-based condition $\phi$ describes the part input state space that is analyzed. Alternatively the input state space can be represented as the set of paths $\Pi$ in the program's CFG. This way a set of paths $\pi$ is also described a part of the program's input space but expressed structurally. In conditional model-checking $\phi$ can be expressed through $\pi$ since model checking is a MOP analysis. However, such correspondence does not exist in data-flow analysis. Thus conditions expressed by $\phi$ and $\pi$ are incomparable analytically in data flow analysis. Therefore in order to formalize conditional data flow analysis we employ both $\phi$ and $\pi$ parts of $\theta$.
+
+With the proposed above predicate and path based conditions we can now write the set of equations for conditional data flow framework for an analysis $\mathcal{A}^{(\phi,\pi)}=\mathcal{A}^\theta$:
+
+\begin{eqnarray*}
+\mathcal{A}_{in}^{\theta}(l) &= &\bigsqcup\{\mathcal{A}_{out}^{\theta}(l') \;|\; (l',l)\in CFG_P, \neg(l',l) \not\in\pi\}\sqcup \iota_E^l\\
+ &  & \text{ where } \iota_E^l = \left\{ \begin{array}{rl}
+ \phi &\mbox{ if $l\in E$} \\
+  \bot &\mbox{ if $l\not\in E$}
+       \end{array}\right. \\
+\mathcal{A}_{out}^{\theta}(l) & = & f_l(\mathcal{A}_{in}^{\theta}(l))     
+\end{eqnarray*}
+where for the first equation we assume $\forall d\in D_{\mathcal{A}} : \emptyset\sqcup d =  d$.
+
+Let $\Phi$ and $\Pi$ be the universe of predicate-based and path-based conditions, respectively, for an analysis $\mathcal{A}$. Executing $\mathcal{A}$ with different conditions $\phi_i\in \Phi$ and $\pi_j\in\Pi$ produces a set of conditional analysis $\mathcal{A}^{(\phi_i,\pi_j)}$. Having these conditional analysis we would like to determine whether its combined effort produces the result of the unconditional analysis. To answer this question we first identify the method for combining conditions $(\phi_i,\pi_j)$ for the same $\mathcal{A}$ and then establish the requirement when combined conditions imply the unconditional result.
+
+Consider two conditions $(\top,\{(l,l')\})$ and $(\top,\{\neg(l,l')\})$. The conditional analysis $\mathcal{A}^{(\top,\{(l,l')\})}$ analyzes all possible input values for the set of paths containing the true branch of $l$ while $\mathcal{A}^{(\top,\{\neg(l,l')\})}$ does it for the set of paths containing the false branch of $l$. Obviously, the cumulative result of $\mathcal{A}^{(\top,\{(l,l')\})}$ and $\mathcal{A}^{(\top,\{\neg(l,l')\})}$ is unconditional. To automate the process of combining the set of paths we convert $\pi$ into a boolean function $g_\pi$ as follows.  Each true edge in $CFG_P$ is mapped to a boolean variable $x_i$ and each false edge is mapped to $\neg x_i$. Then edges in $\pi$ are mapped to a set of literals, i.e., variables and its negations, and $g_\pi$ is expressed as the conjunction of those literals. In our example if $(l,l')$ is mapped to $x_5$ then $g_{\{(ll')\}} := x_5$ and $g_{\{\neg(ll')\}} := \neg x_5$. The union of these two sets of paths is equivalent of the disjunctions of $g_{(ll')}$ and $g_{\neg(ll')}$. Thus the combination of arbitrary $\pi_1$ and $\pi_2$ is equivalent to 
+$$
+g_{\pi_1}\lor g_{\pi_2} \equiv \pi_1 \cup \pi_2 
+$$
+
+Combing two conditions with different predicate condition and the same paths like $(\phi_1, \pi)$ and $(\phi_2, \pi)$ is more straightforward. Since for input variables $x_i$ and $d_i\in D_{\mathcal{A}}$ 
+$$\phi_1=(x_1=d_1,\dots, x_n=d_n)$$ and 
+$$\phi_2=(x_1=d_{n+1},\dots, x_n=d_{2n})$$ 
+then the combination of $\phi_1$ and $\phi_2$ is 
+$$(x_1=d_1\sqcup d_{n+1},\dots, x_n=d_n\sqcup d_{2n}) \equiv \phi_1\sqcup \phi_2$$
+
+The criterion for which the set of conditional analyses equivalent to unconditional result is when the combination of their conditions returns the tuple $(\top, true)$. To combine the set of conditions $\{(\phi_i,\pi_j)\}$ where $\phi_i\in \Phi$ and $\pi_j\in\Pi$ we first partition them into subsets with the same $\pi_j$ 
+$$
+\{(\phi_i,\pi_j)\} = \{(\phi_i, \pi_1)\}\cup\dots\cup \{(\phi_i, \pi_n)\} 
+$$
+and combine $\phi$ as described above
+$$
+\{\sqcup_i\{(\phi_i, \pi_1)\},\dots,\sqcup_i\{(\phi_i, \pi_n)\} \}= \{(\phi_{i_1},\pi_1),\dots,(\phi_{i_n},\pi_n)\}
+$$
+where $\phi_{i_j}\in\Phi$ and not necessary unique. Next we separate the result above into subsets with the same $\phi_{i_j}$
+$$
+\cup_j\{(\phi_1,\pi_j)\}\cup\dots\cup\cup_j\{(\phi_m,\pi_j)\}
+$$
+and union the paths in each partition by converting them to boolean functions $g_{\pi}$ and mapping them back to the set representation
+$$
+\{\lor_j\{(\phi_1,g_{\pi_j})\}, \dots, \lor_j\{(\phi_m,g_{\pi_j)}\}\} = \{(\phi_1,\pi_{j_1}),\dots,(\phi_m,\pi_{j_m})\}
+$$
+In the case when
+$$
+\{(\phi_1,\pi_{j_1}),\dots,(\phi_m,\pi_{j_m})\} = \{(\top,\emptyset)\}
+$$
+then the result is unconditional.

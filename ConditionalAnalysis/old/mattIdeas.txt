@@ -1,0 +1,26 @@
+Can we reuse the overview from ISSTA submission to make
+the case for "coverage" and "control"?
+
+Need a variant of the picture:
+ * run analysis -> generate coverage
+   - could use for comparison
+   - could use as evidence
+ * control analysis -> generate results
+   - property holds, under control assumption
+   - coverage under control
+
+Need to crystalize plan for evaluation
+ * what analysis will we use?
+ * what programs?
+ * what properties?
+
+ These answers will determine how much we can do and 
+ who does what.
+
+What are the killer apps for coverage and control?
+ * that are feasible to perform an initial study 
+
+Where does the "spec" for controlling SA come from?
+ * randomly generate CFG sub-flowgraphs
+ * random domain partitions
+

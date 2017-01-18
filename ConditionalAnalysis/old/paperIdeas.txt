@@ -1,0 +1,63 @@
+ICSE paper outline
+
+Title: Partial (Conditional/Controlled?) Static Analysis.
+
+In testing a test case selection technique $TC_1$ can be compared to another technique $TC_2$ for instance by comparing the structural coverage of the generated tests cases of the same size. The literature more likely has many more comparison techniques based on the structural coverage, but we want to make the point that it CAN be done on a fairly quantifiable level.
+
+Comparison between static analysis (SA) is done on coarser (binary) level. $SA_1$ performs better than $SA_2$ for a program $P$ if the former is able to verify $P$ while the latter is not able to. However, if neither $SA_1$ nor $SA_2$ able to verify $P$ then they are incomparable.
+
+We propose to use partial output of SA as a finer metric to evaluate performance of SA. The type of evaluation depends on the type of SA. For data-flow (DF) SA is the path language. Discuss how to compare these languages (acceptance of languages?). What if they are incomparable then use a subtree-based coverage criteria. For symbolic execution (SE) the path language as well as predicate can be used. How to compare predicates (implication relation?). What if predicates are not comparable then we can compare the sizes of the intervals represented by each analyzed predicate, i.e.,  x < 2 \land x > 0 is less than x < -2 and x > -10 (or roll back to the subtree-based coverage?). If we want to compare DF and SE results we will have to use path-language / the subtree-based coverage for comparison.
+
+RQ1 Does partial output allows for better comparison between SA?
+
+(We can do the comparison between DF with different domain precisions and SE with different exploration heuristics. If we will feel ambitious we can compare results of SE and DF)
+
+The main reason why SA cannot determine $P\models\phi$ is because SA tries to analyze all behavior $P$. The actual reason depends on the type of SA. For MFP SA like DF, it is the merging points of CFG. For MOP SA like SA, it is the running out of resources. Partitioning $P$'s space/CFG and executing controlled/conditional/partial SA on that part of space/CFG may allow for better SA performance which is measured as partial output (assuming RQ1 holds).
+
+The directive of what part of $P$ should be analyzed can be expressed as a precondition. For DF this precondition traditionally expressed as a predicted on the $P$'s arguments over the analysis abstract domain. For SE the precondition can be expressed in a form of linear integer arithmetic. However, in DF case its abstract domain is not expressive enough to describe a path in the CFG, thus still leaving the imprecisions. For SE the expressiveness in not an issue but the mapping between the predicate and a set of paths in the CFG is not known a priori.
+
+An alternative why to describe the directive is by path-language, i.e., a path-based precondition. Both DF and SE can be directed toward the set of paths they need to analyze. To determine if either of precondition types and their combination increase the effectiveness of SA we explore the following research questions.
+
+RQ2 Does the predicate-based precondition increase the partial output of SA?
+RQ3 Does the path-based precondition increase the partial output of SA?
+RQ4 How two directives compare with each other?
+RQ5 Does the combination of predicate-based and path-based preconditions increase the partial output of SA comparing to their separate results.
+
+If before applying a predicate to SA, SA had no partial output then any partial output provided by the restricting the set of paths is a positive result. However, if SA had a partial output then the result of all conditional/partial SA should be combined so their combined precondition is true. I.e., if SA is restricted by \varphi predicate and has a partial output Out_{\varphi} then SA should also run \neg\varphi and have the partial output Out_{\not\varphi}. The combined result of partial outputs Out_{\varphi} and Out_{\not\varphi} is compared to the full version of SA.
+
+Why these partial analysis/results are important? The big picture on combining results from different analyses.
+
+-----------------------------------------------------
+Background and an alternative direction for introduction.
+
+Scalability and precision are the two properties of static analysis (SA). SA has good scalability if it can analyze an large program without running out of resources. The number of false positives produces by SA characterizes its precision, i.e., the less false positives the better precision. Obviously, an ideal SA should be both scalable and precise. Unfortunately scalability and precision work opposite of each other. When SA has a good precision generally it is not scalable and conversely when SA is scalable its precision suffers. 
+
+In the literature there are two approaches that address the issue of scalability and precision in SA. One approach discussed in [1,2] aims on making a precise analyses more scalable by partitioning a large program into modules as procedures or classes. SA analyzes each partition independently and after that combines the results of the partition analyses together. In [1,2] this method is referred  to as partial static analyses.
+
+The goal of another approach is to preserve the scalability of SA but allow it only explore those program states for which SA is adequately precise. This approach is presented in [3,4,5] and is identified as a conditional static analysis because the allowable program states are described by a condition. In this framework a conditional analysis verifies a program under some condition and the complement of that condition is left for another analysis to prove. It either can be that the states satisfying the completion condition are infeasible or they do not violate the property. Our work focuses on the aspects of this approach.
+
+Background.
+[3] looks at conditional model checking. In this work one model checker performs program verification assuming some conditions for which it is able to verify a program. These assumptions then are passed to another instance of a model checker which verifies that these conditions do hold, i.e., the state that don't satisfy this condition are infeasible. Thus, the combined result of the tow model checkers provides unconditional soundness.
+In [4] points-to analyses perform its calculation on C programs assuming that there is no out of bound accesses to data structures. Next memory-safety analyses using the information from points-to analyses verifies that these assumptions always holds. 
+In [5] an analysis can determine that accesses to two variables will never create a race assuming the locks guarding these memory accesses must not alias. In principle another analyses can prove alias condition for these two locks, but the authors implemented it into one single analyses.
+
+In the case of the background work the analyses work on different theories. One merely assumes that a condition holds in other theory and uses that assumption to perform its calculations. [4] and [5] make discussion that combining two different analyses in one framework is possible as described in C&C paper but it might not be scalable and/or extensible.
+
+In our work we consider conditional data-flow static analyses (DF). Unlike the previous work DF does not know what assumption it should use to verify the program. More likely the calculation of those assumption is as complex as the problem itself. DF have tow way of creating its conditions. One is predicate-based when the input value are restricted to a predicate over DF abstract domain. Another, novel, is path-based when DF only analyzes a subset of path in CFG.
+
+In the previous work not-\theta condition is proved by another analysis to be infeasible, i.e., some property would hold there vacuously. In DF different or the same analysis can be used to show not-\theta condition holds. It can be either not-\theta is infeasible or it might be feasible but no violations occur there.
+
+Even so there is not guarantee that conditional DF are able to verify the whole subset of paths, i.e. the conditional soundness, but they might tell something about a subs
+t of the analyzed subset of paths, mainly by showing the some set of paths is infeasible. This information can be used later in providing un-conditional soundness of a set of analyses.
+
+Our research concentrates on experimentally determining what type of conditions for DF is more effective: predicate-based, path-based or their combination. Evaluation is done based on the partial information provided by an analysis since it is finer grained than holds/does not hold.
+
+RQ from the above follow
+
+Experiments: 2 programs but vary assertion placement or assertions themselves, at least 2 analyses {zero, notZero} and sings analysis.
+
+The thought behind placing assertion in different points: the predicate constraints has better chances of verifying assertion that are placed up the top. 
+
+These two approaches may be complementary that can be addressed as a future research goal. We mean a complementary that a static analysis can be both partial and conditional. In theory two combined SA give better results then the same SA running one after another. But we are not exactly sure what is lost on combining information from different program partitions.
+
+
