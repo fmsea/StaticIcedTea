@@ -16,12 +16,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Z3Exception;
 
+import conditional.driver.StartAnalysis;
 import soot.ByteType;
 import soot.IntType;
 import soot.Local;
 import soot.ShortType;
+import soot.Body;
 import soot.BooleanType;
 import soot.Type;
 import soot.Unit;
@@ -70,14 +73,18 @@ import disjoint.solver.SolverWrapperZ3;
 import disjoint.state.*;
 
 public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
-
+	protected long start;
+	protected long end;
+	protected Body b;
 	//only write to the file states of those statements
-	Set<Unit> outputStmt;
+	protected Set<Unit> outputStmt;
 	
 	List<Domain> domains;
 	List<State> states;
 
 	int disjointDomainIndex;
+	
+	public static boolean writeToFile = false;
 	
 	//public static boolean debug = false;
 
@@ -95,7 +102,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 	 */
 	Map<Domain,Integer> unstructuredDomainToIndex;
 	Map<Integer, Domain> indexToUnstructuredDomain;
-	SolverWrapperZ3 solver;
+	protected SolverWrapperZ3 solver;
 
 
 	//boolean disjoint = true;
@@ -103,7 +110,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 	//use that to output values
 	//only of those variables
 	//that have been changed after the state
-	Map<Unit,Set<Value>> changedVariables;
+	protected Map<Unit,Set<Value>> changedVariables;
 
 	public boolean addIntervalDomain(Domain d){
 		//TO-DO: might need to do some checks?
@@ -129,7 +136,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 	public ValueAnalysis(UnitGraph graph, List<Domain> setDomains, boolean symbolicOn) {
 		super(graph);
 		domains = setDomains;
-
+		b = graph.getBody();
 		try {
 			solver = new SolverWrapperZ3();
 		} catch (Z3Exception e) {
@@ -244,102 +251,122 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 		AbstractState.setLocals(locals);
 		outputStmt = new HashSet<Unit>();
 		changedVariables = new HashMap<Unit, Set<Value>>();
-		long start = System.currentTimeMillis();
-		doAnalysis(); //call it explicitly after setting up the domains
-		long end = System.currentTimeMillis();
-		System.out.println("Done in \n" + (end - start));
-		String timeData = graph.getBody().getMethod().getDeclaringClass() + "\t" +graph.getBody().getMethod().getSignature()+
-				"\t" + StartAnalysisKestrel.analysisType + "\t"+ (end - start)+"\n";
-		try {
-			//StartAnalysisKestrel.timeDataFile.append(timeData);
-			RandomAccessFile rf = new RandomAccessFile(StartAnalysisKestrel.timeDataFile, "rwd");
-			FileChannel fileChannel = rf.getChannel();
-			FileLock lock = fileChannel.lock();
-			fileChannel.position(fileChannel.size());
-			fileChannel.write(Charset.defaultCharset().encode(CharBuffer.wrap(timeData)));
-			fileChannel.force(false);
-			lock.release();
-			fileChannel.close();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		System.out.println("done setting");
+//		long start = System.currentTimeMillis();
+//		doAnalysis(); //call it explicitly after setting up the domains
+//		long end = System.currentTimeMillis();
+//		System.out.println("Done in \n" + (end - start));
+//		String timeData = graph.getBody().getMethod().getDeclaringClass() + "\t" +graph.getBody().getMethod().getSignature()+
+//				"\t" + StartAnalysisKestrel.analysisType + "\t"+ (end - start)+"\n";
+//		if(writeToFile){
+//		try {
+//			//StartAnalysisKestrel.timeDataFile.append(timeData);
+//			RandomAccessFile rf = new RandomAccessFile(StartAnalysisKestrel.timeDataFile, "rwd");
+//			FileChannel fileChannel = rf.getChannel();
+//			FileLock lock = fileChannel.lock();
+//			fileChannel.position(fileChannel.size());
+//			fileChannel.write(Charset.defaultCharset().encode(CharBuffer.wrap(timeData)));
+//			fileChannel.force(false);
+//			lock.release();
+//			fileChannel.close();
+//		} catch (IOException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+//		}
+//		if(StartAnalysisKestrel.print){
+//		Iterator<Unit> iter = graph.getBody().getUnits().iterator();
+//		int stmtCount = 0;
+//		//File to write the output to
+//		while(iter.hasNext()){
+//			Unit u = iter.next();
+//			//check against statetment after
+//			//which state has been changed
+//			stmtCount++;
+//			if(outputStmt.contains(u)){
+//				//String that keeps that state info for the current state
+//				String output = stmtCount + " " + u +":" + graph.getBody().getMethod().getSignature() + "\n";
+//				//System.out.println(output);
+//				AbstractState fall = getFallFlowAfter(u);
+//				if(!fall.getStates().isEmpty() && fall.isFeasible()){
+//					for(Local l : locals){
+//						if(changedVariables.get(u).contains(l)){
+//							//System.out.println(" l " + l + " u " + u + " \n" + fall);
+//							//System.out.flush();
+//							Set<BinopExpr> varPerState = evaluateStates(fall, l);
+//							Expr state = null;
+//							for(Expr be : varPerState){
+//								if(state == null){
+//									state = be;
+//								} else {
+//									state = new GAndExpr(state, be);
+//								}
+//							}
+//							output += l + "->" + solver.generate((BinopExpr)state) + "\n";
+//							//System.out.println(l + "->" + solver.generate((BinopExpr)state));
+//						}
+//					}
+//				}
+//				//for other branch if exists
+//				List<AbstractState> branches = getBranchFlowAfter(u);
+//				if(!branches.isEmpty()){
+//					for(AbstractState branch : branches){
+//						if(!branch.getStates().isEmpty() && branch.isFeasible()){
+//							for(Local l : locals){
+//								if(changedVariables.get(u).contains(l)){
+//									//System.out.println(" lf " + l + " u " + u + " \n" + fall);
+//									Set<BinopExpr> varPerState = evaluateStates(branch, l);
+//									Expr state = null;
+//									for(Expr be : varPerState){
+//										if(state == null){
+//											state = be;
+//										} else {
+//											state = new GAndExpr(state, be);
+//										}
+//									}
+//									output += l+"f" + "->" + solver.generate((BinopExpr)state) + "\n";
+//									//System.out.println(l+"f" + "->" + solver.generate((BinopExpr)state));
+//								}
+//							}
+//						}
+//
+//					}
+//				}
+//				if(writeToFile){
+//				//write the string to the file
+//				try {
+//					StartAnalysisKestrel.fileToWrite.write(output);
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				} else {
+//					System.out.println(output);
+//				}
+//			}//end outputStmt check
+//		}
+//		}
+	}
+	
+	protected BoolExpr generateExpr(AbstractState aState, Value l){
+		Set<BinopExpr> varPerState = evaluateStates(aState, l);
+		Expr state = null;
+		for(Expr be : varPerState){
+			if(state == null){
+				state = be;
+			} else {
+				state = new GAndExpr(state, be);
+			}
 		}
-		if(StartAnalysisKestrel.print){
-		Iterator<Unit> iter = graph.getBody().getUnits().iterator();
-		int stmtCount = 0;
-		//File to write the output to
-		while(iter.hasNext()){
-			Unit u = iter.next();
-			//check against statetment after
-			//which state has been changed
-			stmtCount++;
-			if(outputStmt.contains(u)){
-				//String that keeps that state info for the current state
-				String output = stmtCount + " " + u +":" + graph.getBody().getMethod().getSignature() + "\n";
-				//System.out.println(output);
-				AbstractState fall = getFallFlowAfter(u);
-				if(!fall.getStates().isEmpty() && fall.isFeasible()){
-					for(Local l : locals){
-						if(changedVariables.get(u).contains(l)){
-							//System.out.println(" l " + l + " u " + u + " \n" + fall);
-							//System.out.flush();
-							Set<BinopExpr> varPerState = evaluateStates(fall, l);
-							Expr state = null;
-							for(Expr be : varPerState){
-								if(state == null){
-									state = be;
-								} else {
-									state = new GAndExpr(state, be);
-								}
-							}
-							output += l + "->" + solver.generate((BinopExpr)state) + "\n";
-							//System.out.println(l + "->" + solver.generate((BinopExpr)state));
-						}
-					}
-				}
-				//for other branch if exists
-				List<AbstractState> branches = getBranchFlowAfter(u);
-				if(!branches.isEmpty()){
-					for(AbstractState branch : branches){
-						if(!branch.getStates().isEmpty() && branch.isFeasible()){
-							for(Local l : locals){
-								if(changedVariables.get(u).contains(l)){
-									//System.out.println(" lf " + l + " u " + u + " \n" + fall);
-									Set<BinopExpr> varPerState = evaluateStates(branch, l);
-									Expr state = null;
-									for(Expr be : varPerState){
-										if(state == null){
-											state = be;
-										} else {
-											state = new GAndExpr(state, be);
-										}
-									}
-									output += l+"f" + "->" + solver.generate((BinopExpr)state) + "\n";
-									//System.out.println(l+"f" + "->" + solver.generate((BinopExpr)state));
-								}
-							}
-						}
-
-					}
-				}
-				//write the string to the file
-				try {
-					StartAnalysisKestrel.fileToWrite.write(output);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}//end outputStmt check
-		}
-		}
+		return solver.generate((BinopExpr)state);
 	}
 
 	@Override
 	protected void flowThrough(AbstractState in, Unit u, List<AbstractState> fallIn,
 			List<AbstractState> branchOut) {
 		Stmt s = (Stmt) u;
-//		System.out.println("---------------------------------------");
-//		System.out.println("In state \t" + in + " " + in.isFeasible());
+		System.out.println("---------------------------------------");
+		System.out.println("In state \t" + in + " " + in.isFeasible());
 		//System.out.println("Stmt " + s + " " + s.getClass());
 		//debug = s.toString().equals("if i2 != 16 goto $r9 = new java.lang.String");
 		AbstractState inState = in;
@@ -375,7 +402,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 	}
 
 	//coming from feasible to infeasible happens on conditional stmts only
-	private void processIfStmt(IfStmt s, AbstractState inState,
+	protected void processIfStmt(IfStmt s, AbstractState inState,
 			AbstractState ifStmtFalse, AbstractState ifStmtTrue) {
 		ConditionExpr condExpr = (ConditionExpr)s.getCondition();
 		Value lhs = condExpr.getOp1();
@@ -533,7 +560,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 		}
 	}
 
-	private void processAssignStmt(AssignStmt s, AbstractState inState,
+	protected void processAssignStmt(AssignStmt s, AbstractState inState,
 			AbstractState outState) {
 		Value lhs = s.getLeftOp();
 		//only process if lhs of the desired type, otherwise states
@@ -844,7 +871,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 		return ret;
 	}
 
-	private Set<BinopExpr> evaluateStates(AbstractState inState, Value v){
+	protected Set<BinopExpr> evaluateStates(AbstractState inState, Value v){
 		Set<BinopExpr> ret = new HashSet<BinopExpr>();
 		//should be extracted into a sper
 		List<State> states = inState.getStates();
@@ -954,6 +981,109 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 		Type t = val.getType();
 		return !(val instanceof ArrayRef) && !(val instanceof InstanceFieldRef)&&(t instanceof IntType || t instanceof ByteType || t instanceof ShortType
 				|| t instanceof BooleanType);
+	}
+
+	public void start() {
+		start = System.currentTimeMillis();
+		doAnalysis(); //call it explicitly after setting up the domains
+		end = System.currentTimeMillis();
+		
+	}
+
+	public void report() {
+		System.out.println("Done in " + (end - start));
+		String timeData = b.getMethod().getDeclaringClass() + "\t" +b.getMethod().getSignature()+
+				"\t" + StartAnalysisKestrel.analysisType + "\t"+ (end - start)+"\n";
+		
+		if(writeToFile){
+		try {
+			//StartAnalysisKestrel.timeDataFile.append(timeData);
+			RandomAccessFile rf = new RandomAccessFile(StartAnalysisKestrel.timeDataFile, "rwd");
+			FileChannel fileChannel = rf.getChannel();
+			FileLock lock = fileChannel.lock();
+			fileChannel.position(fileChannel.size());
+			fileChannel.write(Charset.defaultCharset().encode(CharBuffer.wrap(timeData)));
+			fileChannel.force(false);
+			lock.release();
+			fileChannel.close();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		}
+		if(StartAnalysis.print){
+		Iterator<Unit> iter = b.getUnits().iterator();
+		int stmtCount = 0;
+		//File to write the output to
+		while(iter.hasNext()){
+			Unit u = iter.next();
+			//check against statetment after
+			//which state has been changed
+			stmtCount++;
+			if(outputStmt.contains(u)){
+				//String that keeps that state info for the current state
+				String output = stmtCount + " " + u +":" + b.getMethod().getSignature() + "\n";
+				//System.out.println(output);
+				AbstractState fall = getFallFlowAfter(u);
+				if(!fall.getStates().isEmpty() && fall.isFeasible()){
+					for(Local l : b.getLocals()){
+						if(changedVariables.get(u).contains(l)){
+							//System.out.println(" l " + l + " u " + u + " \n" + fall);
+							//System.out.flush();
+							Set<BinopExpr> varPerState = evaluateStates(fall, l);
+							Expr state = null;
+							for(Expr be : varPerState){
+								if(state == null){
+									state = be;
+								} else {
+									state = new GAndExpr(state, be);
+								}
+							}
+							output += l + "->" + solver.generate((BinopExpr)state) + "\n";
+							//System.out.println(l + "->" + solver.generate((BinopExpr)state));
+						}
+					}
+				}
+				//for other branch if exists
+				List<AbstractState> branches = getBranchFlowAfter(u);
+				if(!branches.isEmpty()){
+					for(AbstractState branch : branches){
+						if(!branch.getStates().isEmpty() && branch.isFeasible()){
+							for(Local l : b.getLocals()){
+								if(changedVariables.get(u).contains(l)){
+									//System.out.println(" lf " + l + " u " + u + " \n" + fall);
+									Set<BinopExpr> varPerState = evaluateStates(branch, l);
+									Expr state = null;
+									for(Expr be : varPerState){
+										if(state == null){
+											state = be;
+										} else {
+											state = new GAndExpr(state, be);
+										}
+									}
+									output += l+"f" + "->" + solver.generate((BinopExpr)state) + "\n";
+									//System.out.println(l+"f" + "->" + solver.generate((BinopExpr)state));
+								}
+							}
+						}
+
+					}
+				}
+				if(writeToFile){
+				//write the string to the file
+				try {
+					StartAnalysisKestrel.fileToWrite.write(output);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				} else {
+					System.out.println(output);
+				}
+			}//end outputStmt check
+		
+	}
+		}
 	}
 
 }

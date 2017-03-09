@@ -46,6 +46,11 @@ public class ValueTransfomer extends BodyTransformer {
 			System.out.println("analyzing " + b.getMethod().getSignature());
 			System.gc();
 			ValueAnalysis va = new ValueAnalysis(new ExceptionalUnitGraph(b), domains, symbolicOn);
+			System.out.println("done init " + b.getMethod().getSignature());
+			va.start();
+			System.out.println("done fixed-point " + b.getMethod().getSignature());
+			va.report();
+			System.out.println("done reporting " + b.getMethod().getSignature());
 		}
 
 	}

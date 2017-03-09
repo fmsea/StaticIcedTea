@@ -25,7 +25,7 @@ public class StartAnalysis {
 //				"test.StructurePanel", "test.TileRenderor", "test.WorldController", "test.Class11", "test.Class13",
 //		};
 		String[] classNames = {"test.OneTcas"};
-		String[] domainNames = {"dom9.txt"};
+		String[] domainNames = {"dom2.txt"};
 		//String[] domainNames = {"dom3.txt", "dom2.txt"};
 		String[] symbolic = {"sN"};
 		//String symbolicOn = "sY";
@@ -88,7 +88,7 @@ public class StartAnalysis {
 		
 		String[] sootArgs = {"-f", "n", className};
 		PackManager.v().getPack("jtp").
-			add(new Transform("jtp.disjoint", new ValueTransfomer(domain, symbolicOn)));
+			add(new Transform("jtp.disjoint", new ValueTransfomer(domain, 2, symbolicOn)));
 		//adding runtime to the path
 		System.out.println(Scene.v().getSootClassPath() +  " " + System.getProperty("java.class.path"));
 		Scene.v().setSootClassPath(Scene.v().getSootClassPath()+":"+System.getProperty("java.class.path") 
