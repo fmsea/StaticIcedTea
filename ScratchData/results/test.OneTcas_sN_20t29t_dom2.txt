@@ -117,8 +117,8 @@ i37f->(or (= i37 (- 1)) (= i37 1) (= i37 0) (> i37 1) (< i37 (- 1)))
 z16->(= z16 1)
 71 z16 = 0:<test.OneTcas: int main2(int,int,int,int,int,int,int,int,int,int,int,int)>
 z16->(= z16 0)
-*f
 72 if z16 == 0 goto (branch):<test.OneTcas: int main2(int,int,int,int,int,int,int,int,int,int,int,int)>
+*72t
 z16->(= z16 1)
 73 if z5 == 0 goto $z17 = 1:<test.OneTcas: int main2(int,int,int,int,int,int,int,int,int,int,int,int)>
 z5->(= z5 1)
@@ -154,8 +154,8 @@ i38f->(or (= i38 (- 1)) (= i38 1) (= i38 0) (> i38 1) (< i38 (- 1)))
 z20->(= z20 1)
 96 z20 = 0:<test.OneTcas: int main2(int,int,int,int,int,int,int,int,int,int,int,int)>
 z20->(= z20 0)
-*f
 97 if z20 == 0 goto (branch):<test.OneTcas: int main2(int,int,int,int,int,int,int,int,int,int,int,int)>
+*97t
 z20->(= z20 1)
 98 if z5 == 0 goto $z21 = 0:<test.OneTcas: int main2(int,int,int,int,int,int,int,int,int,int,int,int)>
 z5->(= z5 1)

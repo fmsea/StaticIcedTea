@@ -125,14 +125,15 @@ public class PartialAnalysis extends ValueAnalysis {
 		if(outputStmt.contains(u)){
 			String output = "";
 			//String that keeps that state info for the current state
-			if(exclude.containsKey(u)){
-				if(exclude.get(u).equals("f")){
-					output +="*"+stmtCount+ "t\n";
-				} else {
-					output +="*"+stmtCount+"f\n";
-				}
-			}
+
 			output += stmtCount + " " + u +":" + b.getMethod().getSignature() + "\n";
+			if(exclude.containsKey(u)){
+			if(exclude.get(u)){
+				output +="*"+stmtCount+ "t\n";
+			} else {
+				output +="*"+stmtCount+"f\n";
+			}
+		}
 			//System.out.println(output);
 			AbstractState fall = getFallFlowAfter(u);
 			if(!fall.getStates().isEmpty() && fall.isFeasible()){

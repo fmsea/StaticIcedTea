@@ -88,7 +88,7 @@ public class StartAnalysis {
 		//1f say that the first encountered branch -- do not explore false branch,
 		//i.e., propagate bot element there
 		//1f, 3t means exclude 1f and 3t branches. We will assume a BFS ordering.
-		String conditions = "20t,29f";
+		String conditions = "20t,29t";
 		//create the file to write to
 		fileToWrite = new FileWriter(resultsPath+className+"_"+symbolicHelper+"_"+conditions.replaceAll(",", "")+"_"+domainFile);
 		boolean symbolicOn = symbolicHelper.equals("sY");
