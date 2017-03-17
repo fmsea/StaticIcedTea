@@ -26,9 +26,9 @@ public class StartAnalysis {
 //				"test.StructurePanel", "test.TileRenderor", "test.WorldController", "test.Class11", "test.Class13",
 //		};
 		String[] classNames = {"test.OneTcas"};
-		String[] domainNames = {"dom2.txt"};
+		String[] domainNames = {"dom9.txt"};
 		//String[] domainNames = {"dom3.txt", "dom2.txt"};
-		String[] symbolic = {"sN"};
+		String[] symbolic = {"sY"};
 		//String symbolicOn = "sY";
 
 		
@@ -88,7 +88,7 @@ public class StartAnalysis {
 		//1f say that the first encountered branch -- do not explore false branch,
 		//i.e., propagate bot element there
 		//1f, 3t means exclude 1f and 3t branches. We will assume a BFS ordering.
-		String conditions = "20t,29t";
+		String conditions = "20f,29t";//20t,29f
 		//create the file to write to
 		fileToWrite = new FileWriter(resultsPath+className+"_"+symbolicHelper+"_"+conditions.replaceAll(",", "")+"_"+domainFile);
 		boolean symbolicOn = symbolicHelper.equals("sY");
