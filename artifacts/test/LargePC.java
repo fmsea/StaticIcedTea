@@ -92,6 +92,23 @@ public class LargePC {
 			return z;
 		}
 		
+		public int soogood(int x, int y, int z){
+			int ret = 0;
+			if(0){
+				if(1){
+					
+				}
+				
+			} else {
+				if(2){
+					if(3){
+						
+					}
+				}
+			}
+			return ret;
+		}
+		
 
 		public static void main(String[] args) throws IOException {
 			LargePC t = new LargePC();
