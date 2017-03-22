@@ -15,6 +15,8 @@ import soot.Unit;
 import soot.jimple.IfStmt;
 import soot.jimple.internal.JReturnStmt;
 import soot.toolkits.graph.ExceptionalUnitGraph;
+import soot.toolkits.graph.MHGDominatorsFinder;
+import soot.toolkits.graph.MHGPostDominatorsFinder;
 import soot.toolkits.graph.SimpleDominatorsFinder;
 import soot.toolkits.graph.UnitGraph;
 import soot.util.cfgcmd.CFGToDotGraph;
@@ -29,7 +31,8 @@ public class PartitionTransformer extends BodyTransformer {
 		if(methodName.equals("soogood")){
 			UnitGraph gr = new ExceptionalUnitGraph(b);
 			//get a dominator tree
-			SimpleDominatorsFinder<Unit> dom = new SimpleDominatorsFinder<Unit>(gr);
+			MHGDominatorsFinder<Unit> dom = new MHGDominatorsFinder<Unit>(gr);
+			MHGPostDominatorsFinder<Unit> postdom = new MHGPostDominatorsFinder<Unit>(gr);
 			
 			//now we need to find all conditional statements
 			//and decide which true/false branch has
@@ -44,31 +47,46 @@ public class PartitionTransformer extends BodyTransformer {
 				//check if u is a conditional statement
 				if(u instanceof IfStmt){
 					List<Unit> succ = gr.getSuccsOf(u);
-					//System.out.println(countOfCond + " has " + succ);
-					int[] btf = {0,0};
-					//get the number of items
-					//they dominate
-					for(int i=0; i < succ.size(); i++){
-					//for(Unit dm : succ){
-						Unit dm = succ.get(i);
-						int bsize = 0;
-					for(Unit v : b.getUnits()){
-							if(dom.isDominatedBy(v, dm)){
-								bsize++;
+					//if() s2 else s1
+					Unit s1 = succ.get(0);
+					Unit s2 = succ.get(1);
+					System.out.println(u + " s2 " + s2 + " s1 " + s1);
+					//we need to make sure that s1 is not
+					//a post dominator of s2 and vice versa
+					//that would ensure "if" with "else" part
+					//that is the place where we want to slip
+					//for now we will leave cond splitting inside 
+					//the loop to see if it causes any imprecisions.
+					if(!postdom.isDominatedBy(s2, s1) && !postdom.isDominatedBy(s1, s2)){
+						System.out.println("in "+countOfCond + " " + u);
+						//System.out.println(countOfCond + " has " + succ);
+						int[] btf = {0,0};
+						//get the number of items
+						//they dominate
+						for(int i=0; i < succ.size(); i++){
+							//for(Unit dm : succ){
+							Unit dm = succ.get(i);
+							int bsize = 0;
+							for(Unit v : b.getUnits()){
+								if(dom.isDominatedBy(v, dm)){
+									bsize++;
+								}
 							}
+							btf[i] = (int) Math.ceil(bsize/total*100);
+							//System.out.println(dm + " -> " + bsize + " " + " " + btf[i]);
+						}// end iteration for each successor
+						//compare by how much they are different
+						int diff = Math.abs(btf[0] - btf[1]);
+						int max = Math.max(btf[0], btf[1]);
+						//System.out.println("diff " + diff + " max " + max);
+						if(diff < 50 && max >1){
+							System.out.println(countOfCond+"t" + countOfCond + "f");
+							//we need to add this cond to the map
+							condToSplit.add((IfStmt)u);
+							ifToInt.put((IfStmt)u, countOfCond);
 						}
-					btf[i] = (int) Math.ceil(bsize/total*100);
-					System.out.println(dm + " -> " + bsize + " " + " " + btf[i]);
-					}// end iteration for each successor
-					//compare by how much they are different
-					int diff = Math.abs(btf[0] - btf[1]);
-					int max = Math.max(btf[0], btf[1]);
-					System.out.println("diff " + diff + " max " + max);
-					if(diff < 50 && max >1){
-						System.out.println(countOfCond+"t" + countOfCond + "f");
-						//we need to add this cond to the map
-						condToSplit.add((IfStmt)u);
-						ifToInt.put((IfStmt)u, countOfCond);
+					} else {
+						System.out.println("not "+countOfCond + " " + u);
 					}
 					countOfCond++;
 				}
@@ -85,30 +103,33 @@ public class PartitionTransformer extends BodyTransformer {
 //			}
 //			
 //			buildPath(condToSplit, dom, 1, ret, gr);
-			AbstractedCFG aCFG = new AbstractedCFG();
-			//get the first condstimt
-			IfStmt first = condToSplit.get(0);
-			Node str = aCFG.addStart(ifToInt.get(first).toString());
-			List<Unit> firstSucc = gr.getSuccsOf(first);
-			boolean branch = true;
-			for(Unit u : firstSucc){
-				buildACFG(aCFG, gr, ifToInt, condToSplit, u, str, branch);
-				branch = !branch;
-			}
-			System.out.println(aCFG.toString());
-			//print out the paths
-			//System.out.println(aCFG.getPaths());
-			List<String> l = new ArrayList<String>();
-			l.addAll(aCFG.getPaths());
-			Collections.sort(l);
-			for(String s : l){
-				System.out.println(s);
+			if(!condToSplit.isEmpty()){
+				AbstractedCFG aCFG = new AbstractedCFG();
+				//get the first condstimt
+				IfStmt first = condToSplit.get(0);
+				Node str = aCFG.addStart(ifToInt.get(first).toString());
+				List<Unit> firstSucc = gr.getSuccsOf(first);
+				List<IfStmt> seen = new ArrayList<IfStmt>();//for loops
+				boolean branch = true;
+				for(Unit u : firstSucc){
+					buildACFG(aCFG, gr, ifToInt, condToSplit, u, str, branch, seen);
+					branch = !branch;
+				}
+				System.out.println(aCFG.toString());
+				//print out the paths
+				//System.out.println(aCFG.getPaths());
+				List<String> l = new ArrayList<String>();
+				l.addAll(aCFG.getPaths());
+				Collections.sort(l);
+				for(String s : l){
+					System.out.println(s);
+				}
 			}
 	}//end if correct method name
 	}
 	
 	private void buildACFG(AbstractedCFG aCFG, UnitGraph gr, Map<IfStmt, Integer> ifToInt, List<IfStmt> condList, 
-			Unit current, Node from, boolean on){
+			Unit current, Node from, boolean on, List<IfStmt> seen){
 		//end on the return statement
 		if(current instanceof JReturnStmt){
 			//it should be the end node
@@ -120,6 +141,8 @@ public class PartitionTransformer extends BodyTransformer {
 				end = aCFG.addEnd("end");
 			}
 			aCFG.add(from, end, on);
+		} else if (seen.contains(current)){
+			return; //do nothing
 		} else {
 			//continue the recursion
 			if(condList.contains(current)){
@@ -133,16 +156,20 @@ public class PartitionTransformer extends BodyTransformer {
 					to = aCFG.addNode(id);
 					boolean branch = true;
 					for(Unit u : gr.getSuccsOf(current)){
-						buildACFG(aCFG, gr, ifToInt, condList, u, to, branch);
+						buildACFG(aCFG, gr, ifToInt, condList, u, to, branch,  seen);
 						branch = !branch;
 					}
 				} 
 				//create a transition
 				aCFG.add(from, to, on);
 			} else {
-				//do the same without creating a node and a transiton
+				if(current instanceof IfStmt){ // for loops
+					seen.add((IfStmt)current);
+				}
+				//do the same without creating a node and a transition
 				for(Unit u : gr.getSuccsOf(current)){
-					buildACFG(aCFG, gr, ifToInt, condList, u, from, on);
+					
+					buildACFG(aCFG, gr, ifToInt, condList, u, from, on, seen);
 				}
 			}
 		}

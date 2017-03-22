@@ -105,14 +105,16 @@ public class LargePC {
 					z++;
 				}
 				ret = ret + z;
-			} else {
+			} 
+			else {
 				if(x < z){//3
 					ret --;
-					if(y > ret){//4
+					while(y > ret){//4
 						ret = x - 8*z +y;
-					} else {
-						ret = x + 8*z -y;
-					}
+					} 
+//					else {
+//						ret = x + 8*z -y;
+//					}
 				} else {
 					x = x -1;
 					y = y -1;
@@ -129,7 +131,13 @@ public class LargePC {
 			return ret;
 		}
 		
-
+public int loopy(int x, int y){
+	while(x > y){
+		y = y*2;
+		x--;
+	}
+	return x;
+}
 		public static void main(String[] args) throws IOException {
 			LargePC t = new LargePC();
 			//char[] cs = Files.getFileContents(args[0]).toCharArray();
