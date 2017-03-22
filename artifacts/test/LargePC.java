@@ -94,17 +94,37 @@ public class LargePC {
 		
 		public int soogood(int x, int y, int z){
 			int ret = 0;
-			if(0){
-				if(1){
-					
+			if(x > y){ //1
+				ret++;
+				x = x/2;
+				if(ret !=z ){//2
+					z = y*x;
+					z--;
+				} else {
+					z = y/x;
+					z++;
 				}
-				
+				ret = ret + z;
 			} else {
-				if(2){
-					if(3){
-						
+				if(x < z){//3
+					ret --;
+					if(y > ret){//4
+						ret = x - 8*z +y;
+					} else {
+						ret = x + 8*z -y;
 					}
+				} else {
+					x = x -1;
+					y = y -1;
+					z = 2*x - 3*y;
+					ret = z - 2;
 				}
+			}
+			
+			if(ret == 0){
+				ret = 1;
+			} else {
+				ret = -ret;
 			}
 			return ret;
 		}

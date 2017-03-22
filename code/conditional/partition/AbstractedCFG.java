@@ -76,4 +76,26 @@ public class AbstractedCFG {
 		}
 		return ret;
 	}
+	
+	public Set<String> getPaths(){
+		Set<String> ret = buildPath(start, "");
+		//start from the start state
+		
+		return ret;
+	}
+	
+	private Set<String> buildPath(Node n, String prefix){
+		Set<String> ret = new HashSet<String>();
+		if(endNodes.contains(n)){
+			ret.add(prefix.substring(0, prefix.length()-1));
+		} else {
+			//regular node
+			String truePrefix = prefix+n.getName()+"t,";
+			ret.addAll(buildPath(n.getTrue(), truePrefix));
+			String falsePrefix = prefix+n.getName()+"f,";
+			ret.addAll(buildPath(n.getFalse(), falsePrefix));
+		}
+		
+		return ret;
+	}
 }

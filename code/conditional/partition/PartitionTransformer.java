@@ -1,6 +1,7 @@
 package conditional.partition;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -25,7 +26,7 @@ public class PartitionTransformer extends BodyTransformer {
 	protected void internalTransform(Body b, String arg1, Map<String, String> arg2) {
 		String methodName = b.getMethod().getName();
 
-		if(methodName.equals("main2")){
+		if(methodName.equals("soogood")){
 			UnitGraph gr = new ExceptionalUnitGraph(b);
 			//get a dominator tree
 			SimpleDominatorsFinder<Unit> dom = new SimpleDominatorsFinder<Unit>(gr);
@@ -57,12 +58,13 @@ public class PartitionTransformer extends BodyTransformer {
 							}
 						}
 					btf[i] = (int) Math.ceil(bsize/total*100);
-					//System.out.println(dm + " -> " + bsize + " ");
+					System.out.println(dm + " -> " + bsize + " " + " " + btf[i]);
 					}// end iteration for each successor
 					//compare by how much they are different
 					int diff = Math.abs(btf[0] - btf[1]);
 					int max = Math.max(btf[0], btf[1]);
-					if(diff < 2 && max >5){
+					System.out.println("diff " + diff + " max " + max);
+					if(diff < 50 && max >1){
 						System.out.println(countOfCond+"t" + countOfCond + "f");
 						//we need to add this cond to the map
 						condToSplit.add((IfStmt)u);
@@ -94,6 +96,14 @@ public class PartitionTransformer extends BodyTransformer {
 				branch = !branch;
 			}
 			System.out.println(aCFG.toString());
+			//print out the paths
+			//System.out.println(aCFG.getPaths());
+			List<String> l = new ArrayList<String>();
+			l.addAll(aCFG.getPaths());
+			Collections.sort(l);
+			for(String s : l){
+				System.out.println(s);
+			}
 	}//end if correct method name
 	}
 	

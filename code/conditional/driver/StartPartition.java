@@ -16,7 +16,7 @@ import soot.util.dot.DotGraph;
 public class StartPartition {
 	
 	static public void main(String[] args){
-		String className = "test.OneTcas";
+		String className = "test.LargePC";
 		String[] sootArgs = {"-f", "n", className};
 		Scene.v().setSootClassPath(Scene.v().getSootClassPath()+":"+System.getProperty("java.class.path") 
 		+ ":" + System.getProperty("sun.boot.class.path"));
