@@ -127,6 +127,18 @@ public class LargePC {
 			return ret;
 		}
 		
+		public int spoonless(int x, int y){
+			int ret = 0;
+			if(ret > x){
+				ret = x - y;
+				return ret;
+			} else if( x > y){
+				ret = 25 -y;
+				return ret;
+			}
+			return ret;
+		}
+		
 		public int soogood(int x, int y, int z){
 			int ret = 0;
 			if(x > y){ //1

@@ -16,8 +16,8 @@ import soot.util.dot.DotGraph;
 public class StartPartition {
 	
 	static public void main(String[] args){
-		String className = "test.LargePC";
-		String[] sootArgs = {"-f", "n", className};
+		String className = "test.QRCodeDataBlockReader";
+		String[] sootArgs = {"-f", "J", className};
 		Scene.v().setSootClassPath(Scene.v().getSootClassPath()+":"+System.getProperty("java.class.path") 
 		+ ":" + System.getProperty("sun.boot.class.path"));
 		PackManager.v().getPack("jtp").

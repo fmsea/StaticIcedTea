@@ -39,7 +39,7 @@ public class QRCodeDataBlockReader {
 		int bits = 0;
 		if (numBits < bitPointer + 1) { // next word fits into current data block
 			int mask = 0;
-			for (int i = 0; i < numBits; i++) {
+			for (int i = 0; i < numBits; i++) { 
 				mask += 1 << i;
 			}
 			mask <<= (bitPointer - numBits + 1);

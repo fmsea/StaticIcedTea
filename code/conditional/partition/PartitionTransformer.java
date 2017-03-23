@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import soot.Body;
@@ -31,7 +32,7 @@ public class PartitionTransformer extends BodyTransformer {
 	protected void internalTransform(Body b, String arg1, Map<String, String> arg2) {
 		String methodName = b.getMethod().getName();
 
-		if(methodName.equals("spoonfull")){
+		if(methodName.equals("getNextBits")){
 			UnitGraph gr = new ExceptionalUnitGraph(b);
 			//get a dominator tree
 			dom = new MHGDominatorsFinder<Unit>(gr);
@@ -50,6 +51,15 @@ public class PartitionTransformer extends BodyTransformer {
 				//check if u is a conditional statement
 				if(u instanceof IfStmt){
 					List<Unit> succ = gr.getSuccsOf(u);
+					//if u has only one successor then
+					//definitely add
+					if(succ.size() == 1 ){
+						//add for sure
+						System.out.println("single don't include" + u);
+//						condToSplit.add((IfStmt)u);
+//						ifToInt.put((IfStmt)u, countOfCond);
+					} else {
+						//do regular check
 					//if() s2 else s1
 					Unit s1 = succ.get(0);
 					Unit s2 = succ.get(1);
@@ -81,23 +91,29 @@ public class PartitionTransformer extends BodyTransformer {
 						//compare by how much they are different
 						int diff = Math.abs(btf[0] - btf[1]);
 						int max = Math.max(btf[0], btf[1]);
-						//System.out.println("diff " + diff + " max " + max);
-						if(diff < 50 && max >1){
+						System.out.println("diff " + diff + " max " + max);
+						if(diff < 150 && max >1){
 							System.out.println(countOfCond+"t" + countOfCond + "f");
 							//we need to add this cond to the map
 							condToSplit.add((IfStmt)u);
 							ifToInt.put((IfStmt)u, countOfCond);
 						}
+					
 					} else {
 						System.out.println("not "+countOfCond + " " + u);
+					} //end checking the loop
 					}
 					countOfCond++;
-				}
+				}//end of if cond
 			}//end for units
-		//CFGToDotGraph cfgToDot = new CFGToDotGraph(); 
-		//DotGraph dotGraph = cfgToDot.drawCFG(gr, b);
-		//dotGraph.plot("main22.dot");
+		CFGToDotGraph cfgToDot = new CFGToDotGraph(); 
+		DotGraph dotGraph = cfgToDot.drawCFG(gr, b);
+		dotGraph.plot("qrcode.dot");
 			System.out.println(condToSplit);
+			for(Entry<IfStmt, Integer> entry : ifToInt.entrySet()){
+				System.out.println(entry.getValue() + "\t" + entry.getKey());
+			}
+			System.out.println(ifToInt.values());
 //			Set<List<Unit>> ret = new HashSet<List<Unit>>();
 //			for(Unit succ: gr.getSuccsOf(condToSplit.get(0))){
 //				List<Unit> b0 = new ArrayList<Unit>();
@@ -151,6 +167,7 @@ public class PartitionTransformer extends BodyTransformer {
 				end = aCFG.addEnd("end");
 			}
 			if(from != null){
+				System.out.println("return added to " + from.getName());
 				aCFG.add(from, end, on);
 			}
 		} else if (seen.contains(current)){
@@ -183,8 +200,10 @@ public class PartitionTransformer extends BodyTransformer {
 						to = aCFG.addNode(id);
 					}
 					System.out.println("to2 " + to.getName());
-					boolean branch = true;
+					boolean branch = false; // the first is falls through and the second is branchout
+					System.out.println("succ " + gr.getSuccsOf(current).size());
 					for(Unit u : gr.getSuccsOf(current)){
+						System.out.println(branch + " " + u);
 						buildACFG(aCFG, gr, condList, u, to, branch,  seen);
 						branch = !branch;
 					}
