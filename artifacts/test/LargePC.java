@@ -92,6 +92,41 @@ public class LargePC {
 			return z;
 		}
 		
+		public int spoon(int x, int y, int z){
+			int ret = -1;
+			if(x > ret){
+				while(z < y){
+					if( z > 3){
+						ret = z*8;
+					} else {
+						ret = -z / 2;
+					}
+					z++;
+				}
+			
+			} 
+			
+			return ret;
+		}
+		
+		public int spoonfull(int x, int y, int z){
+			int ret = -1;
+			while(z > ret){
+			if(x > ret){
+				while(z < y){
+					if( z > 3){
+						ret = z*8;
+					} else {
+						ret = -z / 2;
+					}
+					z++;
+				}
+			
+			} 
+			}
+			return ret;
+		}
+		
 		public int soogood(int x, int y, int z){
 			int ret = 0;
 			if(x > y){ //1
@@ -109,9 +144,9 @@ public class LargePC {
 			else {
 				if(x < z){//3
 					ret --;
-					while(y > ret){//4
+					while(y > ret){//5
 						ret = x - 8*z +y;
-						if(z > 2){ //5
+						if(z > 2){ //4
 							z = x -2;
 							x = 0;
 						} else {
