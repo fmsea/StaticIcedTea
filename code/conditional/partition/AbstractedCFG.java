@@ -71,6 +71,7 @@ public class AbstractedCFG {
 		String ret = "\tt\tf\n";
 		for(Node n : allNodes){
 			if(!endNodes.contains(n)){
+				System.out.println("n " + n.getName() + " " + n.getTrue() + " " + n.getFalse());
 				ret +=n.getName()+"\t"+n.getTrue().getName()+"\t"+n.getFalse().getName()+"\n";
 			}
 		}

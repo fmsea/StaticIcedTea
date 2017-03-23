@@ -109,7 +109,7 @@ public class PartitionTransformer extends BodyTransformer {
 				IfStmt first = condToSplit.get(0);
 				Node str = aCFG.addStart(ifToInt.get(first).toString());
 				List<Unit> firstSucc = gr.getSuccsOf(first);
-				List<IfStmt> seen = new ArrayList<IfStmt>();//for loops
+				Set<Unit> seen = new HashSet<Unit>();//for loops
 				boolean branch = true;
 				for(Unit u : firstSucc){
 					buildACFG(aCFG, gr, ifToInt, condToSplit, u, str, branch, seen);
@@ -129,7 +129,9 @@ public class PartitionTransformer extends BodyTransformer {
 	}
 	
 	private void buildACFG(AbstractedCFG aCFG, UnitGraph gr, Map<IfStmt, Integer> ifToInt, List<IfStmt> condList, 
-			Unit current, Node from, boolean on, List<IfStmt> seen){
+			Unit current, Node from, boolean on, Set<Unit> seen){
+		System.out.println(from.getName() + " on " + on + " curr " + current);
+		System.out.println("Seen " + seen);
 		//end on the return statement
 		if(current instanceof JReturnStmt){
 			//it should be the end node
@@ -151,9 +153,11 @@ public class PartitionTransformer extends BodyTransformer {
 				Node to = null;
 				if(aCFG.contains(id)){
 					to = aCFG.findNode(id);
+					System.out.println("to " + to.getName());
 				} else {
 					//create a node for it
 					to = aCFG.addNode(id);
+					System.out.println("to " + to.getName());
 					boolean branch = true;
 					for(Unit u : gr.getSuccsOf(current)){
 						buildACFG(aCFG, gr, ifToInt, condList, u, to, branch,  seen);
@@ -161,15 +165,23 @@ public class PartitionTransformer extends BodyTransformer {
 					}
 				} 
 				//create a transition
+				
 				aCFG.add(from, to, on);
 			} else {
-				if(current instanceof IfStmt){ // for loops
-					seen.add((IfStmt)current);
-				}
+			    //instead of cond stmtm in seen we need
+				//to add the branched statments
 				//do the same without creating a node and a transition
+				///List<Unit> newseen = new <Unit>();
 				for(Unit u : gr.getSuccsOf(current)){
-					
-					buildACFG(aCFG, gr, ifToInt, condList, u, from, on, seen);
+					if(current instanceof IfStmt){
+						seen.add(u);
+						//explore its children
+						for(Unit uu : gr.getSuccsOf(u)){
+							buildACFG(aCFG, gr, ifToInt, condList, uu, from, on, seen);
+						}
+					} else {
+						buildACFG(aCFG, gr, ifToInt, condList, u, from, on, seen);
+					}
 				}
 			}
 		}

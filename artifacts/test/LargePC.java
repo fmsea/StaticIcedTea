@@ -111,6 +111,13 @@ public class LargePC {
 					ret --;
 					while(y > ret){//4
 						ret = x - 8*z +y;
+						if(z > 2){ //5
+							z = x -2;
+							x = 0;
+						} else {
+							x = -1;
+							z= z*z;
+						}
 					} 
 //					else {
 //						ret = x + 8*z -y;
@@ -123,7 +130,7 @@ public class LargePC {
 				}
 			}
 			
-			if(ret == 0){
+			if(ret == 0){//6
 				ret = 1;
 			} else {
 				ret = -ret;
