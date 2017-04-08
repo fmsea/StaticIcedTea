@@ -25,12 +25,30 @@ public class StartAnalysis {
 //				"test.InfBlocks", "test.InfCodes", "test.InfTree", "test.MapViewer", "test.QRCodeDataBlockReader", 
 //				"test.StructurePanel", "test.TileRenderor", "test.WorldController", "test.Class11", "test.Class13",
 //		};
-		String[] classNames = {"test.OneTcas"};
+		String[] classNames = {"test.BallonFactory"};
 		String[] domainNames = {"dom9.txt"};
 		//String[] domainNames = {"dom3.txt", "dom2.txt"};
-		String[] symbolic = {"sY"};
+		String[] symbolic = {"sN"};
+		String[] conditions = {
+				"1f,2f,3f",
+				"1f,2f,3t,4f,5f",
+				"1f,2f,3t,4f,5t",
+				"1f,2f,3t,4t",
+				"1f,2t,3f",
+				"1f,2t,3t,4f,5f",
+				"1f,2t,3t,4f,5t",
+				"1f,2t,3t,4t",
+				"1t,2f,3f",
+				"1t,2f,3t,4f,5f",
+				"1t,2f,3t,4f,5t",
+				"1t,2f,3t,4t",
+				"1t,2t,3f",
+				"1t,2t,3t,4f,5f",
+				"1t,2t,3t,4f,5t",
+				"1t,2t,3t,4t"};
+		//String[] conditions = {""};
 		//String symbolicOn = "sY";
-
+		String methodId = "1";
 		
 		try {
 			timeDataFile = new FileWriter(resultsPath+"timeData",true);
@@ -42,14 +60,16 @@ public class StartAnalysis {
 		for(String className : classNames){
 			for(String symbolicOn : symbolic){
 			for(String domainName : domainNames){
+				for(String condition : conditions){
 				try {
 					analysisType = domainName.split("\\.")[0] + "_"+ symbolicOn;
-					new StartAnalysis(className, domainName, symbolicOn);
+					new StartAnalysis(className, domainName, symbolicOn, condition, methodId);
 					G.reset();
 					System.gc();
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+				}
 				}
 			}
 		}
@@ -71,14 +91,14 @@ public class StartAnalysis {
 	
 	public static FileWriter fileToWrite;
 	private static String domainPath = "ScratchData/domains/";
-	private static String conditionPath = "ScratchData/conditions/";
+	//private static String conditionPath = "ScratchData/conditions/";
 	private static String resultsPath = "ScratchData/results/";
 	public static FileWriter timeDataFile;
 	public static String analysisType;
 	
 	//each instance should open/close that file
 	
-	public StartAnalysis(String className, String domainFile, String symbolicHelper) throws IOException{
+	public StartAnalysis(String className, String domainFile, String symbolicHelper, String condition, String methodId) throws IOException{
 		//instantiate the list of domains from a file
 		String domainDescription = domainPath+domainFile;
 		DomainReader dr = new DomainReader(domainDescription);
@@ -88,14 +108,15 @@ public class StartAnalysis {
 		//1f say that the first encountered branch -- do not explore false branch,
 		//i.e., propagate bot element there
 		//1f, 3t means exclude 1f and 3t branches. We will assume a BFS ordering.
-		String conditions = "20f,29t";//20t,29f
+		//String conditions = "20f,29t";//20t,29f
 		//create the file to write to
-		fileToWrite = new FileWriter(resultsPath+className+"_"+symbolicHelper+"_"+conditions.replaceAll(",", "")+"_"+domainFile);
+		String fileName = resultsPath+className+"_"+methodId +"_"+symbolicHelper+"_"+(condition.isEmpty()?"":condition.replaceAll(",", "")+"_")+domainFile;
+		fileToWrite = new FileWriter(fileName);
 		boolean symbolicOn = symbolicHelper.equals("sY");
 		
 		String[] sootArgs = {"-f", "n", className};
 		PackManager.v().getPack("jtp").
-			add(new Transform("jtp.disjoint", new PartialTransformer(domain, symbolicOn, conditions)));
+			add(new Transform("jtp.disjoint", new PartialTransformer(domain, symbolicOn, condition, methodId)));
 		//adding runtime to the path
 		System.out.println(Scene.v().getSootClassPath() +  " " + System.getProperty("java.class.path"));
 		Scene.v().setSootClassPath(Scene.v().getSootClassPath()+":"+System.getProperty("java.class.path") 

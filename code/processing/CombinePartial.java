@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Scanner;
 import java.util.Set;
+
+import javax.swing.plaf.synth.SynthSeparatorUI;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,11 +29,11 @@ public class CombinePartial {
 	static LinkedHashMap<Integer,String> lineCount = new LinkedHashMap<Integer,String>();
 	
 	public static void main(String [] strs) throws IOException{
-		String file1Name = "./ScratchData/results/test.OneTcas_sY_20t_dom9.txt";
-		String file2Name = "./ScratchData/results/test.OneTcas_sY_20f_dom9.txt";
+		String file1Name = "./ScratchData/results/test.BallonFactory_1_sN_1t_dom9.txt";
+		String file2Name = "./ScratchData/results/test.BallonFactory_1_sN_1f_dom9.txt";
 		
 		//file to write the combine output to
-		Writer fileOut = new FileWriter("./ScratchData/results/test.OneTcas_sY_C_dom9.txt");
+		Writer fileOut = new FileWriter("./ScratchData/results/test.BallonFactory_1_sN_C_dom9.txt");
 		String writeTo ="";
 		//read a line from each file
 		
@@ -289,6 +292,7 @@ public class CombinePartial {
 						//put the previous var into the map
 						stmtTo.put(var, formula);
 					}
+					//System.out.println("ln " + ln);
 					String[] data = ln.split("->");
 					var = data[0];
 					formula = data[1];

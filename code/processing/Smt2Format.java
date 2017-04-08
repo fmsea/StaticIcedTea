@@ -16,12 +16,13 @@ public class Smt2Format {
 	private static String smt2FilesPath = "./ScratchData/smt2Files/";
 
 	/**
+	 * Creates an smt2 formula to if file1Name implies file2Name
 	 * @param args
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String file1Name = "test.OneTcas_sY_C_dom9.txt";
-		String file2Name = "test.OneTcas_sY_dom9.txt";
+		String file1Name = "test.BallonFactory_1_sN_C_dom9.txt";
+		String file2Name = "test.BallonFactory_1_sN_dom9.txt";
 		
 		
 		new Smt2Format(file1Name, file2Name);		
@@ -143,7 +144,9 @@ public class Smt2Format {
 		//write the formula for the last variable in the last statement
 		//first create the constraint
 		//for the last read variable
-		constraint +=writeConstraint(stmtTo, constraint, var, formula);
+		if(stmtTo != null){
+			constraint +=writeConstraint(stmtTo, constraint, var, formula);
+		}
 		writer.write(constraint);
 		scanner.close();
 		writer.flush();
@@ -156,7 +159,14 @@ public class Smt2Format {
 		if(formula1 == null){
 			System.out.println("No formula for var " + var + " in stmt " + stmtTo);
 			//set it to unsat
-			formula1="(and (> "+var+" 0) (<" +var +" 0)";
+			//need to make var to be without f
+			String varF = var;
+			if(var.endsWith("f")){
+				//false branch need to remove f
+				varF = var.substring(0, var.length()-1);
+				//System.out.println("var "  + var);
+			}
+			formula1="(and (> "+varF+" 0) (< " +varF +" 0))";
 			//System.exit(2);
 		}
 		String forward = Smt2Format.implies(var, formula1, formula);

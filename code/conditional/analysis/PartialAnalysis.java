@@ -32,14 +32,14 @@ import disjoint.state.*;
 public class PartialAnalysis extends ValueAnalysis {
 
 	//branches to be excluded that is \pi condition
-	Map<IfStmt, Boolean> exclude;
+	Map<IfStmt, Boolean> include; //the opposite will be excluded
     UnitGraph graph;
 
 
 
-	public PartialAnalysis(UnitGraph graph, List<Domain> domain, Map<IfStmt, Boolean> exclude ) {
+	public PartialAnalysis(UnitGraph graph, List<Domain> domain, Map<IfStmt, Boolean> include ) {
 		super(graph, domain, false);
-		this.exclude = exclude;
+		this.include = include;
 		this.graph = graph;
 		System.out.println("analysis");
 		//actual fixed-point iterations
@@ -127,8 +127,8 @@ public class PartialAnalysis extends ValueAnalysis {
 			//String that keeps that state info for the current state
 
 			output += stmtCount + " " + u +":" + b.getMethod().getSignature() + "\n";
-			if(exclude.containsKey(u)){
-			if(exclude.get(u)){
+			if(include.containsKey(u)){
+			if(include.get(u)){
 				output +="*"+stmtCount+ "t\n";
 			} else {
 				output +="*"+stmtCount+"f\n";
@@ -216,13 +216,13 @@ public class PartialAnalysis extends ValueAnalysis {
 				//for now we will process it as usual:
 				processIfStmt((IfStmt)s, inState, ifStmtFalse, ifStmtTrue);
 				//then set one of the branches to be infeasible
-				if(exclude.containsKey(s)){
+				if(include.containsKey(s)){
 					System.out.println("exclude " + s);
-					if(exclude.get(s)){
-						//exclude the true branch
-						ifStmtTrue.setInfeasible();
-					} else {
+					if(include.get(s)){
+						//exclude  branch
 						ifStmtFalse.setInfeasible();
+					} else {
+						ifStmtTrue.setInfeasible();
 					}
 				}
 				//TODO: re-factor processIfStmt so it will not calculate values

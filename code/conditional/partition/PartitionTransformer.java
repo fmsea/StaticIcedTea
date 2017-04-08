@@ -27,12 +27,19 @@ public class PartitionTransformer extends BodyTransformer {
 	private Map<IfStmt, Integer> ifToInt = new HashMap<IfStmt, Integer>();
 	MHGDominatorsFinder<Unit> dom; 
 	MHGPostDominatorsFinder<Unit> postdom;
+	private int methodId = 0;
+
+	public PartitionTransformer(String methodId) {
+		this.methodId = Integer.parseInt(methodId);
+	}
 
 	@Override
 	protected void internalTransform(Body b, String arg1, Map<String, String> arg2) {
 		String methodName = b.getMethod().getName();
 
-		if(methodName.equals("getNextBits")){
+		//if(methodName.equals("getNextBits")){
+		if(b.getMethod().getDeclaringClass().getMethods().get(methodId).equals(b.getMethod())){
+			System.out.println("M " + b.getMethod().getName());
 			UnitGraph gr = new ExceptionalUnitGraph(b);
 			//get a dominator tree
 			dom = new MHGDominatorsFinder<Unit>(gr);
@@ -108,7 +115,7 @@ public class PartitionTransformer extends BodyTransformer {
 			}//end for units
 		CFGToDotGraph cfgToDot = new CFGToDotGraph(); 
 		DotGraph dotGraph = cfgToDot.drawCFG(gr, b);
-		dotGraph.plot("qrcode.dot");
+		dotGraph.plot("bf1.dot");
 			System.out.println(condToSplit);
 			for(Entry<IfStmt, Integer> entry : ifToInt.entrySet()){
 				System.out.println(entry.getValue() + "\t" + entry.getKey());
@@ -132,7 +139,7 @@ public class PartitionTransformer extends BodyTransformer {
 				//List<Unit> firstSucc = gr.getSuccsOf(first);
 				List<Unit> firstSucc = gr.getHeads();
 				Set<Unit> seen = new HashSet<Unit>();//for loops
-				boolean branch = true;
+				boolean branch = false;// start with true or with false? I think the first is falls through, so false
 				for(Unit u : firstSucc){
 					buildACFG(aCFG, gr, condToSplit, u, null, branch, seen);
 					branch = !branch;
@@ -203,7 +210,7 @@ public class PartitionTransformer extends BodyTransformer {
 					boolean branch = false; // the first is falls through and the second is branchout
 					System.out.println("succ " + gr.getSuccsOf(current).size());
 					for(Unit u : gr.getSuccsOf(current)){
-						System.out.println(branch + " " + u);
+						System.out.println("b " + branch + " " + u);
 						buildACFG(aCFG, gr, condList, u, to, branch,  seen);
 						branch = !branch;
 					}

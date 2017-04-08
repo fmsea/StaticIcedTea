@@ -16,8 +16,9 @@ import soot.util.dot.DotGraph;
 public class PartialTransformer extends BodyTransformer {
 	List<Domain> domains;
 	boolean symbolicOn;
-	Map<IfStmt, Boolean> exclude;
+	Map<IfStmt, Boolean> include;
 	String[] condition;
+	int methodId;
 	
 	
 /**
@@ -25,21 +26,26 @@ public class PartialTransformer extends BodyTransformer {
  * @param domain - abstract domain
  * @param symbolicOn - will be always yes for now
  * @param conditions - the set of branches to be excluded.
+ * @param methodId 
  */
-	public PartialTransformer(List<Domain> domains, boolean symbolicOn, String conditions) {
+	public PartialTransformer(List<Domain> domains, boolean symbolicOn, String conditions, String methodId) {
 		super();
 		this.domains = domains;
 		this.symbolicOn = symbolicOn;
 		this.condition = conditions.split(",");
-		this.exclude = new HashMap<IfStmt, Boolean>();
+		this.include = new HashMap<IfStmt, Boolean>();
+		this.methodId = Integer.parseInt(methodId);
 	}
 
 	@Override
 	protected void internalTransform(Body b, String phaseName, Map<String, String> options) {
 		//get the method body
-		String methodName = b.getMethod().getName();
+	
 		//simple filtering of a relevant method for tcas.
-		if(methodName.equals("main2")){
+		//if(methodName.equals("getNextBits")){
+		if(b.getMethod().getDeclaringClass().getMethods().get(methodId).equals(b.getMethod())){
+			String methodName = b.getMethod().getName();
+			System.out.println("M " + methodName);
 			//construct dot
 //			CFGToDotGraph cfgToDot = new CFGToDotGraph();
 //			DotGraph dotGraph = cfgToDot.drawCFG(new ExceptionalUnitGraph(b),b);
@@ -58,13 +64,13 @@ public class PartialTransformer extends BodyTransformer {
 							String id = c.split("f")[0];
 							if(id.equals(Integer.toString(countOfCond))){
 								//add to the map if ids match
-								exclude.put((IfStmt)u, false);
+								include.put((IfStmt)u, false);
 							}
 						} else if (c.endsWith("t")){
 							String id = c.split("t")[0];
 							if(id.equals(Integer.toString(countOfCond))){
 								//add to the map if ids match
-								exclude.put((IfStmt)u, true);
+								include.put((IfStmt)u, true);
 							}
 						} else {
 							if(!c.isEmpty()){
@@ -76,9 +82,9 @@ public class PartialTransformer extends BodyTransformer {
 				}
 				
 			}
-			System.out.println("Exclude map " + exclude);
+			System.out.println("Exclude map " + include);
 			//start the analysis
-			PartialAnalysis pa = new PartialAnalysis(new ExceptionalUnitGraph(b), domains, exclude);
+			PartialAnalysis pa = new PartialAnalysis(new ExceptionalUnitGraph(b), domains, include);
 			pa.start();
 			pa.report();
 		}
