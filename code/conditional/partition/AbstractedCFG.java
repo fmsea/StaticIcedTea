@@ -1,7 +1,15 @@
 package conditional.partition;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Scanner;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 /**
  * Class that contains only relevant
@@ -11,13 +19,85 @@ import java.util.Set;
  *
  */
 public class AbstractedCFG {
+	String className;
+	String methodID;
 	Node start;
-	Set<Node> endNodes;
+	Node end;
 	Set<Node> allNodes;
 	
 	public AbstractedCFG(){
-		allNodes = new HashSet<Node>();
-		endNodes = new HashSet<Node>();
+		allNodes = new LinkedHashSet<Node>();
+	}
+	
+	/**
+	 * Instantiate ACFG from a file
+	 * @param fileName
+	 */
+	public AbstractedCFG(String fileName){
+		allNodes = new LinkedHashSet<Node>();
+		File file = new File(fileName);
+		if(file.exists()){
+			try {
+				Scanner scan = new Scanner(file);
+				//add end and start
+				addStart("1");
+				addEnd("end");
+				while(scan.hasNextLine()){
+					String ln = scan.nextLine();
+
+						StringTokenizer tk = new StringTokenizer(ln);
+						//get three tokens
+						String from = tk.nextToken();
+						if(!from.equals("t")){
+						String onT = tk.nextToken();
+						String onF = tk.nextToken();
+						Node fromN = addNode(from);
+						Node fromTN = addNode(onT);
+						Node fromFN = addNode(onF);
+						add(fromN, fromTN, true);
+						add(fromN, fromFN, false);
+					}
+				}
+				scan.close();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+			System.out.println("cannot find the file " + fileName);
+		}
+	}
+	
+	/**
+	 * Write ACFG encoding to a file
+	 * @param fileName
+	 */
+	public void writeToFile(String fileName){
+		try {
+			Writer fileOut = new FileWriter("./ScratchData/conditions/"+fileName);
+			fileOut.write(toString());
+			fileOut.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Write ACFG paths to a file
+	 * @param fileName
+	 */
+	public void writePaths(String fileName){
+		try {
+			Writer fileOut = new FileWriter("./ScratchData/conditions/paths/"+fileName);
+			for(String path : getPaths()){
+				fileOut.write(path+"\n");
+			}
+			fileOut.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public Node addStart(String name){
@@ -27,20 +107,18 @@ public class AbstractedCFG {
 	}
 	
 	public Node addEnd(String name){
-		Node end = new Node(name);
-		allNodes.add(end);
-		endNodes.add(end);
+		 end = new Node(name);
+		 allNodes.add(end);
 		return end;
 	}
 	
 	public Node addNode(String name){
-		Node n = new Node(name);
-		allNodes.add(n);
+		Node n = findNode(name);
+		if(n==null){
+			n = new Node(name);
+			allNodes.add(n);
+		}
 		return n;
-	}
-	
-	public void addFalse(String from, String to){
-		
 	}
 	
 	public void add(Node from, Node to, boolean on){
@@ -70,7 +148,7 @@ public class AbstractedCFG {
 	public String toString(){
 		String ret = "\tt\tf\n";
 		for(Node n : allNodes){
-			if(!endNodes.contains(n)){
+			if(!end.equals(n)){
 				System.out.println("n " + n.getName() + " " + n.getTrue().getName() + " " + n.getFalse().getName());
 				ret +=n.getName()+"\t"+n.getTrue().getName()+"\t"+n.getFalse().getName()+"\n";
 			}
@@ -87,7 +165,7 @@ public class AbstractedCFG {
 	
 	private Set<String> buildPath(Node n, String prefix){
 		Set<String> ret = new HashSet<String>();
-		if(endNodes.contains(n)){
+		if(end.equals(n)){
 			ret.add(prefix.substring(0, prefix.length()-1));
 		} else {
 			//regular node

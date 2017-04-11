@@ -14,10 +14,9 @@ import soot.util.cfgcmd.CFGToDotGraph;
 import soot.util.dot.DotGraph;
 
 public class StartPartition {
-	
 	static public void main(String[] args){
 		String className = "test.BallonFactory";
-		String[] sootArgs = {"-f", "J", className};
+		String[] sootArgs = {"-f", "n", className};
 		String methodId = "1";
 		Scene.v().setSootClassPath(Scene.v().getSootClassPath()+":"+System.getProperty("java.class.path") 
 		+ ":" + System.getProperty("sun.boot.class.path"));

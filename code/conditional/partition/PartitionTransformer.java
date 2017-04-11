@@ -153,7 +153,11 @@ public class PartitionTransformer extends BodyTransformer {
 				for(String s : l){
 					System.out.println(s);
 				}
-			}
+				//write the graph to the file
+				String fileName = b.getMethod().getDeclaringClass().getName()+"_"+methodId+".txt";
+				aCFG.writePaths(fileName);
+				aCFG.writeToFile(fileName);
+			}//if condtoSplit != empty
 	}//end if correct method name
 	}
 	
@@ -263,17 +267,17 @@ public class PartitionTransformer extends BodyTransformer {
 		}
 	}
 	//recursively build the conditions
-	private void buildPath(List<IfStmt> condList,SimpleDominatorsFinder<Unit> dom, int index,  Set<List<Unit>> paths, UnitGraph gr){
-		if(index >= condList.size()){
-			return;
-		} else {
-			//get the next ifStmt to process
-			IfStmt ifS = condList.get(index);
-			//if iFs
-		index++;
-		buildPath(condList, dom, index, paths, gr);
-		}
-	}
+//	private void buildPath(List<IfStmt> condList,SimpleDominatorsFinder<Unit> dom, int index,  Set<List<Unit>> paths, UnitGraph gr){
+//		if(index >= condList.size()){
+//			return;
+//		} else {
+//			//get the next ifStmt to process
+//			IfStmt ifS = condList.get(index);
+//			//if iFs
+//		index++;
+//		buildPath(condList, dom, index, paths, gr);
+//		}
+//	}
 	
 
 }

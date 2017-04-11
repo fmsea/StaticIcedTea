@@ -217,16 +217,22 @@ public class PartialAnalysis extends ValueAnalysis {
 				processIfStmt((IfStmt)s, inState, ifStmtFalse, ifStmtTrue);
 				//then set one of the branches to be infeasible
 				if(include.containsKey(s)){
-					System.out.println("exclude " + s);
+//					System.out.println("-----------------------------");
+//					System.out.println("false/fall through " + ifStmtFalse.isFeasible());
+//					System.out.println("true/fall out " + ifStmtTrue.isFeasible());
+//					System.out.println("include " + s + " " + include.get(s));
 					if(include.get(s)){
-						//exclude  branch
+						//exclude branch
 						ifStmtFalse.setInfeasible();
 					} else {
 						ifStmtTrue.setInfeasible();
 					}
+//					System.out.println("false/fall through " + ifStmtFalse.isFeasible());
+//					System.out.println("true/fall out " + ifStmtTrue.isFeasible());
 				}
 				//TODO: re-factor processIfStmt so it will not calculate values
 				//for excluded branches.
+				
 			}
 		}
 		

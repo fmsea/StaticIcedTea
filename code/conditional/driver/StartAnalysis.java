@@ -1,8 +1,12 @@
 package conditional.driver;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import conditional.analysis.PartialTransformer;
 import disjoint.domain.Domain;
@@ -29,26 +33,48 @@ public class StartAnalysis {
 		String[] domainNames = {"dom9.txt"};
 		//String[] domainNames = {"dom3.txt", "dom2.txt"};
 		String[] symbolic = {"sN"};
-		String[] conditions = {
-				"1f,2f,3f",
-				"1f,2f,3t,4f,5f",
-				"1f,2f,3t,4f,5t",
-				"1f,2f,3t,4t",
-				"1f,2t,3f",
-				"1f,2t,3t,4f,5f",
-				"1f,2t,3t,4f,5t",
-				"1f,2t,3t,4t",
-				"1t,2f,3f",
-				"1t,2f,3t,4f,5f",
-				"1t,2f,3t,4f,5t",
-				"1t,2f,3t,4t",
-				"1t,2t,3f",
-				"1t,2t,3t,4f,5f",
-				"1t,2t,3t,4f,5t",
-				"1t,2t,3t,4t"};
-		//String[] conditions = {""};
+//		String[] conditions = {
+//				"1f,2f,3f",
+//				"1f,2f,3t,4f,5f",
+//				"1f,2f,3t,4f,5t",
+//				"1f,2f,3t,4t",
+//				"1f,2t,3f",
+//				"1f,2t,3t,4f,5f",
+//				"1f,2t,3t,4f,5t",
+//				"1f,2t,3t,4t",
+//				"1t,2f,3f",
+//				"1t,2f,3t,4f,5f",
+//				"1t,2f,3t,4f,5t",
+//				"1t,2f,3t,4t",
+//				"1t,2t,3f",
+//				"1t,2t,3t,4f,5f",
+//				"1t,2t,3t,4f,5t",
+//				"1t,2t,3t,4t"};
+		//String[] conditions = {"1f,2f,3t,4f,5f"};
+		List<String> conditions = new ArrayList<String>();
+		//populate the conditions
+		//read the file:
+
 		//String symbolicOn = "sY";
 		String methodId = "1";
+		File file = new File("./ScratchData/conditions/paths/"+classNames[0]+"_"+methodId+".txt");
+		if(file.exists()){
+			try {
+				Scanner scan = new Scanner(file);
+				while(scan.hasNextLine()){
+					String ln = scan.nextLine();
+					if(!ln.isEmpty()){
+						conditions.add(ln);
+					}
+				}
+				scan.close();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+	
 		
 		try {
 			timeDataFile = new FileWriter(resultsPath+"timeData",true);
@@ -63,6 +89,7 @@ public class StartAnalysis {
 				for(String condition : conditions){
 				try {
 					analysisType = domainName.split("\\.")[0] + "_"+ symbolicOn;
+					System.out.println(condition);
 					new StartAnalysis(className, domainName, symbolicOn, condition, methodId);
 					G.reset();
 					System.gc();

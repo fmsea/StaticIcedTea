@@ -10,6 +10,9 @@ import java.util.Set;
 
 import javax.swing.plaf.synth.SynthSeparatorUI;
 
+import conditional.partition.AbstractedCFG;
+import conditional.partition.Node;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,19 +29,46 @@ import java.util.Map;
  */
 public class CombinePartial {
 	
-	static LinkedHashMap<Integer,String> lineCount = new LinkedHashMap<Integer,String>();
+	//static LinkedHashMap<Integer,String> lineCount = new LinkedHashMap<Integer,String>();
 	
 	public static void main(String [] strs) throws IOException{
-		String file1Name = "./ScratchData/results/test.BallonFactory_1_sN_1t_dom9.txt";
-		String file2Name = "./ScratchData/results/test.BallonFactory_1_sN_1f_dom9.txt";
+		String className = "test.BallonFactory";
+		String methodId = "1";
+		String acfgName = "./ScratchData/conditions/"+className+"_"+methodId+".txt";
+		//instantiate ACFG from the file
+		AbstractedCFG aCFG = new AbstractedCFG(acfgName);
+		//System.out.println(aCFG.toString());
+		String ret = prefix("", aCFG.findNode("1"));
+		System.out.println(ret);
+	}
+	
+	public static String prefix(String prefix, Node n) throws IOException{
+		String ret = prefix;
+		if(!n.getName().equals("end")){
+			String prefixT = prefix(prefix+n.getName()+"t", n.getTrue());
+			String prefixF = prefix(prefix+n.getName()+"f", n.getFalse());
+			combine(prefixT,prefixF, prefix);
+			//get the corresponding files
+			System.out.println("T " + prefixT + " F " + prefixF);
+			//create a new file name with prefix name
+			System.out.println("P " + prefix);
+		}
+		
+		return ret;
+	}
+
+public static void combine(String p1, String p2, String p) throws IOException{		
+		
+		String file1Name = "./ScratchData/results/test.BallonFactory_1_sN_"+p1+"_dom9.txt";
+		String file2Name = "./ScratchData/results/test.BallonFactory_1_sN_"+p2+"_dom9.txt";
 		
 		//file to write the combine output to
-		Writer fileOut = new FileWriter("./ScratchData/results/test.BallonFactory_1_sN_C_dom9.txt");
+		Writer fileOut = new FileWriter("./ScratchData/results/test.BallonFactory_1_sN_"+p+"_dom9.txt");
 		String writeTo ="";
 		//read a line from each file
-		
-		Map<String,Map<String,String>> file1Map = createMap(file1Name);
-		Map<String,Map<String,String>> file2Map = createMap(file2Name);
+		LinkedHashMap<Integer,String> lineCount = new LinkedHashMap<Integer,String>();
+		Map<String,Map<String,String>> file1Map = createMap(file1Name, lineCount);
+		Map<String,Map<String,String>> file2Map = createMap(file2Name, lineCount);
 		//now we need to assemble them together.
 		List <Integer> orderedStmt = new ArrayList<Integer>();
 		orderedStmt.addAll(lineCount.keySet());
@@ -56,13 +86,13 @@ public class CombinePartial {
 			if(val1Map == null){
 				//go over val2Map;
 				for(String var : val2Map.keySet()){
-					System.out.println(var + "->" + val2Map.get(var));
+					//System.out.println(var + "->" + val2Map.get(var));
 					writeTo +=var + "->" + val2Map.get(var)+"\n";
 				}
 			} else if (val2Map == null){
 				//go over  val1Map;
 				for(String var : val1Map.keySet()){
-					System.out.println(var + "->" + val1Map.get(var));
+					//System.out.println(var + "->" + val1Map.get(var));
 					writeTo +=var + "->" + val1Map.get(var)+"\n";
 				}
 			} else {
@@ -76,20 +106,24 @@ public class CombinePartial {
 					//get the formulas for each
 					String formula1 = val1Map.get(var);
 					String formula2 = val2Map.get(var);
-					if(formula1 == null){
-						System.out.println(var+"->"+formula2);
+					if(formula1 == null && formula2 !=null){
+						//System.out.println(var+"->"+formula2);
 						writeTo +=var + "->" + formula2+"\n";
-					} else if(formula2 == null){
-						System.out.println(var+"->" + formula1);
+					} else if(formula2 == null && formula1 != null){
+						//System.out.println(val1Map);
+						//System.out.println(val2Map);
+						//System.out.println(var+"-->" + formula1);
 						writeTo +=var + "->" + formula1+"\n";
-					} else {
+					} else if(formula2 != null && formula1 != null){
 						if(formula1.equals(formula2)){
-							System.out.println(var+"->" + formula1);
+							//System.out.println(var+"->" + formula1);
 							writeTo +=var + "->" + formula1+"\n";
 						} else {
-							System.out.println(var+"->(or " + formula1 +" " + formula2 + ")");
+							//System.out.println(var+"->(or " + formula1 +" " + formula2 + ")");
 							writeTo +=var+"->(or " + formula1 +" " + formula2 + ")\n";
 						}
+					} else {
+						System.out.println("Nonthing for " + var);
 					}
 				}
 			}
@@ -244,6 +278,7 @@ public class CombinePartial {
 //		}
 		
 	}
+	
 
 	/**
 	 * for now we will work with strings
@@ -255,8 +290,9 @@ public class CombinePartial {
 	 * variable for a conditional stmt can be t or f
 	 * @throws FileNotFoundException 
 	 */
-	public static Map<String,Map<String,String>> createMap(String fileName) throws FileNotFoundException{
+	public static Map<String,Map<String,String>> createMap(String fileName, Map<Integer,String> lineCount) throws FileNotFoundException{
 		Map<String,Map<String,String>> ret = new HashMap<String, Map<String,String>>();
+		System.out.println(fileName);
 		File file = new File(fileName);
 		if(file.exists()){
 			//create a scanner
@@ -268,7 +304,8 @@ public class CombinePartial {
 				String ln = scan.nextLine();
 				if(ln.matches("^[0-9].*")){
 					//finish the previous var
-					if(stmtTo != null){
+					//in case both branches are infeasible
+					if(stmtTo != null && var != "" && formula!=""){
 						//if not the first iteration
 						stmtTo.put(var, formula);
 						//clear out for the next variable
@@ -308,17 +345,19 @@ public class CombinePartial {
 			
 			} //end of the scanner loop
 			//add the last var 
-			stmtTo.put(var, formula);
+			if(var != "" && formula!=""){
+				stmtTo.put(var, formula);
+			}
 			scan.close();
 		} else {
-			System.out.println("Cannot find file, exiting");
+			System.out.println("Cannot find file, exiting " + fileName);
 			System.exit(2);
 		}
 		return ret;
 	}
 }
-/*
-else if(line1.startsWith("*") || line2.startsWith("*")){
-//found where they are taking different branches
-System.out.println("conditional " + line1 + " " + line2);
-*/
+///*
+//else if(line1.startsWith("*") || line2.startsWith("*")){
+////found where they are taking different branches
+//System.out.println("conditional " + line1 + " " + line2);
+//*/

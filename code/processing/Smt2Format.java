@@ -21,7 +21,7 @@ public class Smt2Format {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String file1Name = "test.BallonFactory_1_sN_C_dom9.txt";
+		String file1Name = "test.BallonFactory_1_sN__dom9.txt";
 		String file2Name = "test.BallonFactory_1_sN_dom9.txt";
 		
 		
