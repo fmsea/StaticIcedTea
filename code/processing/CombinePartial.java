@@ -30,10 +30,12 @@ import java.util.Map;
 public class CombinePartial {
 	
 	//static LinkedHashMap<Integer,String> lineCount = new LinkedHashMap<Integer,String>();
-	
+	static String className = "test.BallonFactory";
+	static String methodId = "9";
+	static String filePrefix = "./ScratchData/results/"+className+"_"+methodId+"_sN_";
+	static String dom = "_dom9.txt";
 	public static void main(String [] strs) throws IOException{
-		String className = "test.BallonFactory";
-		String methodId = "1";
+		
 		String acfgName = "./ScratchData/conditions/"+className+"_"+methodId+".txt";
 		//instantiate ACFG from the file
 		AbstractedCFG aCFG = new AbstractedCFG(acfgName);
@@ -59,11 +61,11 @@ public class CombinePartial {
 
 public static void combine(String p1, String p2, String p) throws IOException{		
 		
-		String file1Name = "./ScratchData/results/test.BallonFactory_1_sN_"+p1+"_dom9.txt";
-		String file2Name = "./ScratchData/results/test.BallonFactory_1_sN_"+p2+"_dom9.txt";
+		String file1Name = filePrefix +p1+dom;
+		String file2Name = filePrefix+p2+dom;
 		
 		//file to write the combine output to
-		Writer fileOut = new FileWriter("./ScratchData/results/test.BallonFactory_1_sN_"+p+"_dom9.txt");
+		Writer fileOut = new FileWriter(filePrefix+p+dom);
 		String writeTo ="";
 		//read a line from each file
 		LinkedHashMap<Integer,String> lineCount = new LinkedHashMap<Integer,String>();
