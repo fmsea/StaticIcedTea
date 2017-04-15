@@ -149,7 +149,8 @@ public class AbstractedCFG {
 		String ret = "\tt\tf\n";
 		for(Node n : allNodes){
 			if(!end.equals(n)){
-				System.out.println("n " + n.getName() + " " + n.getTrue().getName() + " " + n.getFalse().getName());
+				//System.out.println(n.getName() + " " + n.getTrue() + " " + n.getFalse());
+				//System.out.println("n " + n.getName() + " " + n.getTrue().getName() + " " + n.getFalse().getName());
 				ret +=n.getName()+"\t"+n.getTrue().getName()+"\t"+n.getFalse().getName()+"\n";
 			}
 		}

@@ -7,9 +7,9 @@ import soot.Transform;
 
 public class StartPartition {
 	static public void main(String[] args){
-		String className = "test.BallonFactory";
+		String className = "test.Base64";
 		String[] sootArgs = {"-f", "n", className};
-		String methodId = "9";
+		String methodId = "20";
 		boolean skipLoops = false;
 		Scene.v().setSootClassPath(Scene.v().getSootClassPath()+":"+System.getProperty("java.class.path") 
 		+ ":" + System.getProperty("sun.boot.class.path"));

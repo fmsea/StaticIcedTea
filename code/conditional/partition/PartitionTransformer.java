@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,10 @@ import soot.BodyTransformer;
 import soot.Unit;
 import soot.jimple.IfStmt;
 import soot.jimple.internal.JReturnStmt;
+import soot.jimple.internal.JThrowStmt;
+import soot.jimple.toolkits.annotation.logic.Loop;
 import soot.toolkits.graph.ExceptionalUnitGraph;
+import soot.toolkits.graph.LoopNestTree;
 import soot.toolkits.graph.MHGDominatorsFinder;
 import soot.toolkits.graph.MHGPostDominatorsFinder;
 import soot.toolkits.graph.SimpleDominatorsFinder;
@@ -27,9 +31,10 @@ public class PartitionTransformer extends BodyTransformer {
 	private Map<IfStmt, Integer> ifToInt = new HashMap<IfStmt, Integer>();
 	MHGDominatorsFinder<Unit> dom; 
 	MHGPostDominatorsFinder<Unit> postdom;
+	Set<IfStmt> condLoops;
 	private int methodId = 0;
 	boolean skipLoops;
-	int percOfCode = 5;
+	int percOfCode = 3;
 	int branchDiff = 10;
 
 	public PartitionTransformer(String methodId, boolean loops) {
@@ -48,7 +53,21 @@ public class PartitionTransformer extends BodyTransformer {
 			//get a dominator tree
 			dom = new MHGDominatorsFinder<Unit>(gr);
 			postdom = new MHGPostDominatorsFinder<Unit>(gr);
-			
+			LoopNestTree loopTree = new LoopNestTree(b);
+			condLoops = new HashSet<IfStmt>();
+			Iterator<Loop> lIt = loopTree.iterator();
+			while(lIt.hasNext()){
+				Loop l = lIt.next();
+				System.out.println(l.getHead() + " " + l.getLoopExits());
+				Unit u = l.getHead();
+				//need to find its if stmt
+				while(!(u instanceof IfStmt)){
+					u = gr.getSuccsOf(u).get(0);
+				}
+				condLoops.add((IfStmt)u);
+			}
+			System.out.println(condLoops);
+			//System.exit(2);
 			//now we need to find all conditional statements
 			//and decide which true/false branch has
 			//the same number of dominators.
@@ -57,9 +76,8 @@ public class PartitionTransformer extends BodyTransformer {
 			double total = b.getUnits().size();
 			//keep track of potential cond stmt
 			List<IfStmt> condToSplit = new ArrayList<IfStmt>();
-			Set<IfStmt> condLoops = new HashSet<IfStmt>();
 			Set<IfStmt> allIfStmt = new HashSet<IfStmt>();
-			
+
 			for(Unit u : b.getUnits()){
 				//check if u is a conditional statement
 				if(u instanceof IfStmt){
@@ -70,91 +88,63 @@ public class PartitionTransformer extends BodyTransformer {
 					if(succ.size() == 1 ){
 						//add for sure
 						System.out.println("single don't include" + u);
-//						condToSplit.add((IfStmt)u);
-//						ifToInt.put((IfStmt)u, countOfCond);
-					} else {
+						//						condToSplit.add((IfStmt)u);
+						//						ifToInt.put((IfStmt)u, countOfCond);
+					} else if(!condLoops.contains(u)){
 						//do regular check
-					//if() s2 else s1
-					Unit s1 = succ.get(0);
-					Unit s2 = succ.get(1);
-					System.out.println(u + " s2 " + s2 + " s1 " + s1);
-					//we need to make sure that s1 is not
-					//a post dominator of s2 and vice versa
-					//that would ensure "if" with "else" part
-					//that is the place where we want to split
-					//for now we will leave cond splitting inside 
-					//the loop to see if it causes any imprecisions.
-					if(!postdom.isDominatedBy(s2, s1) && !postdom.isDominatedBy(s1, s2)){
-						System.out.println("in "+countOfCond + " " + u);
-						//System.out.println(countOfCond + " has " + succ);
-						int[] btf = {0,0};
-						//get the number of items
-						//they dominate
-						for(int i=0; i < succ.size(); i++){
-							//for(Unit dm : succ){
-							Unit dm = succ.get(i);
-							int bsize = 0;
-							for(Unit v : b.getUnits()){
-								if(dom.isDominatedBy(v, dm)){
-									bsize++;
+						//if() s2 else s1
+						Unit s1 = succ.get(0);
+						Unit s2 = succ.get(1);
+						System.out.println(u + " s2 " + s2 + " s1 " + s1);
+						//we need to make sure that s1 is not
+						//a post dominator of s2 and vice versa
+						//that would ensure "if" with "else" part
+						//that is the place where we want to split
+						//for now we will leave cond splitting inside 
+						//the loop to see if it causes any imprecisions.
+						if(!postdom.isDominatedBy(s2, s1) && !postdom.isDominatedBy(s1, s2)){
+							System.out.println("in "+countOfCond + " " + u);
+							//System.out.println(countOfCond + " has " + succ);
+							int[] btf = {0,0};
+							//get the number of items
+							//they dominate
+							for(int i=0; i < succ.size(); i++){
+								//for(Unit dm : succ){
+								Unit dm = succ.get(i);
+								int bsize = 0;
+								for(Unit v : b.getUnits()){
+									if(dom.isDominatedBy(v, dm)){
+										bsize++;
+									}
 								}
+								btf[i] = (int) Math.ceil(bsize/total*100);
+								//System.out.println(dm + " -> " + bsize + " " + " " + btf[i]);
+							}// end iteration for each successor
+							//compare by how much they are different
+							int diff = Math.abs(btf[0] - btf[1]);
+							int max = Math.max(btf[0], btf[1]);
+							System.out.println("diff " + diff + " max " + max);
+							if(diff <= branchDiff && max >= percOfCode){
+								System.out.println(countOfCond+"t" + countOfCond + "f");
+								//we need to add this cond to the map
+								condToSplit.add((IfStmt)u);
 							}
-							btf[i] = (int) Math.ceil(bsize/total*100);
-							//System.out.println(dm + " -> " + bsize + " " + " " + btf[i]);
-						}// end iteration for each successor
-						//compare by how much they are different
-						int diff = Math.abs(btf[0] - btf[1]);
-						int max = Math.max(btf[0], btf[1]);
-						System.out.println("diff " + diff + " max " + max);
-						if(diff <= branchDiff && max >= percOfCode){
-							System.out.println(countOfCond+"t" + countOfCond + "f");
-							//we need to add this cond to the map
-							condToSplit.add((IfStmt)u);
-						}
-					
-					} else if (postdom.isDominatedBy(s1, u) || postdom.isDominatedBy(s2, u)) {
-						System.out.println("loop if " + u);
-						//add it the list
-						condLoops.add((IfStmt)u);
-					} else {
-						System.out.println("not "+countOfCond + " " + u);
-					} //end checking the loop and single branches
-					}
+
+							//						} else if (postdom.isDominatedBy(s1, u) || postdom.isDominatedBy(s2, u)) {
+							//							System.out.println("loop if " + u);
+							//							//add it the list
+							//							condLoops.add((IfStmt)u);
+						} else {
+							System.out.println("not "+countOfCond + " " + u);
+						} //end checking the loop and single branches
+					}//end if u instanceof IfStmt
 					ifToInt.put((IfStmt)u, countOfCond);
 					countOfCond++;
-					
+
 				}//end of if cond
 			}//end for units
+
 			
-			//remove all ifstmt associated with loops
-			allIfStmt.removeAll(condLoops);
-			
-			//add to condToSplit all those
-			//conditions that lead to condToSplit
-			boolean changed = true;
-			while(changed){
-				changed = false;
-				Set<IfStmt> add = new HashSet<IfStmt>();
-				for(IfStmt cond : condToSplit){
-					for(IfStmt dep : allIfStmt){
-						if(!condToSplit.contains(dep)){
-						List<Unit> succOfDep = gr.getSuccsOf(dep);
-						if(succOfDep.size() >1){
-							//do more checks
-							Unit succ1 = succOfDep.get(0);
-							Unit succ2 = succOfDep.get(1);
-							if(!(dom.isDominatedBy(cond, succ1) && dom.isDominatedBy(cond, succ2))){
-								//if at least one does not dominate then add dep 
-								changed = true;
-								add.add(dep);
-							}
-						} //do not include if only one outcome
-						}//end checking of dep in condToSplit already
-					}
-				}// end for condToSplit
-				//now add to condToSplit and start over again.
-				condToSplit.addAll(add);
-			}
 			
 			if(this.skipLoops){
 				System.out.println("removing loops " + condLoops);
@@ -164,30 +154,60 @@ public class PartitionTransformer extends BodyTransformer {
 					for(IfStmt loop : condLoops){
 						//it is inside the loop that if the loop's if both
 						//dominate and postdominate cond
-					if(dom.isDominatedBy(cond, loop)&& postdom.isDominatedBy(cond, loop)){
-						removeIf.add(cond);
-					}
+						if(dom.isDominatedBy(cond, loop)&& postdom.isDominatedBy(cond, loop)){
+							removeIf.add(cond);
+						}
 					}
 				}
-				
 				condToSplit.removeAll(removeIf);
+				}
+			//remove all ifstmt associated with loops
+			allIfStmt.removeAll(condLoops);
+			//add to condToSplit all those
+			//conditions that lead to condToSplit
+			boolean changed = true;
+			while(changed){
+				changed = false;
+				Set<IfStmt> add = new HashSet<IfStmt>();
+				for(IfStmt cond : condToSplit){
+					for(IfStmt dep : allIfStmt){
+						//dep must not be already in the set and dominate cond
+						if(!condToSplit.contains(dep) && dom.isDominatedBy(cond, dep)){
+							List<Unit> succOfDep = gr.getSuccsOf(dep);
+							if(succOfDep.size() >1){
+								//do more checks
+								Unit succ1 = succOfDep.get(0);
+								Unit succ2 = succOfDep.get(1);
+								if(!(dom.isDominatedBy(cond, succ1) && dom.isDominatedBy(cond, succ2))){
+									//if at least one does not dominate then add dep 
+									changed = true;
+									add.add(dep);
+								}
+							} //do not include if only one outcome
+						}//end checking of dep in condToSplit already
+					}
+				}// end for condToSplit
+				//now add to condToSplit and start over again.
+				condToSplit.addAll(add);
 			}
-		CFGToDotGraph cfgToDot = new CFGToDotGraph(); 
-		DotGraph dotGraph = cfgToDot.drawCFG(gr, b);
-		dotGraph.plot("bf1.dot");
-//			System.out.println(condToSplit);
-//			for(Entry<IfStmt, Integer> entry : ifToInt.entrySet()){
-//				System.out.println(entry.getValue() + "\t" + entry.getKey());
-//			}
+			
+			CFGToDotGraph cfgToDot = new CFGToDotGraph(); 
+			DotGraph dotGraph = cfgToDot.drawCFG(gr, b);
+			dotGraph.plot("bf1.dot");
+			//			System.out.println(condToSplit);
+			//			for(Entry<IfStmt, Integer> entry : ifToInt.entrySet()){
+			//				System.out.println(entry.getValue() + "\t" + entry.getKey());
+			//			}
 			System.out.println(ifToInt.values());
-//			Set<List<Unit>> ret = new HashSet<List<Unit>>();
-//			for(Unit succ: gr.getSuccsOf(condToSplit.get(0))){
-//				List<Unit> b0 = new ArrayList<Unit>();
-//				b0.add(succ);
-//				ret.add(b0);
-//			}
-//			
-//			buildPath(condToSplit, dom, 1, ret, gr);
+			System.out.println(condToSplit);
+			//			Set<List<Unit>> ret = new HashSet<List<Unit>>();
+			//			for(Unit succ: gr.getSuccsOf(condToSplit.get(0))){
+			//				List<Unit> b0 = new ArrayList<Unit>();
+			//				b0.add(succ);
+			//				ret.add(b0);
+			//			}
+			//			
+			//			buildPath(condToSplit, dom, 1, ret, gr);
 			if(!condToSplit.isEmpty()){
 				AbstractedCFG aCFG = new AbstractedCFG();
 				//creae the start node;
@@ -210,31 +230,32 @@ public class PartitionTransformer extends BodyTransformer {
 				l.addAll(aCFG.getPaths());
 				Collections.sort(l);
 				System.out.println("Paths " + l.size());
-//				for(String s : l){
-//					System.out.println(s);
-//				}
+				//				for(String s : l){
+				//					System.out.println(s);
+				//				}
 				//write the graph to the file
 				String fileName = b.getMethod().getDeclaringClass().getName()+"_"+methodId+".txt";
 				aCFG.writePaths(fileName);
 				aCFG.writeToFile(fileName);
 			}//if condtoSplit != empty
-	}//end if correct method name
+		}//end if correct method name
 	}
-	
+
 	private void buildACFG(AbstractedCFG aCFG, UnitGraph gr, List<IfStmt> condList, 
 			Unit current, Node from, boolean on, Set<Unit> seen){
 //		if(from != null){
-//			System.out.println(from.getName() + " on " + on + " curr " + current);
+//			System.out.println(from.getName() + " on " + on + " curr " + current + " " + current.getClass());
 //		}
 		//System.out.println("Seen " + seen);
 		//end on the return statement
-		if(current instanceof JReturnStmt){
+		if(gr.getTails().contains(current)){
+		//if(current instanceof JReturnStmt || current instanceof JThrowStmt || current instanceof ....){
 			//it should be the end node
 			Node end = null;
 			if(aCFG.contains("end")){
 				end = aCFG.findNode("end");
 			} else {
-		
+
 				end = aCFG.addEnd("end");
 			}
 			if(from != null){
@@ -281,63 +302,69 @@ public class PartitionTransformer extends BodyTransformer {
 				} 
 				//create a transition
 				if(from != null){
-				//System.out.println("from " + from.getName() + " to " + to.getName() + " on " + on);
-				aCFG.add(from, to, on);
+					//System.out.println("from " + from.getName() + " to " + to.getName() + " on " + on);
+					aCFG.add(from, to, on);
 				}
 			} else {
-			    //instead of cond stmtm in seen we need
+				//instead of cond stmtm in seen we need
 				//to add the branched statments
 				//do the same without creating a node and a transition
 				///List<Unit> newseen = new <Unit>();
-				Unit loop = null;
-				if(current instanceof IfStmt){
-					//check first postdom relation
-					//of its 
-					//get its children
-					for(Unit s : gr.getSuccsOf(current)){
-						if(postdom.isDominatedBy(s, current)){
-							loop = s;
-							break;
-						}
-					}
-					
-					
-				}
+//				Unit loop = null;
+//				if(current instanceof IfStmt){
+//					//check first postdom relation
+//					//of its 
+//					//get its children
+//					for(Unit s : gr.getSuccsOf(current)){
+//						if(postdom.isDominatedBy(s, current)){
+//							loop = s;
+//							break;
+//						}
+//					}
+//
+//
+//				}
 				/*if(current instanceof IfStmt){
 						seen.add(u);
 						//explore its children
 						for(Unit uu : gr.getSuccsOf(u)){
 							buildACFG(aCFG, gr, ifToInt, condList, uu, from, on, seen);
 						}
-						*/
-				if(loop != null){
+				 */
+				if(condLoops.contains(current)){
 					//found the loop explore its true branch first which is loop
 					seen.add(current);
 					//System.out.println("loop " + loop);
-					buildACFG(aCFG, gr, condList, loop, from, on, seen);
+					buildACFG(aCFG, gr, condList, current, from, on, seen);
 					//clear seen
 					seen.remove(current);
 				} else {
-				for(Unit u : gr.getSuccsOf(current)){
-					
-						buildACFG(aCFG, gr,condList, u, from, on, seen);
-				}
+					for(Unit u : gr.getSuccsOf(current)){
+						//System.out.println("u " + u + " curr " + current);
+						//try{
+							buildACFG(aCFG, gr,condList, u, from, on, seen);
+							//System.out.println("done with " + u + " curr " + current + " on " + on);
+						//} catch(StackOverflowError e) {
+							//System.err.println("stack overflow!");
+							//continue;
+						//}
+					}
 				}
 			}
 		}
 	}
 	//recursively build the conditions
-//	private void buildPath(List<IfStmt> condList,SimpleDominatorsFinder<Unit> dom, int index,  Set<List<Unit>> paths, UnitGraph gr){
-//		if(index >= condList.size()){
-//			return;
-//		} else {
-//			//get the next ifStmt to process
-//			IfStmt ifS = condList.get(index);
-//			//if iFs
-//		index++;
-//		buildPath(condList, dom, index, paths, gr);
-//		}
-//	}
-	
+	//	private void buildPath(List<IfStmt> condList,SimpleDominatorsFinder<Unit> dom, int index,  Set<List<Unit>> paths, UnitGraph gr){
+	//		if(index >= condList.size()){
+	//			return;
+	//		} else {
+	//			//get the next ifStmt to process
+	//			IfStmt ifS = condList.get(index);
+	//			//if iFs
+	//		index++;
+	//		buildPath(condList, dom, index, paths, gr);
+	//		}
+	//	}
+
 
 }
