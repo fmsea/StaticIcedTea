@@ -21,8 +21,8 @@ public class Smt2Format {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String file1Name = "test.Base64_20_sN__dom9.txt";
-		String file2Name = "test.Base64_20_sN_dom9.txt";
+		String file1Name = "test.TIFFFaxDecoder_11_sN__dom9.txt";
+		String file2Name = "test.TIFFFaxDecoder_11_sN_dom9.txt";
 		
 		
 		new Smt2Format(file1Name, file2Name);		

@@ -35,7 +35,7 @@ public class PartitionTransformer extends BodyTransformer {
 	private int methodId = 0;
 	boolean skipLoops;
 	int percOfCode = 3;
-	int branchDiff = 10;
+	int branchDiff = 60;
 
 	public PartitionTransformer(String methodId, boolean loops) {
 		this.methodId = Integer.parseInt(methodId);
@@ -58,7 +58,7 @@ public class PartitionTransformer extends BodyTransformer {
 			Iterator<Loop> lIt = loopTree.iterator();
 			while(lIt.hasNext()){
 				Loop l = lIt.next();
-				System.out.println(l.getHead() + " " + l.getLoopExits());
+				System.out.println("l " + l.getHead() + " " + l.getLoopExits());
 				Unit u = l.getHead();
 				//need to find its if stmt
 				while(!(u instanceof IfStmt)){
@@ -66,7 +66,7 @@ public class PartitionTransformer extends BodyTransformer {
 				}
 				condLoops.add((IfStmt)u);
 			}
-			System.out.println(condLoops);
+			System.out.println("loops " + condLoops);
 			//System.exit(2);
 			//now we need to find all conditional statements
 			//and decide which true/false branch has
@@ -104,8 +104,8 @@ public class PartitionTransformer extends BodyTransformer {
 						//the loop to see if it causes any imprecisions.
 						if(!postdom.isDominatedBy(s2, s1) && !postdom.isDominatedBy(s1, s2)){
 							System.out.println("in "+countOfCond + " " + u);
-							//System.out.println(countOfCond + " has " + succ);
-							int[] btf = {0,0};
+							System.out.println(countOfCond + " has " + succ);
+							int[] btf = {0,0,0};
 							//get the number of items
 							//they dominate
 							for(int i=0; i < succ.size(); i++){
@@ -144,17 +144,22 @@ public class PartitionTransformer extends BodyTransformer {
 				}//end of if cond
 			}//end for units
 
-			
+			System.out.println("Orig cond " + condToSplit);
 			
 			if(this.skipLoops){
 				System.out.println("removing loops " + condLoops);
 				//remove those for which the loops is dominator
 				Set<IfStmt> removeIf = new HashSet<IfStmt>();
 				for(IfStmt cond : condToSplit){
+					List<Unit> ch = gr.getSuccsOf(cond);
 					for(IfStmt loop : condLoops){
 						//it is inside the loop that if the loop's if both
-						//dominate and postdominate cond
-						if(dom.isDominatedBy(cond, loop)&& postdom.isDominatedBy(cond, loop)){
+						//dominate the cond and postdominate at least
+						//one of the children of the cond, because
+						//another child can just "break" from the loop
+						//or return a value
+						if(dom.isDominatedBy(cond, loop)&& (postdom.isDominatedBy(ch.get(0), loop)
+								|| postdom.isDominatedBy(ch.get(1),loop))){
 							removeIf.add(cond);
 						}
 					}
@@ -178,10 +183,16 @@ public class PartitionTransformer extends BodyTransformer {
 								//do more checks
 								Unit succ1 = succOfDep.get(0);
 								Unit succ2 = succOfDep.get(1);
-								if(!(dom.isDominatedBy(cond, succ1) && dom.isDominatedBy(cond, succ2))){
-									//if at least one does not dominate then add dep 
-									changed = true;
-									add.add(dep);
+								if(dom.isDominatedBy(cond, succ1) || dom.isDominatedBy(cond, succ2)){
+									//cannot both dominate, if both dominate then
+									//a) either one branch cannot be empty
+									if(!postdom.isDominatedBy(succ1, succ2) && 
+											!postdom.isDominatedBy(succ2, succ1)){
+										//there are two paths.
+										changed = true;
+										add.add(dep);
+									}
+									
 								}
 							} //do not include if only one outcome
 						}//end checking of dep in condToSplit already
@@ -199,7 +210,7 @@ public class PartitionTransformer extends BodyTransformer {
 			//				System.out.println(entry.getValue() + "\t" + entry.getKey());
 			//			}
 			System.out.println(ifToInt.values());
-			System.out.println(condToSplit);
+			System.out.println("Cond " + condToSplit);
 			//			Set<List<Unit>> ret = new HashSet<List<Unit>>();
 			//			for(Unit succ: gr.getSuccsOf(condToSplit.get(0))){
 			//				List<Unit> b0 = new ArrayList<Unit>();
@@ -245,6 +256,8 @@ public class PartitionTransformer extends BodyTransformer {
 			Unit current, Node from, boolean on, Set<Unit> seen){
 //		if(from != null){
 //			System.out.println(from.getName() + " on " + on + " curr " + current + " " + current.getClass());
+//		} else {
+//			System.out.println(from + " on " + on + " curr " + current + " " + current.getClass());
 //		}
 		//System.out.println("Seen " + seen);
 		//end on the return statement
@@ -265,13 +278,15 @@ public class PartitionTransformer extends BodyTransformer {
 		} else if (seen.contains(current)){
 			//when we see cond of the loop again
 			//we need to explore its false branch
-			for(Unit s : gr.getSuccsOf(current)){
-				if(!postdom.isDominatedBy(s, current)){
+			Unit next = gr.getSuccsOf(current).get(0);//fall through
+			//System.out.println("seen " + current + " next " + next);
+//			for(Unit s : gr.getSuccsOf(current)){
+//				if(!postdom.isDominatedBy(s, current)){
 					//explore the false branch now
-					buildACFG(aCFG, gr, condList, s, from, on, seen);
-					break;
-				}
-			}
+					buildACFG(aCFG, gr, condList, next, from, on, seen);
+					//break;
+//				}
+//			}
 		} else {
 			//continue the recursion
 			if(condList.contains(current)){
@@ -310,20 +325,20 @@ public class PartitionTransformer extends BodyTransformer {
 				//to add the branched statments
 				//do the same without creating a node and a transition
 				///List<Unit> newseen = new <Unit>();
-//				Unit loop = null;
-//				if(current instanceof IfStmt){
-//					//check first postdom relation
-//					//of its 
-//					//get its children
-//					for(Unit s : gr.getSuccsOf(current)){
-//						if(postdom.isDominatedBy(s, current)){
-//							loop = s;
-//							break;
-//						}
-//					}
-//
-//
-//				}
+				//				Unit loop = null;
+				//				if(current instanceof IfStmt){
+				//					//check first postdom relation
+				//					//of its 
+				//					//get its children
+				//					for(Unit s : gr.getSuccsOf(current)){
+				//						if(postdom.isDominatedBy(s, current)){
+				//							loop = s;
+				//							break;
+				//						}
+				//					}
+				//
+				//
+				//				}
 				/*if(current instanceof IfStmt){
 						seen.add(u);
 						//explore its children
@@ -334,20 +349,24 @@ public class PartitionTransformer extends BodyTransformer {
 				if(condLoops.contains(current)){
 					//found the loop explore its true branch first which is loop
 					seen.add(current);
-					//System.out.println("loop " + loop);
-					buildACFG(aCFG, gr, condList, current, from, on, seen);
+					//current should be the "true" branch of the cond stmt, i.e.,
+					//that allows getting inside the loop.
+					Unit next = gr.getSuccsOf(current).get(1);//branch out
+					//System.out.println("loop " + current + " next " + next);
+					//System.out.println(next);
+					buildACFG(aCFG, gr, condList, next, from, on, seen);
 					//clear seen
 					seen.remove(current);
 				} else {
 					for(Unit u : gr.getSuccsOf(current)){
 						//System.out.println("u " + u + " curr " + current);
-						//try{
+						try{
 							buildACFG(aCFG, gr,condList, u, from, on, seen);
 							//System.out.println("done with " + u + " curr " + current + " on " + on);
-						//} catch(StackOverflowError e) {
-							//System.err.println("stack overflow!");
-							//continue;
-						//}
+						} catch(StackOverflowError e) {
+							System.err.println("stack overflow!");
+							System.exit(2);
+						}
 					}
 				}
 			}

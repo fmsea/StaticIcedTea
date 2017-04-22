@@ -393,7 +393,7 @@ public class client{
             for (int j6 = 1; j6 > 0; j6++);
         }
         int l5;
-        for (int j5 = l5 = anIntArrayArray901[j3][k3]; j3 != j2 || k3 != j1; j5 = anIntArrayArray901[j3][k3]) {
+        for (int j5 = l5 = anIntArrayArray901[j3][k3]; j3 != j2/* || k3 != j1*/; j5 = anIntArrayArray901[j3][k3]) {
             if (j5 != l5) {
                 l5 = j5;
                 anIntArray1280[i4] = j3;
@@ -456,7 +456,7 @@ public class client{
     public final void method108(int anInt1278, int anInt1131, int x, int y, int anInt1014, int anInt1015,
     		int[] keyArray, int anInt1186, int anInt1187, int anInt1185, int anInt1184, byte [][][] byteGroundArray, 
     		int [][][] intGroundArray, int anInt1005, int anInt984) {
-        try {
+//        try {
             int j = x + anInt1278;
             int k = y + anInt1131;
             if (anInt1014 - j < -500 || anInt1014 - j > 500 || anInt1015 - k < -500 || anInt1015 - k > 500) {
@@ -546,10 +546,10 @@ public class client{
                 anInt984 += (j2 - anInt984) / 80;
                 return;
             }
-        } catch (Exception _ex) {
-           // signlink.reporterror("glfc_ex " + ((Entity) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).x + "," + ((Entity) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).y + "," + anInt1014 + "," + anInt1015 + "," + anInt1069 + "," + anInt1070 + "," + baseX + "," + baseY);
-            throw new RuntimeException("eek");
-        }
+//        } catch (Exception _ex) {
+//           // signlink.reporterror("glfc_ex " + ((Entity) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).x + "," + ((Entity) (aClass30_Sub2_Sub4_Sub1_Sub2_1126)).y + "," + anInt1014 + "," + anInt1015 + "," + anInt1069 + "," + anInt1070 + "," + baseX + "," + baseY);
+//            throw new RuntimeException("eek");
+//        }
     }
 
     public final void determineMenuSize(int i, int menuActionRow, int k, int saveClickX, 

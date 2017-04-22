@@ -30,8 +30,9 @@ import java.util.Map;
 public class CombinePartial {
 	
 	//static LinkedHashMap<Integer,String> lineCount = new LinkedHashMap<Integer,String>();
-	static String className = "test.Base64";
-	static String methodId = "20";
+	static String className = "test.TIFFFaxDecoder";
+	static String methodId = "11";
+	static String startNode = "1";
 	static String filePrefix = "./ScratchData/results/"+className+"_"+methodId+"_sN_";
 	static String dom = "_dom9.txt";
 	public static void main(String [] strs) throws IOException{
@@ -40,7 +41,7 @@ public class CombinePartial {
 		//instantiate ACFG from the file
 		AbstractedCFG aCFG = new AbstractedCFG(acfgName);
 		//System.out.println(aCFG.toString());
-		String ret = prefix("", aCFG.findNode("7"));
+		String ret = prefix("", aCFG.findNode(startNode));
 		System.out.println(ret);
 	}
 	

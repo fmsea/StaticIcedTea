@@ -1603,10 +1603,14 @@ public void setPixels(int x, int y, int putWidth, int[] pixels, int startIndex) 
  * the given mask.
  */
 static int getMSBOffset(int mask) {
+	int ret = 0;
 	for (int i = 31; i >= 0; i--) {
-		if (((mask >> i) & 0x1) != 0) return i + 1;
+		if (((mask >> i) & 0x1) != 0){
+			ret = i + 1;
+			break;
+		}
 	}
-	return 0;
+	return ret;
 }
 
 /**
