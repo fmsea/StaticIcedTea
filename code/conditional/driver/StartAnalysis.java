@@ -29,7 +29,7 @@ public class StartAnalysis {
 //				"test.InfBlocks", "test.InfCodes", "test.InfTree", "test.MapViewer", "test.QRCodeDataBlockReader", 
 //				"test.StructurePanel", "test.TileRenderor", "test.WorldController", "test.Class11", "test.Class13",
 //		};
-		String[] classNames = {"test.TIFFFaxDecoder"};
+		String[] classNames = {"test.MapViewer"};
 		String[] domainNames = {"dom9.txt"};
 		//String[] domainNames = {"dom3.txt", "dom2.txt"};
 		String[] symbolic = {"sN"};
@@ -56,7 +56,7 @@ public class StartAnalysis {
 		//read the file:
 
 		//String symbolicOn = "sY";
-		String methodId = "11";
+		String methodId = "3";
 		File file = new File("./ScratchData/conditions/paths/"+classNames[0]+"_"+methodId+".txt");
 		if(file.exists()){
 			try {
@@ -75,8 +75,8 @@ public class StartAnalysis {
 			
 		}
 		
-//		conditions.clear();
-//		conditions.add("");
+		conditions.clear();
+		conditions.add("");
 	
 		
 		try {

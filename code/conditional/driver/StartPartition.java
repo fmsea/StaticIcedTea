@@ -7,9 +7,9 @@ import soot.Transform;
 
 public class StartPartition {
 	static public void main(String[] args){
-		String className = "test.TIFFFaxDecoder";
+		String className = "test.ImageData";
 		String[] sootArgs = {"-f", "n", className};
-		String methodId = "11";
+		String methodId = "16";
 		boolean skipLoops = true;
 		Scene.v().setSootClassPath(Scene.v().getSootClassPath()+":"+System.getProperty("java.class.path") 
 		+ ":" + System.getProperty("sun.boot.class.path"));

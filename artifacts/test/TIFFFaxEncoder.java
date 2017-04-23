@@ -717,7 +717,8 @@ class TIFFFaxEncoder {
             //
             int color = WHITE;
 
-            while(true) {
+            //while(true) {
+            while(a0 >= last){
                 int b2 = nextState(refData, refAddr, b1, last);
                 if(b2 < a1) {          // pass mode
                     outIndex += add2DBits(compData, outIndex, pass, 0);
@@ -736,7 +737,8 @@ class TIFFFaxEncoder {
                     }
                 }
                 if(a0 >= last) {
-                    break;
+                   // break;
+                	continue;
                 }
                 color = ((data[lineAddr + (a0>>>3)]&0xff) >>>
                          (7-(a0 & 0x7))) & 0x1;
