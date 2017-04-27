@@ -1,0 +1,5 @@
+	t	f
+1	5	2
+2	3	end
+3	end	end
+5	end	end

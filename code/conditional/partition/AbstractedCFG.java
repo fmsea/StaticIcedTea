@@ -40,8 +40,9 @@ public class AbstractedCFG {
 			try {
 				Scanner scan = new Scanner(file);
 				//add end and start
-				addStart("1");
-				addEnd("end");
+				//addStart("1");
+				//addEnd("end");
+				boolean first = true;
 				while(scan.hasNextLine()){
 					String ln = scan.nextLine();
 
@@ -52,6 +53,13 @@ public class AbstractedCFG {
 						String onT = tk.nextToken();
 						String onF = tk.nextToken();
 						Node fromN = addNode(from);
+						if(first){
+							//make as the start state
+							fromN = addStart(from);
+							first = false;
+						} else {
+							fromN = addNode(from);
+						}
 						Node fromTN = addNode(onT);
 						Node fromFN = addNode(onF);
 						add(fromN, fromTN, true);
@@ -103,6 +111,10 @@ public class AbstractedCFG {
 	public Node addStart(String name){
 		start = new Node(name);
 		allNodes.add(start);
+		return start;
+	}
+	
+	public Node getStartNode(){
 		return start;
 	}
 	

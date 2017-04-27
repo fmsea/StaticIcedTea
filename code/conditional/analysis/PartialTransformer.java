@@ -19,6 +19,7 @@ public class PartialTransformer extends BodyTransformer {
 	Map<IfStmt, Boolean> include;
 	String[] condition;
 	int methodId;
+	String conditionsStr;
 	
 	
 /**

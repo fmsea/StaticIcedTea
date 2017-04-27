@@ -1,0 +1,17 @@
+	t	f
+1	2	end
+2	3	end
+3	end	4
+4	5	end
+5	7	6
+6	13	7
+7	10	8
+8	10	9
+9	13	end
+13	end	14
+14	end	15
+15	end	16
+16	end	end
+10	end	11
+11	end	12
+12	13	end

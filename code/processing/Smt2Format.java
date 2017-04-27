@@ -12,7 +12,8 @@ import java.util.Scanner;
 
 public class Smt2Format {
 	
-	private static String resultsPath = "./ScratchData/results/";
+	private static String resultsPathFull = "./ScratchData/results/invariants/";
+	private static String resultsPathCombined = "./ScratchData/results/combined/";
 	private static String smt2FilesPath = "./ScratchData/smt2Files/";
 
 	/**
@@ -21,11 +22,36 @@ public class Smt2Format {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String file1Name = "test.TIFFFaxEncoder_11_sN__dom9.txt";
-		String file2Name = "test.TIFFFaxEncoder_11_sN_dom9.txt";
+//		String file1Name = "test.TIFFFaxEncoder_11_sN__dom9.txt";
+//		String file2Name = "test.TIFFFaxEncoder_11_sN_dom9.txt";
+		String className = "test.BallonFactory";
+		String methodId = "1";
+		String domain = "_dom9.txt";
+		
+		//get the file with the number of paths
+		String pathFileName = "./ScratchData/conditions/paths/" + className+"_"+methodId+".txt";
+		File pathFile = new File(pathFileName);
+		if(pathFile.exists()){
+			Scanner sPath = new Scanner(new FileReader(pathFile));
+			String fullPath = className+"_"+methodId+domain;
+			int pathId = 1;
+			while(sPath.hasNextLine()){
+				String l = sPath.nextLine();
+				if(!l.isEmpty()){
+				//call the Smt2Format
+					System.out.println("Id " + pathId + " " + l);
+				String combinedPath = className+"_"+methodId+"_"+String.valueOf(pathId)+domain;
+				new Smt2Format(combinedPath, fullPath);
+				pathId++;
+				}
+			}
+			sPath.close();
+		} else {
+			System.out.println("Cannot find " + pathFileName);
+		}
 		
 		
-		new Smt2Format(file1Name, file2Name);		
+//		new Smt2Format(file1Name, file2Name);		
 		}
 	
 	public Smt2Format(String file1Name, String file2Name)throws IOException{
@@ -34,7 +60,7 @@ public class Smt2Format {
 
 		//read from the first file and populate the map
 		
-		File file1 = new File(resultsPath+file1Name);
+		File file1 = new File(resultsPathCombined+file1Name);
 		Scanner scanner = new Scanner(new FileReader(file1));
 		Map<String,String> stmtTo = null;
 		String formula = "";
@@ -84,7 +110,7 @@ public class Smt2Format {
 		
 		//now traverse similarly the other file
 		//only write a new formula out of it
-		File file2 = new File(resultsPath+file2Name);
+		File file2 = new File(resultsPathFull+file2Name);
 		formula = "";
 		var = "";
 		String stmt = "";

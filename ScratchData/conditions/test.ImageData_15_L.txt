@@ -1,0 +1,9 @@
+	t	f
+1	end	2
+2	end	3
+3	end	end
+13	27	27
+26	27	end
+27	end	28
+28	end	end
+21	27	end

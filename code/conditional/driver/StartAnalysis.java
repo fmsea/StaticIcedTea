@@ -20,6 +20,10 @@ public class StartAnalysis {
 	//eas: make sure artifacts is a source folder.
 	public static boolean print = true;
 	public static boolean writeToFile = true;
+	public static String className;
+	public static String methodId;
+	public static String domain;
+	public static String condition;
 
 	/**
 	 * @param args
@@ -29,7 +33,7 @@ public class StartAnalysis {
 //				"test.InfBlocks", "test.InfCodes", "test.InfTree", "test.MapViewer", "test.QRCodeDataBlockReader", 
 //				"test.StructurePanel", "test.TileRenderor", "test.WorldController", "test.Class11", "test.Class13",
 //		};
-		String[] classNames = {"test.MapViewer"};
+		String[] classNames = {"test.BallonFactory"};
 		String[] domainNames = {"dom9.txt"};
 		//String[] domainNames = {"dom3.txt", "dom2.txt"};
 		String[] symbolic = {"sN"};
@@ -56,7 +60,8 @@ public class StartAnalysis {
 		//read the file:
 
 		//String symbolicOn = "sY";
-		String methodId = "3";
+		String methodId = "1";
+		StartAnalysis.methodId = methodId;
 		File file = new File("./ScratchData/conditions/paths/"+classNames[0]+"_"+methodId+".txt");
 		if(file.exists()){
 			try {
@@ -79,20 +84,23 @@ public class StartAnalysis {
 		conditions.add("");
 	
 		
-		try {
-			timeDataFile = new FileWriter(resultsPath+"timeData",true);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
+//		try {
+//			timeDataFile = new FileWriter(resultsPath+"timeData",true);
+//		} catch (IOException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+//		
 		for(String className : classNames){
+			StartAnalysis.className = className;
 			for(String symbolicOn : symbolic){
 			for(String domainName : domainNames){
+				StartAnalysis.domain = domainName.split("\\.")[0];
+				analysisType = StartAnalysis.domain + "_"+ symbolicOn;
 				for(String condition : conditions){
-				try {
-					analysisType = domainName.split("\\.")[0] + "_"+ symbolicOn;
+				try {	
 					System.out.println(condition);
+					StartAnalysis.condition = condition.isEmpty()?"":condition.replaceAll(",", "");
 					new StartAnalysis(className, domainName, symbolicOn, condition, methodId);
 					G.reset();
 					System.gc();
@@ -104,12 +112,12 @@ public class StartAnalysis {
 			}
 		}
 		}
-		try {
-			timeDataFile.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			timeDataFile.close();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 	
 	//The class should have static fields for the files to write to
@@ -122,7 +130,7 @@ public class StartAnalysis {
 	public static FileWriter fileToWrite;
 	private static String domainPath = "ScratchData/domains/";
 	//private static String conditionPath = "ScratchData/conditions/";
-	private static String resultsPath = "ScratchData/results/";
+	private static String resultsPath = "ScratchData/results/invariants/";
 	public static FileWriter timeDataFile;
 	public static String analysisType;
 	
@@ -140,7 +148,7 @@ public class StartAnalysis {
 		//1f, 3t means exclude 1f and 3t branches. We will assume a BFS ordering.
 		//String conditions = "20f,29t";//20t,29f
 		//create the file to write to
-		String fileName = resultsPath+className+"_"+methodId +"_"+symbolicHelper+"_"+(condition.isEmpty()?"":condition.replaceAll(",", "")+"_")+domainFile;
+		String fileName = resultsPath+className+"_"+methodId +"_"+(condition.isEmpty()?"":condition.replaceAll(",", "")+"_")+domainFile;
 		fileToWrite = new FileWriter(fileName);
 		boolean symbolicOn = symbolicHelper.equals("sY");
 		

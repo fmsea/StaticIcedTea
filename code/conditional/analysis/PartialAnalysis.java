@@ -91,28 +91,29 @@ public class PartialAnalysis extends ValueAnalysis {
 //		}
 //	}
 	
-	@Override
+	//@Override
 	public void report(){
 	System.out.println("Done in " + (end - start));
-	String timeData = b.getMethod().getDeclaringClass() + "\t" +b.getMethod().getSignature()+
-			"\t" + StartAnalysisKestrel.analysisType + "\t"+ (end - start)+"\n";
+	String timeData = StartAnalysis.condition + "\t"+ (end - start)+"\n";
 	
-//	if(writeToFile){
-//	try {
-//		//StartAnalysisKestrel.timeDataFile.append(timeData);
-//		RandomAccessFile rf = new RandomAccessFile(StartAnalysisKestrel.timeDataFile, "rwd");
-//		FileChannel fileChannel = rf.getChannel();
-//		FileLock lock = fileChannel.lock();
-//		fileChannel.position(fileChannel.size());
-//		fileChannel.write(Charset.defaultCharset().encode(CharBuffer.wrap(timeData)));
-//		fileChannel.force(false);
-//		lock.release();
-//		fileChannel.close();
-//	} catch (IOException e1) {
-//		// TODO Auto-generated catch block
-//		e1.printStackTrace();
-//	}
-//	}
+	if(writeToFile){
+	try {
+		//StartAnalysisKestrel.timeDataFile.append(timeData);
+		String timeDataFile = "./ScratchData/results/time/"+StartAnalysis.className+"_"+StartAnalysis.methodId+"_"+StartAnalysis.domain+".txt";
+		RandomAccessFile rf = new RandomAccessFile(timeDataFile, "rwd");
+		FileChannel fileChannel = rf.getChannel();
+		FileLock lock = fileChannel.lock();
+		fileChannel.position(fileChannel.size());
+		fileChannel.write(Charset.defaultCharset().encode(CharBuffer.wrap(timeData)));
+		fileChannel.force(false);
+		lock.release();
+		fileChannel.close();
+		rf.close();
+	} catch (IOException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
+	}
 	if(StartAnalysis.print){
 	Iterator<Unit> iter = b.getUnits().iterator();
 	int stmtCount = 0;

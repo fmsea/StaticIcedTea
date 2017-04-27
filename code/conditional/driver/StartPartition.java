@@ -10,7 +10,7 @@ public class StartPartition {
 		String className = "test.ImageData";
 		String[] sootArgs = {"-f", "n", className};
 		String methodId = "16";
-		boolean skipLoops = true;
+		boolean skipLoops = false;
 		Scene.v().setSootClassPath(Scene.v().getSootClassPath()+":"+System.getProperty("java.class.path") 
 		+ ":" + System.getProperty("sun.boot.class.path"));
 		PackManager.v().getPack("jtp").

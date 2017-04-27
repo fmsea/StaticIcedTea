@@ -117,12 +117,14 @@ public class PartitionTransformer extends BodyTransformer {
 										bsize++;
 									}
 								}
-								btf[i] = (int) Math.ceil(bsize/total*100);
-								//System.out.println(dm + " -> " + bsize + " " + " " + btf[i]);
+								//btf[i] = (int) Math.ceil(bsize/total*100);
+								btf[i] = bsize;
+								System.out.println(dm + " -> " + bsize + " " + " " + btf[i]);
 							}// end iteration for each successor
 							//compare by how much they are different
-							int diff = Math.abs(btf[0] - btf[1]);
-							int max = Math.max(btf[0], btf[1]);
+							double ratio = 100.0/total;
+							int diff = (int) (Math.abs(btf[0] - btf[1]) * ratio);
+							int max = (int) (Math.max(btf[0], btf[1]) * ratio);
 							System.out.println("diff " + diff + " max " + max);
 							if(diff <= branchDiff && max >= percOfCode){
 								System.out.println(countOfCond+"t" + countOfCond + "f");
@@ -240,15 +242,19 @@ public class PartitionTransformer extends BodyTransformer {
 				List<String> l = new ArrayList<String>();
 				l.addAll(aCFG.getPaths());
 				Collections.sort(l);
-				System.out.println("Paths " + l.size());
+				System.out.println("Paths " + l.size() + " " + condLoops.size());
 				//				for(String s : l){
 				//					System.out.println(s);
 				//				}
 				//write the graph to the file
-				String fileName = b.getMethod().getDeclaringClass().getName()+"_"+methodId+".txt";
+				String loops = skipLoops?"":"_L";
+				String fileName = b.getMethod().getDeclaringClass().getName()+"_"+methodId+loops+ ".txt";
 				aCFG.writePaths(fileName);
 				aCFG.writeToFile(fileName);
 			}//if condtoSplit != empty
+			else {
+				System.out.println("Paths " + 0 + " " + condLoops.size());
+			}
 		}//end if correct method name
 	}
 
