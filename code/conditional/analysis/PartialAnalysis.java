@@ -14,6 +14,7 @@ import java.util.Set;
 import com.microsoft.z3.BoolExpr;
 
 import conditional.driver.StartAnalysis;
+import conditional.driver.StartAnalysisScript;
 import disjoint.analysis.ValueAnalysis;
 import disjoint.domain.Domain;
 import disjoint.driver.StartAnalysisKestrel;
@@ -94,12 +95,12 @@ public class PartialAnalysis extends ValueAnalysis {
 	//@Override
 	public void report(){
 	System.out.println("Done in " + (end - start));
-	String timeData = StartAnalysis.condition + "\t"+ (end - start)+"\n";
+	String timeData = StartAnalysisScript.condition + "\t"+ (end - start)+"\n";
 	
-	if(writeToFile){
+	if(StartAnalysisScript.writeTime){
 	try {
 		//StartAnalysisKestrel.timeDataFile.append(timeData);
-		String timeDataFile = "./ScratchData/results/time/"+StartAnalysis.className+"_"+StartAnalysis.methodId+"_"+StartAnalysis.domain+".txt";
+		String timeDataFile = "./ScratchData/results/time/"+StartAnalysisScript.className+"_"+StartAnalysisScript.methodId+"_"+StartAnalysisScript.domain+".txt";
 		RandomAccessFile rf = new RandomAccessFile(timeDataFile, "rwd");
 		FileChannel fileChannel = rf.getChannel();
 		FileLock lock = fileChannel.lock();
@@ -114,7 +115,7 @@ public class PartialAnalysis extends ValueAnalysis {
 		e1.printStackTrace();
 	}
 	}
-	if(StartAnalysis.print){
+	if(StartAnalysisScript.print){
 	Iterator<Unit> iter = b.getUnits().iterator();
 	int stmtCount = 0;
 	//File to write the output to
@@ -181,16 +182,16 @@ public class PartialAnalysis extends ValueAnalysis {
 
 				}
 			}
-			if(StartAnalysis.writeToFile){
+			if(StartAnalysisScript.writeToFile){
 			//write the string to the file
 			try {
-				StartAnalysis.fileToWrite.write(output);
+				StartAnalysisScript.fileToWrite.write(output);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			} else {
-				System.out.println(output);
+				//System.out.println(output);
 			}
 		}//end outputStmt check
 	

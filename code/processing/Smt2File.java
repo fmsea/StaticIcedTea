@@ -108,9 +108,9 @@ public class Smt2File {
 				scanner.close();
 				//System.out.println("methods " + methodToData.keySet().size());
 				//print the map
-				//System.out.print(pathId);
+				System.out.print(className +"\t" + methodId +"\t" + pathId + "\t");
 					for(Integer val : pathData){
-						System.out.print(val+"\t");
+						System.out.print("\t" + val);
 					}
 					System.out.println();
 				System.out.flush();
