@@ -27,6 +27,11 @@ public class Smt2Format {
 		String className = "test.BallonFactory";
 		String methodId = "1";
 		String domain = "_dom9.txt";
+		if(args.length > 0){
+			className = args[0];
+			methodId = args[1];
+			domain = "_"+args[2]+".txt";
+		}
 		
 		//get the file with the number of paths
 		String pathFileName = "./ScratchData/conditions/paths/" + className+"_"+methodId+".txt";

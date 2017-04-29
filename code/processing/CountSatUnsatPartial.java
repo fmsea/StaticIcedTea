@@ -1,18 +1,18 @@
 package processing;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Scanner;
 import java.util.List;
-
-
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Map.Entry;
 public class CountSatUnsatPartial {
-
-	public static void main(String[] args) throws FileNotFoundException {
+	public static void main(String[] args) throws IOException {
 //		String[] classes = {"BallonFactory", "Base64", "client",
 //						"GeoData", "GeoEngine", "InfBlocks", "InfCode",
 //						"InfTree", "MapViewer", "QRCodeDataBlockReader",
@@ -21,53 +21,77 @@ public class CountSatUnsatPartial {
 //				};
 		
 		//String[] classes = {"Base64"};
-		String domless = "dom6";
-		String dommore = "dom7_6";
+		String className = "test.BallonFactory";
+		String methodId = "1";
+		String domain = "dom9";
+		if(args.length > 0){
+			className = args[0];
+			methodId = args[1];
+			domain = args[2];
+		} 
+		
+		
+		//read the path file and get all the number of path from it
+		String pathFileName = "./ScratchData/conditions/paths/"+className+"_"+methodId+".txt";
+		File pathFile = new File(pathFileName);
+		String satunsatOutput = "";
+		if(pathFile.exists()){
+			//get the scanner
+			Scanner pathScan = new Scanner(pathFile);
+			int pathId = 1;
+			while(pathScan.hasNextLine()){
+				String l = pathScan.nextLine();
+				if(!l.isEmpty()){
+					List<Integer> pathData = new ArrayList<Integer>();
+					//create a list of size 4 for it
+					//index 0 -> sat/sat
+					//index 1 -> unsat/sat
+					//index 2 -> sat/unsat
+					//index 3 -> unsat/unsat
+					for(int i=0; i< 4; i++){// each with 4 counts
+						pathData.add(0);
+					}
+					//smt2 file to count sat/unsat for
+					String smt2File = "./ScratchData/results/satunsat/"+
+					className+"_"+methodId+"_"+
+					String.valueOf(pathId)+"_"+domain+"_satunsat.txt";
 
-		Map<String, List<Integer>> methodToData = new HashMap<String,List<Integer>>();
-		String[] fileNames = {"res1", "res2", "res3", "res4", "res5"};
-		//for(String className : classes){
-			for(int dataFile =0 ; dataFile < fileNames.length; dataFile ++) {
-				int offset = dataFile *4;
-				String path = "ExperimentData/z3Results/"+domless + "_" + dommore +"/";
-				String fileName = fileNames[dataFile];
+		
+//		String[] fileNames = {"res1", "res2", "res3", "res4", "res5"};
+//		//for(String className : classes){
+//			for(int dataFile =0 ; dataFile < fileNames.length; dataFile ++) {
+//				int offset = dataFile *4;
+//				String path = "ExperimentData/z3Results/"+domless + "_" + dommore +"/";
+//				String fileName = fileNames[dataFile];
 				//System.out.println("fileName " + fileName);
-				File file = new File(path+fileName);
+				File file = new File(smt2File);
 				Scanner scanner = new Scanner(new FileReader(file));
-				List<Integer> count = null;
+				//List<Integer> count = null;
 				while(scanner.hasNext()){
 					String line = scanner.nextLine();
 
 					//if line start with a number
-					if(line.matches("^[0-9].*")){
-						//System.out.println(fileName + "\t " + line);
-						//then get the method signature
-						String methodSig = "<"+line.split(":<")[1];
-						//System.out.println(methodSig);
-						if(!methodToData.containsKey(methodSig)){
-							//create a list of size 4 for it
-							//index 0 -> sat/sat
-							//index 1 -> unsat/sat
-							//index 2 -> sat/unsat
-							//index 3 -> unsat/unsat
-							count = new ArrayList<Integer>();
-							for(int i=0; i< 20; i++){// 5 files, each with 4 counts
-								count.add(0);
-							}
-							methodToData.put(methodSig, count);
-						} else {
-							count = methodToData.get(methodSig);
-						}
-					} else {
+//					if(line.matches("^[0-9].*")){
+//						//System.out.println(fileName + "\t " + line);
+//						//then get the method signature
+//						String methodSig = "<"+line.split(":<")[1];
+//						//System.out.println(methodSig);
+//						if(!pathData.containsKey(methodSig)){
+//							
+//							pathData.put(methodSig, count);
+//						} else {
+//							count = pathData.get(methodSig);
+//						}
+//					} else {
 						if(line.equals("sat")){
 							//read the next line
 							String line2 = scanner.nextLine();
 							if(line2.equals("sat")){
 								//add to index 0
-								incrementAt(0+offset, count);
+								incrementAt(0, pathData);
 							} else if (line2.equals("unsat")){
 								//add to index 2
-								incrementAt(2+offset,count);
+								incrementAt(2,pathData);
 							} else {
 								System.out.println("Something wrong1");
 								System.exit(2);
@@ -78,32 +102,45 @@ public class CountSatUnsatPartial {
 							//System.out.println(line + " " + line2);
 							if(line2.equals("sat")){
 								//add to index 1
-								incrementAt(1+offset, count);
+								incrementAt(1, pathData);
 							} else if (line2.equals("unsat")){
 								//add to index 3
-								incrementAt(3+offset,count);
+								incrementAt(3,pathData);
 							} else {
 								System.out.println("Something wrong2");
 								System.exit(2);
 							}
 						}
 					}
-				}
+				//}
 				scanner.close();
+				//System.out.println("methods " + methodToData.keySet().size());
+				//print the map
+				//write timeOutput to a file
+
+				satunsatOutput += className +"\t" + methodId +"\t" + pathId;
+					for(Integer val : pathData){
+						satunsatOutput+="\t" + val;
+					}
+					satunsatOutput+="\n";
+
+				pathId++;
 			}//end reading datafile
+			} 
+			String timeOutFileName = "./ScratchData/results/satunsat/satunsat_"+domain+".txt";
+			File timeOutFile = new File(timeOutFileName);
+			if(!timeOutFile.exists()){
+				 timeOutFile.createNewFile();
+			}
+			FileWriter timeOutWrite = new FileWriter(timeOutFile, true);
+			timeOutWrite.write(satunsatOutput);
+			timeOutWrite.close();
+			pathScan.close();
+			} else {
+				System.out.println("Cannot find file " + pathFileName);
+			}
 	//	}//end of class
 		//Total methods
-		System.out.println("methods " + methodToData.keySet().size());
-		//print the map
-		for(Entry<String, List<Integer>> es : methodToData.entrySet()){
-			System.out.print(es.getKey());
-			for(Integer val : es.getValue()){
-				System.out.print("\t" + val);
-			}
-			System.out.println();
-		}
-		System.out.flush();
-
 	}
 
 	private static void incrementAt(int index, List<Integer> list){
