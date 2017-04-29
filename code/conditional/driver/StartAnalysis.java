@@ -60,7 +60,7 @@ public class StartAnalysis {
 		//read the file:
 
 		//String symbolicOn = "sY";
-		String methodId = "1";
+		String methodId = "6";
 		StartAnalysis.methodId = methodId;
 		File file = new File("./ScratchData/conditions/paths/"+classNames[0]+"_"+methodId+".txt");
 		if(file.exists()){

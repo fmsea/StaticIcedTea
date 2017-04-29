@@ -12,11 +12,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.Scanner;
 import java.util.Set;
 
-import javax.swing.plaf.synth.SynthSeparatorUI;
-
-import conditional.partition.AbstractedCFG;
-import conditional.partition.Node;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,7 +33,7 @@ public class CombinePartialTime {
 	
 	//static LinkedHashMap<Integer,String> lineCount = new LinkedHashMap<Integer,String>();
 	static String className = "test.BallonFactory";
-	static String methodId = "1";
+	static String methodId = "2";
 	//static String startNode = "4";
 	static String filePrefixOrig = "./ScratchData/results/invariants/"+className+"_"+methodId+"_";
 	static String filePrefixComb = "./ScratchData/results/combined/"+className+"_"+methodId+"_";
@@ -70,6 +65,7 @@ public class CombinePartialTime {
 			//and we need to calculate the average 
 			//and put in the map Average -> path
 			SortedMap<Integer, String> averPath = new TreeMap<Integer, String>();
+			int fullTime = 0;
 			for(Entry<String, List<Integer>> e : pathRuns.entrySet()){
 				int average = 0;
 				for(Integer i : e.getValue()){
@@ -80,15 +76,23 @@ public class CombinePartialTime {
 				while(averPath.containsKey(average)){
 					average++;
 				}
-				averPath.put(average, e.getKey());
+				if(e.getKey().isEmpty()){
+					//it means the average for the fullpath
+					fullTime = average;
+				} else {
+					averPath.put(average, e.getKey());
+				}
 			}
 			//should be ordered now
 			System.out.println(averPath);
+			//print overall time result in some kind of file?
+			String timeOutput ="";			
 			//for each entry generate the output file in combined
 			//the first should just copy the file without changes
 			int fileCount = 1;
 			for(Entry<Integer, String> e : averPath.entrySet()){
 				System.out.println("combing for time " + e.getKey());
+				timeOutput +=className +"\t" + methodId +"\t" + e.getValue() +"\t" + fileCount + "\t" + fullTime + "\t" + e.getKey()+"\n";
 				if(fileCount == 1){
 					//just copy to combined folder
 					Path p1 = FileSystems.getDefault().getPath("./ScratchData/results/invariants/",className+"_"+methodId+"_"+e.getValue()+dom);
@@ -100,6 +104,15 @@ public class CombinePartialTime {
 				}
 				fileCount++;
 			}
+			//write timeOutput to a file
+			String timeOutFileName = "./ScratchData/results/time/time"+dom;
+			File timeOutFile = new File(timeOutFileName);
+			if(!timeOutFile.exists()){
+				timeOutFile.createNewFile();
+			}
+			FileWriter timeOutWrite = new FileWriter(timeOutFile, true);
+			timeOutWrite.write(timeOutput);
+			timeOutWrite.close();
 		} else {
 			System.out.println("Connot fine time file " + timeFileName);
 		}

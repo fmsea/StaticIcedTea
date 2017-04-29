@@ -28,7 +28,7 @@ public class StartAnalysisScript {
 		String methodId = args[1];
 		String domain = args[2]+".txt";
 		String symbolic = "sN";
-		String condition = args[3];
+		String condition = args[3].equals("0")?"":args[3];
 		writeToFile = args[4].equals("y") ? true : false;
 			
 		StartAnalysisScript.className = className;
@@ -82,7 +82,7 @@ public class StartAnalysisScript {
 		PackManager.v().getPack("jtp").
 			add(new Transform("jtp.disjoint", new PartialTransformer(domain, symbolicOn, condition, methodId)));
 		//adding runtime to the path
-		System.out.println(Scene.v().getSootClassPath() +  " " + System.getProperty("java.class.path"));
+		//System.out.println(Scene.v().getSootClassPath() +  " " + System.getProperty("java.class.path"));
 		Scene.v().setSootClassPath(Scene.v().getSootClassPath()+":"+System.getProperty("java.class.path") 
 				+ ":" + System.getProperty("sun.boot.class.path"));
 		//run soot
