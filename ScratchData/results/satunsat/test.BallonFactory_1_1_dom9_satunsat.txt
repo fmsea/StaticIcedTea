@@ -33,25 +33,25 @@ sat
 16 if i6 <= i0 goto $i25 = i6:<test.BallonFactory: java.util.ArrayList getLines(java.awt.FontMetrics,java.lang.String,double,int)>
 i0
 sat
-unsat
+sat
 i6
 sat
-unsat
+sat
 i0f
 sat
-sat
+unsat
 i6f
 sat
-sat
+unsat
 17 $i25 = i0:<test.BallonFactory: java.util.ArrayList getLines(java.awt.FontMetrics,java.lang.String,double,int)>
+$i25
+sat
+sat
 19 $i25 = i6:<test.BallonFactory: java.util.ArrayList getLines(java.awt.FontMetrics,java.lang.String,double,int)>
-$i25
-sat
-sat
-$i25
-sat
-sat
 20 i26 = $i25:<test.BallonFactory: java.util.ArrayList getLines(java.awt.FontMetrics,java.lang.String,double,int)>
+$i25
+sat
+unsat
 i26
 sat
 sat

@@ -81,8 +81,8 @@ i6->(or (and (<= i6 (- 62)) (> i6 (- 77)))
     (and (> i6 8) (<= i6 28))
     (and (<= i6 8) (> i6 6)))
 16 if i6 <= i0 goto $i25 = i6:<test.BallonFactory: java.util.ArrayList getLines(java.awt.FontMetrics,java.lang.String,double,int)>
-*16t
-i0f->(or (and (<= i0 (- 62)) (> i0 (- 77)))
+*16f
+i0->(or (and (<= i0 (- 62)) (> i0 (- 77)))
     (and (> i0 (- 62)) (< i0 (- 21)))
     (= i0 0)
     (= i0 1)
@@ -94,7 +94,7 @@ i0f->(or (and (<= i0 (- 62)) (> i0 (- 77)))
     (and (<= i0 (- 15)) (>= i0 (- 21)))
     (and (> i0 8) (<= i0 28))
     (and (<= i0 8) (> i0 6)))
-i6f->(or (and (<= i6 (- 62)) (> i6 (- 77)))
+i6->(or (and (<= i6 (- 62)) (> i6 (- 77)))
     (and (> i6 (- 62)) (< i6 (- 21)))
     (= i6 0)
     (= i6 1)
@@ -106,7 +106,7 @@ i6f->(or (and (<= i6 (- 62)) (> i6 (- 77)))
     (and (<= i6 (- 15)) (>= i6 (- 21)))
     (and (> i6 8) (<= i6 28))
     (and (<= i6 8) (> i6 6)))
-19 $i25 = i6:<test.BallonFactory: java.util.ArrayList getLines(java.awt.FontMetrics,java.lang.String,double,int)>
+17 $i25 = i0:<test.BallonFactory: java.util.ArrayList getLines(java.awt.FontMetrics,java.lang.String,double,int)>
 $i25->(or (and (<= $i25 (- 62)) (> $i25 (- 77)))
     (and (> $i25 (- 62)) (< $i25 (- 21)))
     (= $i25 0)

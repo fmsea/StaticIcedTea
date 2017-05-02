@@ -32,8 +32,8 @@ import java.util.TreeMap;
 public class CombinePartialTime {
 	
 	//static LinkedHashMap<Integer,String> lineCount = new LinkedHashMap<Integer,String>();
-	static String className = "test.BallonFactory";
-	static String methodId = "2";
+	static String className = "test.TIFFFaxEncoder";
+	static String methodId = "14";
 	//static String startNode = "4";
 	static String filePrefixOrig = "./ScratchData/results/invariants/"+className+"_"+methodId+"_";
 	static String filePrefixComb = "./ScratchData/results/combined/"+className+"_"+methodId+"_";
@@ -42,6 +42,7 @@ public class CombinePartialTime {
 		
 		//file that contains the prefix and the time it took to run
 		String timeFileName = "./ScratchData/results/time/"+className+"_"+methodId+dom;
+		System.out.println("timeFileName " + timeFileName);
 		File timeFile = new File(timeFileName);
 		if(timeFile.exists()){
 			//get the data into the map and order it 
@@ -105,14 +106,14 @@ public class CombinePartialTime {
 				fileCount++;
 			}
 			//write timeOutput to a file
-			String timeOutFileName = "./ScratchData/results/time/time"+dom;
-			File timeOutFile = new File(timeOutFileName);
-			if(!timeOutFile.exists()){
-				timeOutFile.createNewFile();
-			}
-			FileWriter timeOutWrite = new FileWriter(timeOutFile, true);
-			timeOutWrite.write(timeOutput);
-			timeOutWrite.close();
+//			String timeOutFileName = "./ScratchData/results/time/time"+dom;
+//			File timeOutFile = new File(timeOutFileName);
+//			if(!timeOutFile.exists()){
+//				timeOutFile.createNewFile();
+//			}
+//			FileWriter timeOutWrite = new FileWriter(timeOutFile, true);
+//			timeOutWrite.write(timeOutput);
+//			timeOutWrite.close();
 		} else {
 			System.out.println("Connot fine time file " + timeFileName);
 		}

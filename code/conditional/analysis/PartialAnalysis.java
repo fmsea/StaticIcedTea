@@ -115,7 +115,8 @@ public class PartialAnalysis extends ValueAnalysis {
 		e1.printStackTrace();
 	}
 	}
-	if(StartAnalysisScript.print){
+	//if(StartAnalysisScript.print){
+	if(true){
 	Iterator<Unit> iter = b.getUnits().iterator();
 	int stmtCount = 0;
 	//File to write the output to

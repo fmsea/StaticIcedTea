@@ -62,7 +62,7 @@ test.TIFFFaxDecoder	10
 test.TIFFFaxDecoder	11
 test.TIFFFaxDecoder	12
 test.TIFFFaxDecoder	13
-test.TIFFaxEncoder	2
-test.TIFFaxEncoder	6
-test.TIFFaxEncoder	8
-test.TIFFaxEncoder	11
+test.TIFFFaxEncoder	2
+test.TIFFFaxEncoder	6
+test.TIFFFaxEncoder	8
+test.TIFFFaxEncoder	11

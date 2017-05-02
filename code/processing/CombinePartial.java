@@ -30,8 +30,8 @@ import java.util.Map;
 public class CombinePartial {
 	
 	//static LinkedHashMap<Integer,String> lineCount = new LinkedHashMap<Integer,String>();
-	static String className = "test.TIFFFaxEncoder";
-	static String methodId = "11";
+	static String className = "test.ImageData";
+	static String methodId = "14";
 	//static String startNode = "4";
 	static String filePrefix = "./ScratchData/results/"+className+"_"+methodId+"_sN_";
 	static String dom = "_dom9.txt";

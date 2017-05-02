@@ -24,8 +24,8 @@ public class Smt2Format {
 	public static void main(String[] args) throws IOException {
 //		String file1Name = "test.TIFFFaxEncoder_11_sN__dom9.txt";
 //		String file2Name = "test.TIFFFaxEncoder_11_sN_dom9.txt";
-		String className = "test.BallonFactory";
-		String methodId = "1";
+		String className = "test.TIFFFaxEncoder";
+		String methodId = "2";
 		String domain = "_dom9.txt";
 		if(args.length > 0){
 			className = args[0];
@@ -44,8 +44,8 @@ public class Smt2Format {
 				String l = sPath.nextLine();
 				if(!l.isEmpty()){
 				//call the Smt2Format
-					System.out.println("Id " + pathId + " " + l);
 				String combinedPath = className+"_"+methodId+"_"+String.valueOf(pathId)+domain;
+				System.out.println(combinedPath + " " +  fullPath);
 				new Smt2Format(combinedPath, fullPath);
 				pathId++;
 				}
