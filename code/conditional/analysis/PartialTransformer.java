@@ -48,9 +48,9 @@ public class PartialTransformer extends BodyTransformer {
 			String methodName = b.getMethod().getName();
 			System.out.println("M " + methodName);
 			//construct dot
-//			CFGToDotGraph cfgToDot = new CFGToDotGraph();
-//			DotGraph dotGraph = cfgToDot.drawCFG(new ExceptionalUnitGraph(b),b);
-//			dotGraph.plot("main2.dot");
+			CFGToDotGraph cfgToDot = new CFGToDotGraph();
+			DotGraph dotGraph = cfgToDot.drawCFG(new ExceptionalUnitGraph(b),b);
+			dotGraph.plot("main2.dot");
 //			//get BFS nodes order?
 			int countOfCond = 0;
 			for(Unit u : b.getUnits()){

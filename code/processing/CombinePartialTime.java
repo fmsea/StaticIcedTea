@@ -32,8 +32,8 @@ import java.util.TreeMap;
 public class CombinePartialTime {
 	
 	//static LinkedHashMap<Integer,String> lineCount = new LinkedHashMap<Integer,String>();
-	static String className = "test.TIFFFaxEncoder";
-	static String methodId = "14";
+	static String className = "test.Client";
+	static String methodId = "7";
 	//static String startNode = "4";
 	static String filePrefixOrig = "./ScratchData/results/invariants/"+className+"_"+methodId+"_";
 	static String filePrefixComb = "./ScratchData/results/combined/"+className+"_"+methodId+"_";
@@ -170,13 +170,13 @@ public static void combine(String p1, String p2, String p) throws IOException{
 			if(val1Map == null){
 				//go over val2Map;
 				for(String var : val2Map.keySet()){
-					//System.out.println(var + "->" + val2Map.get(var));
+					//System.out.println("in 2 " + var + "->" + val2Map.get(var));
 					writeTo +=var + "->" + val2Map.get(var)+"\n";
 				}
 			} else if (val2Map == null){
 				//go over  val1Map;
 				for(String var : val1Map.keySet()){
-					//System.out.println(var + "->" + val1Map.get(var));
+					//System.out.println("in 1 " +var + "->" + val1Map.get(var));
 					writeTo +=var + "->" + val1Map.get(var)+"\n";
 				}
 			} else {
@@ -293,6 +293,7 @@ public static void combine(String p1, String p2, String p) throws IOException{
 			System.out.println("Cannot find file, exiting " + fileName);
 			System.exit(2);
 		}
+		//System.out.println("ret \n" + ret);
 		return ret;
 	}
 }

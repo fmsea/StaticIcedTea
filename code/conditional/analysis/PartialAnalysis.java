@@ -142,7 +142,7 @@ public class PartialAnalysis extends ValueAnalysis {
 			if(!fall.getStates().isEmpty() && fall.isFeasible()){
 				for(Local l : b.getLocals()){
 					if(changedVariables.get(u).contains(l)){
-						//System.out.println(" l " + l + " u " + u + " \n" + fall);
+						System.out.println(" l " + l + " u " + u + " \n" + fall);
 						//System.out.flush();
 						Set<BinopExpr> varPerState = evaluateStates(fall, l);
 						Expr state = null;
@@ -183,10 +183,10 @@ public class PartialAnalysis extends ValueAnalysis {
 
 				}
 			}
-			if(StartAnalysisScript.writeToFile){
+			if(StartAnalysis.writeToFile){
 			//write the string to the file
 			try {
-				StartAnalysisScript.fileToWrite.write(output);
+				StartAnalysis.fileToWrite.write(output);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

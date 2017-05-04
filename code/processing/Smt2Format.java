@@ -24,8 +24,8 @@ public class Smt2Format {
 	public static void main(String[] args) throws IOException {
 //		String file1Name = "test.TIFFFaxEncoder_11_sN__dom9.txt";
 //		String file2Name = "test.TIFFFaxEncoder_11_sN_dom9.txt";
-		String className = "test.TIFFFaxEncoder";
-		String methodId = "2";
+		String className = "test.client";
+		String methodId = "7";
 		String domain = "_dom9.txt";
 		if(args.length > 0){
 			className = args[0];
