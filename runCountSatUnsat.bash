@@ -1,5 +1,5 @@
 #! /bin/bash
-domain="dom9"
+domain="dom4"
 filename="$1"
 writeToFile="y"
 while read -r line

@@ -1,7 +1,7 @@
 #! /bin/bash
 export DYLD_LIBRARY_PATH=~/Documents/z3Java/z3/build/:.
 echo $DYLD_LIBRARY_PATH
-domain="dom9"
+domain="dom4"
 filename="$1"
 writeToFile="y"
 while read -r line
