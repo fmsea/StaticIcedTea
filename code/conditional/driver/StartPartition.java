@@ -7,9 +7,9 @@ import soot.Transform;
 
 public class StartPartition {
 	static public void main(String[] args){
-		String className = "test.ImageData";
+		String className = "test.MapViewer";
 		String[] sootArgs = {"-f", "n", className};
-		String methodId = "16";
+		String methodId = "2";
 		boolean skipLoops = false;
 		Scene.v().setSootClassPath(Scene.v().getSootClassPath()+":"+System.getProperty("java.class.path") 
 		+ ":" + System.getProperty("sun.boot.class.path"));

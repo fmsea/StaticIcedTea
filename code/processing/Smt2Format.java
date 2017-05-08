@@ -34,7 +34,7 @@ public class Smt2Format {
 		}
 		
 		//get the file with the number of paths
-		String pathFileName = "./ScratchData/conditions/paths/" + className+"_"+methodId+".txt";
+		String pathFileName = "./ScratchData/conditions/paths/" + className+"_"+methodId+"_L.txt";
 		File pathFile = new File(pathFileName);
 		if(pathFile.exists()){
 			Scanner sPath = new Scanner(new FileReader(pathFile));

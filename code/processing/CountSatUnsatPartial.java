@@ -32,7 +32,7 @@ public class CountSatUnsatPartial {
 		
 		
 		//read the path file and get all the number of path from it
-		String pathFileName = "./ScratchData/conditions/paths/"+className+"_"+methodId+".txt";
+		String pathFileName = "./ScratchData/conditions/paths/"+className+"_"+methodId+"_L.txt";
 		File pathFile = new File(pathFileName);
 		String satunsatOutput = "";
 		if(pathFile.exists()){

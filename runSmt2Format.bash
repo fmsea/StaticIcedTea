@@ -1,7 +1,6 @@
 #! /bin/bash
-domain="dom4"
+domain="dom9"
 filename="$1"
-writeToFile="y"
 while read -r line
 do 
    name=( $line )

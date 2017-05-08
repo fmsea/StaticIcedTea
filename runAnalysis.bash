@@ -1,7 +1,7 @@
 #! /bin/bash
 export DYLD_LIBRARY_PATH=~/Documents/z3Java/z3/build/:.
 echo $DYLD_LIBRARY_PATH
-domain="dom4"
+domain="dom9"
 filename="$1"
 writeToFile="y"
 while read -r line
@@ -10,7 +10,7 @@ do
    echo ${name[0]} "->" ${name[1]}
    class=${name[0]}
    method=${name[1]}
-   pathfile=./ScratchData/conditions/paths/${class}_${method}.txt
+   pathfile=./ScratchData/conditions/paths/${class}_${method}_L.txt
    echo ${pathfile}
   if [ -f $pathfile ]; then
      while read -r path
