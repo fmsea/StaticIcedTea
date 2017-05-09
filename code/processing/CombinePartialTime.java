@@ -32,12 +32,12 @@ import java.util.TreeMap;
 public class CombinePartialTime {
 	
 	//static LinkedHashMap<Integer,String> lineCount = new LinkedHashMap<Integer,String>();
-	static String className = "test.Client";
-	static String methodId = "7";
+	static String className = "test.MapViewer";
+	static String methodId = "2";
 	//static String startNode = "4";
 	static String filePrefixOrig = "./ScratchData/results/invariants/"+className+"_"+methodId+"_";
 	static String filePrefixComb = "./ScratchData/results/combined/"+className+"_"+methodId+"_";
-	static String dom = "_dom9.txt";
+	static String dom = "_dom5.txt";
 	public static void main(String [] strs) throws IOException{
 		
 		//file that contains the prefix and the time it took to run
