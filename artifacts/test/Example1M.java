@@ -108,6 +108,19 @@ public class Example1M {
 		z = x -y;
 		return z;
 	}
+	
+	static int example_7(int radius, int width){
+		int ret = 0;
+		if(radius < width){
+			int j = 5;
+			System.out.println(j);
+		} else {
+			for(int i=0; i < width; i++){
+				ret +=i;
+			}
+		}
+		return ret;
+	}
 
 	public static void main(String[] args){
 		int x = Integer.valueOf(args[0]);
