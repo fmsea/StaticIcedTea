@@ -84,7 +84,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 
 	int disjointDomainIndex;
 	
-	public static boolean writeToFile = true;
+	public static boolean writeToFile = false;
 	
 	//public static boolean debug = false;
 

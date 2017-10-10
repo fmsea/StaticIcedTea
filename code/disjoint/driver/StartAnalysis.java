@@ -69,7 +69,7 @@ public class StartAnalysis {
 	
 	public static FileWriter fileToWrite;
 	private static String domainPath = "ExperimentData/domains/";
-	private static String resultsPath = "ExperimentData/results/";
+	private static String resultsPath = "ScratchData/results/"; //"ExperimentData/results/";
 	public static FileWriter timeDataFile;
 	public static String analysisType;
 	
