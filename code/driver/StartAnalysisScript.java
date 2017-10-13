@@ -1,12 +1,12 @@
-package conditional.driver;
+package driver;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import conditional.analysis.PartialTransformer;
 import disjoint.domain.Domain;
 import disjoint.domain.reader.DomainReader;
+import pseudo.analysis.PseudoCondtionalValue;
 import soot.PackManager;
 import soot.Scene;
 import soot.Transform;
@@ -80,7 +80,7 @@ public class StartAnalysisScript {
 		
 		String[] sootArgs = {"-f", "n", className};
 		PackManager.v().getPack("jtp").
-			add(new Transform("jtp.disjoint", new PartialTransformer(domain, symbolicOn, condition, methodId)));
+			add(new Transform("jtp.disjoint", new PseudoCondtionalValue(domain, symbolicOn, condition, methodId)));
 		//adding runtime to the path
 		//System.out.println(Scene.v().getSootClassPath() +  " " + System.getProperty("java.class.path"));
 		Scene.v().setSootClassPath(Scene.v().getSootClassPath()+":"+System.getProperty("java.class.path") 

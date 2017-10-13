@@ -1,4 +1,4 @@
-package disjoint.analysis;
+package conditional.analysis;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -19,6 +19,8 @@ import java.util.Set;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Z3Exception;
 
+import conditional.scalar.ConditionalForwardBranchedFlowAnalysis;
+import conditional.scalar.ConditionalInfo;
 import soot.ByteType;
 import soot.IntType;
 import soot.Local;
@@ -70,9 +72,11 @@ import disjoint.domain.Domain;
 import disjoint.driver.StartAnalysisKestrel;
 import disjoint.solver.SolverWrapperZ3;
 import disjoint.state.*;
+import driver.StartAnalysisScript;
+import driver.StartConditionalValue;
 import driver.StartPseudoCondtionalValue;
 
-public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
+public class ConditionalValueAnalysis extends ConditionalForwardBranchedFlowAnalysis<AbstractState> {
 	protected long start;
 	protected long end;
 	protected Body b;
@@ -133,8 +137,8 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 	/*
 	 * States order: interval, relational, symbolic
 	 */
-	public ValueAnalysis(UnitGraph graph, List<Domain> setDomains, boolean symbolicOn) {
-		super(graph);
+	public ConditionalValueAnalysis(UnitGraph graph, List<Domain> setDomains, List<ConditionalInfo> conditions) {
+		super(graph, conditions);
 		domains = setDomains;
 		b = graph.getBody();
 		try {
@@ -233,19 +237,19 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 		
 		*/
 		//----------- adding symbolic state
-		if(symbolicOn){
-				SymbolicState.allStmt = new HashSet<Stmt>();
-				Iterator<Unit> iterUnit = graph.getBody().getUnits().iterator();
-				while(iterUnit.hasNext()){
-					Unit u = iterUnit.next();
-					if(u instanceof Stmt){
-						SymbolicState.allStmt.add((Stmt)u);
-					}
-				}
-				//System.out.println("AllStmt " + SymbolicState.allStmt);
-				SymbolicState ss = new SymbolicState();
-				states.add(ss);
-		}
+//		if(symbolicOn){
+//				SymbolicState.allStmt = new HashSet<Stmt>();
+//				Iterator<Unit> iterUnit = graph.getBody().getUnits().iterator();
+//				while(iterUnit.hasNext()){
+//					Unit u = iterUnit.next();
+//					if(u instanceof Stmt){
+//						SymbolicState.allStmt.add((Stmt)u);
+//					}
+//				}
+//				//System.out.println("AllStmt " + SymbolicState.allStmt);
+//				SymbolicState ss = new SymbolicState();
+//				states.add(ss);
+//		}
 		//initial and entry flows set up
 		Chain<Local> locals = graph.getBody().getLocals();
 		AbstractState.setLocals(locals);
@@ -991,27 +995,46 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 	}
 
 	public void report() {
-		System.out.println("Done in " + (end - start));
+		System.out.println("CV Done in " + (end - start));
 		String timeData = b.getMethod().getDeclaringClass() + "\t" +b.getMethod().getSignature()+
 				"\t" + StartAnalysisKestrel.analysisType + "\t"+ (end - start)+"\n";
 		
-		if(writeToFile){
-		try {
-			//StartAnalysisKestrel.timeDataFile.append(timeData);
-			RandomAccessFile rf = new RandomAccessFile(StartAnalysisKestrel.timeDataFile, "rwd");
-			FileChannel fileChannel = rf.getChannel();
-			FileLock lock = fileChannel.lock();
-			fileChannel.position(fileChannel.size());
-			fileChannel.write(Charset.defaultCharset().encode(CharBuffer.wrap(timeData)));
-			fileChannel.force(false);
-			lock.release();
-			fileChannel.close();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		}
-		if(StartPseudoCondtionalValue.print){
+//		if(writeToFile){
+//		try {
+//			//StartAnalysisKestrel.timeDataFile.append(timeData);
+//			RandomAccessFile rf = new RandomAccessFile(StartCondtionalValue.timeDataFile, "rwd");
+//			FileChannel fileChannel = rf.getChannel();
+//			FileLock lock = fileChannel.lock();
+//			fileChannel.position(fileChannel.size());
+//			fileChannel.write(Charset.defaultCharset().encode(CharBuffer.wrap(timeData)));
+//			fileChannel.force(false);
+//			lock.release();
+//			fileChannel.close();
+//		} catch (IOException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+//		}
+		if(StartConditionalValue.writeTime){
+			try {
+				//StartAnalysisKestrel.timeDataFile.append(timeData);
+				String timeDataFile = "./ScratchData/results/time/"+"C_"+StartAnalysisScript.className+"_"+StartAnalysisScript.methodId+"_"+StartAnalysisScript.domain+".txt";
+				RandomAccessFile rf = new RandomAccessFile(timeDataFile, "rwd");
+				FileChannel fileChannel = rf.getChannel();
+				FileLock lock = fileChannel.lock();
+				fileChannel.position(fileChannel.size());
+				fileChannel.write(Charset.defaultCharset().encode(CharBuffer.wrap(timeData)));
+				fileChannel.force(false);
+				lock.release();
+				fileChannel.close();
+				rf.close();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			}
+		//if(StartPseudoCondtionalValue.print){
+		if(true){
 		Iterator<Unit> iter = b.getUnits().iterator();
 		int stmtCount = 0;
 		//File to write the output to
@@ -1069,10 +1092,10 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 
 					}
 				}
-				if(writeToFile){
+				if(StartConditionalValue.writeToFile){
 				//write the string to the file
 				try {
-					StartAnalysisKestrel.fileToWrite.write(output);
+					StartConditionalValue.fileToWrite.write(output);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

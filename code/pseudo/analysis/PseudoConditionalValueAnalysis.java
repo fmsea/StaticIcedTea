@@ -1,4 +1,4 @@
-package conditional.analysis;
+package pseudo.analysis;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -13,8 +13,6 @@ import java.util.Set;
 
 import com.microsoft.z3.BoolExpr;
 
-import conditional.driver.StartAnalysis;
-import conditional.driver.StartAnalysisScript;
 import disjoint.analysis.ValueAnalysis;
 import disjoint.domain.Domain;
 import disjoint.driver.StartAnalysisKestrel;
@@ -29,8 +27,10 @@ import soot.jimple.Stmt;
 import soot.toolkits.graph.UnitGraph;
 import soot.util.Chain;
 import disjoint.state.*;
+import driver.StartPseudoCondtionalValue;
+import driver.StartAnalysisScript;
 
-public class PartialAnalysis extends ValueAnalysis {
+public class PseudoConditionalValueAnalysis extends ValueAnalysis {
 
 	//branches to be excluded that is \pi condition
 	Map<IfStmt, Boolean> include; //the opposite will be excluded
@@ -38,7 +38,7 @@ public class PartialAnalysis extends ValueAnalysis {
 
 
 
-	public PartialAnalysis(UnitGraph graph, List<Domain> domain, Map<IfStmt, Boolean> include ) {
+	public PseudoConditionalValueAnalysis(UnitGraph graph, List<Domain> domain, Map<IfStmt, Boolean> include ) {
 		super(graph, domain, false);
 		this.include = include;
 		this.graph = graph;
@@ -97,7 +97,7 @@ public class PartialAnalysis extends ValueAnalysis {
 	System.out.println("Done in " + (end - start));
 	String timeData = StartAnalysisScript.condition + "\t"+ (end - start)+"\n";
 	
-	if(StartAnalysisScript.writeTime){
+	if(StartPseudoCondtionalValue.writeTime){
 	try {
 		//StartAnalysisKestrel.timeDataFile.append(timeData);
 		String timeDataFile = "./ScratchData/results/time/"+StartAnalysisScript.className+"_"+StartAnalysisScript.methodId+"_"+StartAnalysisScript.domain+".txt";
@@ -183,10 +183,10 @@ public class PartialAnalysis extends ValueAnalysis {
 
 				}
 			}
-			if(StartAnalysisScript.writeToFile){
+			if(StartPseudoCondtionalValue.writeToFile){
 			//write the string to the file
 			try {
-				StartAnalysisScript.fileToWrite.write(output);
+				StartPseudoCondtionalValue.fileToWrite.write(output);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

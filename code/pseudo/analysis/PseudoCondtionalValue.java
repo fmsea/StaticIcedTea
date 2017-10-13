@@ -1,4 +1,4 @@
-package conditional.analysis;
+package pseudo.analysis;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +13,7 @@ import soot.toolkits.graph.ExceptionalUnitGraph;
 import soot.util.cfgcmd.CFGToDotGraph;
 import soot.util.dot.DotGraph;
 
-public class PartialTransformer extends BodyTransformer {
+public class PseudoCondtionalValue extends BodyTransformer {
 	List<Domain> domains;
 	boolean symbolicOn;
 	Map<IfStmt, Boolean> include;
@@ -29,7 +29,7 @@ public class PartialTransformer extends BodyTransformer {
  * @param conditions - the set of branches to be excluded.
  * @param methodId 
  */
-	public PartialTransformer(List<Domain> domains, boolean symbolicOn, String conditions, String methodId) {
+	public PseudoCondtionalValue(List<Domain> domains, boolean symbolicOn, String conditions, String methodId) {
 		super();
 		this.domains = domains;
 		this.symbolicOn = symbolicOn;
@@ -85,7 +85,7 @@ public class PartialTransformer extends BodyTransformer {
 			}
 			System.out.println("Exclude map " + include);
 			//start the analysis
-			PartialAnalysis pa = new PartialAnalysis(new ExceptionalUnitGraph(b), domains, include);
+			PseudoConditionalValueAnalysis pa = new PseudoConditionalValueAnalysis(new ExceptionalUnitGraph(b), domains, include);
 			pa.start();
 			pa.report();
 		}

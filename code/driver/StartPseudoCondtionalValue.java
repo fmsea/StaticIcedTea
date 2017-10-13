@@ -1,4 +1,4 @@
-package conditional.driver;
+package driver;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,18 +8,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import conditional.analysis.PartialTransformer;
 import disjoint.domain.Domain;
 import disjoint.domain.reader.DomainReader;
+import pseudo.analysis.PseudoCondtionalValue;
 import soot.G;
 import soot.PackManager;
 import soot.Scene;
 import soot.Transform;
 
-public class StartAnalysis {
+public class StartPseudoCondtionalValue {
 	//eas: make sure artifacts is a source folder.
 	public static boolean print = true;
 	public static boolean writeToFile = true;
+	public static boolean writeTime = true;
 	public static String className;
 	public static String methodId;
 	public static String domain;
@@ -33,7 +34,7 @@ public class StartAnalysis {
 //				"test.InfBlocks", "test.InfCodes", "test.InfTree", "test.MapViewer", "test.QRCodeDataBlockReader", 
 //				"test.StructurePanel", "test.TileRenderor", "test.WorldController", "test.Class11", "test.Class13",
 //		};
-		String[] classNames = {"test.Example1M"};
+		String[] classNames = {"test.BallonFactory"};
 		String[] domainNames = {"dom9.txt"};
 		//String[] domainNames = {"dom3.txt", "dom2.txt"};
 		String[] symbolic = {"sN"};
@@ -60,9 +61,9 @@ public class StartAnalysis {
 		//read the file:
 
 		//String symbolicOn = "sY";
-		String methodId = "8";
-		StartAnalysis.methodId = methodId;
-		File file = new File("./ScratchData/conditions/paths/"+classNames[0]+"_"+methodId+".txt");
+		String methodId = "6";
+		StartPseudoCondtionalValue.methodId = methodId;
+		File file = new File("./ExperimentDataConditional/conditions/paths/"+classNames[0]+"_"+methodId+".txt");
 		if(file.exists()){
 			try {
 				Scanner scan = new Scanner(file);
@@ -81,8 +82,8 @@ public class StartAnalysis {
 			
 		}
 		
-		conditions.clear();
-		conditions.add("");
+		//conditions.clear();
+		//conditions.add("");
 	
 		
 //		try {
@@ -93,16 +94,16 @@ public class StartAnalysis {
 //		}
 //		
 		for(String className : classNames){
-			StartAnalysis.className = className;
+			StartPseudoCondtionalValue.className = className;
 			for(String symbolicOn : symbolic){
 			for(String domainName : domainNames){
-				StartAnalysis.domain = domainName.split("\\.")[0];
-				analysisType = StartAnalysis.domain + "_"+ symbolicOn;
+				StartPseudoCondtionalValue.domain = domainName.split("\\.")[0];
+				analysisType = StartPseudoCondtionalValue.domain + "_"+ symbolicOn;
 				for(String condition : conditions){
 				try {	
 					System.out.println(condition);
-					StartAnalysis.condition = condition.isEmpty()?"":condition.replaceAll(",", "");
-					new StartAnalysis(className, domainName, symbolicOn, condition, methodId);
+					StartPseudoCondtionalValue.condition = condition.isEmpty()?"":condition.replaceAll(",", "");
+					new StartPseudoCondtionalValue(className, domainName, symbolicOn, condition, methodId);
 					G.reset();
 					System.gc();
 				} catch (Exception e) {
@@ -129,15 +130,15 @@ public class StartAnalysis {
 	
 	
 	public static FileWriter fileToWrite;
-	private static String domainPath = "ScratchData/domains/";
+	private static String domainPath = "ExperimentDataConditional/domains/";
 	//private static String conditionPath = "ScratchData/conditions/";
-	private static String resultsPath = "ScratchData/results/invariants/";
+	private static String resultsPath = "ScratchData/results/invariants/pseudo";
 	public static FileWriter timeDataFile;
 	public static String analysisType;
 	
 	//each instance should open/close that file
 	
-	public StartAnalysis(String className, String domainFile, String symbolicHelper, String condition, String methodId) throws IOException{
+	public StartPseudoCondtionalValue(String className, String domainFile, String symbolicHelper, String condition, String methodId) throws IOException{
 		//instantiate the list of domains from a file
 		String domainDescription = domainPath+domainFile;
 		DomainReader dr = new DomainReader(domainDescription);
@@ -155,7 +156,7 @@ public class StartAnalysis {
 		
 		String[] sootArgs = {"-f", "n", className};
 		PackManager.v().getPack("jtp").
-			add(new Transform("jtp.disjoint", new PartialTransformer(domain, symbolicOn, condition, methodId)));
+			add(new Transform("jtp.disjoint", new PseudoCondtionalValue(domain, symbolicOn, condition, methodId)));
 		//adding runtime to the path
 		System.out.println(Scene.v().getSootClassPath() +  " " + System.getProperty("java.class.path"));
 		Scene.v().setSootClassPath(Scene.v().getSootClassPath()+":"+System.getProperty("java.class.path") 

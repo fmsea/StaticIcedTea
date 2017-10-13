@@ -1,4 +1,4 @@
-package disjoint.analysis;
+package disjoint.analysis.concurrent;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -72,7 +72,7 @@ import disjoint.solver.SolverWrapperZ3;
 import disjoint.state.*;
 import driver.StartPseudoCondtionalValue;
 
-public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
+public class ValueAnalysisConcurrent extends ForwardBranchedFlowAnalysis<AbstractState> {
 	protected long start;
 	protected long end;
 	protected Body b;
@@ -133,7 +133,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 	/*
 	 * States order: interval, relational, symbolic
 	 */
-	public ValueAnalysis(UnitGraph graph, List<Domain> setDomains, boolean symbolicOn) {
+	public ValueAnalysisConcurrent(UnitGraph graph, List<Domain> setDomains, boolean symbolicOn) {
 		super(graph);
 		domains = setDomains;
 		b = graph.getBody();
@@ -365,8 +365,8 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 	protected void flowThrough(AbstractState in, Unit u, List<AbstractState> fallIn,
 			List<AbstractState> branchOut) {
 		Stmt s = (Stmt) u;
-		//System.out.println("---------------------------------------");
-		//System.out.println("In state \t" + in + " " + in.isFeasible());
+		System.out.println("---------------------------------------");
+		System.out.println("In state \t" + in + " " + in.isFeasible());
 		//System.out.println("Stmt " + s + " " + s.getClass());
 		//debug = s.toString().equals("if i2 != 16 goto $r9 = new java.lang.String");
 		AbstractState inState = in;
