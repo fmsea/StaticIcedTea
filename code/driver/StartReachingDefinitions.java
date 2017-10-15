@@ -12,6 +12,7 @@ import soot.NormalUnitPrinter;
 import soot.Scene;
 import soot.SootClass;
 import soot.SootMethod;
+import soot.Timers;
 import soot.Unit;
 import soot.UnitPrinter;
 import soot.toolkits.graph.ExceptionalUnitGraph;
@@ -27,8 +28,8 @@ public class StartReachingDefinitions {
 	public static void main(String[] args){
 	
 		
-		String className = "test.BallonFactory";
-		int methodId = 6;
+		String className = "test.Example1M";
+		int methodId = 4;
 		
 		String fileName = resultsPath+className+"_"+methodId;
 		//new StartAnalysis(className, domainName, symbolicOn, condition, methodId);
@@ -56,7 +57,7 @@ public class StartReachingDefinitions {
 		myVariables.renameLocals();
 		ReachingDefinitions rdf = new ReachingDefinitions(g);
 		Iterator gIt = g.iterator();
-		System.out.println("RD time " + rdf.getTime());
+		System.out.println("RD time " + rdf.getTime() + ", nf " + Timers.v().totalFlowNodes + ", fc "+ Timers.v().totalFlowComputations + "\n");
 		FileWriter writer;
 		try{
 			//					String path = "/Users/erickeefe/Documents/workspace/Conditional_DFA/src/automatedTesting/";

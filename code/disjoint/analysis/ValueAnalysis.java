@@ -23,6 +23,7 @@ import soot.ByteType;
 import soot.IntType;
 import soot.Local;
 import soot.ShortType;
+import soot.Timers;
 import soot.Body;
 import soot.BooleanType;
 import soot.Type;
@@ -991,7 +992,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 	}
 
 	public void report() {
-		System.out.println("Done in " + (end - start));
+		System.out.println("Done in " + (end - start)+" fn "+ Timers.v().totalFlowNodes + ", fc"+ Timers.v().totalFlowComputations + "\n");
 		String timeData = b.getMethod().getDeclaringClass() + "\t" +b.getMethod().getSignature()+
 				"\t" + StartAnalysisKestrel.analysisType + "\t"+ (end - start)+"\n";
 		

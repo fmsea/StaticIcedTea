@@ -17,6 +17,7 @@ import disjoint.analysis.ValueAnalysis;
 import disjoint.domain.Domain;
 import disjoint.driver.StartAnalysisKestrel;
 import soot.Local;
+import soot.Timers;
 import soot.Unit;
 import soot.grimp.internal.GAndExpr;
 import soot.jimple.AssignStmt;
@@ -94,7 +95,7 @@ public class PseudoConditionalValueAnalysis extends ValueAnalysis {
 	
 	//@Override
 	public void report(){
-	System.out.println("Done in " + (end - start));
+	System.out.println("Done in " + (end - start)+" fn " + Timers.v().totalFlowNodes + ", fc"+ Timers.v().totalFlowComputations + "\n");
 	String timeData = StartAnalysisScript.condition + "\t"+ (end - start)+"\n";
 	
 	if(StartPseudoCondtionalValue.writeTime){

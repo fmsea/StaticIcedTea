@@ -15,6 +15,7 @@ import soot.Body;
 import soot.Scene;
 import soot.SootClass;
 import soot.SootMethod;
+import soot.Timers;
 import soot.Unit;
 import soot.toolkits.graph.ExceptionalUnitGraph;
 import soot.toolkits.graph.UnitGraph;
@@ -31,8 +32,8 @@ public class StartConditionalReachingDefinitions {
 	public static void main(String[] args){
 
 
-		String className = "test.BallonFactory";
-		int methodId = 6;
+		String className = "test.Example1M";
+		int methodId = 4;
 		List<String> conditions = new ArrayList<String>();
 
 		File file = new File("./ExperimentDataConditional/conditions/paths/"+className+"_"+methodId+".txt");
@@ -52,6 +53,11 @@ public class StartConditionalReachingDefinitions {
 			}
 
 		}
+//		conditions.clear();
+//		conditions.add("1t,2t");
+//		conditions.add("1t,2f");
+//		conditions.add("1f,2t");
+//		conditions.add("1f,2f");
 
 
 
@@ -108,7 +114,9 @@ public class StartConditionalReachingDefinitions {
 
 			//loop through each unit in our graph
 			//and print out the list of reaching definitions before that unit
-			System.out.println("CRD " + rdf.getTime());
+			System.out.println("CRD " + rdf.getTime() + ", nf " + Timers.v().totalFlowNodes + ", fc "+ Timers.v().totalFlowComputations + "\n");
+			Timers.v().totalFlowNodes = 0;
+			Timers.v().totalFlowComputations = 0;
 			Iterator gIt = g.iterator();
 
 			FileWriter writer;

@@ -9,7 +9,7 @@ public class StartPartition {
 	static public void main(String[] args){
 		String className = "test.Example1M";
 		String[] sootArgs = {"-f", "n", className};
-		String methodId = "8";
+		String methodId = "4";
 		boolean skipLoops = true;
 		Scene.v().setSootClassPath(Scene.v().getSootClassPath()+":"+System.getProperty("java.class.path") 
 		+ ":" + System.getProperty("sun.boot.class.path"));

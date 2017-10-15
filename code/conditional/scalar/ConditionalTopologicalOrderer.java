@@ -151,8 +151,10 @@ public class ConditionalTopologicalOrderer<N> implements Orderer<N> {
 
 	private boolean specialCond(boolean branch, N node){ //returns true if the node we are at is a conditional node, and it only takes the branch we pass in 
 		if (node instanceof IfStmt){
+			//System.out.println("ifstmt " + node);
 			if (branchList != null){
 				for (ConditionalInfo f: branchList){
+					//System.out.println("ci " + f + " " + condToLine.get(node));
 					if (f.getLine() == condToLine.get(node)){
 						if (f.getBranch() == branch){return true;}
 						
@@ -175,7 +177,6 @@ public class ConditionalTopologicalOrderer<N> implements Orderer<N> {
 			//System.out.println("We are only going down the true branch");
 			indexStack[last++] = 0;}
 		else{
-			
 			indexStack[last++] = -1; //corresponds to the node at that same index in the stmtStack. always 1 less then the next child we want to visit for that node. 
 		}
 		
@@ -194,11 +195,10 @@ public class ConditionalTopologicalOrderer<N> implements Orderer<N> {
 			if (toVisitIndex >= succs.size() || (onlyFall && toVisitIndex > 0)) {
 				// Visit this node now that we ran out of children
 				order.add(toVisitNode);
-
 				last--;
 			} else {
 				N childNode = succs.get(toVisitIndex);
-				//System.out.println(childNode + " " + toVisitIndex);
+				//System.out.println(childNode + " -> " + toVisitIndex);
 				
 				onlyBranch = specialCond(true, childNode);
 				//System.out.println("only branch is " + onlyBranch);

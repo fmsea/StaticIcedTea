@@ -58,18 +58,19 @@ import soot.options.*;
  * WARNING: This does not handle exceptional flow as branches!
  * */
 public abstract class ConditionalForwardBranchedFlowAnalysis<A> extends BranchedFlowAnalysis<Unit, A> {
-	
+
 	public List<ConditionalInfo> myBranchList;
 	Map<Unit, Integer> condToLine;
-	
-	
-	
+
+
+
 	public ConditionalForwardBranchedFlowAnalysis(UnitGraph graph, List<ConditionalInfo> branchList) {
 		super(graph);
 		myBranchList = branchList;
+		System.out.println("BL " + myBranchList);
 		condToLine = new HashMap<Unit, Integer>(); //a map of conditional units to the number of that conditional statement. //the first conditional statement is the 0 conditional statement
 		makeCondToLineMap(condToLine);
-		
+
 	}
 
 	protected boolean isForward() {
@@ -84,11 +85,11 @@ public abstract class ConditionalForwardBranchedFlowAnalysis<A> extends Branched
 		//System.out.println("accumulating the after flow set");
 		int repCount = 0;
 
-//		if( s instanceof JGotoStmt){
-//			System.out.println(s.fallsThrough() + " or " + s.branches());
-//			System.out.println(flowRepositories[0] + " \n" + flowRepositories[1]);
-//		}
-		
+		//		if( s instanceof JGotoStmt){
+		//			System.out.println(s.fallsThrough() + " or " + s.branches());
+		//			System.out.println(flowRepositories[0] + " \n" + flowRepositories[1]);
+		//		}
+
 		previousAfterFlows.clear();
 		if (s.fallsThrough()) {
 			copy(unitToAfterFallFlow.get(s).get(0), flowRepositories[repCount]);
@@ -108,46 +109,46 @@ public abstract class ConditionalForwardBranchedFlowAnalysis<A> extends Branched
 		}
 	} // end accumulateAfterFlowSets
 
-//	private void specialDFS(Map<Unit, Integer> condToLine, List<Unit>  orderedWorkList, Unit root){ //special depth first search to get the orderedWorkingList by only traversing down the branches we select to go down
-//		
-//		HashSet<Unit> visited = new HashSet<Unit>();
-//		visited.add(root);
-//		
-//		//create an empty stack of Unit
-//		int last = 0; //corresponds to the level of the stack we are at. always 1 more than the level we are at
-//		ArrayList <Unit> stmtStack = new ArrayList<Unit>(); //add and remove from end to implement as stack
-//		//add the root to the stack
-//		ArrayList <Integer> indexStack = new ArrayList<Integer>(); //each element corresponds to the next child for the stmtStack
-//		
-//		stmtStack.set(last,root);
-//		indexStack.set(last, 0);
-//		last++;
-//		
-//		
-//		while (last > 0){
-//			Unit current = stmtStack.get(last - 1);
-//			int index = indexStack.get(last - 1);
-//			indexStack.set(last - 1, index + 1);
-//			
-//			List<Unit> succs = graph.getSuccsOf(current);
-//			
-//			if (index >=succs.size()){
-//				orderedWorkList.add(current);
-//				last--;
-//			}else{
-//				if (visited.add(root)){
-//					stmtStack.set(last, succs.get(index));
-//					indexStack.set(last, 0);
-//					last++;
-//				}
-//			}
-//			
-//			
-//		}
-//		
-//		
-//	}
-	
+	//	private void specialDFS(Map<Unit, Integer> condToLine, List<Unit>  orderedWorkList, Unit root){ //special depth first search to get the orderedWorkingList by only traversing down the branches we select to go down
+	//		
+	//		HashSet<Unit> visited = new HashSet<Unit>();
+	//		visited.add(root);
+	//		
+	//		//create an empty stack of Unit
+	//		int last = 0; //corresponds to the level of the stack we are at. always 1 more than the level we are at
+	//		ArrayList <Unit> stmtStack = new ArrayList<Unit>(); //add and remove from end to implement as stack
+	//		//add the root to the stack
+	//		ArrayList <Integer> indexStack = new ArrayList<Integer>(); //each element corresponds to the next child for the stmtStack
+	//		
+	//		stmtStack.set(last,root);
+	//		indexStack.set(last, 0);
+	//		last++;
+	//		
+	//		
+	//		while (last > 0){
+	//			Unit current = stmtStack.get(last - 1);
+	//			int index = indexStack.get(last - 1);
+	//			indexStack.set(last - 1, index + 1);
+	//			
+	//			List<Unit> succs = graph.getSuccsOf(current);
+	//			
+	//			if (index >=succs.size()){
+	//				orderedWorkList.add(current);
+	//				last--;
+	//			}else{
+	//				if (visited.add(root)){
+	//					stmtStack.set(last, succs.get(index));
+	//					indexStack.set(last, 0);
+	//					last++;
+	//				}
+	//			}
+	//			
+	//			
+	//		}
+	//		
+	//		
+	//	}
+
 	private void makeCondToLineMap(Map<Unit, Integer> condToLine){
 		int value = 1;
 		Iterator gIt = graph.iterator();
@@ -155,12 +156,13 @@ public abstract class ConditionalForwardBranchedFlowAnalysis<A> extends Branched
 			Unit next = (Unit) gIt.next();
 			if (next instanceof IfStmt){
 				condToLine.put(next, value);
-				value++;
+			//	value++; BBBBBBBUUUUUGGGG!!!
 			}
+			value++;
 		}
 	}
-	
-	
+
+
 	@Override
 	protected void doAnalysis() {	
 		final Map<Unit, Integer> numbers = new HashMap<Unit, Integer>(); //a map of each unit or line in a program to its line number
@@ -170,24 +172,24 @@ public abstract class ConditionalForwardBranchedFlowAnalysis<A> extends Branched
 		List<Unit> orderedWorkList = myOrderer.newList(graph, false);
 		//List<Unit> orderedWorkList = new ArrayList<Unit>(); //will contain a pseudotopologically ordered set of the units we wish to process
 		//if (myBranchList!= null){
-			//specialDFS(condToLine, orderedWorkList, orderedUnits.get(0));
+		//specialDFS(condToLine, orderedWorkList, orderedUnits.get(0));
 		//}else{
-			//orderedWorkList = orderedUnits;
+		//orderedWorkList = orderedUnits;
 		//}
-				
-//		int condStatement = 0;
+
+		//		int condStatement = 0;
 		{
 			int i = 1;
 			for (Unit u : orderedWorkList) { //for (Unit u: orderedUnits){
 				//System.out.println(u);
 				numbers.put(u, new Integer(i));
 				i++;
-				
-				}
-//			}
-		}
-		
 
+			}
+			//			}
+		}
+
+		System.out.println("Num of nodes " + orderedWorkList.size());
 		//initialize our changedUnit treeset
 		TreeSet<Unit> changedUnits = new TreeSet<Unit>(new Comparator<Unit>() {
 			public int compare(Unit o1, Unit o2) {
@@ -196,9 +198,9 @@ public abstract class ConditionalForwardBranchedFlowAnalysis<A> extends Branched
 				return (i1.intValue() - i2.intValue());
 			}
 		});
-		
-		
-		
+
+
+
 
 		Map<Unit, ArrayList<A>> unitToIncomingFlowSets = new HashMap<Unit, ArrayList<A>>(graph.size() * 2 + 1, 0.7f); //mapping each unit to incoming sets. e.g. a unit with three units merging into it will me mapped to three lists
 		List<Unit> heads = graph.getHeads(); //entry points into the program flow
@@ -212,14 +214,14 @@ public abstract class ConditionalForwardBranchedFlowAnalysis<A> extends Branched
 				unitToIncomingFlowSets.put(s, new ArrayList<A>());
 			}
 		}
-		
-		
+
+
 		for (Unit u: orderedWorkList){
 			changedUnits.add(u);
 		}
-//		
-		
-				
+		//		
+
+
 		// Set initial values and nodes to visit.
 		// WARNING: DO NOT HANDLE THE CASE OF THE TRAPS
 		{
@@ -258,7 +260,7 @@ public abstract class ConditionalForwardBranchedFlowAnalysis<A> extends Branched
 
 						incList.add(f); //again, the successor of s's flow in it list of incoming flow
 					}
-					
+
 				}
 				unitToAfterBranchFlow.put(s, l); //now the afterBranchFlow of s is initiallized as a new initial flow, and put in the map 
 
@@ -267,9 +269,9 @@ public abstract class ConditionalForwardBranchedFlowAnalysis<A> extends Branched
 			}
 		}
 		//System.out.println("I'm printing out the unit to Incoming Flow because my program is annoying");
-//		for (Unit u: unitToIncomingFlowSets.keySet()){
-//			System.out.println("Unit: " + u + " " + "Incoming Flow Set: " + System.identityHashCode(unitToIncomingFlowSets.get(u)));
-//		}
+		//		for (Unit u: unitToIncomingFlowSets.keySet()){
+		//			System.out.println("Unit: " + u + " " + "Incoming Flow Set: " + System.identityHashCode(unitToIncomingFlowSets.get(u)));
+		//		}
 
 		// Feng Qian: March 07, 2002
 		// init entry points
@@ -296,24 +298,24 @@ public abstract class ConditionalForwardBranchedFlowAnalysis<A> extends Branched
 				//System.out.println(changedUnits);
 				A beforeFlow;
 
-				
+
 				Unit s = changedUnits.first();
 				changedUnits.remove(s);
 				boolean isHead = heads.contains(s);
 
 				accumulateAfterFlowSets(s, previousFlowRepositories, previousAfterFlows); //just updating the previousAfterFlow to be the current afterFlow, before we've called the flowThrough method
 				//don't know why flow repository is necessary
-				
+
 
 				// Compute and store beforeFlow
 				{
 					List<A> preds = unitToIncomingFlowSets.get(s); //getting all the incoming flows
- 
+
 					beforeFlow = getFlowBefore(s); //getting the current before flow of the unit we are at (in first iteration this should just be whatever initialFlow() returns)
 
 					//the unitToIncomingFlow sets was initialized to be connected to the incoming flow from previous branches and fallOuts 
 					//if in the last iteration we changed the afteflow of these previous precsessor nodes we need to copy that new inflow into our unitToFlowBefore
-					
+
 					if (preds.size() == 1) //if there is only one incoming flow, just copy it to the current beforeFlow
 						copy(preds.get(0), beforeFlow); 
 					else if (preds.size() != 0) { //otherwise, copy the first incmoing flow, then copy all the branches that are merging into this unit
@@ -330,8 +332,8 @@ public abstract class ConditionalForwardBranchedFlowAnalysis<A> extends Branched
 							//System.out.println("Merged branch is " + newBeforeFlow);
 							copy(newBeforeFlow, beforeFlow);
 						}
-						
-						
+
+
 					}
 
 					if (isHead && preds.size() != 0) //if it's the head and has no pred nodes, then mergeInto the beforeFlow (not really sure what this is doing), i feel like if its the head it should just have no beforeFlow
@@ -342,12 +344,12 @@ public abstract class ConditionalForwardBranchedFlowAnalysis<A> extends Branched
 				{
 					List<A> afterFallFlow = unitToAfterFallFlow.get(s);
 					List<A> afterBranchFlow = getBranchFlowAfter(s);
-					
+
 					//System.out.println("in flow " + beforeFlow + "before fall " + afterFallFlow + " before branch " + afterBranchFlow );
 					flowThrough(beforeFlow, s, afterFallFlow, afterBranchFlow);
-					
-					
-					
+
+
+
 					numComputations++; //the number of computations is one more
 				}
 				//if (unitToAfterFallFlow.get(s).size() > 0){
@@ -355,11 +357,11 @@ public abstract class ConditionalForwardBranchedFlowAnalysis<A> extends Branched
 				//}
 				accumulateAfterFlowSets(s, flowRepositories, afterFlows); //just updating the afterFlows variable
 				//System.out.println("the accumulated after flow is: " + afterFlows);
-											
+
 				// Update queue appropriately //well at least these lines makes sense to me
 				boolean onlyFall = false;
 				boolean onlyBranch = false;
-								
+
 				if (!afterFlows.equals(previousAfterFlows)) { //whatever you are flowing through needs to override Objects equals method otherwise this won't work
 					//System.out.println("Adding successors because after flow has changed");
 					//System.out.println(afterFlows);
@@ -380,7 +382,7 @@ public abstract class ConditionalForwardBranchedFlowAnalysis<A> extends Branched
 							}
 						}
 					}
-									
+
 					if (onlyFall){
 						changedUnits.add(graph.getSuccsOf(s).get(0));
 					}else if (onlyBranch){
@@ -394,23 +396,23 @@ public abstract class ConditionalForwardBranchedFlowAnalysis<A> extends Branched
 						}
 					}
 				}
-			
-			
-			
+
+
+
 			}
 		}
-		
+
 		//printing out RAM Locations
 		//for (Unit u: orderedWorkList){
-			//System.out.println("Unit: " + u);
-			//System.out.println("Fall Flow List Location: " + System.identityHashCode(unitToAfterFallFlow.get(u)));
-			//for (int i = 0; i < unitToAfterFallFlow.get(u).size(); i++){
-				//System.out.println("element: " + i + " " + System.identityHashCode(unitToAfterFallFlow.get(u).get(0)));
-			//}
-			//System.out.println("Branch Flow List Location: " + System.identityHashCode(unitToAfterBranchFlow.get(u)));
-			//for (int i = 0; i < unitToAfterBranchFlow.get(u).size(); i++){
-				//System.out.println("element: " + i + " " + System.identityHashCode(unitToAfterBranchFlow.get(u).get(0)));
-			//}
+		//System.out.println("Unit: " + u);
+		//System.out.println("Fall Flow List Location: " + System.identityHashCode(unitToAfterFallFlow.get(u)));
+		//for (int i = 0; i < unitToAfterFallFlow.get(u).size(); i++){
+		//System.out.println("element: " + i + " " + System.identityHashCode(unitToAfterFallFlow.get(u).get(0)));
+		//}
+		//System.out.println("Branch Flow List Location: " + System.identityHashCode(unitToAfterBranchFlow.get(u)));
+		//for (int i = 0; i < unitToAfterBranchFlow.get(u).size(); i++){
+		//System.out.println("element: " + i + " " + System.identityHashCode(unitToAfterBranchFlow.get(u).get(0)));
+		//}
 		//}
 
 		// G.v().out.println(graph.getBody().getMethod().getSignature() +
@@ -422,7 +424,7 @@ public abstract class ConditionalForwardBranchedFlowAnalysis<A> extends Branched
 		Timers.v().totalFlowComputations += numComputations;
 
 	} // end doAnalysis
-	
-	
+
+
 
 } // end class ForwardBranchedFlowAnalysis

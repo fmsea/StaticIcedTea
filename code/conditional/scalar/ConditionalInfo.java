@@ -27,7 +27,7 @@ public class ConditionalInfo {
 	}
 	
 	public static List<ConditionalInfo> createFlowInfoList(String flowList){
-		System.out.println("I'm here " + flowList);
+		//System.out.println("I'm here " + flowList);
 		List<ConditionalInfo> myList = new ArrayList<ConditionalInfo>();
 		int lineNumber = 1;
 		int last = 0;
@@ -39,7 +39,7 @@ public class ConditionalInfo {
 			Character current = flowList.charAt(i);
 			if (current == 'f' || current == 't'){
 				lineNumber = Integer.parseInt(flowList.substring(last, i));
-				System.out.println(lineNumber);
+				//System.out.println(lineNumber);
 				last = i+ 1;
 				boolean branch = true;
 				if (current == 'f'){
@@ -63,11 +63,11 @@ public class ConditionalInfo {
 //				//add linenumber and branch 
 //			}
 		}
-		System.out.println("printing out the branch Infos");
-		for (ConditionalInfo f: myList){
-			System.out.println(f);
-		}
-
+//		System.out.println("printing out the branch Infos");
+//		for (ConditionalInfo f: myList){
+//			System.out.println(f);
+//		}
+//System.out.println("ML " + myList);
 		return myList;
 	}
 }

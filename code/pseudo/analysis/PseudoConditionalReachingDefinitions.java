@@ -24,7 +24,7 @@ public class PseudoConditionalReachingDefinitions{
 		int countOfCond = 0 ;
 		int countOfStmt = 1;
 		for(Unit u : graph.getBody().getUnits()){
-			System.out.println(countOfStmt + " " + u);
+			//System.out.println(countOfStmt + " " + u);
 			if(u instanceof IfStmt){
 				countOfCond++;
 				for(String c : branches){
@@ -32,13 +32,13 @@ public class PseudoConditionalReachingDefinitions{
 						String id = c.split("f")[0];
 						if(id.equals(Integer.toString(countOfCond))){
 							conditions+=countOfStmt+"f";
-							System.out.println(u);
+							//System.out.println(u);
 						}
 					} else if (c.endsWith("t")){
 						String id = c.split("t")[0];
 						if(id.equals(Integer.toString(countOfCond))){
 							conditions+=countOfStmt+"t";
-							System.out.println(u);
+							//System.out.println(u);
 						}
 					} else {
 						if(!c.isEmpty()){

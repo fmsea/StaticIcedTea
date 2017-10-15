@@ -66,12 +66,14 @@ public class Example1M {
 	static int example_3(int x, int y){
 		if (x == 0) {
 			  y = 3;
+			  x = y * 11;
 			} else {
 			  y = 1;
 			}
 			y++;
 			if (y > 0) {
 			  x = y;
+			  y = 22*x - 11;
 			} else {
 			  x = y+1;
 			}

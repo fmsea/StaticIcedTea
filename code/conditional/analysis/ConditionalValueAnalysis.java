@@ -25,6 +25,7 @@ import soot.ByteType;
 import soot.IntType;
 import soot.Local;
 import soot.ShortType;
+import soot.Timers;
 import soot.Body;
 import soot.BooleanType;
 import soot.Type;
@@ -194,162 +195,11 @@ public class ConditionalValueAnalysis extends ConditionalForwardBranchedFlowAnal
 			//System.out.println("Size Un " + size);
 			UnstructuredState.bitsInDomain.add(size);
 		}
-		
-/*		
-		if(disjoint){
-			IntervalState.bitsInDomain.clear();
-			IntervalState s = new IntervalState();
-			states.add(s);//add interval state first
-			//initialize the list of domain the analysis will be using
-			intervalDomainToIndex = new HashMap<Domain, Integer>();
-			indexToIntervalDomain = new HashMap<Integer, Domain>();
-			intervalDomainIndex = 0;
-			//addIntervalDomain(DomainHelper.oneDomain());
-			System.out.println("BitsInDomain  " + IntervalState.bitsInDomain);
-			//addIntervalDomain(DomainHelper.zeroAndOnesAndTwos());
-			//addIntervalDomain(DomainHelper.zeroAndOnes());
-			addIntervalDomain(DomainHelper.disjoint1());
-			addIntervalDomain(DomainHelper.disjoint2());
-			//calculate the number of bits in each interval domain
-			for(int i=0; i< intervalDomainIndex; i++){
-				int size = indexToIntervalDomain.get(i).size();
-				System.out.println("Size " + size);
-				IntervalState.bitsInDomain.add(size);
-			}
-		} else {
-			//System.out.println("Locals " + graph.getBody().getLocals());
-			//unstructured domain instantiation
-			UnstructuredState.bitsInDomain.clear();
-			unstructuredDomainToIndex = new HashMap<Domain, Integer>();
-			indexToUnstructuredDomain = new HashMap<Integer, Domain>();
-			unstructuredDomainIndex = 0;
-
-			UnstructuredState us = new UnstructuredState();
-			states.add(us);
-			//addUnstructuredDomain(DomainHelper.zeroAndOnesAndTwos());
-			addUnstructuredDomain(DomainHelper.unstructuredBoth());
-			for(int i = 0; i < unstructuredDomainIndex; i++){
-				int size = indexToUnstructuredDomain.get(i).size();
-				System.out.println("size Un " + size);
-				UnstructuredState.bitsInDomain.add(size);
-			}
-		}	
-		
-		*/
-		//----------- adding symbolic state
-//		if(symbolicOn){
-//				SymbolicState.allStmt = new HashSet<Stmt>();
-//				Iterator<Unit> iterUnit = graph.getBody().getUnits().iterator();
-//				while(iterUnit.hasNext()){
-//					Unit u = iterUnit.next();
-//					if(u instanceof Stmt){
-//						SymbolicState.allStmt.add((Stmt)u);
-//					}
-//				}
-//				//System.out.println("AllStmt " + SymbolicState.allStmt);
-//				SymbolicState ss = new SymbolicState();
-//				states.add(ss);
-//		}
-		//initial and entry flows set up
 		Chain<Local> locals = graph.getBody().getLocals();
 		AbstractState.setLocals(locals);
 		outputStmt = new HashSet<Unit>();
 		changedVariables = new HashMap<Unit, Set<Value>>();
 		System.out.println("done setting");
-//		long start = System.currentTimeMillis();
-//		doAnalysis(); //call it explicitly after setting up the domains
-//		long end = System.currentTimeMillis();
-//		System.out.println("Done in \n" + (end - start));
-//		String timeData = graph.getBody().getMethod().getDeclaringClass() + "\t" +graph.getBody().getMethod().getSignature()+
-//				"\t" + StartAnalysisKestrel.analysisType + "\t"+ (end - start)+"\n";
-//		if(writeToFile){
-//		try {
-//			//StartAnalysisKestrel.timeDataFile.append(timeData);
-//			RandomAccessFile rf = new RandomAccessFile(StartAnalysisKestrel.timeDataFile, "rwd");
-//			FileChannel fileChannel = rf.getChannel();
-//			FileLock lock = fileChannel.lock();
-//			fileChannel.position(fileChannel.size());
-//			fileChannel.write(Charset.defaultCharset().encode(CharBuffer.wrap(timeData)));
-//			fileChannel.force(false);
-//			lock.release();
-//			fileChannel.close();
-//		} catch (IOException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
-//		}
-//		if(StartAnalysisKestrel.print){
-//		Iterator<Unit> iter = graph.getBody().getUnits().iterator();
-//		int stmtCount = 0;
-//		//File to write the output to
-//		while(iter.hasNext()){
-//			Unit u = iter.next();
-//			//check against statetment after
-//			//which state has been changed
-//			stmtCount++;
-//			if(outputStmt.contains(u)){
-//				//String that keeps that state info for the current state
-//				String output = stmtCount + " " + u +":" + graph.getBody().getMethod().getSignature() + "\n";
-//				//System.out.println(output);
-//				AbstractState fall = getFallFlowAfter(u);
-//				if(!fall.getStates().isEmpty() && fall.isFeasible()){
-//					for(Local l : locals){
-//						if(changedVariables.get(u).contains(l)){
-//							//System.out.println(" l " + l + " u " + u + " \n" + fall);
-//							//System.out.flush();
-//							Set<BinopExpr> varPerState = evaluateStates(fall, l);
-//							Expr state = null;
-//							for(Expr be : varPerState){
-//								if(state == null){
-//									state = be;
-//								} else {
-//									state = new GAndExpr(state, be);
-//								}
-//							}
-//							output += l + "->" + solver.generate((BinopExpr)state) + "\n";
-//							//System.out.println(l + "->" + solver.generate((BinopExpr)state));
-//						}
-//					}
-//				}
-//				//for other branch if exists
-//				List<AbstractState> branches = getBranchFlowAfter(u);
-//				if(!branches.isEmpty()){
-//					for(AbstractState branch : branches){
-//						if(!branch.getStates().isEmpty() && branch.isFeasible()){
-//							for(Local l : locals){
-//								if(changedVariables.get(u).contains(l)){
-//									//System.out.println(" lf " + l + " u " + u + " \n" + fall);
-//									Set<BinopExpr> varPerState = evaluateStates(branch, l);
-//									Expr state = null;
-//									for(Expr be : varPerState){
-//										if(state == null){
-//											state = be;
-//										} else {
-//											state = new GAndExpr(state, be);
-//										}
-//									}
-//									output += l+"f" + "->" + solver.generate((BinopExpr)state) + "\n";
-//									//System.out.println(l+"f" + "->" + solver.generate((BinopExpr)state));
-//								}
-//							}
-//						}
-//
-//					}
-//				}
-//				if(writeToFile){
-//				//write the string to the file
-//				try {
-//					StartAnalysisKestrel.fileToWrite.write(output);
-//				} catch (IOException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//				} else {
-//					System.out.println(output);
-//				}
-//			}//end outputStmt check
-//		}
-//		}
 	}
 	
 	protected BoolExpr generateExpr(AbstractState aState, Value l){
@@ -995,7 +845,8 @@ public class ConditionalValueAnalysis extends ConditionalForwardBranchedFlowAnal
 	}
 
 	public void report() {
-		System.out.println("CV Done in " + (end - start));
+		System.out.println("CV Done in " + (end - start) + 
+				 ", fn " + Timers.v().totalFlowNodes + ", fc"+ Timers.v().totalFlowComputations + "\n");
 		String timeData = b.getMethod().getDeclaringClass() + "\t" +b.getMethod().getSignature()+
 				"\t" + StartAnalysisKestrel.analysisType + "\t"+ (end - start)+"\n";
 		
