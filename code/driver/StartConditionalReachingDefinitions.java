@@ -2,6 +2,11 @@ package driver;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.RandomAccessFile;
+import java.nio.CharBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -23,10 +28,7 @@ import util.Variables;
 
 public class StartConditionalReachingDefinitions {
 
-	public static FileWriter fileToWrite;
-	//private static String conditionPath = "ScratchData/conditions/";
-	private static String resultsPath = "ScratchData/results/";
-	public static FileWriter timeDataFile;
+	private static String resultsPath = "ScratchData/resultsRD/";
 
 
 	public static void main(String[] args){
@@ -36,23 +38,23 @@ public class StartConditionalReachingDefinitions {
 		int methodId = 4;
 		List<String> conditions = new ArrayList<String>();
 
-		File file = new File("./ExperimentDataConditional/conditions/paths/"+className+"_"+methodId+".txt");
-		if(file.exists()){
-			try {
-				Scanner scan = new Scanner(file);
-				while(scan.hasNextLine()){
-					String ln = scan.nextLine();
-					if(!ln.isEmpty()){
-						conditions.add(ln);
-					}
-				}
-				scan.close();
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		}
+//		File file = new File("./ExperimentDataConditional/conditions/paths/"+className+"_"+methodId+".txt");
+//		if(file.exists()){
+//			try {
+//				Scanner scan = new Scanner(file);
+//				while(scan.hasNextLine()){
+//					String ln = scan.nextLine();
+//					if(!ln.isEmpty()){
+//						conditions.add(ln);
+//					}
+//				}
+//				scan.close();
+//			} catch (FileNotFoundException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//
+//		}
 //		conditions.clear();
 //		conditions.add("1t,2t");
 //		conditions.add("1t,2f");
@@ -66,7 +68,7 @@ public class StartConditionalReachingDefinitions {
 
 			System.out.println(condition);
 			//StartAnalysis.condition = condition.isEmpty()?"":condition.replaceAll(",", "");
-			String fileName = resultsPath+className+"_"+methodId +"_"+(condition.isEmpty()?"":condition.replaceAll(",", ""));
+			String fileName = resultsPath+"/invariants/"+ className+"_"+methodId +"_"+condition.replaceAll(",", "")+"_c2";
 			//new StartAnalysis(className, domainName, symbolicOn, condition, methodId);
 			String[] sootArgs = {"-f", "n", className};
 			System.out.println(Scene.v().getSootClassPath() +  " " + System.getProperty("java.class.path"));
@@ -114,13 +116,24 @@ public class StartConditionalReachingDefinitions {
 
 			//loop through each unit in our graph
 			//and print out the list of reaching definitions before that unit
-			System.out.println("CRD " + rdf.getTime() + ", nf " + Timers.v().totalFlowNodes + ", fc "+ Timers.v().totalFlowComputations + "\n");
-			Timers.v().totalFlowNodes = 0;
-			Timers.v().totalFlowComputations = 0;
+			//String timeData = "c2\t" + condition.replaceAll(",", "")+"\t" + rdf.getTime()  + "\t" + Timers.v().totalFlowNodes + "\t"+ Timers.v().totalFlowComputations + "\n";
+			String timeData = "c2\t" + condition.replaceAll(",", "")+"\t" + rdf.getTime() + "\n";
+			
+			System.out.println(timeData); 
 			Iterator gIt = g.iterator();
-
+			String timeDataFile = resultsPath+"/time/"+className+"_"+methodId;
 			FileWriter writer;
 			try{
+				
+				RandomAccessFile rf = new RandomAccessFile(timeDataFile, "rwd");
+				FileChannel fileChannel = rf.getChannel();
+				FileLock lock = fileChannel.lock();
+				fileChannel.position(fileChannel.size());
+				fileChannel.write(Charset.defaultCharset().encode(CharBuffer.wrap(timeData)));
+				fileChannel.force(false);
+				lock.release();
+				fileChannel.close();
+				rf.close();
 				//					String path = "/Users/erickeefe/Documents/workspace/Conditional_DFA/src/automatedTesting/";
 				//					String fName = aClass + "_" + methodStop + "_" + branchInfo;
 				//					String name = path + fName;

@@ -66,8 +66,7 @@ public class ReachingDefinitions{
 		// TODO Auto-generated method stub
 		
 		StringBuilder toReturn = new StringBuilder();
-		toReturn.append(Variables.numbers.get(s) + "\n");
-		toReturn.append("s " + s + " " + s.getClass() + "\n");
+		toReturn.append(Variables.numbers.get(s)+" " + s +"\n");
 		
 		
 		HashMap<Local, Set<Unit>> defMap = new HashMap<Local, Set<Unit>>();		

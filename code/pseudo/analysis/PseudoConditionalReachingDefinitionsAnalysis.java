@@ -35,6 +35,8 @@ public class PseudoConditionalReachingDefinitionsAnalysis extends ForwardBranche
 		super(graph);
 		createBranchInfo(option);	
 		makeCondToLineMap();
+		System.out.println(condToLine);
+		System.out.println(branchInfo);
 		start = System.currentTimeMillis();
 		doAnalysis();
 		end = System.currentTimeMillis();
@@ -53,8 +55,9 @@ public class PseudoConditionalReachingDefinitionsAnalysis extends ForwardBranche
 			if (next instanceof IfStmt){
 				condToLine.put(next, value);
 				//System.out.println(value + ": " + next);
-				value++;
+				//value++; -> prehaps differen encoding
 			}
+			value++;
 		}
 	}
 	
@@ -141,12 +144,13 @@ public class PseudoConditionalReachingDefinitionsAnalysis extends ForwardBranche
 			//System.out.println("Cond stmt ");
 			
 			for (ConditionalInfo f: branchInfo){
+				//System.out.println(f.getLine() + " " + condToLine.get(s));
 				if (f.getLine() == condToLine.get(s)){
 					//System.out.println(f.getLine());
 					//System.out.println(condToLine.get(s));
 					if (f.getBranch()){
 						//System.out.println("we are at conditional statement: " + s);
-//						System.out.println("Making the false branch invisible");
+						//System.out.println("Making the false branch invisible");
 						//make the fallOut branch invisible
 						for (int i = 0; i < fallOut.size(); i++){
 							fallOut.get(i).makeInvisible();

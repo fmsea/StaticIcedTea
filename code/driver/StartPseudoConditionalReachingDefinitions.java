@@ -4,6 +4,11 @@ package driver;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.RandomAccessFile;
+import java.nio.CharBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -23,10 +28,7 @@ import util.Variables;
 
 public class StartPseudoConditionalReachingDefinitions {
 	
-	public static FileWriter fileToWrite;
-	//private static String conditionPath = "ScratchData/conditions/";
-	private static String resultsPath = "ScratchData/results/";
-	public static FileWriter timeDataFile;
+	private static String resultsPath = "ScratchData/resultsRD/";
 	
 	public static void main(String[] args){
 	
@@ -62,7 +64,7 @@ public class StartPseudoConditionalReachingDefinitions {
 
 			System.out.println(condition);
 			//StartAnalysis.condition = condition.isEmpty()?"":condition.replaceAll(",", "");
-			String fileName = resultsPath+className+"_"+methodId +"_"+(condition.isEmpty()?"":condition.replaceAll(",", ""));
+			String fileName = resultsPath+"/invariants/"+ className+"_"+methodId +"_"+condition.replaceAll(",", "")+"_c1";
 			//new StartAnalysis(className, domainName, symbolicOn, condition, methodId);
 			String[] sootArgs = {"-f", "n", className};
 			System.out.println(Scene.v().getSootClassPath() +  " " + System.getProperty("java.class.path"));
@@ -110,13 +112,22 @@ public class StartPseudoConditionalReachingDefinitions {
 
 			//loop through each unit in our graph
 			//and print out the list of reaching definitions before that unit
-			System.out.println("PRD "  + rdf.getTime() + ", nf " + Timers.v().totalFlowNodes + ", fc"+ Timers.v().totalFlowComputations + "\n");
-			Timers.v().totalFlowNodes = 0;
-			Timers.v().totalFlowComputations = 0;
+			String timeData = "c1\t" + condition.replaceAll(",", "")+"\t" + rdf.getTime() + "\n";
+			System.out.println(timeData); 
 			Iterator gIt = g.iterator();
-
+			String timeDataFile = resultsPath+"/time/"+className+"_"+methodId;
 			FileWriter writer;
 			try{
+				RandomAccessFile rf = new RandomAccessFile(timeDataFile, "rwd");
+				FileChannel fileChannel = rf.getChannel();
+				FileLock lock = fileChannel.lock();
+				fileChannel.position(fileChannel.size());
+				fileChannel.write(Charset.defaultCharset().encode(CharBuffer.wrap(timeData)));
+				fileChannel.force(false);
+				lock.release();
+				fileChannel.close();
+				rf.close();
+				
 				//					String path = "/Users/erickeefe/Documents/workspace/Conditional_DFA/src/automatedTesting/";
 				//					String fName = aClass + "_" + methodStop + "_" + branchInfo;
 				//					String name = path + fName;
