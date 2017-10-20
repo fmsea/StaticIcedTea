@@ -36,6 +36,13 @@ public class StartPseudoConditionalReachingDefinitions {
 		String className = "test.Example1M";
 		int methodId = 4;
 		List<String> conditions = new ArrayList<String>();
+		boolean writeInv = true;
+		if(args.length > 0){
+			className =args[0];
+			methodId = Integer.parseInt(args[1]);
+			conditions.add(args[2]);
+			writeInv = args[3].equals("y")?true:false;
+		}
 		
 //		File file = new File("./ExperimentDataConditional/conditions/paths/"+className+"_"+methodId+".txt");
 //		if(file.exists()){
@@ -62,12 +69,12 @@ public class StartPseudoConditionalReachingDefinitions {
 		
 		for(String condition : conditions){
 
-			System.out.println(condition);
+			//System.out.println(condition);
 			//StartAnalysis.condition = condition.isEmpty()?"":condition.replaceAll(",", "");
 			String fileName = resultsPath+"/invariants/"+ className+"_"+methodId +"_"+condition.replaceAll(",", "")+"_c1";
 			//new StartAnalysis(className, domainName, symbolicOn, condition, methodId);
 			String[] sootArgs = {"-f", "n", className};
-			System.out.println(Scene.v().getSootClassPath() +  " " + System.getProperty("java.class.path"));
+			//System.out.println(Scene.v().getSootClassPath() +  " " + System.getProperty("java.class.path"));
 			Scene.v().setSootClassPath(Scene.v().getSootClassPath()+":"+System.getProperty("java.class.path") 
 			+ ":" + System.getProperty("sun.boot.class.path"));
 			SootClass sClass = Scene.v().loadClassAndSupport(className);		
@@ -100,8 +107,7 @@ public class StartPseudoConditionalReachingDefinitions {
 			Body b = m.retrieveActiveBody();
 
 			System.out.println("=======================================");			
-			System.out.println(m.toString());
-			System.out.println(methodId);
+			System.out.println(m.toString() + " " + methodId + " " + writeInv);
 
 			UnitGraph g = new ExceptionalUnitGraph(b);
 			Variables myVariables = new Variables(g);
@@ -131,6 +137,7 @@ public class StartPseudoConditionalReachingDefinitions {
 				//					String path = "/Users/erickeefe/Documents/workspace/Conditional_DFA/src/automatedTesting/";
 				//					String fName = aClass + "_" + methodStop + "_" + branchInfo;
 				//					String name = path + fName;
+				if(writeInv){
 				writer = new FileWriter(new File(fileName));
 				while (gIt.hasNext()){
 					Unit u = (Unit) gIt.next();
@@ -167,6 +174,7 @@ public class StartPseudoConditionalReachingDefinitions {
 				}	
 				writer.close();
 				System.out.println("=======================================");
+				}
 			}catch(Exception e){
 				System.out.println("Error" + e);
 			}

@@ -36,15 +36,20 @@ public class CombineConditionalTimeRD {
 	//static LinkedHashMap<Integer,String> lineCount = new LinkedHashMap<Integer,String>();
 	static String className = "test.Example1M";
 	static String methodId = "4";
-	//static String startNode = "4";
-	static String filePrefixOrig = "./ScratchData/results/invariants/"+className+"_"+methodId+"_";
-	static String filePrefixComb = "./ScratchData/results/combined/"+className+"_"+methodId+"_";
-	static String type = "c1";//c1 for pseudo-conditional and c2 for true conditional
-	public static void main(String [] strs) throws IOException{
+	static String type = "c2";//c1 for pseudo-conditional and c2 for true conditional
+	public static void main(String [] args) throws IOException{
+
+		//to use with a script that passes classes and methods
+		if(args.length > 0){
+			//get the input
+			className = args[0];
+			methodId = args[1]; 
+			type = args[2];
+		}
 
 		//file that contains the prefix and the time it took to run
 		String timeFileName = "./ScratchData/resultsRD/time/"+className+"_"+methodId;
-		System.out.println("timeFileName " + timeFileName);
+		//System.out.println("timeFileName " + timeFileName);
 		File timeFile = new File(timeFileName);
 		if(timeFile.exists()){
 			//get the data into the map and order it 
@@ -52,10 +57,11 @@ public class CombineConditionalTimeRD {
 			Scanner scan = new Scanner(timeFile);
 			while(scan.hasNextLine()){
 				String[] line = scan.nextLine().split("\t");
-				System.out.println(line[0]);
+				//System.out.println(line[0]);
 				String analysisType = line[0];
-				if(analysisType.equals(type)){
+				if(analysisType.equals(type)||analysisType.equals("f")){
 					String path = line[1];
+					//System.out.println(path);
 					Integer time = Integer.parseInt(line[2]);
 					List<Integer> timeList = null;
 					if(pathRuns.containsKey(path)){
@@ -71,17 +77,18 @@ public class CombineConditionalTimeRD {
 			//now we should have map populated 
 			//and we need to calculate the average 
 			//and put in the map Average -> path
-			SortedMap<Integer, String> averPath = new TreeMap<Integer, String>();
-			int fullTime = 0;
+			SortedMap<Float, String> averPath = new TreeMap<Float, String>();
+			float fullTime = 0;
+		
 			for(Entry<String, List<Integer>> e : pathRuns.entrySet()){
-				int average = 0;
+				float average = 0;
 				for(Integer i : e.getValue()){
 					average+=i;
 				}
 				average = average/e.getValue().size();
 				//offset a bit in case the same value is already there
 				while(averPath.containsKey(average)){
-					average++;
+					average += 0.0001;
 				}
 				if(e.getKey().isEmpty()){
 					//it means the average for the fullpath
@@ -90,12 +97,13 @@ public class CombineConditionalTimeRD {
 					averPath.put(average, e.getKey());
 				}
 			}
-			//remove the empty key since we do not use it in the comparison
-			averPath.remove(fullTime);
+			
+			//System.out.println("size2 " + averPath.size() + " " + fullTime);
+
 			//should be ordered now
-			System.out.println(averPath);
+			//System.out.println(averPath.size());
 			//print overall time result in some kind of file?
-			String timeOutput ="";			
+			String resultsOutput ="";			
 			//for each entry generate the output file in combined
 			//the first should just copy the file without changes
 			int fileCount = 1;
@@ -103,29 +111,83 @@ public class CombineConditionalTimeRD {
 			//Statement -> variable -> its reaching definitions
 			Map<String,Map<String,Set<Integer>>> currentRDValue = new HashMap<String, Map<String,Set<Integer>>> ();
 			Map<String,Map<String,Set<Integer>>> allRDValue = process("./ScratchData/resultsRD/invariants/"+className+"_"+methodId);
-			System.out.println(allRDValue);
-			int totalElements = 0;//compare(allRDValue,currentRDValue);
-			for(Entry<Integer, String> e : averPath.entrySet()){
-				System.out.println("combing for time " + e.getKey());
+			int currInvCount = 0;
+			int totalElements = countInvariants(allRDValue);
+			//System.out.println(totalElements);
+			for(Entry<Float, String> e : averPath.entrySet()){
+				//System.out.println("combing for time " + e.getKey());
 				Map<String,Map<String,Set<Integer>>> newRDValue = process("./ScratchData/resultsRD/invariants/"+className+"_"+methodId+"_"+e.getValue()+"_"+type);
-				//Map<String,Map<String,Set<Integer>>> combinedRDValue = combine(currentRDValue, newRDValue);
-				int newElements = 0;//compare(combinedRDValue, currentRDValue);
-				timeOutput +=className +"\t" + methodId +"\t" + e.getValue() +"\t" + fileCount + "\t" + fullTime + "\t" + e.getKey()+ "\t"+newElements+"\t"+totalElements+"\n";
+				if(currInvCount != 0){
+					combine(currentRDValue, newRDValue);
+				}
+				currInvCount = countInvariants(newRDValue);
+				currentRDValue = newRDValue;
+				//				int newElements =  newInvCount - currInvCount;
+				resultsOutput +=className +"\t" + methodId +"\t" + e.getValue() +"\t" + fileCount + "\t" + fullTime + "\t" + e.getKey()+ "\t"+currInvCount+"\t"+totalElements+"\n";
 				fileCount++;
 			}
-			//write timeOutput to a file
-			//			String timeOutFileName = "./ScratchData/results/time/time"+dom;
-			//			File timeOutFile = new File(timeOutFileName);
-			//			if(!timeOutFile.exists()){
-			//				timeOutFile.createNewFile();
-			//			}
-			//			FileWriter timeOutWrite = new FileWriter(timeOutFile, true);
-			//			timeOutWrite.write(timeOutput);
-			//			timeOutWrite.close();
+			//			System.out.println(resultsOutput);
+			//			System.out.println(allRDValue);
+			//			System.out.println(currentRDValue);
+			//write resultOutput to a file
+			String resultOutFileName = "./ScratchData/resultsRD/time/time_"+type;
+			File resultOutFile = new File(resultOutFileName);
+			if(!resultOutFile.exists()){
+				resultOutFile.createNewFile();
+			}
+			FileWriter timeOutWrite = new FileWriter(resultOutFile, true);
+			timeOutWrite.write(resultsOutput);
+			timeOutWrite.close();
 		} else {
 			System.out.println("Connot fine time file " + timeFileName);
 		}
 
+	}
+
+	/**
+	 * augments the newRDValue with currentRDvalues
+	 * @param currentRDValue
+	 * @param newRDValue
+	 * @return
+	 */
+	private static void combine(Map<String, Map<String, Set<Integer>>> currentRDValue,
+			Map<String, Map<String, Set<Integer>>> newRDValue) {
+		//System.out.println(newRDValue);
+		for(String stmt : newRDValue.keySet()){
+			Map<String,Set<Integer>> newMap = newRDValue.get(stmt);
+			Map<String,Set<Integer>> currMap = currentRDValue.get(stmt);
+			Set<String> combinedKeySet = new HashSet<String>();
+			combinedKeySet.addAll(newMap.keySet());
+			//System.out.println(stmt + " " + newMap.keySet() + " " + currMap.keySet());
+			combinedKeySet.addAll(currMap.keySet());
+			for(String var : combinedKeySet){
+				if(currMap.containsKey(var) && newMap.containsKey(var)){
+					Set<Integer> newRdSet = newMap.get(var);
+					Set<Integer> currRdSet = currMap.get(var);
+					//merge them together
+					newRdSet.addAll(currRdSet);
+				} else if(currMap.containsKey(var)){
+					//create a set for that var and add all entyr to the newRDVal map
+					Set<Integer> newRdSet = new HashSet<Integer>();
+					newRdSet.addAll(currMap.get(var));//do a deep copy just in case
+					newMap.put(var, newRdSet);
+				} //otherwise do nothing - newRDVal just keeps it
+			}
+		}
+		//System.out.println(newRDValue);
+	}
+	/**
+	 * Computes the number of new invariants discovered by the additional analysis. 
+	 * @param newValues - the map with the new (combined) values
+	 * @param oldValue - the map of the previous values
+	 * @return
+	 */
+	private static int countInvariants(Map<String, Map<String, Set<Integer>>> values) {
+		int invCount = 0;
+		for(Map <String, Set<Integer>> val : values.values()){
+			invCount += val.values().size();
+		}
+		return invCount;
 	}
 	/**
 	 * 
@@ -148,7 +210,7 @@ public class CombineConditionalTimeRD {
 					stmt = new HashMap<String, Set<Integer>>();
 					//added to the data map
 					data.put(line, stmt);
-					
+
 				} else if(!line.isEmpty()){
 					//we are reading variables and their RD values
 					String[] varLine = line.split(":");
@@ -169,7 +231,7 @@ public class CombineConditionalTimeRD {
 		}
 		return data;
 	}
-	
+
 }
 ///*
 //else if(line1.startsWith("*") || line2.startsWith("*")){

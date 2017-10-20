@@ -52,7 +52,7 @@ public class ConditionalReachingDefinitions {
 			}
 			countOfStmt++;
 		}
-		System.out.println(conditions);
+		//System.out.println(conditions);
 		ConditionalReachingDefinitionsAnalysis analysis = new ConditionalReachingDefinitionsAnalysis(graph, conditions);
 		time = analysis.getTime();
 		//ReachingDefinitionsOriginal analysis = new ReachingDefinitionsOriginal(graph, "allBranches");

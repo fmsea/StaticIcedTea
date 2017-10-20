@@ -35,8 +35,8 @@ public class PseudoConditionalReachingDefinitionsAnalysis extends ForwardBranche
 		super(graph);
 		createBranchInfo(option);	
 		makeCondToLineMap();
-		System.out.println(condToLine);
-		System.out.println(branchInfo);
+		//System.out.println(condToLine);
+		//System.out.println(branchInfo);
 		start = System.currentTimeMillis();
 		doAnalysis();
 		end = System.currentTimeMillis();
@@ -93,9 +93,9 @@ public class PseudoConditionalReachingDefinitionsAnalysis extends ForwardBranche
 			
 		}
 		//System.out.println("printing out the branch Infos");
-		for (ConditionalInfo f: branchInfo){
-			System.out.println(f);
-		}
+//		for (ConditionalInfo f: branchInfo){
+//			System.out.println(f);
+//		}
 	}
 	
 	@Override

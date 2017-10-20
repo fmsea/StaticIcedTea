@@ -37,24 +37,14 @@ public class StartConditionalReachingDefinitions {
 		String className = "test.Example1M";
 		int methodId = 4;
 		List<String> conditions = new ArrayList<String>();
+		boolean writeInv = true;
+		if(args.length > 0){
+			className =args[0];
+			methodId = Integer.parseInt(args[1]);
+			conditions.add(args[2]);
+			writeInv = args[3].equals("y")?true:false;
+		}
 
-//		File file = new File("./ExperimentDataConditional/conditions/paths/"+className+"_"+methodId+".txt");
-//		if(file.exists()){
-//			try {
-//				Scanner scan = new Scanner(file);
-//				while(scan.hasNextLine()){
-//					String ln = scan.nextLine();
-//					if(!ln.isEmpty()){
-//						conditions.add(ln);
-//					}
-//				}
-//				scan.close();
-//			} catch (FileNotFoundException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//
-//		}
 //		conditions.clear();
 //		conditions.add("1t,2t");
 //		conditions.add("1t,2f");
@@ -69,31 +59,11 @@ public class StartConditionalReachingDefinitions {
 			System.out.println(condition);
 			//StartAnalysis.condition = condition.isEmpty()?"":condition.replaceAll(",", "");
 			String fileName = resultsPath+"/invariants/"+ className+"_"+methodId +"_"+condition.replaceAll(",", "")+"_c2";
-			//new StartAnalysis(className, domainName, symbolicOn, condition, methodId);
-			String[] sootArgs = {"-f", "n", className};
-			System.out.println(Scene.v().getSootClassPath() +  " " + System.getProperty("java.class.path"));
 			Scene.v().setSootClassPath(Scene.v().getSootClassPath()+":"+System.getProperty("java.class.path") 
 			+ ":" + System.getProperty("sun.boot.class.path"));
 			SootClass sClass = Scene.v().loadClassAndSupport(className);		
 			sClass.setApplicationClass();
 			Scene.v().loadNecessaryClasses();
-			//					G.reset();
-			//					System.gc();
-
-
-			//		String sootClp = Scene.v().getSootClassPath();
-			//		System.out.println("sclp: " + sootClp);
-			//		sootClp = sootClp.replace("/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/../Classes/classes.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/../Classes/ui.jar:", "");
-			//		sootClp +=":/Users/erickeefe/Documents/workspace/Conditional_DFA/src";
-			//		//sootClp += ":/Users/erickeefe/Documents/workspace/Velocity/src";
-			//		sootClp += ":/Users/erickeefe/Documents/workspace/Velocity/src/java";
-			//		//sootClp +=":/Users/erickeefe/Documents/workspace/Conditional_DFA/artifacts/test";
-			//		//sootClp += "/Users/erickeefe/Documents/workspace/Java";
-			//		System.out.println("sclp: " + sootClp);
-			//		Scene.v().setSootClassPath(sootClp);
-			//		SootClass sClass = Scene.v().loadClassAndSupport(args[0]);		
-			//		sClass.setApplicationClass();
-			//		Scene.v().loadNecessaryClasses();
 
 			//we are analyzing sClass
 
@@ -104,8 +74,7 @@ public class StartConditionalReachingDefinitions {
 			Body b = m.retrieveActiveBody();
 
 			System.out.println("=======================================");			
-			System.out.println(m.toString());
-			System.out.println(methodId);
+			System.out.println(m.toString() + " " + methodId + " " + writeInv);
 
 			UnitGraph g = new ExceptionalUnitGraph(b);
 			Variables myVariables = new Variables(g);
@@ -134,45 +103,16 @@ public class StartConditionalReachingDefinitions {
 				lock.release();
 				fileChannel.close();
 				rf.close();
-				//					String path = "/Users/erickeefe/Documents/workspace/Conditional_DFA/src/automatedTesting/";
-				//					String fName = aClass + "_" + methodStop + "_" + branchInfo;
-				//					String name = path + fName;
+				if(writeInv){
 				writer = new FileWriter(new File(fileName));
 				while (gIt.hasNext()){
-					Unit u = (Unit) gIt.next();
-
-					//System.out.println(u);
-					//				
-					//				String[] flowTypes = {"before", "fall", "branch"};
-					//				
-					//				for (int i = 0; i < 1; i++){
-					//					
+					Unit u = (Unit) gIt.next();				
 					String output = rdf.getReachableExpressions(u, "before") + "\n";
-					//					
-					//					UnitPrinter up = new NormalUnitPrinter(b);
-					//					up.setIndent("");
-					//					
-					//					System.out.println("---------------------------------------");			
-					//					u.toString(up);			
-					//					System.out.println(up.output());
-					//					System.out.println("Reachable Defitions " + flowTypes[i] + " this unit are:");
-					//					String sep = "";
-					//					Iterator flowIt = flowList.iterator();
-					//					while(flowIt.hasNext()){
-					//						String varReachables = (String) flowIt.next();
-					//						System.out.println(sep);
-					//						System.out.println(varReachables);
-					//						sep = ", ";
-					//					}
-					//					System.out.println("---------------------------------------");
-					//System.out.println(output);
 					writer.write(output);
-
-					//					
-					//			    }
 				}	
 				writer.close();
 				System.out.println("=======================================");
+				}
 			}catch(Exception e){
 				System.out.println("Error" + e);
 			}

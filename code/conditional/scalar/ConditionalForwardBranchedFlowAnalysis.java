@@ -67,7 +67,7 @@ public abstract class ConditionalForwardBranchedFlowAnalysis<A> extends Branched
 	public ConditionalForwardBranchedFlowAnalysis(UnitGraph graph, List<ConditionalInfo> branchList) {
 		super(graph);
 		myBranchList = branchList;
-		System.out.println("BL " + myBranchList);
+		//System.out.println("BL " + myBranchList);
 		condToLine = new HashMap<Unit, Integer>(); //a map of conditional units to the number of that conditional statement. //the first conditional statement is the 0 conditional statement
 		makeCondToLineMap(condToLine);
 
@@ -189,7 +189,7 @@ public abstract class ConditionalForwardBranchedFlowAnalysis<A> extends Branched
 			//			}
 		}
 
-		System.out.println("Num of nodes " + orderedWorkList.size());
+		//System.out.println("Num of nodes " + orderedWorkList.size());
 		//initialize our changedUnit treeset
 		TreeSet<Unit> changedUnits = new TreeSet<Unit>(new Comparator<Unit>() {
 			public int compare(Unit o1, Unit o2) {
