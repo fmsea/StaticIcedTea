@@ -35,92 +35,30 @@ public class StartValue {
 //				"test.InfBlocks", "test.InfCodes", "test.InfTree", "test.MapViewer", "test.QRCodeDataBlockReader", 
 //				"test.StructurePanel", "test.TileRenderor", "test.WorldController", "test.Class11", "test.Class13",
 //		};
-		String[] classNames = {"test.Class13"};
-		String[] domainNames = {"dom9.txt"};
-		//String[] domainNames = {"dom3.txt", "dom2.txt"};
-		String[] symbolic = {"sN"};
-//		String[] conditions = {
-//				"1f,2f,3f",
-//				"1f,2f,3t,4f,5f",
-//				"1f,2f,3t,4f,5t",
-//				"1f,2f,3t,4t",
-//				"1f,2t,3f",
-//				"1f,2t,3t,4f,5f",
-//				"1f,2t,3t,4f,5t",
-//				"1f,2t,3t,4t",
-//				"1t,2f,3f",
-//				"1t,2f,3t,4f,5f",
-//				"1t,2f,3t,4f,5t",
-//				"1t,2f,3t,4t",
-//				"1t,2t,3f",
-//				"1t,2t,3t,4f,5f",
-//				"1t,2t,3t,4f,5t",
-//				"1t,2t,3t,4t"};
-		//String[] conditions = {"1f,2f,3t,4f,5f"};
-		//List<String> conditions = new ArrayList<String>();
-		//populate the conditions
-		//read the file:
+		
+		String domain = "dom5.txt";
+		String symbolic = "sN";
+		className = "test.Example1m";
+		methodId = "3";
+		if(args.length > 0){
+			 className = args[0];
+			 methodId = args[1];
+			domain = args[2]+".txt";
+			writeToFile = args[3].equals("y");
+		}
+		
 
-		//String symbolicOn = "sY";
-		String methodId = "1";
-		StartValue.methodId = methodId;
-		File file = new File("./ScratchData/conditions/paths/"+classNames[0]+"_"+methodId+".txt");
-//		if(file.exists()){
-//			try {
-//				Scanner scan = new Scanner(file);
-//				while(scan.hasNextLine()){
-//					String ln = scan.nextLine();
-//					if(!ln.isEmpty()){
-//						conditions.add(ln);
-//						//StartAnalysisScript.writeToFile=false;
-//					}
-//				}
-//				scan.close();
-//			} catch (FileNotFoundException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			
-//		}
-		
-		//conditions.clear();
-		//conditions.add("");
-	
-		
-//		try {
-//			timeDataFile = new FileWriter(resultsPath+"timeData",true);
-//		} catch (IOException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
-//		
-		for(String className : classNames){
-			StartValue.className = className;
-			for(String symbolicOn : symbolic){
-			for(String domainName : domainNames){
-				StartValue.domain = domainName.split("\\.")[0];
-				analysisType = StartValue.domain + "_"+ symbolicOn;
+				StartValue.domain = domain.split("\\.")[0];
+				analysisType = StartValue.domain + "_" + symbolic;
 				//for(String condition : conditions){
 				try {	
 					//System.out.println(condition);
 					//StartValue.condition = condition.isEmpty()?"":condition.replaceAll(",", "");
-					new StartValue(className, domainName, symbolicOn,  methodId);
-					G.reset();
-					System.gc();
+					new StartValue(className, domain, symbolic,  methodId);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				//}
-			}
-		}
-		}
-//		try {
-//			timeDataFile.close();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
 	}
 	
 	//The class should have static fields for the files to write to
@@ -132,8 +70,7 @@ public class StartValue {
 	
 	public static FileWriter fileToWrite;
 	private static String domainPath = "ExperimentDataConditional/domains/";
-	//private static String conditionPath = "ScratchData/conditions/";
-	private static String resultsPath = "ScratchData/results/invariants/";
+	private static String resultsPath = "ScratchData/resultsVA/invariants/";
 	public static String analysisType;
 	
 	//each instance should open/close that file

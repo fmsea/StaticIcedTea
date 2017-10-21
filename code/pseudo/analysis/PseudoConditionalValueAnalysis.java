@@ -28,7 +28,7 @@ import soot.jimple.Stmt;
 import soot.toolkits.graph.UnitGraph;
 import soot.util.Chain;
 import disjoint.state.*;
-import driver.StartPseudoCondtionalValue;
+import driver.StartPseudoConditionalValue;
 import driver.StartAnalysisScript;
 
 public class PseudoConditionalValueAnalysis extends ValueAnalysis {
@@ -96,12 +96,12 @@ public class PseudoConditionalValueAnalysis extends ValueAnalysis {
 	//@Override
 	public void report(){
 	System.out.println("Done in " + (end - start)+" fn " + Timers.v().totalFlowNodes + ", fc"+ Timers.v().totalFlowComputations + "\n");
-	String timeData = StartAnalysisScript.condition + "\t"+ (end - start)+"\n";
+	String timeData = "c1\t" + StartPseudoConditionalValue.condition + "\t"+ (end - start)+"\n";
 	
-	if(StartPseudoCondtionalValue.writeTime){
+	if(StartPseudoConditionalValue.writeTime){
 	try {
 		//StartAnalysisKestrel.timeDataFile.append(timeData);
-		String timeDataFile = "./ScratchData/results/time/"+StartAnalysisScript.className+"_"+StartAnalysisScript.methodId+"_"+StartAnalysisScript.domain+".txt";
+		String timeDataFile = "./ScratchData/resultsVA/time/"+StartPseudoConditionalValue.className+"_"+StartPseudoConditionalValue.methodId+"_"+StartPseudoConditionalValue.domain+".txt";
 		RandomAccessFile rf = new RandomAccessFile(timeDataFile, "rwd");
 		FileChannel fileChannel = rf.getChannel();
 		FileLock lock = fileChannel.lock();
@@ -184,10 +184,10 @@ public class PseudoConditionalValueAnalysis extends ValueAnalysis {
 
 				}
 			}
-			if(StartPseudoCondtionalValue.writeToFile){
+			if(StartPseudoConditionalValue.writeToFile){
 			//write the string to the file
 			try {
-				StartPseudoCondtionalValue.fileToWrite.write(output);
+				StartPseudoConditionalValue.fileToWrite.write(output);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

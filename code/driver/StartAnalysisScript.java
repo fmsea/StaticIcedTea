@@ -29,7 +29,7 @@ public class StartAnalysisScript {
 		String domain = args[2]+".txt";
 		String symbolic = "sN";
 		String condition = args[3].equals("0")?"":args[3];
-		writeToFile = args[4].equals("y") ? true : false;
+		writeToFile = args[4].equals("y");
 			
 		StartAnalysisScript.className = className;
 		StartAnalysisScript.domain = domain.split("\\.")[0];

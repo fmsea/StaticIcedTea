@@ -30,22 +30,23 @@ import java.util.TreeMap;
  *
  */
 public class CombinePartialTimeScript {
-	
+
 	//static LinkedHashMap<Integer,String> lineCount = new LinkedHashMap<Integer,String>();
 	static String className = "test.BallonFactory";
 	static String methodId = "2";
 	//static String startNode = "4";
 	static String filePrefixOrig;
 	static String filePrefixComb;
-	static String dom = "_dom9.txt";
+	static String dom = "_dom4.txt";
 	public static void main(String [] args) throws IOException{
 		className = args[0];
 		methodId = args[1]; 
-		dom = "_"+args[2]+".txt";
-		filePrefixOrig = "./ScratchData/results/invariants/"+className+"_"+methodId+"_";
-		filePrefixComb = "./ScratchData/results/combined/"+className+"_"+methodId+"_";
+		//dom = "_"+args[2]+".txt";
+		String type = args[2];
+		filePrefixOrig = "./ScratchData/resultsVA/invariants/"+type+"/"+className+"_"+methodId+"_";
+		filePrefixComb = "./ScratchData/resultsVA/combined/"+type+"/"+className+"_"+methodId+"_";
 		//file that contains the prefix and the time it took to run
-		String timeFileName = "./ScratchData/results/time/"+className+"_"+methodId+dom;
+		String timeFileName = "./ScratchData/resultsVA/time/"+className+"_"+methodId+dom;
 		File timeFile = new File(timeFileName);
 		if(timeFile.exists()){
 			//get the data into the map and order it 
@@ -53,16 +54,26 @@ public class CombinePartialTimeScript {
 			Scanner scan = new Scanner(timeFile);
 			while(scan.hasNextLine()){
 				String[] line = scan.nextLine().split("\t");
-				String path = line[0];
-				Integer time = Integer.parseInt(line[1]);
-				List<Integer> timeList = null;
-				if(pathRuns.containsKey(path)){
-					timeList = pathRuns.get(path);
-				} else {
-					timeList = new ArrayList<Integer>();
-					pathRuns.put(path, timeList);
+				String typeIn = line[0];
+				if(typeIn.equals(type) || typeIn.isEmpty()){
+					String path = "";
+					Integer time = 0;
+					if(typeIn.isEmpty()){
+						time = Integer.parseInt(line[1]);
+					} else {
+						path = line[1];
+						time = Integer.parseInt(line[2]);
+					}
+					
+					List<Integer> timeList = null;
+					if(pathRuns.containsKey(path)){
+						timeList = pathRuns.get(path);
+					} else {
+						timeList = new ArrayList<Integer>();
+						pathRuns.put(path, timeList);
+					}
+					timeList.add(time);
 				}
-				timeList.add(time);
 			}
 			scan.close();
 			//now we should have map populated 
@@ -98,9 +109,9 @@ public class CombinePartialTimeScript {
 				System.out.println("combing for time " + e.getKey());
 				timeOutput +=className +"\t" + methodId +"\t" + e.getValue() +"\t" + fileCount + "\t" + fullTime + "\t" + e.getKey()+"\n";
 				if(fileCount == 1){
-					//just copy to combined folder
-					Path p1 = FileSystems.getDefault().getPath("./ScratchData/results/invariants/",className+"_"+methodId+"_"+e.getValue()+dom);
-					Path p2 = FileSystems.getDefault().getPath("./ScratchData/results/combined/",className+"_"+methodId+"_"+fileCount+dom);
+					//just copy to the combined folder
+					Path p1 = FileSystems.getDefault().getPath("./ScratchData/resultsVA/invariants/"+type+"/",className+"_"+methodId+"_"+e.getValue()+dom);
+					Path p2 = FileSystems.getDefault().getPath("./ScratchData/resultsVA/combined/"+type+"/",className+"_"+methodId+"_"+fileCount+dom);
 					Files.copy(p1, p2, StandardCopyOption.REPLACE_EXISTING);
 				} else {
 					//call the combine method
@@ -109,7 +120,7 @@ public class CombinePartialTimeScript {
 				fileCount++;
 			}
 			//write timeOutput to a file
-			String timeOutFileName = "./ScratchData/results/time/time"+dom;
+			String timeOutFileName = "./ScratchData/resultsVA/time/time_"+type;
 			File timeOutFile = new File(timeOutFileName);
 			if(!timeOutFile.exists()){
 				timeOutFile.createNewFile();
@@ -120,35 +131,35 @@ public class CombinePartialTimeScript {
 		} else {
 			System.out.println("Connot fine time file " + timeFileName);
 		}
-		
+
 	}
-	
-//	public static String prefix(String prefix, Node n) throws IOException{
-//		String ret = prefix;
-//		if(!n.getName().equals("end")){
-//			String prefixT = prefix(prefix+n.getName()+"t", n.getTrue());
-//			String prefixF = prefix(prefix+n.getName()+"f", n.getFalse());
-//			combine(prefixT,prefixF, prefix);
-//			//get the corresponding files
-//			//System.out.println("T " + prefixT + " F " + prefixF);
-//			//create a new file name with prefix name
-//			System.out.println("P " + prefix);
-//		}
-//		
-//		return ret;
-//	}
-	 /**
-	  * 
-	  * @param p1 previous count
-	  * @param p2 current prefix
-	  * @param p current count
-	  * @throws IOException
-	  */
-public static void combine(String p1, String p2, String p) throws IOException{		
-		
+
+	//	public static String prefix(String prefix, Node n) throws IOException{
+	//		String ret = prefix;
+	//		if(!n.getName().equals("end")){
+	//			String prefixT = prefix(prefix+n.getName()+"t", n.getTrue());
+	//			String prefixF = prefix(prefix+n.getName()+"f", n.getFalse());
+	//			combine(prefixT,prefixF, prefix);
+	//			//get the corresponding files
+	//			//System.out.println("T " + prefixT + " F " + prefixF);
+	//			//create a new file name with prefix name
+	//			System.out.println("P " + prefix);
+	//		}
+	//		
+	//		return ret;
+	//	}
+	/**
+	 * 
+	 * @param p1 previous count
+	 * @param p2 current prefix
+	 * @param p current count
+	 * @throws IOException
+	 */
+	public static void combine(String p1, String p2, String p) throws IOException{		
+
 		String file1Name = filePrefixComb +p1+dom;
 		String file2Name = filePrefixOrig+p2+dom;
-		
+
 		//file to write the combine output to
 		Writer fileOut = new FileWriter(filePrefixComb+p+dom);
 		String writeTo ="";
@@ -187,8 +198,8 @@ public static void combine(String p1, String p2, String p) throws IOException{
 				Set<String> allVars = new HashSet<String>();
 				allVars.addAll(val1Map.keySet());
 				allVars.addAll(val2Map.keySet());
-//				System.out.println(val1Map);
-//				System.out.println(val2Map);
+				//				System.out.println(val1Map);
+				//				System.out.println(val2Map);
 				for(String var : allVars){
 					//get the formulas for each
 					String formula1 = val1Map.get(var);
@@ -219,9 +230,9 @@ public static void combine(String p1, String p2, String p) throws IOException{
 		fileOut.write(writeTo);
 		fileOut.flush();
 		fileOut.close();
-		
+
 	}
-	
+
 
 	/**
 	 * for now we will work with strings
@@ -285,7 +296,7 @@ public static void combine(String p1, String p2, String p) throws IOException{
 					//but the continuation of that formula
 					formula += ln.trim();
 				}
-			
+
 			} //end of the scanner loop
 			//add the last var 
 			if(var != "" && formula!=""){

@@ -71,7 +71,9 @@ import disjoint.domain.Domain;
 import disjoint.driver.StartAnalysisKestrel;
 import disjoint.solver.SolverWrapperZ3;
 import disjoint.state.*;
-import driver.StartPseudoCondtionalValue;
+import driver.StartAnalysisScript;
+import driver.StartPseudoConditionalValue;
+import driver.StartValue;
 
 public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 	protected long start;
@@ -85,7 +87,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 
 	int disjointDomainIndex;
 	
-	public static boolean writeToFile = false;
+	//public static boolean writeToFile = false;
 	
 	//public static boolean debug = false;
 
@@ -993,13 +995,12 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 
 	public void report() {
 		System.out.println("Done in " + (end - start)+" fn "+ Timers.v().totalFlowNodes + ", fc"+ Timers.v().totalFlowComputations + "\n");
-		String timeData = b.getMethod().getDeclaringClass() + "\t" +b.getMethod().getSignature()+
-				"\t" + StartAnalysisKestrel.analysisType + "\t"+ (end - start)+"\n";
+		String timeData ="\t"+ (end - start)+"\n";
 		
-		if(writeToFile){
 		try {
 			//StartAnalysisKestrel.timeDataFile.append(timeData);
-			RandomAccessFile rf = new RandomAccessFile(StartAnalysisKestrel.timeDataFile, "rwd");
+			String timeDataFile = "./ScratchData/resultsVA/time/"+StartValue.className+"_"+StartValue.methodId+"_"+StartValue.domain+".txt";
+			RandomAccessFile rf = new RandomAccessFile(timeDataFile, "rwd");
 			FileChannel fileChannel = rf.getChannel();
 			FileLock lock = fileChannel.lock();
 			fileChannel.position(fileChannel.size());
@@ -1011,8 +1012,8 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		}
-		if(StartPseudoCondtionalValue.print){
+		
+		if(StartValue.print){
 		Iterator<Unit> iter = b.getUnits().iterator();
 		int stmtCount = 0;
 		//File to write the output to
@@ -1070,10 +1071,10 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 
 					}
 				}
-				if(writeToFile){
+				if(StartValue.writeToFile){
 				//write the string to the file
 				try {
-					StartAnalysisKestrel.fileToWrite.write(output);
+					StartValue.fileToWrite.write(output);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

@@ -16,12 +16,12 @@ do
      while read -r path
      do
        echo $class $method $path
-       java -cp .:./bin/:./libs/soot-trunk.jar:/Users/elenasherman/Documents/z3Java/z3/build/com.microsoft.z3.jar:./libs/antlr-4.1-complete.jar  conditional.driver.StartAnalysisScript $class $method $domain $path $writeToFile
+       java -cp .:./bin/:./libs/soot-trunk.jar:/Users/elenasherman/Documents/z3Java/z3/build/com.microsoft.z3.jar:./libs/antlr-4.1-complete.jar  driver.StartAnalysisScript $class $method $domain $path $writeToFile
      done < $pathfile
   else 
      echo "File $pathfile does not exists."
   fi
  # run regular analysis with all paths - idex 0 means all paths
  echo $class $method "full"
- java -cp .:./bin/:./libs/soot-trunk.jar:/Users/elenasherman/Documents/z3Java/z3/build/com.microsoft.z3.jar:./libs/antlr-4.1-complete.jar  conditional.driver.StartAnalysisScript $class $method $domain 0 $writeToFile
+ java -cp .:./bin/:./libs/soot-trunk.jar:/Users/elenasherman/Documents/z3Java/z3/build/com.microsoft.z3.jar:./libs/antlr-4.1-complete.jar  driver.StartAnalysisScript $class $method $domain 0 $writeToFile
 done < $filename

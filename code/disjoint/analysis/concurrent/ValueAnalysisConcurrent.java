@@ -70,7 +70,7 @@ import disjoint.domain.Domain;
 import disjoint.driver.StartAnalysisKestrel;
 import disjoint.solver.SolverWrapperZ3;
 import disjoint.state.*;
-import driver.StartPseudoCondtionalValue;
+import driver.StartPseudoConditionalValue;
 
 public class ValueAnalysisConcurrent extends ForwardBranchedFlowAnalysis<AbstractState> {
 	protected long start;
@@ -1011,7 +1011,7 @@ public class ValueAnalysisConcurrent extends ForwardBranchedFlowAnalysis<Abstrac
 			e1.printStackTrace();
 		}
 		}
-		if(StartPseudoCondtionalValue.print){
+		if(StartPseudoConditionalValue.print){
 		Iterator<Unit> iter = b.getUnits().iterator();
 		int stmtCount = 0;
 		//File to write the output to

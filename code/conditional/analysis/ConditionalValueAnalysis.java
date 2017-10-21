@@ -75,7 +75,7 @@ import disjoint.solver.SolverWrapperZ3;
 import disjoint.state.*;
 import driver.StartAnalysisScript;
 import driver.StartConditionalValue;
-import driver.StartPseudoCondtionalValue;
+import driver.StartPseudoConditionalValue;
 
 public class ConditionalValueAnalysis extends ConditionalForwardBranchedFlowAnalysis<AbstractState> {
 	protected long start;
@@ -847,29 +847,12 @@ public class ConditionalValueAnalysis extends ConditionalForwardBranchedFlowAnal
 	public void report() {
 		System.out.println("CV Done in " + (end - start) + 
 				 ", fn " + Timers.v().totalFlowNodes + ", fc"+ Timers.v().totalFlowComputations + "\n");
-		String timeData = b.getMethod().getDeclaringClass() + "\t" +b.getMethod().getSignature()+
-				"\t" + StartAnalysisKestrel.analysisType + "\t"+ (end - start)+"\n";
+		String timeData = "c2\t" + StartConditionalValue.condition + "\t"+ (end - start)+"\n";
 		
-//		if(writeToFile){
-//		try {
-//			//StartAnalysisKestrel.timeDataFile.append(timeData);
-//			RandomAccessFile rf = new RandomAccessFile(StartCondtionalValue.timeDataFile, "rwd");
-//			FileChannel fileChannel = rf.getChannel();
-//			FileLock lock = fileChannel.lock();
-//			fileChannel.position(fileChannel.size());
-//			fileChannel.write(Charset.defaultCharset().encode(CharBuffer.wrap(timeData)));
-//			fileChannel.force(false);
-//			lock.release();
-//			fileChannel.close();
-//		} catch (IOException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
-//		}
+		
 		if(StartConditionalValue.writeTime){
 			try {
-				//StartAnalysisKestrel.timeDataFile.append(timeData);
-				String timeDataFile = "./ScratchData/results/time/"+"C_"+StartAnalysisScript.className+"_"+StartAnalysisScript.methodId+"_"+StartAnalysisScript.domain+".txt";
+				String timeDataFile = "./ScratchData/resultsVA/time/"+StartConditionalValue.className+"_"+StartConditionalValue.methodId+"_"+StartConditionalValue.domain+".txt";
 				RandomAccessFile rf = new RandomAccessFile(timeDataFile, "rwd");
 				FileChannel fileChannel = rf.getChannel();
 				FileLock lock = fileChannel.lock();
@@ -952,7 +935,7 @@ public class ConditionalValueAnalysis extends ConditionalForwardBranchedFlowAnal
 					e.printStackTrace();
 				}
 				} else {
-					System.out.println(output);
+					//System.out.println(output);
 				}
 			}//end outputStmt check
 		

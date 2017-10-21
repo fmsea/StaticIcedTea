@@ -12,9 +12,9 @@ import java.util.Scanner;
 
 public class Smt2Format {
 	
-	private static String resultsPathFull = "./ScratchData/results/invariants/";
-	private static String resultsPathCombined = "./ScratchData/results/combined/";
-	private static String smt2FilesPath = "./ScratchData/smt2Files/";
+	private static String resultsPathFull = "./ScratchData/resultsVA/invariants/c2/";
+	private static String resultsPathCombined = "./ScratchData/resultsVA/combined/c2/";
+	private static String smt2FilesPath = "./ScratchData/smt2Files/c2/";
 
 	/**
 	 * Creates an smt2 formula to if file1Name implies file2Name
@@ -34,7 +34,7 @@ public class Smt2Format {
 		}
 		
 		//get the file with the number of paths
-		String pathFileName = "./ScratchData/conditions/paths/" + className+"_"+methodId+"_L.txt";
+		String pathFileName = "./ExperimentDataConditional/conditions/paths/" + className+"_"+methodId+".txt";
 		File pathFile = new File(pathFileName);
 		if(pathFile.exists()){
 			Scanner sPath = new Scanner(new FileReader(pathFile));

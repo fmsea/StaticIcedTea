@@ -1,5 +1,5 @@
 #! /bin/bash
-domain="dom5"
+domain="dom4"
 filename="$1"
 while read -r line
 do 

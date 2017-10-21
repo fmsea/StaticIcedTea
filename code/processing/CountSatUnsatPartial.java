@@ -32,7 +32,7 @@ public class CountSatUnsatPartial {
 		
 		
 		//read the path file and get all the number of path from it
-		String pathFileName = "./ScratchData/conditions/paths/"+className+"_"+methodId+"_L.txt";
+		String pathFileName = "./ExperimentDataConditional/conditions/paths/"+className+"_"+methodId+".txt";
 		File pathFile = new File(pathFileName);
 		String satunsatOutput = "";
 		if(pathFile.exists()){
@@ -52,7 +52,7 @@ public class CountSatUnsatPartial {
 						pathData.add(0);
 					}
 					//smt2 file to count sat/unsat for
-					String smt2File = "./ScratchData/results/satunsat/"+
+					String smt2File = "./ScratchData/resultsVA/satunsat/c2/"+
 					className+"_"+methodId+"_"+
 					String.valueOf(pathId)+"_"+domain+"_satunsat.txt";
 
@@ -127,7 +127,7 @@ public class CountSatUnsatPartial {
 				pathId++;
 			}//end reading datafile
 			} 
-			String timeOutFileName = "./ScratchData/results/satunsat/satunsat_"+domain+".txt";
+			String timeOutFileName = "./ScratchData/resultsVA/satunsat/c2/satunsat_"+domain+".txt";
 			File timeOutFile = new File(timeOutFileName);
 			if(!timeOutFile.exists()){
 				 timeOutFile.createNewFile();
