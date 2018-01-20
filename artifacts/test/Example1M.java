@@ -10,16 +10,16 @@ public class Example1M {
 		}
 		
 		if (x1 == 6){
-			while (x1 != 2){
+		//	while (x1 != 2){
 				y1 = y1 + 2;
-				while(y1 > 0) {
-					y1--;
-				}
+//				while(y1 > 0) {
+//					y1--;
+//				}
 				if(x1 == 0){
 					System.out.println("assert");
 				}
 				x1=0;
-			}	
+			//}	
 		} else {
 			y1 = 5;
 		}
