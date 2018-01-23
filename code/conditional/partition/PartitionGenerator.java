@@ -1,7 +1,5 @@
 package conditional.partition;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -39,6 +37,7 @@ public class PartitionGenerator {
 	
 	public PartitionGenerator(Body b){
 		this.b = b;
+		gr = new ExceptionalUnitGraph(b);
 		//find all condition stmt that
 		//are part of a loop so we will not
 		//include them into the partition
@@ -61,7 +60,6 @@ public class PartitionGenerator {
 		//and has at least two successors
 		//Populate the index map
 		ifSet = new HashSet<IfStmt>();
-		gr = new ExceptionalUnitGraph(b);
 		ifIndex = new HashMap<IfStmt, Integer>();
 		int ifCount = 1;
 		for(Unit u : b.getUnits()){
@@ -116,8 +114,8 @@ public class PartitionGenerator {
 						System.out.println(succ.get(0) + " -> " +btf[0]);
 						System.out.println(succ.get(1) + " -> " +btf[1]);
 						//compute the data
-						int diff = (int) (Math.abs(btf[0] - btf[1]) * ratio);
-						int perc = (int) (Math.max(btf[0], btf[1]) * ratio);
+						int diff = (int) Math.round(Math.abs(btf[0] - btf[1]) * ratio);
+						int perc = (int) Math.round(Math.max(btf[0], btf[1]) * ratio);
 						System.out.println("diff " + diff + " perc " + perc);
 						br.setDiff(diff);
 						br.setPerc(perc);
@@ -136,7 +134,7 @@ public class PartitionGenerator {
 			}
 		}
 		
-		System.out.println(condToSplit.size());
+		System.out.println("condToSplit1 " + condToSplit);
 		
 		//add all conditions that lead to ifs in condToSplit
 		//need to determine on what other ifs they depend.
@@ -149,6 +147,7 @@ public class PartitionGenerator {
 				for(IfStmt dep : ifSet){
 					//dep must not be in condToSplit set and dominate cond
 					if(contains(condToSplit, dep)==null && dom.isDominatedBy(cond, dep)){
+						System.out.println("found dep " + dep);
 						List<Unit> succOfDep = gr.getSuccsOf(dep);
 						if(succOfDep.size() > 1){
 							Unit succ1 = succOfDep.get(0);
@@ -157,7 +156,7 @@ public class PartitionGenerator {
 							//we need to make sure that only
 							//one of its branch outcomes dominates
 							//our branch cond
-							if(dom.isDominatedBy(cond, succ1) && dom.isDominatedBy(cond, succ2)){
+							if(dom.isDominatedBy(cond, succ1) || dom.isDominatedBy(cond, succ2)){
 								//one of the successor must dominate the branch
 								if(!postdom.isDominatedBy(succ1, succ2) && 
 										!postdom.isDominatedBy(succ2, succ1)){
@@ -177,6 +176,8 @@ public class PartitionGenerator {
 		
 		//for debugging
 		debug();
+		System.out.println("condtoSplit2 " + condToSplit);
+	    //System.exit(1);
 		AbstractedCFG cfgA = null;
 		//creating an abstract graph if there is something to split
 		if(!condToSplit.isEmpty()){
@@ -200,7 +201,7 @@ public class PartitionGenerator {
 	
 	private void buildACFG(AbstractedCFG cfgA, Set<Branch> branches, Unit curr, Node from,
 			boolean outcome, Set<Unit> seen){
-
+		System.out.println("curr " + curr + " outcome " + outcome + " from " + from);
 		if(gr.getTails().contains(curr)){
 			//encountered at least one branch
 			//at least one branch encountered
@@ -214,6 +215,7 @@ public class PartitionGenerator {
 			}
 		} else {
 			Branch br = contains(branches, curr);
+			//System.out.println("br " + br);
 			if(br != null){
 				//if the branch is to be explored
 				String id = String.valueOf(br.getIndex());
@@ -221,7 +223,7 @@ public class PartitionGenerator {
 				if(cfgA.contains(id)){
 					//this condition stmt has been already explored before
 					to = cfgA.findNode(id);
-					//just make the connection and use the node with its decendatns already created
+					//just make the connection and use the node with its descendants already created
 				}else {
 					if(from == null){
 						//the first branch found
@@ -237,25 +239,36 @@ public class PartitionGenerator {
 						boolean branch = false;
 						for(Unit u : br.getSucc()){
 							buildACFG(cfgA, branches, u, to, branch,seen);
-						}
-					
-					//create a transition function if from not start
-						if(from!=null){
-							cfgA.add(from, to, outcome);
+							branch = !branch;//flip the branch outcome for next successor
 						}
 				} 
+				
+				//found to node
+				//create an edge "from" "to" when "from" is not the start node
+				if(from!=null){
+					cfgA.add(from, to, outcome);
+				}
 
 			} else {
 				//curr is not to be explored
 				//then just continue the graph exploration
 				//will optimize later for loops - need just skip them
+				int succCount = 0;
 				for(Unit u : gr.getSuccsOf(curr)){
+					//in case of cond stmt that are not in the tracking set
+					//the alg will always takes false branch (fall through)
+					//and never goes onto exploring true branch (branch out)
+					//this should take care of loops
+					if(!(curr instanceof IfStmt) || succCount == 0 ){
+						//System.out.println("cont " + curr + " to " + u + " count " + succCount);
 					try{
 						buildACFG(cfgA, branches, u, from, outcome, seen);
 					} catch(StackOverflowError e){
 						System.err.print("stack overflow!");
 						System.exit(2);
 					}
+					}
+					succCount++;
 				}
 				
 			}
@@ -276,7 +289,7 @@ public class PartitionGenerator {
 				break;
 			}
 		}
-		return null;
+		return ret;
 	}
 
 }

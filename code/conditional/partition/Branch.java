@@ -45,4 +45,9 @@ public class Branch {
 	public int getIndex(){
 		return index;
 	}
+	
+	@Override
+	public String toString(){
+		return index + ": " + ifS;
+	}
 }

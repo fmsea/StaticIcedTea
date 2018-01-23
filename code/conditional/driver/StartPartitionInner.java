@@ -13,7 +13,7 @@ import soot.SootMethod;
 
 public class StartPartitionInner {
 	static public void main(String[] args){
-		String className = "test.Example1M";
+		String className = "test.BallonFactory";
 		int methodId = Integer.parseInt("1");
 
 		Scene.v().setSootClassPath(Scene.v().getSootClassPath()+":"+System.getProperty("java.class.path") 
@@ -28,7 +28,8 @@ public class StartPartitionInner {
 		Body b = m.retrieveActiveBody();
 		System.out.println(b);
 		PartitionGenerator pg = new PartitionGenerator(b);
-		AbstractedCFG acfg = pg.getAbstractedCFG(3, 60);
+		AbstractedCFG acfg = pg.getAbstractedCFG(2, 60);
+		if(acfg != null){
 		List<String> l = new ArrayList<String>();
 		l.addAll(acfg.getPaths());
 		Collections.sort(l);
@@ -36,6 +37,9 @@ public class StartPartitionInner {
 						for(String s : l){
 							System.out.println(s);
 						}
+		} else {
+			System.out.println("No partitions");
+		}
 		//write the graph to the file
 //		String fileName = b.getMethod().getDeclaringClass().getName()+"_"+methodId+loops+ ".txt";
 //		aCFG.writePaths(fileName);
