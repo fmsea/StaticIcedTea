@@ -82,7 +82,7 @@ public class AbstractedCFG {
 	 */
 	public void writeToFile(String fileName){
 		try {
-			Writer fileOut = new FileWriter("./ScratchData/conditions/"+fileName);
+			Writer fileOut = new FileWriter(fileName);
 			fileOut.write(toString());
 			fileOut.close();
 		} catch (IOException e) {
@@ -97,7 +97,7 @@ public class AbstractedCFG {
 	 */
 	public void writePaths(String fileName){
 		try {
-			Writer fileOut = new FileWriter("./ScratchData/conditions/paths/"+fileName);
+			Writer fileOut = new FileWriter(fileName);
 			for(String path : getPaths()){
 				fileOut.write(path+"\n");
 			}
@@ -161,7 +161,7 @@ public class AbstractedCFG {
 		String ret = "\tt\tf\n";
 		for(Node n : allNodes){
 			if(!end.equals(n)){
-				System.out.println(n.getName() + " " + n.getTrue() + " " + n.getFalse());
+				//System.out.println(n.getName() + " " + n.getTrue() + " " + n.getFalse());
 				//System.out.println("n " + n.getName() + " " + n.getTrue().getName() + " " + n.getFalse().getName());
 				ret +=n.getName()+"\t"+n.getTrue().getName()+"\t"+n.getFalse().getName()+"\n";
 			}

@@ -53,7 +53,7 @@ public class PartitionGenerator {
 				}
 			}
 		}
-		System.out.println(insideLoops);
+		//System.out.println(insideLoops);
 		//now iterate over all units
 		//and add to ifSet those that are
 		//not in insdieLoops
@@ -73,7 +73,7 @@ public class PartitionGenerator {
 			}
 		}
 		
-		System.out.println(ifSet);
+		//System.out.println(ifSet);
 		//to use later
 		postdom = new MHGPostDominatorsFinder<Unit>(gr);
 		dom = new MHGDominatorsFinder<Unit>(gr);
@@ -83,6 +83,7 @@ public class PartitionGenerator {
 		//compute information for each stmt in ifSet
 		//iterate over all ifStmt outside loops
 				for(IfStmt ifS : ifSet){
+					//System.out.println("ifS " + ifS);
 					List<Unit> succ = gr.getSuccsOf(ifS);
 					Unit s1 = succ.get(0);
 					Unit s2 = succ.get(1);
@@ -90,14 +91,15 @@ public class PartitionGenerator {
 						System.err.print("More than two branch outcomes!");
 					}
 					/*
-					 * s1 is not a post dominator for s2
+					 * 1: s1 is not a post dominator for s2
 					 * and vice versa, i.e., they are
 					 * in if/else parts of the branch 
+					 * 2: in case of || make sure that s2 is not
+					 * a successor of s1 and vicsysoue versa
 					 */
-					if(!postdom.isDominatedBy(s2, s1) && !postdom.isDominatedBy(s1, s2)){
+					if(!postdom.isDominatedBy(s2, s1) && !postdom.isDominatedBy(s1, s2) 
+							&& !gr.getSuccsOf(s1).contains(s2) && !gr.getSuccsOf(s2).contains(s1)){
 						//create a branch object
-						Branch br = new Branch(ifS, succ, ifIndex.get(ifS));
-						branchSet.add(br);
 						//now do the computation of nodes
 						//which each branch dominates
 						int[] btf = {0,0};
@@ -111,14 +113,16 @@ public class PartitionGenerator {
 								btf[i] = blkSize;
 							}//end for b.getUnits()
 						}//end for each successor
-						System.out.println(succ.get(0) + " -> " +btf[0]);
-						System.out.println(succ.get(1) + " -> " +btf[1]);
+						//System.out.println(succ.get(0) + " -> " +btf[0]);
+						//System.out.println(succ.get(1) + " -> " +btf[1]);
 						//compute the data
 						int diff = (int) Math.round(Math.abs(btf[0] - btf[1]) * ratio);
 						int perc = (int) Math.round(Math.max(btf[0], btf[1]) * ratio);
-						System.out.println("diff " + diff + " perc " + perc);
+						//System.out.println("diff " + diff + " perc " + perc);
+						Branch br = new Branch(ifS, succ, ifIndex.get(ifS));
 						br.setDiff(diff);
 						br.setPerc(perc);
+						branchSet.add(br);
 					}// end if neither of them dominates another
 				}
 				
@@ -130,11 +134,11 @@ public class PartitionGenerator {
 		for(Branch br : branchSet){
 			if(br.getDiff() <= branchDiff && br.getPerc() >= percOfCode){
 				condToSplit.add(br);
-				System.out.println(br.getIfStmt());
+				//System.out.println(br.getIndex() + " " + br.getIfStmt());
 			}
 		}
 		
-		System.out.println("condToSplit1 " + condToSplit);
+		//System.out.println("condToSplit1 " + condToSplit);
 		
 		//add all conditions that lead to ifs in condToSplit
 		//need to determine on what other ifs they depend.
@@ -147,9 +151,20 @@ public class PartitionGenerator {
 				for(IfStmt dep : ifSet){
 					//dep must not be in condToSplit set and dominate cond
 					if(contains(condToSplit, dep)==null && dom.isDominatedBy(cond, dep)){
-						System.out.println("found dep " + dep);
+						//now check that dep and cond are not part of the same composite
+						//conditional statement, if they are they will have one common
+						//successor
+						//System.out.println("found dep " + dep);
 						List<Unit> succOfDep = gr.getSuccsOf(dep);
-						if(succOfDep.size() > 1){
+						boolean noCommon = true;
+						for(Unit uDep : succOfDep){
+							if (br.getSucc().contains(uDep)){
+								noCommon = false;
+								break;
+							}
+						}
+						
+						if(noCommon && succOfDep.size() > 1){
 							Unit succ1 = succOfDep.get(0);
 							Unit succ2 = succOfDep.get(1);
 							//in order to consider dep
@@ -175,8 +190,8 @@ public class PartitionGenerator {
 		}//end while(changed)
 		
 		//for debugging
-		debug();
-		System.out.println("condtoSplit2 " + condToSplit);
+		//debug();
+		//System.out.println("condtoSplit2 " + condToSplit);
 	    //System.exit(1);
 		AbstractedCFG cfgA = null;
 		//creating an abstract graph if there is something to split
@@ -189,7 +204,7 @@ public class PartitionGenerator {
 			}
 			
 			//print the graph out
-			System.out.println(cfgA.toString());
+			//System.out.println(cfgA.toString());
 		}
 		
 		return cfgA;
@@ -201,7 +216,7 @@ public class PartitionGenerator {
 	
 	private void buildACFG(AbstractedCFG cfgA, Set<Branch> branches, Unit curr, Node from,
 			boolean outcome, Set<Unit> seen){
-		System.out.println("curr " + curr + " outcome " + outcome + " from " + from);
+		//System.out.println("curr " + curr + " outcome " + outcome + " from " + from);
 		if(gr.getTails().contains(curr)){
 			//encountered at least one branch
 			//at least one branch encountered

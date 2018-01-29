@@ -26,9 +26,22 @@ import soot.toolkits.graph.ExceptionalUnitGraph;
 import soot.toolkits.graph.UnitGraph;
 import util.Variables;
 
+/**
+ * RD analysis that uses the modification
+ * to the topological ordering algorithm
+ * args[0] - the paths where to write the results
+ * make sure it has invariants and time folders
+ * args[1] - class name
+ * args[2] - method id in that class
+ * args[3] - the path to follow in the method's CFG
+ * args[4] - whether to write invariant to the file (set to no to get time data)
+ * @author elenasherman
+ *
+ */
+
 public class StartConditionalReachingDefinitions {
 
-	private static String resultsPath = "ScratchData/resultsRD/";
+	private static String resultsPath = "ConditionalTACAS/resultsRD/";
 
 
 	public static void main(String[] args){
@@ -39,10 +52,11 @@ public class StartConditionalReachingDefinitions {
 		List<String> conditions = new ArrayList<String>();
 		boolean writeInv = true;
 		if(args.length > 0){
-			className =args[0];
-			methodId = Integer.parseInt(args[1]);
-			conditions.add(args[2]);
-			writeInv = args[3].equals("y")?true:false;
+			resultsPath = args[0];
+			className =args[1];
+			methodId = Integer.parseInt(args[2]);
+			conditions.add(args[3]);
+			writeInv = args[4].equals("y");
 		}
 
 //		conditions.clear();

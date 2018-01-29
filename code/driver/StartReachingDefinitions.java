@@ -9,22 +9,28 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.charset.Charset;
 import java.util.Iterator;
-import java.util.List;
 
 import original.analysis.ReachingDefinitions;
 import soot.Body;
-import soot.NormalUnitPrinter;
 import soot.Scene;
 import soot.SootClass;
 import soot.SootMethod;
-import soot.Timers;
 import soot.Unit;
-import soot.UnitPrinter;
 import soot.toolkits.graph.ExceptionalUnitGraph;
 import soot.toolkits.graph.UnitGraph;
 import util.Variables;
-import soot.jimple.internal.*;
 
+/**
+ * Driver for full versions of reaching definitions analysis
+ * args[0] is the path where to write the ouptput,  
+ * which are time and the computed invariants.
+ * Make sure to have two folder on this paths: invariants and time.
+ * args[1] is the class name
+ * args[2] is the method id in this class
+ * args[3] is whether to write computed invariants (only set to no to compute average run)
+ * @author elenasherman
+ *
+ */
 public class StartReachingDefinitions {
 	private static String resultsPath = "ScratchData/resultsRD/";
 
@@ -33,16 +39,15 @@ public class StartReachingDefinitions {
 		int methodId = 4;
 		boolean writeInv = true;
 		if(args.length > 0){
-			className =args[0];
-			methodId = Integer.parseInt(args[1]);
-			writeInv = args[2].equals("y")?true:false;
+			resultsPath = args[0];
+			className =args[1];
+			methodId = Integer.parseInt(args[2]);
+			writeInv = args[3].equals("y");
 		} 
 
 
 
 		String fileName = resultsPath+"/invariants/"+className+"_"+methodId;
-		//new StartAnalysis(className, domainName, symbolicOn, condition, methodId);
-		//System.out.println(Scene.v().getSootClassPath() +  " " + System.getProperty("java.class.path"));
 		Scene.v().setSootClassPath(Scene.v().getSootClassPath()+":"+System.getProperty("java.class.path") 
 		+ ":" + System.getProperty("sun.boot.class.path"));
 		SootClass sClass = Scene.v().loadClassAndSupport(className);		

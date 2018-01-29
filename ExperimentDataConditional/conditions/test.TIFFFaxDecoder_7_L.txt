@@ -1,4 +1,0 @@
-	t	f
-1	2	end
-2	3	end
-3	end	end

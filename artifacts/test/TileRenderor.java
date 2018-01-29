@@ -1638,6 +1638,687 @@ public class TileRenderor extends java.lang.Object
         g.setColor(Color.black);
     }
     
+    public void drawRouteRefactored(Graphics g, int style, int direction, Color trackColor)
+    {
+    	int HEIGHT = 52;
+        int HEX_SIDE = 30;
+        int WIDTH = 60;
+        int HEIGHT_DIV_2 = 26;
+        
+        int L3 = HEX_SIDE * 3;
+        int L3div2 = L3 / 2;
+        
+        g.setColor(trackColor);
+        
+        int mid1x = 0;
+        int mid2x = 0;
+        int mid1y = 0;
+        int mid2y = 0;
+        int angle = 0;
+        int angle2 = 0;
+        int centerX = 0;
+        int centerY = 0;
+  
+        
+        if(style == STRAIGHT || style == HALF_STRAIGHT){
+        	if(direction == S || direction == N){
+        		 // Midpoint of S line segment
+                mid1x = ((xPoints[4] - xPoints[5]) / 2) + xPoints[5];
+                mid1y = ((yPoints[4] - yPoints[5]) / 2) + yPoints[5];
+                // Midpoint of N line segment
+                mid2x = ((xPoints[2] - xPoints[1]) / 2) + xPoints[1];
+                mid2y = ((yPoints[2] - yPoints[1]) / 2) + yPoints[1];
+                angle = 90;
+        	} else if (direction == SW || direction == NE){
+        		// Midpoint of SW line segment
+                mid1x = ((xPoints[5] - xPoints[0]) / 2) + xPoints[0];
+                mid1y = ((yPoints[5] - yPoints[0]) / 2) + yPoints[0];
+                // Midpoint of NE line segment
+                mid2x = ((xPoints[3] - xPoints[2]) / 2) + xPoints[2];
+                mid2y = ((yPoints[3] - yPoints[2]) / 2) + yPoints[2];
+                angle = 30;
+        	} else if(direction == SE || direction == NW){
+        		// Midpoint of NW line segment
+                mid1x = ((xPoints[1] - xPoints[0]) / 2) + xPoints[0];
+                mid1y = ((yPoints[0] - yPoints[1]) / 2) + yPoints[1];
+                // Midpoint of SE line segment
+                mid2x = ((xPoints[3] - xPoints[4]) / 2) + xPoints[4];
+                mid2y = ((yPoints[4] - yPoints[3]) / 2) + yPoints[3];
+                angle = 330;
+        	}
+        	if (style == HALF_STRAIGHT)
+            {
+                if (direction == N || direction == NE || direction == SE)
+                {
+                    mid1x = mid2x;
+                    mid1y = mid2y;
+                }
+                mid2x = (WIDTH / 2) + x;
+                mid2y = HEIGHT_DIV_2 + y;
+           }
+            //GraphicsUtil.drawLine(g, mid1x, mid1y, mid2x, mid2y, PEN_WIDTH);
+            System.out.println(g + " " + mid1x + " " + mid1y + " " + mid2x + " " + mid2y + " " + PEN_WIDTH);
+            
+        } else if (style == GENTLE_CURVE){
+        	if(direction == S){
+        		centerX = (-(HEX_SIDE / 2)) + x;
+                centerY = HEIGHT + y;
+                angle = 0;
+        	} else if(direction == SW){
+        		centerX = (-(HEX_SIDE / 2)) + x;
+                centerY = 0 + y;
+                angle = 300;
+        	} else if(direction == NW){
+        		centerX = (WIDTH / 2) + x;
+                centerY = (-HEIGHT_DIV_2) + y;
+                angle = 240;
+        	} else if(direction == N){
+        		centerX = (WIDTH + (HEX_SIDE / 2)) + x;
+                centerY = 0 + y;
+                angle = 180;
+        	} else if(direction == NE){
+        		centerX = (WIDTH + (HEX_SIDE / 2)) + x;
+                centerY = HEIGHT + y;
+                angle = 120;
+        	} else if(direction == SE){
+        		centerX = (WIDTH / 2) + x;
+                centerY = (HEIGHT_DIV_2 * 3) + y;
+                angle = 60;
+        	}
+        	//GraphicsUtil.drawArc(g, centerX - L3div2, centerY - L3div2, L3, L3, angle, 60, PEN_WIDTH);
+            System.out.println(g + " " + (centerX - L3div2) +  " " + (centerY - L3div2) + L3 + angle + " " + PEN_WIDTH);
+            
+        } else if(style == TIGHT_CURVE){
+        	int point = 0;
+        	if(direction == S){
+        		 point = 5;
+                 angle = 0;
+        	} else if(direction == SW){
+        		 point = 0;
+                 angle = 300;
+        	} else if(direction == NW){
+        		point = 1;
+                angle = 240;
+        	} else if(direction == N){
+        		point = 2;
+                angle = 180;
+        	} else if(direction == NE){
+        		point = 3;
+                angle = 120;
+        	} else if(direction == SE){
+        		 point = 4;
+                 angle = 60;
+        	}
+        	 angle2 = 120;
+             //GraphicsUtil.drawArc(g, xPoints[point] - HEX_SIDE_DIV_2, yPoints[point] - HEX_SIDE_DIV_2, HEX_SIDE, HEX_SIDE, angle, angle2, PEN_WIDTH);
+             System.out.println(g + " " + (xPoints[point] - HEX_SIDE_DIV_2) + (yPoints[point] - HEX_SIDE_DIV_2) + HEX_SIDE +  angle +  angle2 + PEN_WIDTH);
+             
+        }
+        
+        g.setColor(Color.black);
+   
+    }
+    
+    public void drawTileRefactored(Graphics g, int tileNumber, int orientation, int x, int y)
+    {
+        int HEIGHT = 52;
+        int HEX_SIDE = 30;
+        int WIDTH = 60;
+        int HEIGHT_DIV_2 = 26;
+        int CIRCLE_RADIUS = 9;
+        
+        g.setFont(font);
+        g.setColor(c);
+        g.fillPolygon(xPoints, yPoints, 6);
+        
+        int x1 = 0;
+        int y1 = 0;
+        int x2 = 0;
+        int y2 = 0;
+        int mid1x = 0;
+        int mid2x = 0;
+        int mid1y = 0;
+        int mid2y = 0;
+        int angle = 0;
+        int angle1 = 0;
+        int angle2 = 0;
+        int angle3 = 0;
+        int centerX = 0;
+        int centerY = 0;
+        int offset = 0;
+        
+        int drawingOffset = HEIGHT / 4;
+        
+        String tileNumberS = String.valueOf(tileNumber);
+        
+        
+        int i;
+        int j;
+        for (i = 0; i < geography.length; i++)
+        {
+            for (j = 0; j < geography[i].length; j++)
+            {
+                //switch (geography[i][j])
+               if(geography[i][j] == REVERSE_GENTLE_MINOR) {
+            	   
+                    	if(i == S){
+                        	centerX = (-(HEX_SIDE / 2)) + x;
+                                centerY = HEIGHT + y;
+                                angle = 0;
+                        }else if(i == N){
+                        	centerX = (WIDTH + (HEX_SIDE / 2)) + x;
+                            centerY = 0 + y;
+                            angle = 180;
+                        } else if(i == SW){
+                        	centerX = (-(HEX_SIDE / 2)) + x;
+                                centerY = 0 + y;
+                                angle = 300;
+                        } else if(i == NE){
+                        	centerX = (WIDTH + (HEX_SIDE / 2)) + x;
+                            centerY = HEIGHT + y;
+                            angle = 120;
+                        } else if(i == SE){
+                        	centerX = (WIDTH / 2) + x;
+                            centerY = (HEIGHT_DIV_2 * 3) + y;
+                            angle = 60;
+                        } else if(i == NW){
+                        	centerX = (WIDTH / 2) + x;
+                                centerY = (-HEIGHT_DIV_2) + y;
+                                angle = 240;
+                        }
+                        //GraphicsUtil.drawArc(g, centerX - L3div2, centerY - L3div2, L3, L3, angle, 60, PEN_WIDTH);
+                        if (geography[i][j] == GENTLE_MINOR)
+                        {
+                            x1 = (int)(Math.cos((angle + 20) * radiansPerDegree) * (L3div2 - (PEN_WIDTH * 2))) + centerX;
+                            y1 = centerY - (int)(Math.sin((angle + 20) * radiansPerDegree) * (L3div2 - (PEN_WIDTH * 2)));
+                            x2 = (int)(Math.cos((angle + 20) * radiansPerDegree) * (L3div2 + (PEN_WIDTH * 2))) + centerX;
+                            y2 = centerY - (int)(Math.sin((angle + 20) * radiansPerDegree) * (L3div2 + (PEN_WIDTH * 2)));
+                            //GraphicsUtil.drawLine(g, x1, y1, x2, y2, PEN_WIDTH);
+                        }
+                        else if (geography[i][j] == REVERSE_GENTLE_MINOR)
+                        {
+                            x1 = (int)(Math.cos((angle + 40) * radiansPerDegree) * (L3div2 - (PEN_WIDTH * 2))) + centerX;
+                            y1 = centerY - (int)(Math.sin((angle + 40) * radiansPerDegree) * (L3div2 - (PEN_WIDTH * 2)));
+                            x2 = (int)(Math.cos((angle + 40) * radiansPerDegree) * (L3div2 + (PEN_WIDTH * 2))) + centerX;
+                            y2 = centerY - (int)(Math.sin((angle + 40) * radiansPerDegree) * (L3div2 + (PEN_WIDTH * 2)));
+                            //GraphicsUtil.drawLine(g, x1, y1, x2, y2, PEN_WIDTH);
+                        }
+                        break;
+                    } else if (geography[i][j] == TIGHT_MINOR){
+                    	int point = 0;
+                    	if(i == S){
+                        		point = 5;
+                                angle = 0;
+                        }else if(i == N){
+                        	point = 2;
+                            angle = 180;
+                        } else if(i == SW){
+                        	point = 0;
+                                angle = 300;
+                        } else if(i == NE){
+                        	point = 3;
+                            angle = 120;
+                        } else if(i == SE){
+                        	 point = 4;
+                             angle = 60;
+                        } else if(i == NW){
+                        	 point = 1;
+                             angle = 240;
+                        }
+                        
+                      
+                        
+                        angle2 = 120;
+                        if (geography[i][j] == HALF_TIGHT)
+                        {
+                            angle2 = 60;
+                        }
+                       //GraphicsUtil.drawArc(g, xPoints[point] - HEX_SIDE_DIV_2, yPoints[point] - HEX_SIDE_DIV_2, HEX_SIDE, HEX_SIDE, angle, angle2, PEN_WIDTH);
+                        if (geography[i][j] == REVERSE_HALF_TIGHT)
+                        {
+                            angle2 = 60;
+                            g.setColor(c);
+                            //GraphicsUtil.drawArc(g, xPoints[point] - HEX_SIDE_DIV_2, yPoints[point] - HEX_SIDE_DIV_2, HEX_SIDE, HEX_SIDE, angle, angle2, PEN_WIDTH);
+                            g.setColor(Color.black);
+                        }
+                        
+                        if (geography[i][j] == TIGHT_MINOR)
+                        {
+                            x1 = (int)(Math.cos((angle + 40) * radiansPerDegree) * (HEX_SIDE_DIV_2 - (PEN_WIDTH * 2))) + xPoints[point];
+                            y1 = yPoints[point] - (int)(Math.sin((angle + 40) * radiansPerDegree) * (HEX_SIDE_DIV_2 - (PEN_WIDTH * 2)));
+                            x2 = (int)(Math.cos((angle + 40) * radiansPerDegree) * (HEX_SIDE_DIV_2 + (PEN_WIDTH * 2))) + xPoints[point];
+                            y2 = yPoints[point] - (int)(Math.sin((angle + 40) * radiansPerDegree) * (HEX_SIDE_DIV_2 + (PEN_WIDTH * 2)));
+                            //GraphicsUtil.drawLine(g, x1, y1, x2, y2, PEN_WIDTH);
+                        }
+                    }
+                    
+                }//for loop
+            }//for loop
+       
+        
+
+        
+        int middleX = (WIDTH / 2) + x;
+        int middleY = HEIGHT_DIV_2 + y;
+            if(cityType == SINGLE_MAJOR){
+                g.setColor(Color.white);
+                //GraphicsUtil.fillCircle(g, middleX, middleY, CIRCLE_RADIUS);
+                g.setColor(Color.black);
+                //GraphicsUtil.drawCircle(g, middleX, middleY, CIRCLE_RADIUS);
+                cityMiddle[0] = new Point(middleX, middleY);
+            } else if(cityType == SINGLE_DOT){
+            
+                g.setColor(Color.black);
+                //GraphicsUtil.fillCircle(g, middleX, middleY, CIRCLE_RADIUS / 3);
+                //GraphicsUtil.drawCircle(g, middleX, middleY, CIRCLE_RADIUS / 3);
+            }
+            else if(cityType == MOUNTAIN)
+            {
+                int distance = CIRCLE_RADIUS / 2;
+                int [] xpos = { middleX - distance, middleX, middleX + distance }; 
+                int [] ypos = { middleY + distance, middleY - distance, middleY + distance }; 
+                g.setColor(Color.black);
+                g.fillPolygon(xpos, ypos, 3);
+               
+            }
+            else if (cityType == DOUBLE_MAJOR || cityType == DOUBLE_MAJOR_OFFSET)
+            {
+  
+                offset = 0;
+                if (cityType == DOUBLE_MAJOR)
+                {
+                    offset = 30;
+                }
+                int edge = (NW + orientation) % 6;
+                if(edge == S || edge == N){
+                	angle1 = 330 - 60 + offset;
+                    angle2 = 210 - 60 + offset;
+                    angle3 = 30 - 60 + offset;	
+                } else if(edge == SW || edge == NE){
+                	 angle1 = 330 + 60 + offset;
+                     angle2 = 210 + 60 + offset;
+                     angle3 = 30 + 60 + offset;
+                } else if(edge == SE ||edge == NW){
+                	angle1 = 330 + offset;
+                    angle2 = 210 + offset;
+                    angle3 = 30 + offset;
+                } 
+                
+                int c2x = middleX + (int)(Math.cos(angle1 * radiansPerDegree) * CIRCLE_RADIUS) + 1;
+                int c2y = middleY - (int)(Math.sin(angle1 * radiansPerDegree) * CIRCLE_RADIUS);
+                int c1x = middleX + (int)(Math.cos((angle1 + 180) * radiansPerDegree) * CIRCLE_RADIUS) - 1;
+                int c1y = middleY - (int)(Math.sin((angle1 + 180) * radiansPerDegree) * CIRCLE_RADIUS);
+                        
+                int [] newX = { c1x + (int)(Math.cos(angle2 * radiansPerDegree) * CIRCLE_RADIUS),
+                                c1x + (int)(Math.cos((angle2 + 180) * radiansPerDegree) * CIRCLE_RADIUS),
+                                c2x + (int)(Math.cos(angle3 * radiansPerDegree) * CIRCLE_RADIUS),
+                                c2x + (int)(Math.cos((angle3 + 180) * radiansPerDegree) * CIRCLE_RADIUS) };
+                int [] newY = { c1y - (int)(Math.sin(angle2 * radiansPerDegree) * CIRCLE_RADIUS),
+                                c1y - (int)(Math.sin((angle2 + 180) * radiansPerDegree) * CIRCLE_RADIUS),
+                                c2y - (int)(Math.sin(angle3 * radiansPerDegree) * CIRCLE_RADIUS),
+                                c2y - (int)(Math.sin((angle3 + 180) * radiansPerDegree) * CIRCLE_RADIUS) };
+                        
+                g.setColor(Color.white);
+                g.fillPolygon(newX, newY, 4);
+                g.setColor(Color.black);
+                g.drawPolygon(newX, newY, 4);
+                        
+                g.setColor(Color.white);
+                //GraphicsUtil.fillCircle(g, c2x, c2y, CIRCLE_RADIUS);
+                //GraphicsUtil.fillCircle(g, c1x, c1y, CIRCLE_RADIUS);
+                g.setColor(Color.black);
+               //GraphicsUtil.drawCircle(g, c2x, c2y, CIRCLE_RADIUS);
+                //GraphicsUtil.drawCircle(g, c1x, c1y, CIRCLE_RADIUS);
+                cityMiddle[0] = new Point(c1x, c1y);
+                cityMiddle[1] = new Point(c2x, c2y);
+             
+            }
+            else if (cityType ==  OO_GREEN_MOUNTAIN)
+            {
+                mid1x = xPoints[orientation];
+                mid1y = yPoints[orientation];
+                offset = 3;
+                angle = -(60 * orientation);
+                angle2 = 180;
+                if (cityType == TORONTO_GREEN)
+                {
+                    offset = 2;
+                    angle2 = 240;
+                }
+                else if (cityType == OO_BROWN65)
+                {
+                    mid1x = xPoints[(orientation + 1) % 6];
+                    mid1y = yPoints[(orientation + 1) % 6];
+                    offset = 3;
+                    angle = (-(60 * orientation)) - 60;
+                    angle2 = 240;
+                }
+                mid2x = xPoints[(orientation + offset) % 6];
+                mid2y = yPoints[(orientation + offset) % 6];
+                x1 = mid1x + (int)(Math.cos(angle * radiansPerDegree) * (HEX_SIDE_DIV_2));
+                y1 = mid1y - (int)(Math.sin(angle * radiansPerDegree) * (HEX_SIDE_DIV_2));
+                x2 = mid2x + (int)(Math.cos((angle + angle2) * radiansPerDegree) * (HEX_SIDE_DIV_2));
+                y2 = mid2y - (int)(Math.sin((angle + angle2) * radiansPerDegree) * (HEX_SIDE_DIV_2));
+
+                if (cityType == OO_GREEN_MOUNTAIN)
+                {
+                    int distance = CIRCLE_RADIUS / 2;
+                    int [] xpos = { middleX - distance, middleX, middleX + distance };
+                    int [] ypos = { middleY + distance, middleY - distance, middleY + distance };
+
+                }
+               
+            }
+            else if(cityType == OO_BROWN66)
+            {
+                // North East midpoint, a little more than the radius
+                mid1x = xPoints[orientation];
+                mid1y = yPoints[orientation];
+                offset = 3;
+                angle = -(60 * orientation);
+                angle2 = 180;
+                mid1x = xPoints[(orientation + 1) % 6];
+                mid1y = yPoints[(orientation + 1) % 6];
+                offset = 3;
+                angle = (-(60 * orientation)) - 60;
+                angle2 = 240;
+                mid2x = xPoints[(orientation + offset) % 6];
+                mid2y = yPoints[(orientation + offset) % 6];
+
+                x1 = mid1x + (int)(Math.cos(angle * radiansPerDegree) * (HEX_SIDE_DIV_2));
+                y1 = mid1y - (int)(Math.sin(angle * radiansPerDegree) * (HEX_SIDE_DIV_2));
+                x2 = mid2x + (int)(Math.cos((angle + angle2) * radiansPerDegree) * (HEX_SIDE_DIV_2));
+                y2 = mid2y - (int)(Math.sin((angle + angle2) * radiansPerDegree) * (HEX_SIDE_DIV_2));
+
+
+                x2 = centerX + (int)(Math.cos((angle) * radiansPerDegree) * (L3div2 / 3));
+                y2 = centerY - (int)(Math.sin((angle) * radiansPerDegree) * (L3div2 / 3));
+                g.setColor(Color.white);
+
+            }
+            else if(cityType == OO_BROWN67)
+            {
+				if(orientation == S){
+					 // Midpoint of N line segment
+                    mid1x = ((xPoints[2] - xPoints[1]) / 2) + xPoints[1];
+                    mid1y = ((yPoints[2] - yPoints[1]) / 2) + yPoints[1];
+                    angle = 270;
+                    centerX = (WIDTH / 2) + x;
+                    centerY = (HEIGHT_DIV_2 * 3) + y;
+                }else if(orientation == N){
+                	 // Midpoint of S line segment
+                    mid1x = ((xPoints[4] - xPoints[5]) / 2) + xPoints[5];
+                    mid1y = ((yPoints[4] - yPoints[5]) / 2) + yPoints[5];
+                    angle = 90;
+                    centerX = (WIDTH / 2) + x;
+                    centerY = (-HEIGHT_DIV_2) + y;
+                } else if(orientation == SW){
+                	// Midpoint of NE line segment
+                    mid1x = ((xPoints[3] - xPoints[2]) / 2) + xPoints[2];
+                    mid1y = ((yPoints[3] - yPoints[2]) / 2) + yPoints[2];
+                    angle = 210;
+                    centerX = (-(HEX_SIDE / 2)) + x;
+                    centerY = HEIGHT + y;
+                } else if(orientation == NE){
+                	 // Midpoint of SW line segment
+                    mid1x = ((xPoints[5] - xPoints[0]) / 2) + xPoints[0];
+                    mid1y = ((yPoints[5] - yPoints[0]) / 2) + yPoints[0];
+                    angle = 30;
+                    centerX = (WIDTH + (HEX_SIDE / 2)) + x;
+                    centerY = 0 + y;
+                } else if(orientation == SE){
+                	 // Midpoint of NW line segment
+                    mid1x = ((xPoints[1] - xPoints[0]) / 2) + xPoints[0];
+                    mid1y = ((yPoints[0] - yPoints[1]) / 2) + yPoints[1];
+                    angle = 330;
+                    centerX = (WIDTH + (HEX_SIDE / 2)) + x;
+                    centerY = HEIGHT + y;
+                } else if(orientation == NW){
+                	// Midpoint of SE line segment
+                    mid1x = ((xPoints[3] - xPoints[4]) / 2) + xPoints[4];
+                    mid1y = ((yPoints[4] - yPoints[3]) / 2) + yPoints[3];
+                    angle = 150;
+                    centerX = (-(HEX_SIDE / 2)) + x;
+                    centerY = 0 + y;
+                }
+                // North midpoint, a little more than the radius
+           
+                x1 = mid1x + (int)(Math.cos(angle * radiansPerDegree) * (HEX_SIDE_DIV_2));
+                y1 = mid1y - (int)(Math.sin(angle * radiansPerDegree) * (HEX_SIDE_DIV_2));
+                x2 = centerX + (int)(Math.cos((angle + 195) * radiansPerDegree) * (L3div2));
+                y2 = centerY - (int)(Math.sin((angle + 195) * radiansPerDegree) * (L3div2));
+ 
+            }
+
+            else if(cityType == DOUBLE_DOUBLE_MAJOR)
+            {
+                offset = 90;
+                int edge = (NW + orientation) % 6;
+                int angle4 = 0;
+                if(edge == S){
+                	angle1 = 330 - 60 + offset;
+                        angle2 = 210 - 60 + offset;
+                        angle3 = 30 - 60 + offset;
+                        angle4 = 0;
+                }else if(edge == N){
+                	 angle1 = 330 - 60 + offset;
+                        angle2 = 210 - 60 + offset;
+                        angle3 = 30 - 60 + offset;
+                        angle4 = 180;
+                } else if(edge == SW){
+                	angle1 = 330 + 60 + offset;
+                    angle2 = 210 + 60 + offset;
+                    angle3 = 30 + 60 + offset;
+                    angle4 = 240 + 180;
+                } else if(edge == NE){
+                	 angle1 = 330 + 60 + offset;
+                        angle2 = 210 + 60 + offset;
+                        angle3 = 30 + 60 + offset;
+                        angle4 = 240;
+                } else if(edge == SE){
+                	angle1 = 330 + offset;
+                    angle2 = 210 + offset;
+                    angle3 = 30 + offset;
+                    angle4 = 120 + 180;
+                } else if(edge == NW){
+                	 angle1 = 330 + offset;
+                     angle2 = 210 + offset;
+                     angle3 = 30 + offset;
+                     angle4 = 120;
+                }
+                
+                
+                // Move middleX and MiddleY
+                mid1x = middleX + (int)(Math.cos((240 + angle4) * radiansPerDegree) * HEX_SIDE_DIV_2);
+                mid1y = middleY + (int)(Math.sin((240 + angle4) * radiansPerDegree) * HEX_SIDE_DIV_2);
+                                
+                int c2x = mid1x + (int)(Math.cos(angle1 * radiansPerDegree) * CIRCLE_RADIUS) + 1;
+                int c2y = mid1y - (int)(Math.sin(angle1 * radiansPerDegree) * CIRCLE_RADIUS);
+                int c1x = mid1x + (int)(Math.cos((angle1 + 180) * radiansPerDegree) * CIRCLE_RADIUS) - 1;
+                int c1y = mid1y - (int)(Math.sin((angle1 + 180) * radiansPerDegree) * CIRCLE_RADIUS);
+                        
+                int [] newX = { c1x + (int)(Math.cos(angle2 * radiansPerDegree) * CIRCLE_RADIUS),
+                                c1x + (int)(Math.cos((angle2 + 180) * radiansPerDegree) * CIRCLE_RADIUS),
+                                c2x + (int)(Math.cos(angle3 * radiansPerDegree) * CIRCLE_RADIUS),
+                                c2x + (int)(Math.cos((angle3 + 180) * radiansPerDegree) * CIRCLE_RADIUS) };
+                int [] newY = { c1y - (int)(Math.sin(angle2 * radiansPerDegree) * CIRCLE_RADIUS),
+                                c1y - (int)(Math.sin((angle2 + 180) * radiansPerDegree) * CIRCLE_RADIUS),
+                                c2y - (int)(Math.sin(angle3 * radiansPerDegree) * CIRCLE_RADIUS),
+                                c2y - (int)(Math.sin((angle3 + 180) * radiansPerDegree) * CIRCLE_RADIUS) };
+                System.out.println(newX + " " + newY);
+                        
+
+                // Move middleX and MiddleY
+                mid1x = middleX + (int)(Math.cos((240 + angle4 - 90) * radiansPerDegree) * HEX_SIDE_DIV_2);
+                mid1y = middleY + (int)(Math.sin((240 + angle4 - 90) * radiansPerDegree) * HEX_SIDE_DIV_2);
+                                
+                c2x = mid1x + (int)(Math.cos(angle1 * radiansPerDegree) * CIRCLE_RADIUS) + 1;
+                c2y = mid1y - (int)(Math.sin(angle1 * radiansPerDegree) * CIRCLE_RADIUS);
+                c1x = mid1x + (int)(Math.cos((angle1 + 180) * radiansPerDegree) * CIRCLE_RADIUS) - 1;
+                c1y = mid1y - (int)(Math.sin((angle1 + 180) * radiansPerDegree) * CIRCLE_RADIUS);
+                        
+                int [] newX1 = { c1x + (int)(Math.cos(angle2 * radiansPerDegree) * CIRCLE_RADIUS),
+                                c1x + (int)(Math.cos((angle2 + 180) * radiansPerDegree) * CIRCLE_RADIUS),
+                                c2x + (int)(Math.cos(angle3 * radiansPerDegree) * CIRCLE_RADIUS),
+                                c2x + (int)(Math.cos((angle3 + 180) * radiansPerDegree) * CIRCLE_RADIUS) };
+                int [] newY1 = { c1y - (int)(Math.sin(angle2 * radiansPerDegree) * CIRCLE_RADIUS),
+                                c1y - (int)(Math.sin((angle2 + 180) * radiansPerDegree) * CIRCLE_RADIUS),
+                                c2y - (int)(Math.sin(angle3 * radiansPerDegree) * CIRCLE_RADIUS),
+                                c2y - (int)(Math.sin((angle3 + 180) * radiansPerDegree) * CIRCLE_RADIUS) };
+                System.out.println(newX1 + " " + newY1);
+                        
+                
+            }
+            else if (cityType == TRIPPLE_MAJOR)
+            {
+                int angle4 = 0;
+                int angle5 = 0;
+				if(orientation == S){
+					 angle1 = 180;
+                     angle2 = 240 + 180;
+                     angle3 = 60 + 180;
+                     angle4 = 270;
+                     angle5 = 90;
+                }else if(orientation == N){
+                	 angle1 = 0 + 180;
+                     angle2 = 240 + 180;
+                     angle3 = 60 + 180;
+                     angle4 = 270 + 180;
+                     angle5 = 90 + 180;
+                } else if(orientation == SW){
+                	angle1 = 0 - 60;
+                    angle2 = 240 - 60;
+                    angle3 = 60 - 60;
+                    angle4 = 210;
+                    angle5 = 30;
+                } else if(orientation == NE){
+                	angle1 = 0 - 60;
+                    angle2 = 240 - 60;
+                    angle3 = 60 - 60;
+                    angle4 = 30;
+                    angle5 = 30 + 180;
+                } else if(orientation == SE){
+                	angle1 = 0 + 60 + 180;
+                    angle2 = 240 + 60 + 180;
+                    angle3 = 60 + 60 + 180;
+                    angle4 = 330 + 180;
+                    angle5 = 330 + 180;
+                } else if(orientation == NW){
+                	angle1 = 0 + 60 + 180;
+                    angle2 = 240 + 60 + 180;
+                    angle3 = 60 + 60 + 180;
+                    angle4 = 330;
+                    angle5 = 330;
+                }
+                
+                // Move middleX and MiddleY
+                mid1x = middleX + (int)(Math.cos((angle1 + angle4) * radiansPerDegree) * CIRCLE_RADIUS);
+                mid1y = middleY + (int)(Math.sin((angle1 + angle4) * radiansPerDegree) * CIRCLE_RADIUS);
+
+                int c2x = mid1x + (int)(Math.cos(angle1 * radiansPerDegree) * CIRCLE_RADIUS) + 1;
+                int c2y = mid1y - (int)(Math.sin(angle1 * radiansPerDegree) * CIRCLE_RADIUS);
+                int c1x = mid1x + (int)(Math.cos((angle1 + 180) * radiansPerDegree) * CIRCLE_RADIUS) - 1;
+                int c1y = mid1y - (int)(Math.sin((angle1 + 180) * radiansPerDegree) * CIRCLE_RADIUS);
+                        
+                // Move middleX and MiddleY
+                mid2x = middleX + (int)(Math.cos(angle5 * radiansPerDegree) * CIRCLE_RADIUS);
+                mid2y = middleY - (int)(Math.sin(angle5 * radiansPerDegree) * CIRCLE_RADIUS);
+
+
+                int [] newX = { c1x + (int)(Math.cos(angle2 * radiansPerDegree) * CIRCLE_RADIUS),
+                                c1x + (int)(Math.cos((angle2 + 180) * radiansPerDegree) * CIRCLE_RADIUS),
+                                c2x + (int)(Math.cos(angle3 * radiansPerDegree) * CIRCLE_RADIUS),
+                                c2x + (int)(Math.cos((angle3 + 180) * radiansPerDegree) * CIRCLE_RADIUS) };
+                int [] newY = { c1y - (int)(Math.sin(angle2 * radiansPerDegree) * CIRCLE_RADIUS),
+                                c1y - (int)(Math.sin((angle2 + 180) * radiansPerDegree) * CIRCLE_RADIUS),
+                                c2y - (int)(Math.sin(angle3 * radiansPerDegree) * CIRCLE_RADIUS),
+                                c2y - (int)(Math.sin((angle3 + 180) * radiansPerDegree) * CIRCLE_RADIUS) };
+                System.out.println(newX + " " + newY + " ");
+                        
+               
+            }
+            else if (cityType == QUAD_MAJOR)
+            {
+                int angle4 = 0;
+                if(orientation == S){
+                	angle1 = 180;
+                        angle2 = 240 + 180;
+                        angle3 = 60 + 180;
+                        angle4 = 270;
+                }else if(orientation == N){
+                	angle1 = 0 + 180;
+                        angle2 = 240 + 180;
+                        angle3 = 60 + 180;
+                        angle4 = 270 + 180;
+                } else if(orientation == SW){
+                	angle1 = 0 - 60;
+                        angle2 = 240 - 60;
+                        angle3 = 60 - 60;
+                        angle4 = 210;
+                } else if(orientation == NE){
+                	angle1 = 0 - 60;
+                    angle2 = 240 - 60;
+                    angle3 = 60 - 60;
+                    angle4 = 30;
+                } else if(orientation == SE){
+                	 angle1 = 0 + 60 + 180;
+                     angle2 = 240 + 60 + 180;
+                     angle3 = 60 + 60 + 180;
+                     angle4 = 330 + 180;
+                } else if(orientation == NW){
+                	angle1 = 0 + 60 + 180;
+                    angle2 = 240 + 60 + 180;
+                    angle3 = 60 + 60 + 180;
+                    angle4 = 330;
+                }
+                
+                // Move middleX and MiddleY
+                mid1x = middleX + (int)(Math.cos((angle1 + angle4) * radiansPerDegree) * CIRCLE_RADIUS);
+                mid1y = middleY + (int)(Math.sin((angle1 + angle4) * radiansPerDegree) * CIRCLE_RADIUS);
+
+                int c2x = mid1x + (int)(Math.cos(angle1 * radiansPerDegree) * CIRCLE_RADIUS) + 1;
+                int c2y = mid1y - (int)(Math.sin(angle1 * radiansPerDegree) * CIRCLE_RADIUS);
+                int c1x = mid1x + (int)(Math.cos((angle1 + 180) * radiansPerDegree) * CIRCLE_RADIUS) - 1;
+                int c1y = mid1y - (int)(Math.sin((angle1 + 180) * radiansPerDegree) * CIRCLE_RADIUS);
+                        
+                // Move middleX and MiddleY
+                mid2x = middleX + (int)(Math.cos((angle1 + angle4 + 180) * radiansPerDegree) * CIRCLE_RADIUS);
+                mid2y = middleY + (int)(Math.sin((angle1 + angle4 + 180) * radiansPerDegree) * CIRCLE_RADIUS);
+
+                int c4x = mid2x + (int)(Math.cos(angle1 * radiansPerDegree) * CIRCLE_RADIUS) + 1;
+                int c4y = mid2y - (int)(Math.sin(angle1 * radiansPerDegree) * CIRCLE_RADIUS);
+                int c3x = mid2x + (int)(Math.cos((angle1 + 180) * radiansPerDegree) * CIRCLE_RADIUS) - 1;
+                int c3y = mid2y - (int)(Math.sin((angle1 + 180) * radiansPerDegree) * CIRCLE_RADIUS);
+                        
+
+
+                int [] newX = { c1x + (int)(Math.cos(angle2 * radiansPerDegree) * CIRCLE_RADIUS),
+                                c1x + (int)(Math.cos((angle2 + 180) * radiansPerDegree) * CIRCLE_RADIUS),
+                                c2x + (int)(Math.cos(angle3 * radiansPerDegree) * CIRCLE_RADIUS),
+                                c2x + (int)(Math.cos((angle3 + 180) * radiansPerDegree) * CIRCLE_RADIUS) };
+                int [] newY = { c1y - (int)(Math.sin(angle2 * radiansPerDegree) * CIRCLE_RADIUS),
+                                c1y - (int)(Math.sin((angle2 + 180) * radiansPerDegree) * CIRCLE_RADIUS),
+                                c2y - (int)(Math.sin(angle3 * radiansPerDegree) * CIRCLE_RADIUS),
+                                c2y - (int)(Math.sin((angle3 + 180) * radiansPerDegree) * CIRCLE_RADIUS) };
+                        
+
+
+                int [] newX1 = { c3x + (int)(Math.cos(angle2 * radiansPerDegree) * CIRCLE_RADIUS),
+                                c3x + (int)(Math.cos((angle2 + 180) * radiansPerDegree) * CIRCLE_RADIUS),
+                                c4x + (int)(Math.cos(angle3 * radiansPerDegree) * CIRCLE_RADIUS),
+                                c4x + (int)(Math.cos((angle3 + 180) * radiansPerDegree) * CIRCLE_RADIUS) };
+                int [] newY1 = { c3y - (int)(Math.sin(angle2 * radiansPerDegree) * CIRCLE_RADIUS),
+                                c3y - (int)(Math.sin((angle2 + 180) * radiansPerDegree) * CIRCLE_RADIUS),
+                                c4y - (int)(Math.sin(angle3 * radiansPerDegree) * CIRCLE_RADIUS),
+                                c4y - (int)(Math.sin((angle3 + 180) * radiansPerDegree) * CIRCLE_RADIUS) };
+                System.out.println(newX + " " + newY +" "+ newX1 + " "+ newY1);
+                        
+
+                
+            }
+    }
+
+    
     private void createRotatedImage(Graphics g, String text, Color bgColor, Color fgColor, int angle1) 
 	{
 	    /*

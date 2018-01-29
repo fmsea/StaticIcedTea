@@ -999,7 +999,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 		
 		try {
 			//StartAnalysisKestrel.timeDataFile.append(timeData);
-			String timeDataFile = "./ScratchData/resultsVA/time/"+StartValue.className+"_"+StartValue.methodId+"_"+StartValue.domain+".txt";
+			String timeDataFile = StartValue.path+"/time/"+StartValue.className+"_"+StartValue.methodId+"_"+StartValue.domain+".txt";
 			RandomAccessFile rf = new RandomAccessFile(timeDataFile, "rwd");
 			FileChannel fileChannel = rf.getChannel();
 			FileLock lock = fileChannel.lock();

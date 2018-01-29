@@ -101,7 +101,7 @@ public class PseudoConditionalValueAnalysis extends ValueAnalysis {
 	if(StartPseudoConditionalValue.writeTime){
 	try {
 		//StartAnalysisKestrel.timeDataFile.append(timeData);
-		String timeDataFile = "./ScratchData/resultsVA/time/"+StartPseudoConditionalValue.className+"_"+StartPseudoConditionalValue.methodId+"_"+StartPseudoConditionalValue.domain+".txt";
+		String timeDataFile = StartPseudoConditionalValue.path + "/time/"+StartPseudoConditionalValue.className+"_"+StartPseudoConditionalValue.methodId+"_"+StartPseudoConditionalValue.domain+".txt";
 		RandomAccessFile rf = new RandomAccessFile(timeDataFile, "rwd");
 		FileChannel fileChannel = rf.getChannel();
 		FileLock lock = fileChannel.lock();

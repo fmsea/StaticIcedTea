@@ -11,30 +11,33 @@ import java.util.Scanner;
 
 
 public class Smt2Format {
+	private static String resultsPathFull;
+	private static String resultsPathCombined;
+	private static String smt2FilesPath;
 	
-	private static String resultsPathFull = "./ScratchData/resultsVA/invariants/c2/";
-	private static String resultsPathCombined = "./ScratchData/resultsVA/combined/c2/";
-	private static String smt2FilesPath = "./ScratchData/smt2Files/c2/";
-
 	/**
 	 * Creates an smt2 formula to if file1Name implies file2Name
 	 * @param args
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-//		String file1Name = "test.TIFFFaxEncoder_11_sN__dom9.txt";
-//		String file2Name = "test.TIFFFaxEncoder_11_sN_dom9.txt";
 		String className = "test.MapViewer";
 		String methodId = "2";
 		String domain = "_dom5.txt";
+		String type = "c1";
+		String dataPath = "./ScratchData/";
 		if(args.length > 0){
-			className = args[0];
-			methodId = args[1];
-			domain = "_"+args[2]+".txt";
+			dataPath = args[0];
+			className = args[1];
+			methodId = args[2];
+			domain = "_"+args[3]+".txt";
+			type = args[4];
 		}
-		
+		resultsPathFull = dataPath+"/resultsVA/invariants/";
+		resultsPathCombined = dataPath+"/resultsVA/combined/"+type + "/";
+		smt2FilesPath = dataPath+"/resultsVA/smt2Files/"+type+"/";
 		//get the file with the number of paths
-		String pathFileName = "./ExperimentDataConditional/conditions/paths/" + className+"_"+methodId+".txt";
+		String pathFileName = dataPath+"/conditions/paths/" + className+"_"+methodId+".txt";
 		File pathFile = new File(pathFileName);
 		if(pathFile.exists()){
 			Scanner sPath = new Scanner(new FileReader(pathFile));
@@ -109,7 +112,9 @@ public class Smt2Format {
 			}
 		} // end of the scanner loop
 		//add the last var to formula
-		stmtTo.put(var, formula);
+		if(stmtTo != null){
+			stmtTo.put(var, formula);
+		}
 		scanner.close();
 		//System.out.println(file1Map);
 		

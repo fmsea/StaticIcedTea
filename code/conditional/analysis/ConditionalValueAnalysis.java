@@ -852,7 +852,7 @@ public class ConditionalValueAnalysis extends ConditionalForwardBranchedFlowAnal
 		
 		if(StartConditionalValue.writeTime){
 			try {
-				String timeDataFile = "./ScratchData/resultsVA/time/"+StartConditionalValue.className+"_"+StartConditionalValue.methodId+"_"+StartConditionalValue.domain+".txt";
+				String timeDataFile = StartConditionalValue.path+"/time/"+StartConditionalValue.className+"_"+StartConditionalValue.methodId+"_"+StartConditionalValue.domain+".txt";
 				RandomAccessFile rf = new RandomAccessFile(timeDataFile, "rwd");
 				FileChannel fileChannel = rf.getChannel();
 				FileLock lock = fileChannel.lock();

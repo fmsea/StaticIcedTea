@@ -24,15 +24,19 @@ public class CountSatUnsatPartial {
 		String className = "test.BallonFactory";
 		String methodId = "1";
 		String domain = "dom9";
+		String dataPath ="./ConditionalTACAS/";
+		String type = "c1";
 		if(args.length > 0){
-			className = args[0];
-			methodId = args[1];
-			domain = args[2];
+			dataPath = args[0];
+			className = args[1];
+			methodId = args[2];
+			domain = args[3];
+			type = args[4];
 		} 
 		
 		
 		//read the path file and get all the number of path from it
-		String pathFileName = "./ExperimentDataConditional/conditions/paths/"+className+"_"+methodId+".txt";
+		String pathFileName = dataPath+"/conditions/paths/"+className+"_"+methodId+".txt";
 		File pathFile = new File(pathFileName);
 		String satunsatOutput = "";
 		if(pathFile.exists()){
@@ -52,7 +56,7 @@ public class CountSatUnsatPartial {
 						pathData.add(0);
 					}
 					//smt2 file to count sat/unsat for
-					String smt2File = "./ScratchData/resultsVA/satunsat/c2/"+
+					String smt2File = dataPath+"/resultsVA/satunsat/"+type + "/"+
 					className+"_"+methodId+"_"+
 					String.valueOf(pathId)+"_"+domain+"_satunsat.txt";
 
@@ -127,7 +131,7 @@ public class CountSatUnsatPartial {
 				pathId++;
 			}//end reading datafile
 			} 
-			String timeOutFileName = "./ScratchData/resultsVA/satunsat/c2/satunsat_"+domain+".txt";
+			String timeOutFileName = dataPath + "/resultsVA/satunsat/"+type+"/satunsat_"+domain+".txt";
 			File timeOutFile = new File(timeOutFileName);
 			if(!timeOutFile.exists()){
 				 timeOutFile.createNewFile();

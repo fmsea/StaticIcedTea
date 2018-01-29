@@ -50,4 +50,19 @@ public class Branch {
 	public String toString(){
 		return index + ": " + ifS;
 	}
+	
+	@Override
+	public boolean equals(Object o){
+		boolean ret = false;
+		if(o instanceof Branch){
+			Branch other = (Branch)o;
+			ret = other.getIfStmt().equals(ifS);
+		}
+		return ret;
+	}
+	
+	@Override
+	public int hashCode(){
+		return ifS.hashCode();
+	}
 }

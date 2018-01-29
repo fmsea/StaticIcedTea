@@ -1,8 +1,13 @@
 #! /bin/bash
-filename="$1"
-#c1 - pseudo, c2 -coditional or f - full
-type="$2"
-writeToFile="$3"
+# path to where write the output
+# make it it has data and invariants folders inside it
+# and also contains the conditions and paths
+loc="$1"
+#the file containing classes and methods
+filename="$2"
+#c1 - pseudo, c2 -conditional or f - full
+type="$3"
+writeToFile="$4"
 echo $type 
 while read -r line
 do 
@@ -11,7 +16,7 @@ do
    class=${name[0]}
    method=${name[1]}
 if [ "$type" != "f" ]; then 
-   pathfile=./ExperimentDataConditional/conditions/paths/${class}_${method}.txt
+   pathfile=./${loc}/conditions/paths/${class}_${method}.txt
    echo ${pathfile}
   driver="driver.StartConditionalReachingDefinitions"
   if [ "$type" == "c1" ]; then
@@ -20,8 +25,8 @@ if [ "$type" != "f" ]; then
   if [ -f $pathfile ]; then
      while read -r path
      do
-       echo $class $method $path
-       java -cp .:./bin/:./libs/soot-trunk.jar:  $driver $class $method $path $writeToFile
+       echo ${loc}/resultsRD/ $class $method $path $wrtieToFile
+       java -cp .:./bin/:./libs/soot-trunk.jar:  $driver ${loc}/resultsRD/ $class $method $path $writeToFile
      done < $pathfile
   else 
      echo 'File $pathfile does not exists.'
@@ -29,6 +34,6 @@ if [ "$type" != "f" ]; then
 else
  # run regular analysis with all paths - idex 0 means all paths
  echo $class $method 'full'
-     java -cp .:./bin/:./libs/soot-trunk.jar:  driver.StartReachingDefinitions $class $method $writeToFile
+     java -cp .:./bin/:./libs/soot-trunk.jar:  driver.StartReachingDefinitions ${loc}/resultsRD/ $class $method $writeToFile
 fi
 done < $filename

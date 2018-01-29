@@ -1,8 +1,0 @@
-	t	f
-1	5	2
-2	4	3
-3	end	end
-4	end	end
-5	7	6
-6	end	end
-7	end	end

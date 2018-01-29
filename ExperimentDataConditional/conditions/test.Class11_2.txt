@@ -1,4 +1,0 @@
-	t	f
-1	end	7
-7	end	end
-24	end	end

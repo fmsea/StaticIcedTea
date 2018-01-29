@@ -2,7 +2,6 @@ package driver;
 
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.RandomAccessFile;
 import java.nio.CharBuffer;
@@ -12,20 +11,29 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Scanner;
 
-import conditional.analysis.ConditionalReachingDefinitions;
 import pseudo.analysis.PseudoConditionalReachingDefinitions;
 import soot.Body;
 import soot.Scene;
 import soot.SootClass;
 import soot.SootMethod;
-import soot.Timers;
 import soot.Unit;
 import soot.toolkits.graph.ExceptionalUnitGraph;
 import soot.toolkits.graph.UnitGraph;
 import util.Variables;
 
+/**
+ * Driver for running conditional analysis implemented
+ * in flowthrough method
+ * args[0] - the paths where to write the results
+ * make sure it has invariants and time folders
+ * args[1] - class name
+ * args[2] - method id in that class
+ * args[3] - the path to follow in the method's CFG
+ * args[4] - whether to write invariant to the file (set to no to get time data)
+ * @author elenasherman
+ *
+ */
 public class StartPseudoConditionalReachingDefinitions {
 	
 	private static String resultsPath = "ScratchData/resultsRD/";
@@ -38,10 +46,11 @@ public class StartPseudoConditionalReachingDefinitions {
 		List<String> conditions = new ArrayList<String>();
 		boolean writeInv = true;
 		if(args.length > 0){
-			className =args[0];
-			methodId = Integer.parseInt(args[1]);
-			conditions.add(args[2]);
-			writeInv = args[3].equals("y")?true:false;
+			resultsPath = args[0];
+			className =args[1];
+			methodId = Integer.parseInt(args[2]);
+			conditions.add(args[3]);
+			writeInv = args[4].equals("y");
 		}
 		
 //		File file = new File("./ExperimentDataConditional/conditions/paths/"+className+"_"+methodId+".txt");

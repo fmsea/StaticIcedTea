@@ -37,18 +37,20 @@ public class CombineConditionalTimeRD {
 	static String className = "test.Example1M";
 	static String methodId = "4";
 	static String type = "c2";//c1 for pseudo-conditional and c2 for true conditional
+	static String path = "./ScratchData/resultsRD";
 	public static void main(String [] args) throws IOException{
 
 		//to use with a script that passes classes and methods
 		if(args.length > 0){
 			//get the input
-			className = args[0];
-			methodId = args[1]; 
-			type = args[2];
+			path = args[0];
+			className = args[1];
+			methodId = args[2]; 
+			type = args[3];
 		}
 
 		//file that contains the prefix and the time it took to run
-		String timeFileName = "./ScratchData/resultsRD/time/"+className+"_"+methodId;
+		String timeFileName = path+"/time/"+className+"_"+methodId;
 		//System.out.println("timeFileName " + timeFileName);
 		File timeFile = new File(timeFileName);
 		if(timeFile.exists()){
@@ -110,13 +112,13 @@ public class CombineConditionalTimeRD {
 			//the accumulated map of statements and their RD data
 			//Statement -> variable -> its reaching definitions
 			Map<String,Map<String,Set<Integer>>> currentRDValue = new HashMap<String, Map<String,Set<Integer>>> ();
-			Map<String,Map<String,Set<Integer>>> allRDValue = process("./ScratchData/resultsRD/invariants/"+className+"_"+methodId);
+			Map<String,Map<String,Set<Integer>>> allRDValue = process(path+"/invariants/"+className+"_"+methodId);
 			int currInvCount = 0;
 			int totalElements = countInvariants(allRDValue);
 			//System.out.println(totalElements);
 			for(Entry<Float, String> e : averPath.entrySet()){
 				//System.out.println("combing for time " + e.getKey());
-				Map<String,Map<String,Set<Integer>>> newRDValue = process("./ScratchData/resultsRD/invariants/"+className+"_"+methodId+"_"+e.getValue()+"_"+type);
+				Map<String,Map<String,Set<Integer>>> newRDValue = process(path+"/invariants/"+className+"_"+methodId+"_"+e.getValue()+"_"+type);
 				if(currInvCount != 0){
 					combine(currentRDValue, newRDValue);
 				}
@@ -130,7 +132,7 @@ public class CombineConditionalTimeRD {
 			//			System.out.println(allRDValue);
 			//			System.out.println(currentRDValue);
 			//write resultOutput to a file
-			String resultOutFileName = "./ScratchData/resultsRD/time/time_"+type;
+			String resultOutFileName = path+"/time/time_"+type;
 			File resultOutFile = new File(resultOutFileName);
 			if(!resultOutFile.exists()){
 				resultOutFile.createNewFile();

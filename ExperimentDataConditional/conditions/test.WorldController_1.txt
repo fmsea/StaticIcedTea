@@ -1,5 +1,0 @@
-	t	f
-1	7	end
-7	13	end
-13	19	end
-19	end	end

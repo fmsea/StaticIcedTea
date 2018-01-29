@@ -1,12 +1,8 @@
 package driver;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import conditional.analysis.ConditionalValue;
 import disjoint.domain.Domain;
@@ -25,6 +21,7 @@ public class StartConditionalValue {
 	public static String methodId;
 	public static String domain;
 	public static String condition;
+	public static String path;
 
 	/**
 	 * @param args
@@ -35,15 +32,16 @@ public class StartConditionalValue {
 		String domain = "dom4.txt";
 		String symbolic = "sN";
 		String condition = "1f1t";
+		path = "./ConditionalTACAS/resultsVA/";
 
 		if(args.length > 0){
-
-			className = args[0];
-			methodId = args[1];
-			domain = args[2]+".txt";
+			path = args[0];
+			className = args[1];
+			methodId = args[2];
+			domain = args[3]+".txt";
 			symbolic = "sN";
-			condition = args[3];
-			writeToFile = args[4].equals("y");
+			condition = args[4];
+			writeToFile = args[5].equals("y");
 		}
 		
 		StartConditionalValue.methodId = methodId;
@@ -85,15 +83,15 @@ public class StartConditionalValue {
 	
 	
 	public static FileWriter fileToWrite;
-	private static String domainPath = "ExperimentDataConditional/domains/";
-	//private static String conditionPath = "ScratchData/conditions/";
-	private static String resultsPath = "ScratchData/resultsVA/invariants/c2/";
 	public static FileWriter timeDataFile;
 	public static String analysisType;
 	
 	//each instance should open/close that file
 	
 	public StartConditionalValue(String className, String domainFile, /*String symbolicHelper,*/ String condition, String methodId) throws IOException{
+		String domainPath = path+"/domains/";
+		//private static String conditionPath = "ScratchData/conditions/";
+		String resultsPath = path+"/invariants/c2/";
 		//instantiate the list of domains from a file
 		String domainDescription = domainPath+domainFile;
 		DomainReader dr = new DomainReader(domainDescription);

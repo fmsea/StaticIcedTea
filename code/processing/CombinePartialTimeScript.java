@@ -39,14 +39,15 @@ public class CombinePartialTimeScript {
 	static String filePrefixComb;
 	static String dom = "_dom4.txt";
 	public static void main(String [] args) throws IOException{
-		className = args[0];
-		methodId = args[1]; 
-		//dom = "_"+args[2]+".txt";
-		String type = args[2];
-		filePrefixOrig = "./ScratchData/resultsVA/invariants/"+type+"/"+className+"_"+methodId+"_";
-		filePrefixComb = "./ScratchData/resultsVA/combined/"+type+"/"+className+"_"+methodId+"_";
+		String dataPath = args[0];
+		className = args[1];
+		methodId = args[2]; 
+		dom = "_"+args[3]+".txt";
+		String type = args[4];
+		filePrefixOrig = dataPath+"/invariants/"+type+"/"+className+"_"+methodId+"_";
+		filePrefixComb = dataPath+"/combined/"+type+"/"+className+"_"+methodId+"_";
 		//file that contains the prefix and the time it took to run
-		String timeFileName = "./ScratchData/resultsVA/time/"+className+"_"+methodId+dom;
+		String timeFileName = dataPath+"/time/"+className+"_"+methodId+dom;
 		File timeFile = new File(timeFileName);
 		if(timeFile.exists()){
 			//get the data into the map and order it 
@@ -110,8 +111,8 @@ public class CombinePartialTimeScript {
 				timeOutput +=className +"\t" + methodId +"\t" + e.getValue() +"\t" + fileCount + "\t" + fullTime + "\t" + e.getKey()+"\n";
 				if(fileCount == 1){
 					//just copy to the combined folder
-					Path p1 = FileSystems.getDefault().getPath("./ScratchData/resultsVA/invariants/"+type+"/",className+"_"+methodId+"_"+e.getValue()+dom);
-					Path p2 = FileSystems.getDefault().getPath("./ScratchData/resultsVA/combined/"+type+"/",className+"_"+methodId+"_"+fileCount+dom);
+					Path p1 = FileSystems.getDefault().getPath(dataPath+"/invariants/"+type+"/",className+"_"+methodId+"_"+e.getValue()+dom);
+					Path p2 = FileSystems.getDefault().getPath(dataPath+"/combined/"+type+"/",className+"_"+methodId+"_"+fileCount+dom);
 					Files.copy(p1, p2, StandardCopyOption.REPLACE_EXISTING);
 				} else {
 					//call the combine method
@@ -120,7 +121,7 @@ public class CombinePartialTimeScript {
 				fileCount++;
 			}
 			//write timeOutput to a file
-			String timeOutFileName = "./ScratchData/resultsVA/time/time_"+type;
+			String timeOutFileName = dataPath+"/time/time_"+type;
 			File timeOutFile = new File(timeOutFileName);
 			if(!timeOutFile.exists()){
 				timeOutFile.createNewFile();
@@ -309,9 +310,4 @@ public class CombinePartialTimeScript {
 		}
 		return ret;
 	}
-}
-///*
-//else if(line1.startsWith("*") || line2.startsWith("*")){
-////found where they are taking different branches
-//System.out.println("conditional " + line1 + " " + line2);
-//*/
+} 
