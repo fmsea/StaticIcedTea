@@ -24,9 +24,9 @@ public class StartPartitionInner {
 	static public void main(String[] args){
 
 		String outPath = "./ConditionalTACAS/conditions/";
-		String className = "test.TIFFFaxDecoder";
-		int methodId = Integer.parseInt("7");
-		int percOfCode = 3;
+		String className = "test.BallonFactory";
+		int methodId = Integer.parseInt("1");
+		int percOfCode = 2;
 		int diff = 60;
 
 		if(args.length == 5 ) {
@@ -42,6 +42,7 @@ public class StartPartitionInner {
 		Scene.v().setSootClassPath(Scene.v().getSootClassPath()+":"+System.getProperty("java.class.path") 
 		+ ":" + System.getProperty("sun.boot.class.path"));
 
+		System.out.println(Scene.v().getSootClassPath());
 
 		System.out.println("class " + className + " methodId " + methodId);
 		SootClass sClass = Scene.v().loadClassAndSupport(className);
@@ -49,7 +50,8 @@ public class StartPartitionInner {
 		Scene.v().loadNecessaryClasses();
 		SootMethod m = sClass.getMethods().get(methodId);
 		Body b = m.retrieveActiveBody();
-		//System.out.println(b);
+		System.out.println(m.getName());
+		System.out.println(b);
 		PartitionGenerator pg = new PartitionGenerator(b);
 		AbstractedCFG acfg = pg.getAbstractedCFG(percOfCode, diff);
 		if(acfg != null){
