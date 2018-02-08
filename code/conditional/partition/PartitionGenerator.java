@@ -190,7 +190,7 @@ public class PartitionGenerator {
 		}//end while(changed)
 		
 		//for debugging
-		//debug();
+		debug();
 		//System.out.println("condtoSplit2 " + condToSplit);
 	    //System.exit(1);
 		AbstractedCFG cfgA = null;
