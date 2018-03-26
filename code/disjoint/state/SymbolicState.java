@@ -1,6 +1,5 @@
 package disjoint.state;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -16,10 +15,10 @@ import soot.jimple.BinopExpr;
 import soot.jimple.IfStmt;
 import soot.jimple.Stmt;
 /* Symbolic state holds the set of soot 
-* assignment of conditional statements
-* that can be used to expressed
-* the current state symbolically
-*/
+ * assignment of conditional statements
+ * that can be used to expressed
+ * the current state symbolically
+ */
 import soot.jimple.internal.ImmediateBox;
 
 public class SymbolicState implements State {
@@ -34,25 +33,25 @@ public class SymbolicState implements State {
 	//while BinopExpr will be used for 
 	//determining the branch of the cond stmt
 	private Map<Stmt,BinopExpr> condToExpr;
-	
+
 	//jimple is not pure SSA, so when
 	//a variables used in smt \in reachedStmt
 	// has been re-assigned then
 	//this stmt should be removed from reachedStmt
-	//e.g., reachedStmt = {i0 = i1 -1}
+	//e.g., let's have reachedStmt = {i0 = i1 -1}
 	//then if the new statement is i1 = 2*i0
 	//then the update reachedStmt = {i1= 2*i0}
 	//if the same vars appear in lhs and rhs
 	//like i1 = i1 - 1 then such stmt
 	//is not added to reachedStmt
 	private Map<Value, Set<Stmt>> usedVars;
-	
+
 	public SymbolicState(){
 		reachedStmt = new HashSet<Stmt>();
 		usedVars = new HashMap<Value, Set<Stmt>>();
 		condToExpr = new HashMap<Stmt, BinopExpr>();
 	}
-	
+
 	/*
 	 * Make sure to create a deep copy
 	 * of stmts, since it is used up
@@ -82,27 +81,26 @@ public class SymbolicState implements State {
 
 	// symbolic state is not per variable state,
 	//so the next two methods have no effect.
-	
+
 	@Override
 	public void initFlowVar(Value var) {
-		
+
 	}
 
 	@Override
 	public void initEntryVar(Value var) {
-		
+
 	}
 
 	@Override
 	public State merge(State state) {
 		SymbolicState ret = null;
 		if(state instanceof SymbolicState){
-			//System.out.println(this + " \n " + state);
 			SymbolicState other = (SymbolicState)state;
 			Set<Stmt> newSet = new HashSet<Stmt>();
 			newSet.addAll(reachedStmt);
 			newSet.retainAll(other.getStaments()); // intersection of statements
-			
+
 			Map<Stmt,BinopExpr> newCond = new HashMap<Stmt, BinopExpr>();
 			Set<Stmt> removeStmt = new HashSet<Stmt>();
 			//go through condstmt that must be in both
@@ -136,14 +134,13 @@ public class SymbolicState implements State {
 						//since soot never merges several flows
 						//at a time
 					}
-					
+
 				}
 			}//end iterating over cond stmts
 			//remove condStmt of jointed flows
 			newSet.removeAll(removeStmt);
-			
-			//System.out.println("newSet " + newSet + "\n" + removeStmt);
-			
+
+
 			Map<Value, Set<Stmt>> newUsed = new HashMap<Value, Set<Stmt>>();
 			for (Entry<Value, Set<Stmt>> es : usedVars.entrySet()) {
 				// it can happen that other might not have
@@ -156,22 +153,20 @@ public class SymbolicState implements State {
 					newStmtSet.addAll(es.getValue());
 					// remove those that for merged condStmt
 					newStmtSet.removeAll(removeStmt);
-					// System.out.println("newStmtSet " + newStmtSet + "\n var "
-					// + es.getKey() + " "+ other.usedVars);
 					newStmtSet.retainAll(otherUsed);
 					newUsed.put(es.getKey(), newStmtSet);
 				}
 			}
-			
+
 			ret = new SymbolicState(newSet, newUsed, newCond);
 		}
 		return ret;
 	}
-	
+
 	public Set<Stmt> getStaments(){
 		return reachedStmt;
 	}
-	
+
 	public Set<Stmt> getUsed(Value var){
 		return usedVars.get(var);
 	}
@@ -189,7 +184,7 @@ public class SymbolicState implements State {
 	public void initEntry() {
 		reachedStmt.clear();
 	}
-	
+
 	@Override
 	public String toString(){
 		String ret = "(";
@@ -216,7 +211,7 @@ public class SymbolicState implements State {
 		ret += ")";
 		return ret;
 	}
-	
+
 	@Override
 	public boolean equals(Object o){
 		boolean ret = true;
@@ -227,18 +222,16 @@ public class SymbolicState implements State {
 		} else {
 			ret = false;
 		}
-		
+
 		return ret;
 	}
 
 	public void removeLhsDepndencies(Value lhs){
 		Set<Stmt> toRemove = new HashSet<Stmt>();
-		//System.out.println("UsedVars " + usedVars);
 		//remove all statement where lhs has been used
 		if(usedVars.containsKey(lhs)){
 			toRemove.addAll(usedVars.get(lhs));
 		}
-		//println("To remove " + toRemove);
 		//determine whether exits reachedStmt of AssignStmt with the same lhs
 		for(Stmt stmt : reachedStmt){
 			if(stmt instanceof AssignStmt){
@@ -251,16 +244,16 @@ public class SymbolicState implements State {
 			}
 			//conditional stmts are the case of use
 		} // end for loop
-		
+
 		//remove the statement from the list
 		reachedStmt.removeAll(toRemove);
-		
+
 		//remove those statements from the key/value set of 
 		//usedVars to save memory
 		for(Set<Stmt> es : usedVars.values()){
 			es.removeAll(toRemove);
 		}
-		
+
 		//remove from the condToExpr map -- to keep it clean
 		for(Stmt rm : toRemove){
 			if(rm instanceof IfStmt){
@@ -270,27 +263,26 @@ public class SymbolicState implements State {
 	}
 	//inState is "old" state
 	public void add(AssignStmt newStmt) {
-		
+
 		//get lhs of s
 		Value lhs = newStmt.getLeftOp();
 		removeLhsDepndencies(lhs);
-		
+
 		//remove lhsOld values from the map of the disjoint values
-		
+
 		boolean toAdd = true;
 		//check whether newStmt is of the form i0 = i0 + 1
 		for(Object box : newStmt.getRightOp().getUseBoxes()){
 			if(((ImmediateBox)box).getValue().equals(lhs)){
-				//System.out.println("Special form! " + newStmt);
 				toAdd = false;
 				break;
 			}
 		}
-		
+
 		if(toAdd){
 			//adding newStmt to the list of reachedStmt
 			reachedStmt.add(newStmt);
-			
+
 			//for an assignment stmt it's always rhs
 			List<ValueBox> used = newStmt.getRightOp().getUseBoxes();
 			addUsedVars(used, newStmt);
@@ -306,9 +298,9 @@ public class SymbolicState implements State {
 		addUsedVars(used, newStmt);
 		//add to map 
 		condToExpr.put(newStmt, expr);
-		
+
 	}
-	
+
 	private void addUsedVars(List<ValueBox> vars, Stmt add){
 		for(ValueBox box : vars){
 			Value val = box.getValue();
@@ -323,13 +315,12 @@ public class SymbolicState implements State {
 				usedVars.put(val, setUpdate);
 			}
 		}
-		//System.out.println("UsedVars 2" + usedVars);
 	}
-	
+
 	public BinopExpr getBinop(Stmt s){
 		return condToExpr.get(s);
 	}
-	
+
 	public Map<Stmt,BinopExpr> getAllBinop(){
 		return condToExpr;
 	}

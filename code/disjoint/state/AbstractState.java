@@ -12,7 +12,7 @@ import soot.Value;
 import soot.util.Chain;
 
 public class AbstractState {
-	
+
 	/*
 	 * Contains a collection of different types states
 	 * For now at least three:
@@ -20,17 +20,17 @@ public class AbstractState {
 	 * 2) Relational state
 	 * 3) Symbolic state
 	 */
-	
+
 	boolean feasible; //becomes infeasible when at least of the states become infeasible
-	
-	List<State> states; //it should be ordered, so can do merges with other states
+
+	List<State> states; //it should be ordered, so can do merges with other states in the expected order
 	public static List<Local> localVars = new ArrayList<Local>(); //used for state initializations
-	
+
 	public AbstractState(){
 		states = new ArrayList<State>();
 		feasible = true;
 	}
-	
+
 	public AbstractState(List<State> initStates){
 		states = new ArrayList<State>();
 		for(State s : initStates){
@@ -38,7 +38,7 @@ public class AbstractState {
 		}
 		feasible = true;
 	}
-	
+
 	public boolean addState(State s){
 		return states.add(s);
 	}
@@ -51,15 +51,14 @@ public class AbstractState {
 		copy.feasible = feasible;
 		return copy;
 	}
-	
+
 	@Override
 	public String toString(){
 		return states.toString() + " " + isFeasible();
 	}
-	
+
 	@Override
 	public boolean equals(Object o){
-		//System.out.println("comparing abstract state");
 		boolean ret = false;
 		if(o instanceof AbstractState){
 			AbstractState other = (AbstractState) o;
@@ -71,7 +70,7 @@ public class AbstractState {
 		}
 		return ret;
 	}
-	
+
 	public List<State> getStates(){
 		return states;
 	}
@@ -101,7 +100,7 @@ public class AbstractState {
 				s.initEntryVar(l);
 			}
 		}
-		
+
 	}
 
 	public static void setLocals(Chain<Local> locals) {
@@ -115,7 +114,7 @@ public class AbstractState {
 				localVars.add(l);
 			}
 		}
-		
+
 	}
 
 	public AbstractState merge(AbstractState in2) {
@@ -134,11 +133,11 @@ public class AbstractState {
 		states = newState.states;
 		feasible = source.isFeasible();
 	}
-	
+
 	public void setInfeasible(){
 		feasible = false;
 	}
-	
+
 	public boolean isFeasible(){
 		return feasible;
 	}

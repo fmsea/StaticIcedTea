@@ -1,101 +1,96 @@
 package disjoint.driver;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+
+import com.microsoft.z3.Z3Exception;
 
 import disjoint.analysis.ValueTransfomer;
 import disjoint.domain.Domain;
 import disjoint.domain.reader.DomainReader;
-import soot.G;
+import disjoint.solver.SolverWrapper;
+import disjoint.solver.SolverWrapperZ3;
 import soot.PackManager;
 import soot.Scene;
 import soot.Transform;
+/**
+ * The driver for the analysis
+ * you're welcome to come up with your own.
+ * @author elenasherman
+ *
+ */
 
 public class StartAnalysis {
-	
-	public static boolean print = true;
-
 	/**
-	 * @param args
+	 *  The class should have static fields for the files to write to
+	 *  className_sY_domainName
+	 *  where  (with all its methods)
+	 *  domainName is the domain that the analysis uses
+	 *  sY means using symbolic helper state and sN means not using symbolic helper state.
+	 * @param args, where 
+	 * args[0] - the name of class being analyzed, make sure its location in your classpath
+	 * args[1] - the integer representing the order in which the method
+	 *           occurs in the class file, i.e., first method, second method and so on
+	 * args[2] - the path to the domain file
+	 * args[3] - "sY" for adding symbolic analysis
 	 */
 	public static void main(String[] args) {
-//		String[] classNames = {"test.BallonFactory", "test.OneTcas", "test.Base64", "test.client", "test.GeoData", "test.GeoEngine", 
-//				"test.InfBlocks", "test.InfCodes", "test.InfTree", "test.MapViewer", "test.QRCodeDataBlockReader", 
-//				"test.StructurePanel", "test.TileRenderor", "test.WorldController", "test.Class11", "test.Class13",
-//		};
-		String[] classNames = {"test.OneTcas"};
-		String[] domainNames = {"dom2.txt"};
-		//String[] domainNames = {"dom3.txt", "dom2.txt"};
-		String[] symbolic = {"sN"};
-		//String symbolicOn = "sY";
-		
+
+		//Parse arguments
+		String className = args[0];
+		Integer methodId = Integer.parseInt(args[1]);
+		String domainName = args[2];
+		String symbolicOn = args[3];
+		//Print info based on the arguments
+		System.out.println("Running analysis for " + domainName + "_"+ symbolicOn);
 		try {
-			timeDataFile = new FileWriter(resultsPath+"timeData",true);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
-		for(String className : classNames){
-			for(String symbolicOn : symbolic){
-			for(String domainName : domainNames){
-				try {
-					analysisType = domainName.split("\\.")[0] + "_"+ symbolicOn;
-					new StartAnalysis(className, domainName, symbolicOn);
-					G.reset();
-					System.gc();
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-		}
-		try {
-			timeDataFile.close();
+			//instantiate domain and analysis
+			new StartAnalysis(className, methodId, domainName, symbolicOn.equals("sY"));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
-	//The class should have static fields for the files to write to
-	//className_sY_domainName
-	//where className is the name of class being analyzed (with all its methods)
-	//domainName is the domain that the analysis uses
-	//sY means using symbolic helper state and sN means not using symbolic helper state.
-	
-	
-	public static FileWriter fileToWrite;
-	private static String domainPath = "ExperimentData/domains/";
-	private static String resultsPath = "ScratchData/results/"; //"ExperimentData/results/";
-	public static FileWriter timeDataFile;
-	public static String analysisType;
-	
-	//each instance should open/close that file
-	
-	public StartAnalysis(String className, String domainFile, String symbolicHelper) throws IOException{
+
+	public StartAnalysis(String className, int methodId, String domainFile, boolean symbolicOn) throws IOException{
 		//instantiate the list of domains from a file
-		String domainDescription = domainPath+domainFile;
-		DomainReader dr = new DomainReader(domainDescription);
+		DomainReader dr = new DomainReader(domainFile);
 		List<Domain> domain = dr.getReadDomains();
-		System.out.println(domain);
-	
-		//create the file to write to
-		fileToWrite = new FileWriter(resultsPath+className+"_"+symbolicHelper+"_"+domainFile);
-		boolean symbolicOn = symbolicHelper.equals("sY");
-		
+		//show the domain encoding used in the analysis
+		System.out.println("Domain provided: \n" + " " + domain);
+		//"-f" "n" means for soot not to output the compiled files 
 		String[] sootArgs = {"-f", "n", className};
+		//add the analysis into the compiler
 		PackManager.v().getPack("jtp").
-			add(new Transform("jtp.disjoint", new ValueTransfomer(domain, 2, symbolicOn)));
+		add(new Transform("jtp.disjoint", new ValueTransfomer(domain, methodId, symbolicOn)));
+		//system separator
+		String pathSeparator = System.getProperty("path.separator");
 		//adding runtime to the path
-		System.out.println(Scene.v().getSootClassPath() +  " " + System.getProperty("java.class.path"));
-		Scene.v().setSootClassPath(Scene.v().getSootClassPath()+":"+System.getProperty("java.class.path") 
-				+ ":" + System.getProperty("sun.boot.class.path"));
-		//run soot
+		Scene.v().setSootClassPath(Scene.v().getSootClassPath()+pathSeparator+System.getProperty("java.class.path") 
+				+ pathSeparator + System.getProperty("sun.boot.class.path"));
+		//run soot with the added analysis
 		soot.Main.main(sootArgs);
-		fileToWrite.close();
+	}
+
+	/*
+	 * Instantiates solver based on the choice
+	 * of the solver 
+	 * For now just a single one that
+	 * we have based on Z3
+	 */
+	public static SolverWrapper getSolver(){
+		SolverWrapper s = null;
+		try {
+			s = new SolverWrapperZ3();
+
+		} catch (Z3Exception e) {
+			e.printStackTrace();
+			System.out.println("Cannot instatiate the solver");
+			System.exit(2);
+		}
+		//set the timeout if applicable
+		//in milliseconds
+		s.setTimeOut(10000000);
+		return s;
 	}
 
 }

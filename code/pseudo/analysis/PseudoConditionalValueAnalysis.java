@@ -95,8 +95,8 @@ public class PseudoConditionalValueAnalysis extends ValueAnalysis {
 	
 	//@Override
 	public void report(){
-	System.out.println("Done in " + (end - start)+" fn " + Timers.v().totalFlowNodes + ", fc"+ Timers.v().totalFlowComputations + "\n");
-	String timeData = "c1\t" + StartPseudoConditionalValue.condition + "\t"+ (end - start)+"\n";
+	System.out.println("Done in " + time +" fn " + Timers.v().totalFlowNodes + ", fc"+ Timers.v().totalFlowComputations + "\n");
+	String timeData = "c1\t" + StartPseudoConditionalValue.condition + "\t"+ time +"\n";
 	
 	if(StartPseudoConditionalValue.writeTime){
 	try {
@@ -154,7 +154,7 @@ public class PseudoConditionalValueAnalysis extends ValueAnalysis {
 								state = new GAndExpr(state, be);
 							}
 						}
-						output += l + "->" + solver.generate((BinopExpr)state) + "\n";
+						output += l + "->" + solver.smt2((BinopExpr)state) + "\n";
 						//System.out.println(l + "->" + solver.generate((BinopExpr)state));
 					}
 				}
@@ -176,7 +176,7 @@ public class PseudoConditionalValueAnalysis extends ValueAnalysis {
 										state = new GAndExpr(state, be);
 									}
 								}
-								output += l+"f" + "->" + solver.generate((BinopExpr)state) + "\n";
+								output += l+"f" + "->" + solver.smt2((BinopExpr)state) + "\n";
 								//System.out.println(l+"f" + "->" + solver.generate((BinopExpr)state));
 							}
 						}

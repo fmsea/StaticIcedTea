@@ -348,18 +348,18 @@ public class ValueAnalysisConcurrent extends ForwardBranchedFlowAnalysis<Abstrac
 //		}
 	}
 	
-	protected BoolExpr generateExpr(AbstractState aState, Value l){
-		Set<BinopExpr> varPerState = evaluateStates(aState, l);
-		Expr state = null;
-		for(Expr be : varPerState){
-			if(state == null){
-				state = be;
-			} else {
-				state = new GAndExpr(state, be);
-			}
-		}
-		return solver.generate((BinopExpr)state);
-	}
+//	protected BoolExpr generateExpr(AbstractState aState, Value l){
+//		Set<BinopExpr> varPerState = evaluateStates(aState, l);
+//		Expr state = null;
+//		for(Expr be : varPerState){
+//			if(state == null){
+//				state = be;
+//			} else {
+//				state = new GAndExpr(state, be);
+//			}
+//		}
+//		return solver.generate((BinopExpr)state);
+//	}
 
 	@Override
 	protected void flowThrough(AbstractState in, Unit u, List<AbstractState> fallIn,
@@ -1039,7 +1039,7 @@ public class ValueAnalysisConcurrent extends ForwardBranchedFlowAnalysis<Abstrac
 									state = new GAndExpr(state, be);
 								}
 							}
-							output += l + "->" + solver.generate((BinopExpr)state) + "\n";
+							output += l + "->" + solver.smt2((BinopExpr)state) + "\n";
 							//System.out.println(l + "->" + solver.generate((BinopExpr)state));
 						}
 					}
@@ -1061,7 +1061,7 @@ public class ValueAnalysisConcurrent extends ForwardBranchedFlowAnalysis<Abstrac
 											state = new GAndExpr(state, be);
 										}
 									}
-									output += l+"f" + "->" + solver.generate((BinopExpr)state) + "\n";
+									output += l+"f" + "->" + solver.smt2((BinopExpr)state) + "\n";
 									//System.out.println(l+"f" + "->" + solver.generate((BinopExpr)state));
 								}
 							}
