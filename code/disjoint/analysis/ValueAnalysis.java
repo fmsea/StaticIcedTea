@@ -54,6 +54,7 @@ import soot.jimple.internal.JUshrExpr;
 import soot.jimple.internal.JimpleLocal;
 import soot.toolkits.graph.UnitGraph;
 import soot.toolkits.scalar.ForwardBranchedFlowAnalysis;
+//import abstractinterp.scalar.ForwardBranchedFlowAnalysis;
 import soot.util.Chain;
 
 import disjoint.domain.BaseElement;
@@ -69,6 +70,7 @@ import disjoint.state.*;
  *
  */
 public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
+//public class ValueAnalysis extends ForwardBranchedFlowAnalysis<Unit, AbstractState> {
 
 	//only write to the file states of those statements
 	protected Set<Unit> outputStmt;
@@ -238,6 +240,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 			//check against statement after
 			//which state has been changed
 			stmtCount++;
+			//System.out.println("outputStmt " + outputStmt);
 			if(outputStmt.contains(u)){
 				//String that keeps that state info for the current state
 				String outputInfo = stmtCount + " " + u +":" + b.getMethod().getSignature() + "\n";
@@ -293,6 +296,8 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 	protected void flowThrough(AbstractState in, Unit u, List<AbstractState> fallIn,
 			List<AbstractState> branchOut) {
 		Stmt s = (Stmt) u;
+		//System.out.println("Unit " + u);
+		//System.out.println("In " + in);
 		AbstractState inState = in;
 		AbstractState ifStmtTrue = inState.copy(); //instantiated in ifStmt only; outBranch
 		AbstractState ifStmtFalse = inState.copy();//fallIn; out
@@ -316,6 +321,9 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 		for(Iterator<AbstractState> it = branchOut.iterator(); it.hasNext();){
 			copy(ifStmtTrue, it.next());
 		}
+		
+		//System.out.println("outFall " + ifStmtFalse);
+		//System.out.println("outBranch " + ifStmtTrue);
 
 	}
 

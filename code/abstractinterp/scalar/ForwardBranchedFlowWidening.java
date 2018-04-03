@@ -3,6 +3,7 @@ package abstractinterp.scalar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import soot.Unit;
 import soot.toolkits.graph.DirectedGraph;
@@ -15,21 +16,25 @@ import soot.toolkits.graph.DirectedGraph;
  * @param <N>
  * @param <A>
  */
-public abstract class BranchedForwardFlowWidening<N extends Unit, A> extends BranchedForwardFlowBasic<N, A> {
+public abstract class ForwardBranchedFlowWidening<N extends Unit, A> extends ForwardBranchedFlowBasic<N, A> {
 
 	
-	List<N> wideningNodes;
+	Set<N> wideningNodes;
 	/**
 	 * Count of merging performed by a widening node
 	 */
 	Map<N,Integer> itersCount;
 	
 
-	public BranchedForwardFlowWidening(DirectedGraph<N> graph, List<N> order,
+	public ForwardBranchedFlowWidening(DirectedGraph<N> graph, List<N> order,
 			Map<N, A> unitToBeforeFlow, Map<N, List<A>> unitToAfterBranchFlow, 
 			Map<N, List<A>> unitToAfterFallFlow,
-			List<N> wideningNodes, int iters) {
-		super(graph, order, unitToBeforeFlow, unitToAfterBranchFlow, unitToAfterFallFlow);
+			Set<N> wideningNodes, int iters) {
+		super(graph);
+		this.order = order;
+		this.unitToAfterBranchFlow = unitToAfterBranchFlow;
+		this.unitToAfterFallFlow = unitToAfterFallFlow;
+		this.unitToBeforeFlow = unitToBeforeFlow;
 		this.wideningNodes = wideningNodes;
 		itersCount = new HashMap<N,Integer>();
 		for(N n : wideningNodes){

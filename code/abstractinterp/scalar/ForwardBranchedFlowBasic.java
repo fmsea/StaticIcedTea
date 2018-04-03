@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
-public abstract class BranchedForwardFlowBasic<N extends Unit, A> {
+public abstract class ForwardBranchedFlowBasic<N extends Unit, A> {
 
 	/** The results of the analysis */
 	protected Map<N, List<A>> unitToAfterFallFlow;
@@ -31,16 +31,24 @@ public abstract class BranchedForwardFlowBasic<N extends Unit, A> {
 	 * Constructor - can start with the results of a
 	 * previous analysis.
 	 */
-	public BranchedForwardFlowBasic(DirectedGraph<N> graph, List<N> order,
-			Map<N, A> unitToBeforeFlow,
-			Map<N, List<A>> unitToAfterBranchFlow,
-			Map<N, List<A>> unitToAfterFallFlow){
+	public ForwardBranchedFlowBasic(DirectedGraph<N> graph){
 		this.graph = graph;
+	}
+	
+	public void setOrder(List<N> order){
 		this.order = order;
-		//initialize maps
-		this.unitToAfterBranchFlow = unitToAfterBranchFlow;
-		this.unitToAfterFallFlow = unitToAfterFallFlow;
+	}
+	
+	public void setBeforeFlow(Map<N, A> unitToBeforeFlow ){
 		this.unitToBeforeFlow = unitToBeforeFlow;
+	}
+	
+	public void setAfterFallFlow(Map<N, List<A>> unitToAfterFallFlow){
+		this.unitToAfterFallFlow = unitToAfterFallFlow;
+	}
+	
+	public void setAfterBranchFlow(Map<N, List<A>> unitToAfterBranchFlow){
+		this.unitToAfterBranchFlow = unitToAfterBranchFlow;
 	}
 
 	/** abstract methods that needs to  be implemented */
@@ -48,15 +56,10 @@ public abstract class BranchedForwardFlowBasic<N extends Unit, A> {
 	/** Create a copy of the <code>source</code? flow object in <code>dest</code>. */
 	protected abstract void copy(A source, A dest);
 
-	//	/** Creates a copy of <code>source</code> and returns it*/
-	//	protected abstract A copy(A source);
-
 	/** Merges the IN flows <code>in1</code>, <code>in2</code> 
 	 * and assigns the results to <code>out</code>  */
 	protected abstract void merge(A in1, A in2, A out);
 
-	//	/** Merges <code>in1</code> and <code>in2</code> and returns int */
-	//	protected abstract A merge(A in1, A in2);
 
 	/** the transfer function for a unit <code>s</code>*/
 	protected abstract void flowThrough(A in, N s, List<A> fallOut, List<A> bracnOut);
@@ -102,18 +105,18 @@ public abstract class BranchedForwardFlowBasic<N extends Unit, A> {
 			//case 1 not a branching node
 			if(node.fallsThrough()){
 				N succ = stmts.getSuccOf(node);
-				if(unitToIncomingFlowSets.containsKey(succ)){
+				if(order.contains(succ)){//make sure it is in the order
 					List<A> predsFlows = unitToIncomingFlowSets.get(succ);
 					predsFlows.addAll(unitToAfterFallFlow.get(node));
 				}
 			}
-
 			//case 2 a branching node
 			if(node.branches()){
-				List<UnitBox> succs = node.getUnitBoxes();
-				for(UnitBox succ : succs){
-					if(unitToIncomingFlowSets.containsKey(succ)){
-						List<A> predsFlows = unitToIncomingFlowSets.get(succs);
+				List<UnitBox> successors = node.getUnitBoxes();
+				for(UnitBox succBox : successors){
+					N succ = (N) succBox.getUnit();
+					if(order.contains(succ)){//make sure it is in the order
+						List<A> predsFlows = unitToIncomingFlowSets.get(succ);
 						predsFlows.addAll(unitToAfterBranchFlow.get(node));
 					}
 				}
@@ -126,7 +129,7 @@ public abstract class BranchedForwardFlowBasic<N extends Unit, A> {
 		/* setting up datastructures */
 		List<A> previousAfterFlows = new ArrayList<A>();
 		List<A> afterFlows = new ArrayList<A>();
-		/* arrays are used to save on new object creations
+		/* arrays are used to save on new object inits
 		 * instead creating a new object that is a copy of
 		 * an after flow, the object stored in the repository
 		 * is changed.
@@ -164,7 +167,12 @@ public abstract class BranchedForwardFlowBasic<N extends Unit, A> {
 			accumulateAfterFlowSets(node, flowRepositories, afterFlows);
 			if(!afterFlows.equals(previousAfterFlows)){
 				//add the successors of that node
-				worklist.addAll(graph.getSuccsOf(node));
+				//only put those successors that are in the order
+				for(N succ : graph.getSuccsOf(node)){
+					if(order.contains(succ)){
+						worklist.add(succ);
+					}
+				}
 			}
 		}
 

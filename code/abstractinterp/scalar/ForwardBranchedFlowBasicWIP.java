@@ -17,7 +17,7 @@ import java.util.TreeSet;
 
 import abstractinterp.graph.BranchedUnitGraph;
 
-public abstract class BranchedForwardFlowBasicWIP<N extends Unit, A> {
+public abstract class ForwardBranchedFlowBasicWIP<N extends Unit, A> {
 
 	/** The results of the analysis */
 	protected Map<N, List<A>> unitToAfterFallFlow;
@@ -34,7 +34,7 @@ public abstract class BranchedForwardFlowBasicWIP<N extends Unit, A> {
 	 * Constructor - can start with the results of a
 	 * previous analysis.
 	 */
-	public BranchedForwardFlowBasicWIP(BranchedUnitGraph<N> graph, List<N> order,
+	public ForwardBranchedFlowBasicWIP(BranchedUnitGraph<N> graph, List<N> order,
 			Map<N, List<N>>predsMap, 
 			Map<N, A> unitToBeforeFlow,
 			Map<N, List<A>> unitToAfterBranchFlow,

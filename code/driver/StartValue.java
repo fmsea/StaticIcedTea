@@ -35,7 +35,7 @@ public class StartValue {
 		String symbolic = "sN";
 		className = "test.Example1m";
 		methodId = "3";
-		path = "./ConditionalTACAS/resultsVA/";
+		path = "./ScratchData/resultsVA/";
 		if(args.length > 0){
 			path = args[0];
 			className = args[1];
