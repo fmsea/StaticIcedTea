@@ -1,9 +1,11 @@
 package abstractinterp.scalar;
 
+import abstractinterp.scalar.state.BoxState;
 import parma_polyhedra_library.C_Polyhedron;
 import parma_polyhedra_library.Coefficient;
 import parma_polyhedra_library.Constraint;
 import parma_polyhedra_library.Degenerate_Element;
+import parma_polyhedra_library.Int32_Box;
 import parma_polyhedra_library.Linear_Expression_Variable;
 import parma_polyhedra_library.Parma_Polyhedra_Library;
 import parma_polyhedra_library.Rational_Box;
@@ -59,6 +61,27 @@ public class StartPPL {
 		System.out.println("all gone ? " + cp2);
 		Rational_Box rb = new Rational_Box(2, Degenerate_Element.UNIVERSE);
 		rb.CC76_narrowing_assign(rb);
+		
+		Int32_Box b = new Int32_Box(1, Degenerate_Element.UNIVERSE);
+		//b.add_constraints(cp2.constraints());
+		cs_ppl = new Constraint(new Linear_Expression_Coefficient(new Coefficient(8)), Relation_Symbol.EQUAL,  new Linear_Expression_Variable(var));
+		//b.add_constraint(cs_ppl);
+		cs_ppl = new Constraint(new Linear_Expression_Coefficient(new Coefficient(100)).unary_minus(), Relation_Symbol.LESS_OR_EQUAL,  new Linear_Expression_Variable(var));
+		b.add_constraint(cs_ppl);
+		cs_ppl = new Constraint(new Linear_Expression_Coefficient(new Coefficient(-80)).unary_minus(), Relation_Symbol.GREATER_OR_EQUAL,  new Linear_Expression_Variable(var));
+		b.add_constraint(cs_ppl);
+		for(Constraint c : b.constraints()){
+			System.out.println("c " + c + " " + c.kind());
+		}
+		System.out.println(b.contains_integer_point());
+		
+		Coefficient c  = new Coefficient(-3);
+		System.out.println(c.getBigInteger().intValue());
+		
+		System.out.println("bNeg " + b);
+		Int32_Box bNeg = BoxState.negate(b);
+		System.out.println("bNeg " + bNeg);
+		
 	}
 
 }

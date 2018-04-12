@@ -35,7 +35,7 @@ public class Numerical {
 //		myVariables.makeVariables();
 //		myVariables.renameLocals();
 		//do the set up of PPL
-		System.load("/Users/elenasherman/Documents/tools/ppl-1.2/interfaces/Java/jni/libppl_java.ls");
+		System.load("/usr/local/lib/ppl/libppl_java.jnilib");
 		Parma_Polyhedra_Library.initialize_library();
 		//init the analysis
 		//the order
@@ -74,10 +74,12 @@ public class Numerical {
 					f.add(v);
 				}
 			}
+		}
 			//entry points
-			for(Unit head : g.getHeads()){
-				unitToBeforeFlow.put(head, analysis.entryInitialFlow());
-			}
+//			for(Unit head : g.getHeads()){
+//				System.out.println("head " + head);
+//				unitToBeforeFlow.put(head, analysis.entryInitialFlow());
+//			}
 
 			//traps are treated as entry points
 			if(analysis.treatTrapHandlersAsEntries()){
@@ -87,7 +89,22 @@ public class Numerical {
 				}
 			}
 
+		
+	}
+	public void runAnalysis() {
+		analysis.doAnalysis();
+		
+	}
+	public void report() {
+		//for each line print out the state
+		for(Unit u : g.getBody().getUnits()){
+			System.out.println(u + " " + u.getClass() + " f->" + analysis.getFallFlowAfter(u));
+			if(u.branches()){
+			System.out.println(u + " b->" + analysis.getBranchFlowAfter(u));
+			}
+			
 		}
+		
 	}
 
 }
