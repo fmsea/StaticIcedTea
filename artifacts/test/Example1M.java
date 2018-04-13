@@ -104,7 +104,7 @@ public class Example1M {
 
 	static int example_5(int x){
 		int y = 1;
-		x = y - 3;
+		x =  3;
 		if(x == 0){
 			y = x - y;
 		} else {
