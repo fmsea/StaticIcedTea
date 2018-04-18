@@ -18,7 +18,7 @@ import parma_polyhedra_library.Linear_Expression_Coefficient;
 public class StartPPL {
 
 	public static void main(String[] args) {
-		//System.load("/Users/elenasherman/Documents/research/jpf-symbc/lib/libppl_java.jnilib");
+		//System.load("/Users/elenasherman/git/DFA_SMT/libs/libppl_java.jnilib");
 		System.load("/usr/local/lib/ppl/libppl_java.jnilib");
 		Parma_Polyhedra_Library.initialize_library();
 		C_Polyhedron cp = new C_Polyhedron(2, Degenerate_Element.UNIVERSE);
