@@ -186,7 +186,7 @@ public abstract class ForwardBranchedFlowBasic<N extends Unit, A> {
 	 * @param preds - list of predecessor flows ordered - fall through
 	 * is first if there is one (entry to a loop, then back edge)
 	 */
-	protected void mergeFlows(N node, A beforeFlow, List<A> preds){
+	protected void basicMergeFlows(N node, A beforeFlow, List<A> preds){
 		if(preds.size() > 0){
 			Iterator<A> it = preds.iterator();
 			//if only one predecessor then nothing to merge
@@ -200,6 +200,8 @@ public abstract class ForwardBranchedFlowBasic<N extends Unit, A> {
 			}
 		}
 	}
+	
+	abstract void mergeFlows(N node, A beforeFlow, List<A> preds);
 
 	/**
 	 * This method retrieves all after flows of a node from two maps, 

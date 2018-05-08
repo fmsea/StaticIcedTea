@@ -24,7 +24,7 @@ public abstract class ForwardBranchedFlowAnalysis<N extends Unit, A> extends For
 
 	@Override
 	protected void doAnalysis(){
-		//initialize the flows
+		//initialize the flows as done in the original implementation
 		for(N node : order){
 			unitToBeforeFlow.put(node, newInitialFlow());
 			List<A> f = new ArrayList<A>();
@@ -75,5 +75,10 @@ public abstract class ForwardBranchedFlowAnalysis<N extends Unit, A> extends For
 	 * is applied to trap handlers.
 	 */
 	protected boolean treatTrapHandlersAsEntries() { return false; }
+	
+	@Override
+	protected void mergeFlows(N node, A beforeFlow, List<A> preds){
+		basicMergeFlows(node, beforeFlow, preds);
+	}
 
 }

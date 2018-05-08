@@ -29,15 +29,28 @@ import soot.jimple.AddExpr;
 import soot.jimple.ArrayRef;
 import soot.jimple.AssignStmt;
 import soot.jimple.BinopExpr;
+import soot.jimple.ConditionExpr;
 import soot.jimple.DivExpr;
+import soot.jimple.EqExpr;
+import soot.jimple.GeExpr;
+import soot.jimple.GtExpr;
 import soot.jimple.IdentityStmt;
 import soot.jimple.IfStmt;
 import soot.jimple.InstanceFieldRef;
 import soot.jimple.IntConstant;
+import soot.jimple.LeExpr;
+import soot.jimple.LtExpr;
 import soot.jimple.MulExpr;
+import soot.jimple.NeExpr;
 import soot.jimple.NegExpr;
 import soot.jimple.NumericConstant;
 import soot.jimple.SubExpr;
+import soot.jimple.internal.JEqExpr;
+import soot.jimple.internal.JGeExpr;
+import soot.jimple.internal.JGtExpr;
+import soot.jimple.internal.JLeExpr;
+import soot.jimple.internal.JLtExpr;
+import soot.jimple.internal.JNeExpr;
 import soot.jimple.internal.JNegExpr;
 import soot.jimple.internal.JimpleLocal;
 import soot.toolkits.graph.DirectedGraph;
@@ -113,6 +126,40 @@ public class ForwardBranchedFlowNumericalBox extends ForwardBranchedFlowWidening
 				}
 			} else if(s instanceof IfStmt){
 				//process if stmt
+				IfStmt stmt = (IfStmt) s;
+				ConditionExpr condExpr = (ConditionExpr)stmt.getCondition();
+				Value left = condExpr.getOp1();
+				Value right = condExpr.getOp2();
+				byte type = -1;
+				if(condExpr instanceof EqExpr){
+					type = 0;
+				} else if(condExpr instanceof NeExpr){
+					type = 1;
+				} else if(condExpr instanceof LeExpr){
+					type = 2;
+				} else if(condExpr instanceof GtExpr){
+					type = 3;
+				} else if(condExpr instanceof GeExpr){
+					type = 4;
+				} else if(condExpr instanceof LtExpr){
+					type = 5;
+				} 
+				ifStmtFall.updateCond(inState, left, right, type);//false branch
+				//rotate type;
+				if(type == 0){
+					type = 1;
+				} else if (type == 1){
+					type = 0;
+				} else if (type == 2){
+					type = 3;
+				} else if (type == 3){
+					type = 2;
+				} else if (type == 4){
+					type = 5;
+				} else if (type == 5){
+					type = 4;
+				}
+				ifStmtBranch.updateCond(inState, left, right, type);//true branch
 			}
 		} 
 			if(s instanceof IdentityStmt){

@@ -53,7 +53,7 @@ public abstract class ForwardBranchedFlowWidening<N extends Unit, A> extends For
 			// if you want or just call super
 			//x_in is the first element of preds list
 			//x_back are the rest one in the list
-			super.mergeFlows(node, beforeFlow, preds);
+			basicMergeFlows(node, beforeFlow, preds);
 			//if different 
 			if(!prevBeforeFlow.equals(beforeFlow)){
 				//check the count
@@ -69,7 +69,7 @@ public abstract class ForwardBranchedFlowWidening<N extends Unit, A> extends For
 			
 		} else {
 			//if node is not a widening node call regular merge
-			super.mergeFlows(node, beforeFlow, preds);
+			basicMergeFlows(node, beforeFlow, preds);
 		}
 	}
 	
