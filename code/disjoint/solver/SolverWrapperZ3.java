@@ -65,16 +65,16 @@ public class SolverWrapperZ3 implements SolverWrapper {
 		BoolExpr z3Formula2 = generate(expr2);
 		BoolExpr z3Formula = null;;
 		try {
-			BoolExpr lhs = ctx.MkImplies(z3Formula1, z3Formula2);
-			BoolExpr rhs = ctx.MkImplies(z3Formula2, z3Formula1);
-			z3Formula = ctx.MkAnd(new BoolExpr[]{lhs, rhs});
+			BoolExpr lhs = ctx.mkImplies(z3Formula1, z3Formula2);
+			BoolExpr rhs = ctx.mkImplies(z3Formula2, z3Formula1);
+			z3Formula = ctx.mkAnd(new BoolExpr[]{lhs, rhs});
 			Expr [] forall = new Expr[sootVarToZ3Var.size()];
 			int i = 0;
 			for(IntExpr var : sootVarToZ3Var.values()){
 				forall[i] = var;
 				i++;
 			}
-			z3Formula = ctx.MkForall(forall, z3Formula, 0, null, null, null, null);
+			z3Formula = ctx.mkForall(forall, z3Formula, 0, null, null, null, null);
 		} catch (Z3Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -83,15 +83,15 @@ public class SolverWrapperZ3 implements SolverWrapper {
 		return ret;
 	}
 
-	public boolean solve(BoolExpr z3Formula){
+	public boolean solve(BoolExpr z3Formula) {
 		boolean ret = true;
 		try {
-			Solver solver = ctx.MkSolver();
-			Params p = ctx.MkParams();
-			p.Add("soft_timeout", timeout);
+			Solver solver = ctx.mkSolver();
+			Params p = ctx.mkParams();
+			p.add("soft_timeout", timeout);
 			solver.setParameters(p);
-			solver.Assert(z3Formula);
-			Status result = solver.Check();
+			solver.assertAndTrack(z3Formula, ctx.mkBoolConst("c1"));
+			Status result = solver.check();
 			if(result.equals(Status.SATISFIABLE)){
 				ret = true;
 			} else if (result.equals(Status.UNSATISFIABLE)){
@@ -119,7 +119,7 @@ public class SolverWrapperZ3 implements SolverWrapper {
 		BoolExpr z3Formula = generate(expr);
 		BoolExpr z3FormulaNot;
 		try {
-			z3FormulaNot = ctx.MkNot(z3Formula);
+			z3FormulaNot = ctx.mkNot(z3Formula);
 			ret = solve(z3FormulaNot);
 		} catch (Z3Exception e) {
 			e.printStackTrace();
@@ -156,24 +156,24 @@ public class SolverWrapperZ3 implements SolverWrapper {
 				try {
 					if(rhsBinop instanceof AddExpr){
 						ArithExpr[] operands = new ArithExpr[]{lhsArith, rhsArith};
-						rhsExpr = ctx.MkAdd(operands);
+						rhsExpr = ctx.mkAdd(operands);
 					} else if (rhsBinop instanceof SubExpr){
 						ArithExpr[] operands = new ArithExpr[]{lhsArith, rhsArith};
-						rhsExpr = ctx.MkSub(operands);
+						rhsExpr = ctx.mkSub(operands);
 					} else if (rhsBinop instanceof MulExpr){
 						ArithExpr[] operands = new ArithExpr[]{lhsArith, rhsArith};
-						rhsExpr = ctx.MkMul(operands);
+						rhsExpr = ctx.mkMul(operands);
 					} else if (rhsBinop instanceof DivExpr){
-						rhsExpr = ctx.MkDiv(lhsArith, rhsArith);
+						rhsExpr = ctx.mkDiv(lhsArith, rhsArith);
 					} else if(rhsBinop instanceof RemExpr){
-						rhsExpr = ctx.MkMod(lhsArith, rhsArith);
+						rhsExpr = ctx.mkMod(lhsArith, rhsArith);
 					} else if (rhsBinop instanceof ShrExpr){
 						//can only handle when rhs,i.e., y is not a variable
 						// x >> y = x / (2^y)
-						if(rhsArith.IsArithmeticNumeral()){
+						if(rhsArith.isArithmeticNumeral()){
 							IntNum number = (IntNum)rhsArith;
-							rhsArith = ctx.MkInt(1<<number.Int()); // this is 2^y
-							rhsExpr = ctx.MkDiv(lhsArith, rhsArith);
+							rhsArith = ctx.mkInt(1<<number.getInt()); // this is 2^y
+							rhsExpr = ctx.mkDiv(lhsArith, rhsArith);
 						} else {
 							System.out.println("Rhs in ShrExpr is not a number " + rhsArith.getClass());
 							System.exit(2);
@@ -181,11 +181,11 @@ public class SolverWrapperZ3 implements SolverWrapper {
 					} else if(rhsBinop instanceof ShlExpr){
 						//can only handle when rhs, i.e., u is not a variable
 						// x << y = x * (2^y)
-						if(rhsArith.IsArithmeticNumeral()){
+						if(rhsArith.isArithmeticNumeral()){
 							IntNum number = (IntNum)rhsArith;
-							rhsArith = ctx.MkInt(1<<number.Int()); // this is 2^y
+							rhsArith = ctx.mkInt(1<<number.getInt()); // this is 2^y
 							ArithExpr[] operands = new ArithExpr[]{lhsArith, rhsArith};
-							rhsExpr = ctx.MkMul(operands);
+							rhsExpr = ctx.mkMul(operands);
 						} else {
 							System.out.println("Rhs in ShlExpr is not a number " + rhsArith.getClass());
 							System.exit(2);
@@ -201,8 +201,8 @@ public class SolverWrapperZ3 implements SolverWrapper {
 			} else if (rhs instanceof NegExpr){
 				try {
 					ArithExpr[] operands;
-					operands = new ArithExpr[]{ctx.MkInt(0), evaluateExpr(((NegExpr)rhs).getOp())};
-					rhsExpr = ctx.MkSub(operands);
+					operands = new ArithExpr[]{ctx.mkInt(0), evaluateExpr(((NegExpr)rhs).getOp())};
+					rhsExpr = ctx.mkSub(operands);
 				} catch (Z3Exception e) {
 					e.printStackTrace();
 				}
@@ -213,17 +213,17 @@ public class SolverWrapperZ3 implements SolverWrapper {
 			//now generate the condition
 			try {
 				if(expr instanceof EqExpr){
-					ret = ctx.MkEq(lhsExpr, rhsExpr);
+					ret = ctx.mkEq(lhsExpr, rhsExpr);
 				} else if (expr instanceof GeExpr){
-					ret = ctx.MkGe(lhsExpr, rhsExpr);
+					ret = ctx.mkGe(lhsExpr, rhsExpr);
 				} else if (expr instanceof GtExpr){
-					ret = ctx.MkGt(lhsExpr, rhsExpr);
+					ret = ctx.mkGt(lhsExpr, rhsExpr);
 				} else if (expr instanceof LeExpr){
-					ret = ctx.MkLe(lhsExpr, rhsExpr);
+					ret = ctx.mkLe(lhsExpr, rhsExpr);
 				} else if (expr instanceof LtExpr){
-					ret = ctx.MkLt(lhsExpr, rhsExpr);
+					ret = ctx.mkLt(lhsExpr, rhsExpr);
 				} else if (expr instanceof NeExpr){
-					ret = ctx.MkNot(ctx.MkEq(lhsExpr, rhsExpr));
+					ret = ctx.mkNot(ctx.mkEq(lhsExpr, rhsExpr));
 				}
 			} catch (Z3Exception e) {
 				e.printStackTrace();
@@ -233,7 +233,7 @@ public class SolverWrapperZ3 implements SolverWrapper {
 			BoolExpr lhs = generate((BinopExpr)expr.getOp1());
 			BoolExpr rhs = generate((BinopExpr)expr.getOp2());
 			try {
-				ret = ctx.MkOr(new BoolExpr[]{lhs, rhs});
+				ret = ctx.mkOr(new BoolExpr[]{lhs, rhs});
 			} catch (Z3Exception e) {
 				e.printStackTrace();
 			}
@@ -241,7 +241,7 @@ public class SolverWrapperZ3 implements SolverWrapper {
 			BoolExpr lhs = generate((BinopExpr)expr.getOp1());
 			BoolExpr rhs = generate((BinopExpr)expr.getOp2());
 			try {
-				ret = ctx.MkAnd(new BoolExpr[]{lhs, rhs});
+				ret = ctx.mkAnd(new BoolExpr[]{lhs, rhs});
 			} catch (Z3Exception e) {
 				e.printStackTrace();
 			}
@@ -262,7 +262,7 @@ public class SolverWrapperZ3 implements SolverWrapper {
 				ret = sootVarToZ3Var.get(v);
 			} else {
 				try {
-					ret = ctx.MkIntConst(v.toString());
+					ret = ctx.mkIntConst(v.toString());
 				} catch (Z3Exception e) {
 					e.printStackTrace();
 				}
@@ -270,7 +270,7 @@ public class SolverWrapperZ3 implements SolverWrapper {
 			}
 		} else if (v instanceof IntConstant){
 			try {
-				ret = ctx.MkInt(((IntConstant)v).value);
+				ret = ctx.mkInt(((IntConstant)v).value);
 			} catch (Z3Exception e) {
 				e.printStackTrace();
 			}
@@ -286,22 +286,22 @@ public class SolverWrapperZ3 implements SolverWrapper {
 		//("expr " + expr + " " + " a " + a);
 		BoolExpr z3Formula = generate(expr);
 		try {
-			BoolExpr z3ForA = a==null? ctx.MkFalse() : generate(a);
+			BoolExpr z3ForA = a==null? ctx.mkFalse() : generate(a);
 			//negate a
-			BoolExpr negA = ctx.MkNot(z3ForA);
+			BoolExpr negA = ctx.mkNot(z3ForA);
 			//("negA " + negA);
-			z3Formula = ctx.MkAnd(new BoolExpr[]{z3Formula, negA});
-			Solver solver = ctx.MkSolver();
-			Params p = ctx.MkParams();
-			p.Add("soft_timeout", timeout);
+			z3Formula = ctx.mkAnd(new BoolExpr[]{z3Formula, negA});
+			Solver solver = ctx.mkSolver();
+			Params p = ctx.mkParams();
+			p.add("soft_timeout", timeout);
 			solver.setParameters(p);
-			solver.Assert(z3Formula);
-			Status result = solver.Check();
+			solver.assertAndTrack(z3Formula, ctx.mkBoolConst("c1"));
+			Status result = solver.check();
 			if(result.equals(Status.SATISFIABLE)){
 				ret = new ArrayList<Long>();
-				Model m = solver.Model();
+				Model m = solver.getModel();
 				for(Value v : unknown){
-					IntExpr res = (IntExpr)m.ConstInterp(sootVarToZ3Var.get(v));
+					IntExpr res = (IntExpr)m.getConstInterp(sootVarToZ3Var.get(v));
 					if(res.toString().contains("mod") || res.toString().contains("div")){
 						System.out.println("Z3Formula  " + z3Formula);
 						return null;
