@@ -14,3 +14,6 @@ hs_err_pid*
 /ScratchData/
 /sootOutput/
 /ConditionalTACAS/
+/target
+/.m2
+dependency-reduced-pom.xml
