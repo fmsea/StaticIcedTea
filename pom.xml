@@ -132,7 +132,7 @@
             <argument>-classpath</argument>
             <classpath />
             <argument>driver.Main</argument>
-            <argument>numerical</argument>
+            <argument>interval-numerical</argument>
           </arguments>
         </configuration>
       </plugin>
