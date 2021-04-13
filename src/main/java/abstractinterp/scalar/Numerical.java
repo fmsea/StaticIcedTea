@@ -23,6 +23,7 @@ import soot.toolkits.graph.LoopNestTree;
 import soot.toolkits.graph.PseudoTopologicalOrderer;
 import soot.toolkits.graph.UnitGraph;
 import util.Variables;
+import util.Configuration;
 
 
 
@@ -35,7 +36,9 @@ public class Numerical {
 //		myVariables.makeVariables();
 //		myVariables.renameLocals();
 		//do the set up of PPL
-		System.load("/usr/local/lib/ppl/libppl_java.jnilib");
+        // Load the Library from the ${PPL_JNI} environment variable or default to /usr/local/lib
+        String pplLib = Configuration.PPLLibraryPath();
+		System.load(pplLib);
 		Parma_Polyhedra_Library.initialize_library();
 		//init the analysis
 		//the order
