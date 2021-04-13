@@ -13,6 +13,7 @@ import driver.commands.*;
          version = "1.0",
          description = "Run various dfa-smt utilities",
          subcommands = {
+             StartIntervalNumericalCommand.class,
              StartNumericalCommand.class
          })
 public class Main implements Callable<Integer> {
