@@ -12,12 +12,12 @@
   <build>
     <resources>
       <resource>
-        <directory>resources</directory>
+        <directory>src/main/resources</directory>
       </resource>
     </resources>
     <testResources>
       <testResource>
-        <directory>resources</directory>
+        <directory>src/test/resources</directory>
       </testResource>
     </testResources>
     <directory>target</directory>
@@ -45,6 +45,13 @@
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.22.2</version>
+        <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+            <include>**/*Properties.java</include>
+            <include>**/*Examples.java</include>
+          </includes>
+        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
@@ -195,6 +202,12 @@
     <groupId>org.junit.jupiter</groupId>
     <artifactId>junit-jupiter-engine</artifactId>
     <version>5.7.1</version>
+    <scope>test</scope>
+  </dependency>
+  <dependency>
+    <groupId>net.jqwik</groupId>
+    <artifactId>jqwik</artifactId>
+    <version>1.5.1</version>
     <scope>test</scope>
   </dependency>
   </dependencies>

@@ -213,6 +213,31 @@ public class Interval32BoxTest {
     }
 
     @Test
+    void testIntersectionPosition() {
+        Interval32Box x = new Interval32Box(0, 2);
+        Interval32Box y = null;
+        Assertions.assertEquals(-1, x.intersectionPosition(y));
+        y = new Interval32Box(3, 4);
+        Assertions.assertEquals(0, x.intersectionPosition(y));
+        Assertions.assertEquals(4, y.intersectionPosition(x));
+        y = new Interval32Box(1, 3);
+        Assertions.assertEquals(1, x.intersectionPosition(y));
+        Assertions.assertEquals(3, y.intersectionPosition(x));
+        y = new Interval32Box(1, 1);
+        Assertions.assertEquals(2, x.intersectionPosition(y));
+        Assertions.assertEquals(5, y.intersectionPosition(x));
+        y = new Interval32Box(-1, 1);
+        Assertions.assertEquals(3, x.intersectionPosition(y));
+        Assertions.assertEquals(1, y.intersectionPosition(x));
+        y = new Interval32Box(-2, -1);
+        Assertions.assertEquals(4, x.intersectionPosition(y));
+        Assertions.assertEquals(0, y.intersectionPosition(x));
+        y = new Interval32Box(-1, 3);
+        Assertions.assertEquals(5, x.intersectionPosition(y));
+        Assertions.assertEquals(2, y.intersectionPosition(x));
+    }
+
+    @Test
     void testToString() {
         Interval32Box bot = Interval32Box.BOT();
         Interval32Box top = Interval32Box.TOP();

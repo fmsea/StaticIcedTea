@@ -137,15 +137,11 @@ public class Interval32Box {
     }
 
     public void upperBoundAssign(Interval32Box box) {
-        if (!box.isBottom() && this.isBottom()) {
-            // assign box bounds
+        if (this.isBottom() && !box.isBottom()) {
             this.bottom = false;
-            this.lowerBound = box.lowerBound;
-            this.upperBound = box.upperBound;
-        } else {
-            this.minAssign(box);
-            this.maxAssign(box);
         }
+        this.minAssign(box);
+        this.maxAssign(box);
     }
 
     public void wideningAssign(Interval32Box box) {
@@ -154,6 +150,61 @@ public class Interval32Box {
         }
         minWidenAssign(box);
         maxWidenAssign(box);
+    }
+
+    public byte intersectionPosition(Interval32Box box) {
+        byte position = -1;
+        if (box == null ||
+            this.bottom ||
+            box.bottom ||
+            !(this.isBounded() || box.isBounded())) {
+            position = -1;
+        } else if (this.isTop()) {
+            position = 2;
+        } else if (box.isTop()) {
+            position = 5;
+        } else if (this.upperBound.compareTo(box.lowerBound) < 0) {
+            // [x1,x2] ... [y1,y2]
+            position = 0;
+        } else if (this.lowerBound.compareTo(box.lowerBound) < 0 &&
+                   box.lowerBound.compareTo(this.upperBound) <= 0 &&
+                   this.upperBound.compareTo(box.upperBound) < 0) {
+            // [x1, y1, x2, y2]
+            position = 1;
+        } else if (this.lowerBound.compareTo(box.lowerBound) <= 0 &&
+                   box.upperBound.compareTo(this.upperBound) <= 0) {
+            // [x1,y1,y2,x2]
+            position = 2;
+        } else if (box.lowerBound.compareTo(this.lowerBound) < 0 &&
+                   this.lowerBound.compareTo(box.upperBound) <= 0 &&
+                   box.upperBound.compareTo(this.upperBound) < 0) {
+            // [y1,x1,y2,x2]
+            position = 3;
+        } else if (box.upperBound.compareTo(this.lowerBound) < 0) {
+            // [y1,y2] .. [x1,x2]
+            position = 4;
+        } else if (box.lowerBound.compareTo(this.lowerBound) <= 0 &&
+                   this.upperBound.compareTo(box.upperBound) <= 0) {
+            // [y1,x1,x2,y2]
+            position = 5;
+        }
+        return position;
+    }
+
+    public boolean intersects(Interval32Box box) {
+        boolean ret;
+        byte position = this.intersectionPosition(box);
+        if (position == -1 || position == 0 || position == 4) {
+            ret = false;
+        } else if (position == 1 ||
+                   position == 2 ||
+                   position == 3 ||
+                   position == 5) {
+            ret = true;
+        } else {
+            ret = false;
+        }
+        return ret;
     }
 
     public void negate() {
