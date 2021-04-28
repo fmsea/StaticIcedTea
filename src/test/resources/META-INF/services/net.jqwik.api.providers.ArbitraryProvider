@@ -1,1 +1,2 @@
 abstractinterp.scalar.state.providers.Interval32BoxProvider
+abstractinterp.scalar.state.providers.JimpleProvider

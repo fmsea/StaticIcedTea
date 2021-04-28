@@ -1,0 +1,124 @@
+package abstractinterp.scalar.state;
+
+import java.util.Map;
+import java.util.HashMap;
+
+import soot.Scene;
+import soot.Body;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeAll;
+
+import abstractinterp.scalar.IntervalNumerical;
+import abstractinterp.scalar.state.providers.JimpleProvider;
+
+public class IntervalNumericalTest {
+
+    @BeforeAll
+    static void sootSuiteInitialize() {
+        Scene.v().loadClassAndSupport("java.lang.Object");
+        Scene.v().loadClassAndSupport("java.lang.System");
+        Scene.v().loadNecessaryClasses();
+    }
+
+    @Test
+    void testConstantValuePropagation() {
+        Body body = JimpleProvider.constantJimpleMethod("constant_test");
+        IntervalNumerical analysis = new IntervalNumerical(body, 2);
+        analysis.runAnalysis();
+        String[] actual = analysis.generateReport().split("\n");
+        assertReportOutputEquals(new String[] {
+                "l1 = 6 class soot.jimple.internal.JAssignStmt f->{l1=6}",
+                "return l1 class soot.jimple.internal.JReturnStmt f->{l1=⟙}"},
+            actual);
+    }
+
+    @Test
+    void testConstantMathPropagation() {
+        Body body = JimpleProvider.binaryArithmaticMethod("constantMath");
+        IntervalNumerical analysis = new IntervalNumerical(body, 2);
+        analysis.runAnalysis();
+        String[] actual = analysis.generateReport().split("\n");
+        assertReportOutputEquals(new String[] {
+                "l0 = 3 class soot.jimple.internal.JAssignStmt f->{l0=3, l1=⟙, l2=⟙, l3=⟙}",
+                "l1 = l0 + 6 class soot.jimple.internal.JAssignStmt f->{l0=3, l1=9, l2=⟙, l3=⟙}",
+                "l2 = l1 - l0 class soot.jimple.internal.JAssignStmt f->{l0=3, l1=9, l2=6, l3=⟙}",
+                "l3 = l2 * -1 class soot.jimple.internal.JAssignStmt f->{l0=3, l1=9, l2=6, l3=-6}",
+                "l0 = l3 / l2 class soot.jimple.internal.JAssignStmt f->{l0=-1, l1=9, l2=6, l3=-6}",
+                "return class soot.jimple.internal.JReturnVoidStmt f->{l0=⟙, l1=⟙, l2=⟙, l3=⟙}"},
+            actual);
+    }
+
+    @Test
+    void testIfStatementPropagation() {
+        Body body = JimpleProvider.simpleIfStatement("simpleIf");
+        IntervalNumerical analysis = new IntervalNumerical(body, 2);
+        analysis.runAnalysis();
+        String[] actual = analysis.generateReport().split("\n");
+        assertReportOutputEquals(new String[] {
+                "l0 = 4 class soot.jimple.internal.JAssignStmt f->{l0=4, l1=⟙, l2=⟙, l3=⟙}",
+                "l2 = 0 class soot.jimple.internal.JAssignStmt f->{l0=4, l1=⟙, l2=0, l3=⟙}",
+                "if l0 >= 3 goto l3 = 6 class soot.jimple.internal.JIfStmt f->{l0=4, l1=⟙, l2=0, l3=⟙}",
+                "if l0 >= 3 goto l3 = 6 b->[{l0=4, l1=⟙, l2=0, l3=⟙}]",
+                "l3 = l1 / l2 class soot.jimple.internal.JAssignStmt f->{l0=4, l1=⟙, l2=0, l3=⟙}",
+                "l3 = 6 class soot.jimple.internal.JAssignStmt f->{l0=4, l1=⟙, l2=0, l3=6}",
+                "return class soot.jimple.internal.JReturnVoidStmt f->{l3=⟙, l1=⟙, l2=⟙, l0=⟙}"},
+            actual);
+    }
+
+    @Test
+    void testWhileStatementPropagation() {
+        Body body = JimpleProvider.simpleLoopStatement("simpleLoop");
+        IntervalNumerical analysis = new IntervalNumerical(body, 2);
+        analysis.runAnalysis();
+        String[] actual = analysis.generateReport().split("\n");
+        assertReportOutputEquals(new String[] {
+                "l0 = 5 class soot.jimple.internal.JAssignStmt f->{l0=5, l2=⟙, l1=⟙, l3=⟙}",
+                "l1 = 0 class soot.jimple.internal.JAssignStmt f->{l0=5, l2=⟙, l1=0, l3=⟙}",
+                "if l1 >= 5 goto l3 = l0 + l1 class soot.jimple.internal.JIfStmt f->{l0=5, l2=⟙, l1=⟘, l3=⟙}",
+                "if l1 >= 5 goto l3 = l0 + l1 b->[{l0=5, l2=⟙, l1=⟘, l3=⟙}]",
+                "l1 = l1 + 1 class soot.jimple.internal.JAssignStmt f->{l0=5, l2=⟙, l1=⟘, l3=⟙}",
+                "goto [?= (branch)] class soot.jimple.internal.JGotoStmt f->{l0=⟙, l2=⟙, l1=⟙, l3=⟙}",
+                "goto [?= (branch)] b->[{l0=5, l2=⟙, l1=⟘, l3=⟙}]",
+                "l3 = l0 + l1 class soot.jimple.internal.JAssignStmt f->{l0=5, l2=⟙, l1=⟘, l3=⟙}",
+                "return class soot.jimple.internal.JReturnVoidStmt f->{l0=⟙, l2=⟙, l1=⟙, l3=⟙}"},
+            actual);
+    }
+
+    private void assertReportOutputEquals(String[] expected, String[] actual) {
+        Assertions.assertEquals(expected.length, actual.length);
+        for (int i = 0; i < actual.length; i++) {
+            Assertions.assertEquals(
+                    expected[i].substring(0, expected[i].lastIndexOf("->")),
+                    actual[i].substring(0, actual[i].lastIndexOf("->")));
+            Assertions.assertTrue(areLocalsEqual(expected[i], actual[i]));
+        }
+    }
+
+    private boolean areLocalsEqual(String expected, String result) {
+        Map<String, String> expectedLocals = parseLocals(expected);
+        Map<String, String> resultLocals = parseLocals(result);
+        if (expectedLocals.keySet().size() != resultLocals.keySet().size()) {
+            return false;
+        }
+        for (Map.Entry<String, String> l : expectedLocals.entrySet()) {
+            if (!resultLocals.containsKey(l.getKey())) {
+                return false;
+            } else if (!resultLocals.get(l.getKey()).equals(l.getValue())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private Map<String, String> parseLocals(String statement) {
+        Map<String, String> locals = new HashMap<>();
+        String[] values = statement.substring(statement.indexOf('{') + 1, statement.indexOf('}')).split(",");
+        for (int i = 0; i < values.length; i++) {
+            String[] parts = values[i].split("=", 2);
+            locals.put(parts[0].trim(), parts[1].trim());
+        }
+        return locals;
+    }
+}
