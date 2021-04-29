@@ -88,7 +88,7 @@ public class SolverWrapperZ3 implements SolverWrapper {
 		try {
 			Solver solver = ctx.mkSolver();
 			Params p = ctx.mkParams();
-			p.add("soft_timeout", timeout);
+			p.add("timeout", timeout);
 			solver.setParameters(p);
 			solver.assertAndTrack(z3Formula, ctx.mkBoolConst("c1"));
 			Status result = solver.check();
@@ -293,7 +293,7 @@ public class SolverWrapperZ3 implements SolverWrapper {
 			z3Formula = ctx.mkAnd(new BoolExpr[]{z3Formula, negA});
 			Solver solver = ctx.mkSolver();
 			Params p = ctx.mkParams();
-			p.add("soft_timeout", timeout);
+			p.add("timeout", timeout);
 			solver.setParameters(p);
 			solver.assertAndTrack(z3Formula, ctx.mkBoolConst("c1"));
 			Status result = solver.check();
