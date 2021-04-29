@@ -1,6 +1,7 @@
 package disjoint.driver;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 
 import com.microsoft.z3.Z3Exception;
@@ -37,10 +38,17 @@ public class StartAnalysis {
 	public static void main(String[] args) {
 
 		//Parse arguments
-		String className = args[0];
-		Integer methodId = Integer.parseInt(args[1]);
-		String domainName = args[2];
-		String symbolicOn = args[3];
+        String className = "test.Example1M";
+        Integer methodId = 6;
+        String domainName = Paths.get("ExperimentData/domains/dom3.txt").toAbsolutePath().toString();
+        String symbolicOn = "sY";
+        if (args.length >= 4) {
+            className = args[0];
+            methodId = Integer.parseInt(args[1]);
+            domainName = args[2];
+            symbolicOn = args[3];
+        }
+
 		//Print info based on the arguments
 		System.out.println("Running analysis for " + domainName + "_"+ symbolicOn);
 		try {
