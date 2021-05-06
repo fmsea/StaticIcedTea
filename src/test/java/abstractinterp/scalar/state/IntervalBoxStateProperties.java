@@ -1,6 +1,10 @@
 package abstractinterp.scalar.state;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.Map;
 import net.jqwik.api.Property;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.constraints.IntRange;
@@ -8,6 +12,7 @@ import net.jqwik.api.statistics.StatisticsReport;
 import net.jqwik.api.statistics.Histogram;
 import net.jqwik.api.Provide;
 import org.junit.jupiter.api.Assertions;
+import soot.Local;
 
 public class IntervalBoxStateProperties {
 
@@ -272,6 +277,26 @@ public class IntervalBoxStateProperties {
             Assertions.assertEquals(x, zs.get(0));
             Assertions.assertEquals(x.lowerBound() + 1, zs.get(1).lowerBound());
             Assertions.assertEquals(x.upperBound() - 1, zs.get(1).upperBound());
+        }
+    }
+
+    @Property
+    void toSMTFormula(@ForAll Map<Local, Interval32Box> states) {
+        Set<Local> locals = states.keySet();
+        IntervalBoxState state = new IntervalBoxState(locals, false);
+        states.forEach((l, b) -> state.update(l, b));
+        List<String> expected = states.entrySet().stream().map(e -> {
+                Local l = e.getKey();
+                Interval32Box b = e.getValue();
+                return String.format("%s->%s", l, b.toSMTFormula(l.toString()));
+            }).sorted().collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+        List<String> result = Arrays.stream(state.toSMTFormula().split("\n"))
+            .filter(s -> !s.isEmpty())
+            .sorted()
+            .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+        Assertions.assertEquals(expected.size(), result.size());
+        for (int i = 0; i < expected.size(); i++) {
+            Assertions.assertEquals(expected.get(i), result.get(i));
         }
     }
 

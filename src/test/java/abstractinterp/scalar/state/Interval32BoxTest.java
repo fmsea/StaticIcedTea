@@ -264,4 +264,22 @@ public class Interval32BoxTest {
         Assertions.assertFalse(max.equals(top));
         Assertions.assertFalse(max.equals(bot));
     }
+
+    @Test
+    void testToSMTFormula() {
+        Interval32Box bot = Interval32Box.BOT();
+        Assertions.assertEquals("(and (>= l0 0) (< l0 0))", bot.toSMTFormula("l0"));
+        Interval32Box top = Interval32Box.TOP();
+        Assertions.assertEquals("(or (>= l0 0) (< l0 0))", top.toSMTFormula("l0"));
+        Interval32Box max = Interval32Box.MAX();
+        Assertions.assertEquals(String.format("(and (>= l0 %d) (<= l0 %d))",
+                                              Integer.MIN_VALUE,
+                                              Integer.MAX_VALUE),
+                                max.toSMTFormula("l0"));
+        Interval32Box box = new Interval32Box(5);
+        Assertions.assertEquals("(= l0 5)", box.toSMTFormula("l0"));
+        box = new Interval32Box(-5, 5);
+        Assertions.assertEquals("(and (>= l0 -5) (<= l0 5))",
+                                box.toSMTFormula("l0"));
+    }
 }

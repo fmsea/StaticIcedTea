@@ -272,4 +272,20 @@ public class Interval32Box {
             return String.format("[%d, %d]", this.lowerBound, this.upperBound);
         }
     }
+
+    public String toSMTFormula(String local) {
+        if (this.isBottom()) {
+            return String.format("(and (>= %s 0) (< %s 0))", local, local);
+        } else if (this.isTop()) {
+            return String.format("(or (>= %s 0) (< %s 0))", local, local);
+        } else if (this.isBounded() && this.lowerBound == this.upperBound) {
+            return String.format("(= %s %d)", local, this.lowerBound);
+        } else {
+            return String.format("(and (>= %s %d) (<= %s %d))",
+                                 local,
+                                 this.lowerBound,
+                                 local,
+                                 this.upperBound);
+        }
+    }
 }

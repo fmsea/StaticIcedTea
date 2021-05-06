@@ -190,6 +190,19 @@ public class IntervalBoxState {
         return state.toString();
     }
 
+    public String toSMTFormula() {
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<Local, Interval32Box> e : this.state.entrySet()) {
+            Local l = e.getKey();
+            Interval32Box interval = e.getValue();
+            sb.append(l.toString());
+            sb.append("->");
+            sb.append(interval.toSMTFormula(l.toString()));
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
     @Override
     public boolean equals(Object a) {
         boolean equal = false;

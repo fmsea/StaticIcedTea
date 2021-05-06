@@ -1,8 +1,13 @@
 package abstractinterp.scalar.state;
 
+import java.util.Set;
 import java.util.List;
+import java.util.HashSet;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import soot.Local;
+import soot.IntType;
+import soot.jimple.Jimple;
 
 public class IntervalBoxStateTest {
 
@@ -36,5 +41,14 @@ public class IntervalBoxStateTest {
         Interval32Box y = new Interval32Box(0, 0);
         Interval32Box z = IntervalBoxState.transferBinary(x, y, (byte) 3);
         Assertions.assertTrue(z.isMax());
+    }
+
+    @Test
+    void testToSMTFormula() {
+        Set<Local> locals = new HashSet<>();
+        locals.add(Jimple.v().newLocal("l0", IntType.v()));
+        IntervalBoxState box = new IntervalBoxState(locals, false);
+        locals.forEach(l -> box.update(l, new Interval32Box(-5, 5)));
+        Assertions.assertEquals("l0->(and (>= l0 -5) (<= l0 5))\n", box.toSMTFormula());
     }
 }

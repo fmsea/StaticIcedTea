@@ -22,10 +22,12 @@ import util.Variables;
 import abstractinterp.scalar.state.IntervalBoxState;
 
 public class IntervalNumerical {
+    protected Body b;
     UnitGraph g;
     ForwardBranchedFlowIntervalNumericalBox analysis;
 
     public IntervalNumerical(Body b, int iterations) {
+        this.b = b;
         this.g = new ExceptionalUnitGraph(b);
         // init the analysis
         // the order
@@ -86,16 +88,50 @@ public class IntervalNumerical {
 
     }
 
-    public void report() {
+    public String generateReport() {
+        StringBuilder sb = new StringBuilder();
         // for each line print out the state
         for (Unit u : g.getBody().getUnits()) {
-            System.out.println(u + " " + u.getClass() + " f->" + analysis.getFallFlowAfter(u));
+            sb.append(u);
+            sb.append(" ");
+            sb.append(u.getClass());
+            sb.append(" f->");
+            sb.append(analysis.getFallFlowAfter(u));
+            sb.append('\n');
             if (u.branches()) {
-                System.out.println(u + " b->" + analysis.getBranchFlowAfter(u));
+                sb.append(u);
+                sb.append(" b->");
+                sb.append(analysis.getBranchFlowAfter(u));
+                sb.append('\n');
             }
-
         }
+        return sb.toString();
+    }
 
+    public String generateSMTFormulaReport() {
+        StringBuilder sb = new StringBuilder();
+        String methodSignature = this.b.getMethod().getSignature();
+        int stmtCount = 0;
+        for (Unit u : g.getBody().getUnits()) {
+            stmtCount++;
+            sb.append(stmtCount);
+            sb.append(" ");
+            sb.append(u);
+            sb.append(":");
+            sb.append(methodSignature);
+            sb.append('\n');
+            IntervalBoxState state = analysis.getFallFlowAfter(u);
+            sb.append(state.toSMTFormula());
+            List<IntervalBoxState> branches = analysis.getBranchFlowAfter(u);
+            for (IntervalBoxState branch : branches) {
+                sb.append(branch.toSMTFormula());
+            }
+        }
+        return sb.toString();
+    }
+
+    public void report() {
+        System.out.print(generateReport());
     }
 
 }
