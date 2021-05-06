@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +52,7 @@ public class Smt2Format {
                     String combinedPath =
                             className + "_" + methodId + "_" + String.valueOf(pathId) + domain;
                     System.out.println(combinedPath + " " + fullPath);
-                    new Smt2Format(combinedPath, fullPath);
+                    SMT2Format(combinedPath, fullPath);
                     pathId++;
                 }
             }
@@ -64,14 +65,20 @@ public class Smt2Format {
         // new Smt2Format(file1Name, file2Name);
     }
 
-    public Smt2Format(String file1Name, String file2Name) throws IOException {
+    public static void SMT2Format(String file1Name, String file2Name) throws IOException {
+        File file1 = new File(resultsPathCombined + file1Name);
+        File file2 = new File(resultsPathFull + file2Name);
+        String outputFileName = smt2FilesPath + file1Name + "_VS_" + file2Name;
+        SMT2Format(new FileReader(file1), new FileReader(file2), new FileWriter(outputFileName));
+    }
+
+    public static void SMT2Format(Reader reader1, Reader reader2, Writer writer) throws IOException {
         // statement -> variable -> value_as_formula
         Map<String, Map<String, String>> file1Map = new HashMap<String, Map<String, String>>();
 
         // read from the first file and populate the map
 
-        File file1 = new File(resultsPathCombined + file1Name);
-        Scanner scanner = new Scanner(new FileReader(file1));
+        Scanner scanner = new Scanner(reader1);
         Map<String, String> stmtTo = null;
         String formula = "";
         String var = "";
@@ -122,14 +129,12 @@ public class Smt2Format {
 
         // now traverse similarly the other file
         // only write a new formula out of it
-        File file2 = new File(resultsPathFull + file2Name);
         formula = "";
         var = "";
         String stmt = "";
         String constraint = "";
-        scanner = new Scanner(new FileReader(file2));
+        scanner = new Scanner(reader2);
         // File to write to smt2 constraints
-        Writer writer = new FileWriter(smt2FilesPath + file1Name + "_VS_" + file2Name);
         while (scanner.hasNext()) {
             String line = scanner.nextLine();
             if (line.matches("^[0-9].*")) {
@@ -145,7 +150,7 @@ public class Smt2Format {
                 // starting a new constraint
                 stmtTo = file1Map.get(line);
                 stmt = line;
-                constraint = "(echo \"" + stmt + "\") \n";
+                constraint = "(echo \"" + stmt + "\")\n";
                 if (stmtTo == null) {
                     System.out.println("Stmt not present " + line);
                     // System.exit(2);
@@ -191,7 +196,7 @@ public class Smt2Format {
         writer.close();
     }
 
-    private String writeConstraint(Map<String, String> stmtTo, String constraint, String var,
+    private static String writeConstraint(Map<String, String> stmtTo, String constraint, String var,
             String formula) throws IOException {
         // System.out.println(stmtTo + " " + constraint + " " + var + " " + formula);
         String formula1 = stmtTo.get(var);
@@ -212,7 +217,7 @@ public class Smt2Format {
         String backward = Smt2Format.implies(var, formula, formula1);
         // System.out.println(forward + backward);
         // constraint += "(echo \"" + var + "\") \n" + forward + backward;
-        return "(echo \"" + var + "\") \n" + forward + backward;
+        return "(echo \"" + var + "\")\n" + forward + backward;
     }
 
     private static String implies(String var, String from, String to) {
