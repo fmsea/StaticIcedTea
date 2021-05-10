@@ -35,6 +35,21 @@ public class IntervalNumericalTest {
     }
 
     @Test
+    void testSMTFomulaReportWithConstantValuePropagation() {
+        Body body = JimpleProvider.constantJimpleMethod("constant_test", true);
+        IntervalNumerical analysis = new IntervalNumerical(body, 2);
+        analysis.runAnalysis();
+        String[] actual = analysis.generateSMTFormulaReport().split("\n");
+        String[] expected = new String[] {
+            "2 l1 = 6:<constant_testSootClass: int constant_test(int)>",
+            "l1->(= l1 6)"};
+        Assertions.assertEquals(expected.length, actual.length);
+        for (int i = 0; i < expected.length; i++) {
+            Assertions.assertEquals(expected[i], actual[i]);
+        }
+    }
+
+    @Test
     void testConstantMathPropagation() {
         Body body = JimpleProvider.binaryArithmaticMethod("constantMath");
         IntervalNumerical analysis = new IntervalNumerical(body, 2);
@@ -48,6 +63,30 @@ public class IntervalNumericalTest {
                 "l0 = l3 / l2 class soot.jimple.internal.JAssignStmt f->{l0=-1, l1=9, l2=6, l3=-6}",
                 "return class soot.jimple.internal.JReturnVoidStmt f->{l0=⟙, l1=⟙, l2=⟙, l3=⟙}"},
             actual);
+    }
+
+    @Test
+    void testSMTFormulaReportWithConstantArithmaticPropagation() {
+        Body body = JimpleProvider.binaryArithmaticMethod("moreConstantMath");
+        IntervalNumerical analysis = new IntervalNumerical(body, 2);
+        analysis.runAnalysis();
+        String[] actual = analysis.generateSMTFormulaReport().split("\n");
+        String[] expected = new String[] {
+                "1 l0 = 3:<moreConstantMathSootClass: void moreConstantMath()>",
+                "l0->(= l0 3)",
+                "2 l1 = l0 + 6:<moreConstantMathSootClass: void moreConstantMath()>",
+                "l1->(= l1 9)",
+                "3 l2 = l1 - l0:<moreConstantMathSootClass: void moreConstantMath()>",
+                "l2->(= l2 6)",
+                "4 l3 = l2 * -1:<moreConstantMathSootClass: void moreConstantMath()>",
+                "l3->(= l3 -6)",
+                "5 l0 = l3 / l2:<moreConstantMathSootClass: void moreConstantMath()>",
+                "l0->(= l0 -1)"
+        };
+        Assertions.assertEquals(expected.length, actual.length);
+        for (int i = 0; i < expected.length; i++) {
+            Assertions.assertEquals(expected[i], actual[i]);
+        }
     }
 
     @Test
@@ -68,6 +107,31 @@ public class IntervalNumericalTest {
     }
 
     @Test
+    void testSMTFormlaReportWhenIfStatement() {
+        Body body = JimpleProvider.simpleIfStatement("anotherSimpleIf");
+        IntervalNumerical analysis = new IntervalNumerical(body, 2);
+        analysis.runAnalysis();
+        String[] actual = analysis.generateSMTFormulaReport().split("\n");
+        String[] expected = new String[] {
+            "1 l0 = 4:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
+            "l0->(= l0 4)",
+            "2 l2 = 0:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
+            "l2->(= l2 0)",
+            "3 if l0 >= 3 goto l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
+            "l0->(= l0 4)",
+            "l0f->(= l0 4)",
+            "4 l3 = l1 / l2:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
+            "l3->(or (>= l3 0) (< l3 0))",
+            "5 l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
+            "l3->(= l3 6)"
+        };
+        Assertions.assertEquals(expected.length, actual.length);
+        for (int i = 0; i < expected.length; i++) {
+            Assertions.assertEquals(expected[i], actual[i]);
+        }
+    }
+
+    @Test
     void testWhileStatementPropagation() {
         Body body = JimpleProvider.simpleLoopStatement("simpleLoop");
         IntervalNumerical analysis = new IntervalNumerical(body, 2);
@@ -84,6 +148,25 @@ public class IntervalNumericalTest {
                 "l3 = l0 + l1 class soot.jimple.internal.JAssignStmt f->{l0=5, l2=⟙, l1=⟘, l3=⟙}",
                 "return class soot.jimple.internal.JReturnVoidStmt f->{l0=⟙, l2=⟙, l1=⟙, l3=⟙}"},
             actual);
+    }
+
+    @Test
+    void testSMTFormulaWhenWhileStatement() {
+        Body body = JimpleProvider.simpleLoopStatement("anotherSimpleLoop");
+        IntervalNumerical analysis = new IntervalNumerical(body, 2);
+        analysis.runAnalysis();
+        String[] actual = analysis.generateSMTFormulaReport().split("\n");
+        String[] expected = new String[] {
+            "1 l0 = 5:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
+            "l0->(= l0 5)",
+            "2 l1 = 0:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
+            "l1->(= l1 0)",
+            "3 if l1 >= 5 goto l3 = l0 + l1:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>"
+        };
+        Assertions.assertEquals(expected.length, actual.length);
+        for (int i = 0; i < expected.length; i++) {
+            Assertions.assertEquals(expected[i], actual[i]);
+        }
     }
 
     private void assertReportOutputEquals(String[] expected, String[] actual) {

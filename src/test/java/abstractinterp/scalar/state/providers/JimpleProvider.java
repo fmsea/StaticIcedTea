@@ -15,6 +15,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
 import java.util.Set;
+import java.util.Arrays;
+import java.util.List;
 
 public class JimpleProvider implements ArbitraryProvider {
     @Override
@@ -31,15 +33,26 @@ public class JimpleProvider implements ArbitraryProvider {
     }
 
     public static Body constantJimpleMethod(String name) {
+        return constantJimpleMethod(name, false);
+    }
+
+    public static Body constantJimpleMethod(String name, boolean addParameter) {
         SootClass testClass = new SootClass(name + "SootClass", Modifier.PUBLIC);
         testClass.setSuperclass(Scene.v().getSootClass("java.lang.Object"));
-        SootMethod method = new SootMethod(name, null, IntType.v());
+        List<Type> parameters = Arrays.asList(new Type[] {IntType.v()});
+        SootMethod method = new SootMethod(name, addParameter ? parameters : null, IntType.v());
         Scene.v().addClass(testClass);
         testClass.addMethod(method);
         JimpleBody body = Jimple.v().newBody(method);
         method.setActiveBody(body);
         Chain units = body.getUnits();
+        Local parameter = Jimple.v().newLocal("l0", IntType.v());
         Local constant = Jimple.v().newLocal("l1", IntType.v());
+        if (addParameter) {
+            units.add(Jimple.v().newIdentityStmt(parameter,
+                                                 Jimple.v().newParameterRef(IntType.v(), 0)));
+            body.getLocals().add(parameter);
+        }
         units.add(Jimple.v().newAssignStmt(constant, IntConstant.v(6)));
         body.getLocals().add(constant);
         units.add(Jimple.v().newReturnStmt(constant));

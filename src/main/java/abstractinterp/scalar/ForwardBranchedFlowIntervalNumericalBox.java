@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import soot.BooleanType;
 import soot.ByteType;
@@ -48,6 +50,8 @@ import abstractinterp.scalar.state.IntervalBoxState;
 
 public class ForwardBranchedFlowIntervalNumericalBox extends ForwardBranchedFlowWidening<Unit, IntervalBoxState> {
 
+    private Set<Unit> outputStmt;
+    private Map<Unit, Set<Value>> changedVariables;
     protected Set<Local> localVars;
 
     public ForwardBranchedFlowIntervalNumericalBox(DirectedGraph<Unit> graph,
@@ -59,7 +63,17 @@ public class ForwardBranchedFlowIntervalNumericalBox extends ForwardBranchedFlow
                                                    int iters,
                                                    Set<Local> local) {
         super(graph, order, unitToBeforeFlow, unitToAfterBranchFlow, unitToAfterFallFlow, wideningNodes, iters);
+        this.outputStmt = new HashSet<>();
+        this.changedVariables = new HashMap<>();
         this.localVars = local;
+    }
+
+    public Set<Unit> getOutputStatements() {
+        return this.outputStmt;
+    }
+
+    public Map<Unit, Set<Value>> getChangedVariables() {
+        return this.changedVariables;
     }
 
     @Override
@@ -94,6 +108,10 @@ public class ForwardBranchedFlowIntervalNumericalBox extends ForwardBranchedFlow
                 AssignStmt stmt = (AssignStmt) s;
                 Value lhs = stmt.getLeftOp();
                 if(lhs instanceof Local && isIntType(lhs)){
+                    this.outputStmt.add(s);
+                    Set<Value> track = new HashSet<>();
+                    track.add(lhs);
+                    this.changedVariables.put(s, track);
                     Local lVar = (Local) lhs;
                     Value rhs = stmt.getRightOp();
                     if(rhs instanceof BinopExpr){
@@ -123,6 +141,9 @@ public class ForwardBranchedFlowIntervalNumericalBox extends ForwardBranchedFlow
                 ConditionExpr condExpr = (ConditionExpr)stmt.getCondition();
                 Value left = condExpr.getOp1();
                 Value right = condExpr.getOp2();
+                this.outputStmt.add(s);
+                Set<Value> track = new HashSet<>();
+                this.changedVariables.put(s, track);
                 byte type = -1;
                 if(condExpr instanceof EqExpr){
                     type = 0;
@@ -153,6 +174,13 @@ public class ForwardBranchedFlowIntervalNumericalBox extends ForwardBranchedFlow
                     type = 4;
                 }
                 ifStmtBranch.updateCond(inState, left, right, type);//true branch
+                if (left instanceof JimpleLocal) {
+                    track.add(left);
+                }
+                if (right instanceof JimpleLocal) {
+                    track.add(right);
+                }
+
             }
         }
             if(s instanceof IdentityStmt){

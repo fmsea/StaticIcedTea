@@ -12,6 +12,8 @@ import soot.Body;
 import soot.Local;
 import soot.Trap;
 import soot.Unit;
+import soot.Value;
+import soot.util.Chain;
 import soot.jimple.toolkits.annotation.logic.Loop;
 import soot.toolkits.graph.ExceptionalUnitGraph;
 import soot.toolkits.graph.LoopNestTree;
@@ -20,6 +22,7 @@ import soot.toolkits.graph.UnitGraph;
 import util.Variables;
 
 import abstractinterp.scalar.state.IntervalBoxState;
+import abstractinterp.scalar.state.Interval32Box;
 
 public class IntervalNumerical {
     protected Body b;
@@ -108,11 +111,11 @@ public class IntervalNumerical {
         return sb.toString();
     }
 
-    public String generateSMTFormulaReport() {
+    public String generateFullSMTFormula() {
         StringBuilder sb = new StringBuilder();
         String methodSignature = this.b.getMethod().getSignature();
         int stmtCount = 0;
-        for (Unit u : g.getBody().getUnits()) {
+        for (Unit u : this.g.getBody().getUnits()) {
             stmtCount++;
             sb.append(stmtCount);
             sb.append(" ");
@@ -125,6 +128,55 @@ public class IntervalNumerical {
             List<IntervalBoxState> branches = analysis.getBranchFlowAfter(u);
             for (IntervalBoxState branch : branches) {
                 sb.append(branch.toSMTFormula());
+            }
+        }
+        return sb.toString();
+    }
+
+    public String generateSMTFormulaReport() {
+        StringBuilder sb = new StringBuilder();
+        String methodSignature = this.b.getMethod().getSignature();
+        Set<Unit> outputStmt = this.analysis.getOutputStatements();
+        Map<Unit, Set<Value>> changedVariables = this.analysis.getChangedVariables();
+        Chain<Local> locals = this.b.getLocals();
+        int stmtCount = 0;
+        for (Unit u : this.g.getBody().getUnits()) {
+            stmtCount++;
+            if (outputStmt.contains(u)) {
+                sb.append(stmtCount);
+                sb.append(" ");
+                sb.append(u);
+                sb.append(":");
+                sb.append(methodSignature);
+                sb.append('\n');
+                IntervalBoxState state = analysis.getFallFlowAfter(u);
+                if (state.isFeasible()) {
+                    for (Local l : locals) {
+                        if (changedVariables.get(u).contains(l)) {
+                            sb.append(l.toString());
+                            sb.append("->");
+                            Interval32Box box = state.getMap().get(l);
+                            sb.append(box.toSMTFormula(l.toString()));
+                            sb.append('\n');
+                        }
+                    }
+                    List<IntervalBoxState> branches = analysis.getBranchFlowAfter(u);
+                    if (!branches.isEmpty()) {
+                        for (IntervalBoxState branch : branches) {
+                            if (branch.isFeasible()) {
+                                for (Local l : locals) {
+                                    if (changedVariables.get(u).contains(l)) {
+                                        sb.append(l.toString());
+                                        sb.append("f->");
+                                        Interval32Box box = state.getMap().get(l);
+                                        sb.append(box.toSMTFormula(l.toString()));
+                                        sb.append('\n');
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
         return sb.toString();
