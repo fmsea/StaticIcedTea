@@ -1,4 +1,4 @@
-package abstractinterp.scalar.state;
+package abstractinterp.scalar;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 
-import abstractinterp.scalar.IntervalNumerical;
 import abstractinterp.scalar.state.providers.JimpleProvider;
 
 public class IntervalNumericalTest {
