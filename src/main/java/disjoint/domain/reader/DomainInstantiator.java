@@ -17,7 +17,7 @@ import com.microsoft.z3.Z3Exception;
 import disjoint.domain.BaseElement;
 import disjoint.domain.Domain;
 import disjoint.domain.IntervalPredicate;
-import disjoint.solver.SolverWrapperZ3;
+import solver.SolverWrapperZ3;
 
 public class DomainInstantiator extends DomainBaseVisitor {
 	

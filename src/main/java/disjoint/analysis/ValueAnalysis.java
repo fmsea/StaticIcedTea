@@ -60,7 +60,7 @@ import soot.util.Chain;
 import disjoint.domain.BaseElement;
 import disjoint.domain.Domain;
 import disjoint.driver.StartAnalysis;
-import disjoint.solver.SolverWrapper;
+import solver.SolverWrapper;
 import disjoint.state.*;
 
 /**

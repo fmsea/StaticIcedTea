@@ -71,7 +71,7 @@ import soot.util.Chain;
 import disjoint.domain.BaseElement;
 import disjoint.domain.Domain;
 import disjoint.driver.StartAnalysisKestrel;
-import disjoint.solver.SolverWrapperZ3;
+import solver.SolverWrapperZ3;
 import disjoint.state.*;
 import driver.StartAnalysisScript;
 import driver.StartConditionalValue;
