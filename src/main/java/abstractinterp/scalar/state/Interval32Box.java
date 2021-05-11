@@ -5,6 +5,8 @@ import soot.grimp.Grimp;
 import soot.jimple.IntConstant;
 import soot.jimple.BinopExpr;
 
+import solver.SolverWrapper;
+
 public class Interval32Box {
 
     private boolean bottom = false;
@@ -281,38 +283,8 @@ public class Interval32Box {
         }
     }
 
-    public String toSMTFormula(String local) {
-        if (this.isBottom()) {
-            return String.format("(and (>= %s 0) (< %s 0))", local, local);
-        } else if (this.isTop()) {
-            return String.format("(or (>= %s 0) (< %s 0))", local, local);
-        } else if (this.isBounded() && this.lowerBound == this.upperBound) {
-            return String.format("(= %s %d)", local, this.lowerBound);
-        } else if (this.isBounded()) {
-            return String.format("(and (>= %s %d) (<= %s %d))",
-                                 local,
-                                 this.lowerBound,
-                                 local,
-                                 this.upperBound);
-        } else if (this.isLowerBounded()) {
-            return String.format("(and (>= %s %d) (<= %s %d))",
-                                 local,
-                                 this.lowerBound,
-                                 local,
-                                 Integer.MAX_VALUE);
-        } else if (this.isUpperBounded()) {
-            return String.format("(and (>= %s %d) (<= %s %d))",
-                                 local,
-                                 Integer.MIN_VALUE,
-                                 local,
-                                 this.upperBound);
-        } else {
-            return String.format("(and (>= %s %d) (<= %s %d))",
-                                 local,
-                                 Integer.MIN_VALUE,
-                                 local,
-                                 Integer.MAX_VALUE);
-        }
+    public String toSMTFormula(SolverWrapper solver, Local local) {
+        return solver.smt2(this.toGrimpExpr(local));
     }
 
     public BinopExpr toGrimpExpr(Local local) {

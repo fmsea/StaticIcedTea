@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.Map;
 import net.jqwik.api.Property;
 import net.jqwik.api.ForAll;
+import net.jqwik.api.lifecycle.BeforeProperty;
 import net.jqwik.api.constraints.IntRange;
 import net.jqwik.api.statistics.StatisticsReport;
 import net.jqwik.api.statistics.Histogram;
@@ -14,7 +15,17 @@ import net.jqwik.api.Provide;
 import org.junit.jupiter.api.Assertions;
 import soot.Local;
 
+import solver.SolverWrapper;
+import solver.SolverWrapperZ3;
+
 public class IntervalBoxStateProperties {
+
+    private SolverWrapper solver;
+
+    @BeforeProperty
+    void setup() {
+        this.solver = new SolverWrapperZ3();
+    }
 
     @Property
     void negateReturnsNewBox(@ForAll Interval32Box box) {
@@ -288,9 +299,9 @@ public class IntervalBoxStateProperties {
         List<String> expected = states.entrySet().stream().map(e -> {
                 Local l = e.getKey();
                 Interval32Box b = e.getValue();
-                return String.format("%s->%s", l, b.toSMTFormula(l.toString()));
+                return String.format("%s->%s", l, b.toSMTFormula(this.solver, l));
             }).sorted().collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
-        List<String> result = Arrays.stream(state.toSMTFormula().split("\n"))
+        List<String> result = Arrays.stream(state.toSMTFormula(this.solver).split("\n"))
             .filter(s -> !s.isEmpty())
             .sorted()
             .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);

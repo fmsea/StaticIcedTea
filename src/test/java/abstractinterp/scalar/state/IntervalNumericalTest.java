@@ -79,9 +79,9 @@ public class IntervalNumericalTest {
                 "3 l2 = l1 - l0:<moreConstantMathSootClass: void moreConstantMath()>",
                 "l2->(= l2 6)",
                 "4 l3 = l2 * -1:<moreConstantMathSootClass: void moreConstantMath()>",
-                "l3->(= l3 -6)",
+                "l3->(= l3 (- 6))",
                 "5 l0 = l3 / l2:<moreConstantMathSootClass: void moreConstantMath()>",
-                "l0->(= l0 -1)"
+                "l0->(= l0 (- 1))"
         };
         Assertions.assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {

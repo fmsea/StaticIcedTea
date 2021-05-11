@@ -11,6 +11,8 @@ import soot.Value;
 import soot.jimple.IntConstant;
 import soot.jimple.internal.JNegExpr;
 
+import solver.SolverWrapper;
+
 public class IntervalBoxState {
     // map of variables to its interval abstract state
 
@@ -190,14 +192,14 @@ public class IntervalBoxState {
         return state.toString();
     }
 
-    public String toSMTFormula() {
+    public String toSMTFormula(SolverWrapper solver) {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<Local, Interval32Box> e : this.state.entrySet()) {
             Local l = e.getKey();
             Interval32Box interval = e.getValue();
             sb.append(l.toString());
             sb.append("->");
-            sb.append(interval.toSMTFormula(l.toString()));
+            sb.append(solver.smt2(interval.toGrimpExpr(l)));
             sb.append("\n");
         }
         return sb.toString();

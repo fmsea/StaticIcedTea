@@ -4,12 +4,23 @@ import java.util.Set;
 import java.util.List;
 import java.util.HashSet;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import soot.Local;
 import soot.IntType;
 import soot.jimple.Jimple;
 
+import solver.SolverWrapper;
+import solver.SolverWrapperZ3;
+
 public class IntervalBoxStateTest {
+
+    private SolverWrapper solver;
+
+    @BeforeEach
+    void setup() {
+        this.solver = new SolverWrapperZ3();
+    }
 
     @Test
     void transferBinaryReturnsTopWhenUnbounded() {
@@ -49,6 +60,6 @@ public class IntervalBoxStateTest {
         locals.add(Jimple.v().newLocal("l0", IntType.v()));
         IntervalBoxState box = new IntervalBoxState(locals, false);
         locals.forEach(l -> box.update(l, new Interval32Box(-5, 5)));
-        Assertions.assertEquals("l0->(and (>= l0 -5) (<= l0 5))\n", box.toSMTFormula());
+        Assertions.assertEquals("l0->(and (>= l0 (- 5)) (<= l0 5))\n", box.toSMTFormula(this.solver));
     }
 }

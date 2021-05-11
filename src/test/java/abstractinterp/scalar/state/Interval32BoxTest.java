@@ -4,9 +4,20 @@ import soot.IntType;
 import soot.Local;
 import soot.jimple.Jimple;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import solver.SolverWrapper;
+import solver.SolverWrapperZ3;
+
 public class Interval32BoxTest {
+
+    private SolverWrapper solver;
+
+    @BeforeEach
+    void setup() {
+        this.solver = new SolverWrapperZ3();
+    }
 
     @Test
     void testInterval32BoxClone() {
@@ -277,24 +288,21 @@ public class Interval32BoxTest {
 
     @Test
     void testToSMTFormula() {
+        Local l = Jimple.v().newLocal("l0", IntType.v());
         Interval32Box bot = Interval32Box.BOT();
-        Assertions.assertEquals("(and (>= l0 0) (< l0 0))", bot.toSMTFormula("l0"));
+        Assertions.assertEquals("(and (>= l0 0) (< l0 0))", bot.toSMTFormula(this.solver, l));
         Interval32Box top = Interval32Box.TOP();
-        Assertions.assertEquals("(or (>= l0 0) (< l0 0))", top.toSMTFormula("l0"));
+        Assertions.assertEquals("(or (>= l0 0) (< l0 0))", top.toSMTFormula(this.solver, l));
         Interval32Box max = Interval32Box.MAX();
-        Assertions.assertEquals(String.format("(and (>= l0 %d) (<= l0 %d))",
-                                              Integer.MIN_VALUE,
-                                              Integer.MAX_VALUE),
-                                max.toSMTFormula("l0"));
+        Assertions.assertEquals("(and (>= l0 (- 2147483648)) (<= l0 2147483647))",
+                                max.toSMTFormula(this.solver, l));
         Interval32Box box = new Interval32Box(5);
-        Assertions.assertEquals("(= l0 5)", box.toSMTFormula("l0"));
+        Assertions.assertEquals("(= l0 5)", box.toSMTFormula(this.solver, l));
         box = new Interval32Box(-5, 5);
-        Assertions.assertEquals("(and (>= l0 -5) (<= l0 5))",
-                                box.toSMTFormula("l0"));
+        Assertions.assertEquals("(and (>= l0 (- 5)) (<= l0 5))",
+                                box.toSMTFormula(this.solver, l));
         box = new Interval32Box(null, 5);
-        Assertions.assertEquals(String.format("(and (>= l0 %d) (<= l0 5))",
-                                              Integer.MIN_VALUE),
-                                box.toSMTFormula("l0"));
+        Assertions.assertEquals("(<= l0 5)", box.toSMTFormula(this.solver, l));
     }
 
     @Test

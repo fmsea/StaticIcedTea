@@ -23,15 +23,23 @@ import util.Variables;
 
 import abstractinterp.scalar.state.IntervalBoxState;
 import abstractinterp.scalar.state.Interval32Box;
+import solver.SolverWrapper;
+import solver.SolverWrapperZ3;
 
 public class IntervalNumerical {
     protected Body b;
     UnitGraph g;
     ForwardBranchedFlowIntervalNumericalBox analysis;
+    private SolverWrapper solver;
 
     public IntervalNumerical(Body b, int iterations) {
+        this(new SolverWrapperZ3(), b, iterations);
+    }
+
+    public IntervalNumerical(SolverWrapper solver, Body b, int iterations) {
         this.b = b;
         this.g = new ExceptionalUnitGraph(b);
+        this.solver = solver;
         // init the analysis
         // the order
         List<Unit> order = new PseudoTopologicalOrderer<Unit>().newList(g, false);
@@ -124,10 +132,10 @@ public class IntervalNumerical {
             sb.append(methodSignature);
             sb.append('\n');
             IntervalBoxState state = analysis.getFallFlowAfter(u);
-            sb.append(state.toSMTFormula());
+            sb.append(state.toSMTFormula(this.solver));
             List<IntervalBoxState> branches = analysis.getBranchFlowAfter(u);
             for (IntervalBoxState branch : branches) {
-                sb.append(branch.toSMTFormula());
+                sb.append(branch.toSMTFormula(this.solver));
             }
         }
         return sb.toString();
@@ -156,7 +164,7 @@ public class IntervalNumerical {
                             sb.append(l.toString());
                             sb.append("->");
                             Interval32Box box = state.getMap().get(l);
-                            sb.append(box.toSMTFormula(l.toString()));
+                            sb.append(box.toSMTFormula(this.solver, l));
                             sb.append('\n');
                         }
                     }
@@ -169,7 +177,7 @@ public class IntervalNumerical {
                                         sb.append(l.toString());
                                         sb.append("f->");
                                         Interval32Box box = state.getMap().get(l);
-                                        sb.append(box.toSMTFormula(l.toString()));
+                                        sb.append(box.toSMTFormula(this.solver, l));
                                         sb.append('\n');
                                     }
                                 }
