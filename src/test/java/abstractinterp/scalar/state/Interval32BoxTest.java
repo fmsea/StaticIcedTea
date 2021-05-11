@@ -1,5 +1,8 @@
 package abstractinterp.scalar.state;
 
+import soot.IntType;
+import soot.Local;
+import soot.jimple.Jimple;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -293,5 +296,24 @@ public class Interval32BoxTest {
                                               Integer.MIN_VALUE),
                                 box.toSMTFormula("l0"));
     }
+
+    @Test
+    void testToGrimpExpr() {
+        Local l = Jimple.v().newLocal("l0", IntType.v());
+        Interval32Box bot = Interval32Box.BOT();
+        Interval32Box top = Interval32Box.TOP();
+        Interval32Box max = Interval32Box.MAX();
+        Interval32Box box = new Interval32Box(null, 5);
+        Assertions.assertEquals("l0 >= 0 & l0 < 0", bot.toGrimpExpr(l).toString());
+        Assertions.assertEquals("l0 >= 0 | l0 < 0", top.toGrimpExpr(l).toString());
+        Assertions.assertEquals(String.format("l0 >= %d & l0 <= %d",
+                                              Integer.MIN_VALUE,
+                                              Integer.MAX_VALUE),
+                                max.toGrimpExpr(l).toString());
+        Assertions.assertEquals("l0 <= 5", box.toGrimpExpr(l).toString());
+        box = new Interval32Box(-5, null);
+        Assertions.assertEquals("l0 >= -5", box.toGrimpExpr(l).toString());
+        box = new Interval32Box(-5, 5);
+        Assertions.assertEquals("l0 >= -5 & l0 <= 5", box.toGrimpExpr(l).toString());
     }
 }

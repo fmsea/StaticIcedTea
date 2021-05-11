@@ -1,5 +1,10 @@
 package abstractinterp.scalar.state;
 
+import soot.Local;
+import soot.grimp.Grimp;
+import soot.jimple.IntConstant;
+import soot.jimple.BinopExpr;
+
 public class Interval32Box {
 
     private boolean bottom = false;
@@ -309,6 +314,28 @@ public class Interval32Box {
                                  Integer.MAX_VALUE);
         }
     }
+
+    public BinopExpr toGrimpExpr(Local local) {
+        BinopExpr r = null;
+        if (this.isBottom()) {
+            r = Grimp.v().newAndExpr(Grimp.v().newGeExpr(local, IntConstant.v(0)),
+                                     Grimp.v().newLtExpr(local, IntConstant.v(0)));
+        } else if (this.isTop()) {
+            r = Grimp.v().newOrExpr(Grimp.v().newGeExpr(local, IntConstant.v(0)),
+                                    Grimp.v().newLtExpr(local, IntConstant.v(0)));
+        } else if (this.isBounded() && this.lowerBound == this.upperBound) {
+            r = Grimp.v().newEqExpr(local, IntConstant.v(this.lowerBound));
+        } else if (this.isBounded()) {
+            r = Grimp.v().newAndExpr(Grimp.v().newGeExpr(local, IntConstant.v(this.lowerBound)),
+                                     Grimp.v().newLeExpr(local, IntConstant.v(this.upperBound)));
+        } else if (this.isLowerBounded()) {
+            r = Grimp.v().newGeExpr(local, IntConstant.v(this.lowerBound));
+        } else if (this.isUpperBounded()) {
+            r = Grimp.v().newLeExpr(local, IntConstant.v(this.upperBound));
+        } else {
+            r = Grimp.v().newAndExpr(Grimp.v().newGeExpr(local, IntConstant.v(Integer.MIN_VALUE)),
+                                     Grimp.v().newLeExpr(local, IntConstant.v(Integer.MAX_VALUE)));
         }
+        return r;
     }
 }

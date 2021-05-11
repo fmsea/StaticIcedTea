@@ -3,7 +3,7 @@ package abstractinterp.scalar.state;
 import net.jqwik.api.Property;
 import net.jqwik.api.ForAll;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import soot.Local;
 
 public class Interval32BoxProperties {
 
@@ -122,5 +122,15 @@ public class Interval32BoxProperties {
         yBox = new Interval32Box(x, y);
         Assertions.assertTrue(xBox.equals(yBox));
         Assertions.assertTrue(yBox.equals(xBox));
+    }
+
+    @Property
+    void toGrimpExprStringsAreCorrect(@ForAll Interval32Box b, @ForAll Local l) {
+        Assertions.assertEquals(String.format("%s >= %d & %s <= %d",
+                                              l.toString(),
+                                              b.lowerBound(),
+                                              l.toString(),
+                                              b.upperBound()),
+                                b.toGrimpExpr(l).toString());
     }
 }
