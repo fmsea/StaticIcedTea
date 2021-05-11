@@ -39,6 +39,10 @@ public class Interval32BoxTest {
         Assertions.assertTrue(top.isTop());
         Assertions.assertFalse(bot.isTop());
         Assertions.assertFalse(max.isTop());
+        Interval32Box box = new Interval32Box(null, 5);
+        Assertions.assertFalse(box.isTop());
+        box = new Interval32Box(-5, null);
+        Assertions.assertFalse(box.isTop());
     }
 
     @Test
@@ -167,6 +171,8 @@ public class Interval32BoxTest {
         Interval32Box top = Interval32Box.TOP();
         Interval32Box a = new Interval32Box(null, 0);
         Interval32Box b = new Interval32Box(0, null);
+        bot.wideningAssign(bot);
+        Assertions.assertTrue(bot.isBottom());
         bot.wideningAssign(top);
         Assertions.assertTrue(bot.isTop());
         top.wideningAssign(a);
@@ -177,6 +183,7 @@ public class Interval32BoxTest {
         bot = Interval32Box.BOT();
         a = new Interval32Box(1, 10);
         bot.wideningAssign(a);
+        Assertions.assertFalse(bot.isBottom());
         Assertions.assertEquals(1, bot.lowerBound());
         Assertions.assertEquals(10, bot.upperBound());
         b = new Interval32Box(1, 11);
@@ -281,5 +288,10 @@ public class Interval32BoxTest {
         box = new Interval32Box(-5, 5);
         Assertions.assertEquals("(and (>= l0 -5) (<= l0 5))",
                                 box.toSMTFormula("l0"));
+        box = new Interval32Box(null, 5);
+        Assertions.assertEquals(String.format("(and (>= l0 %d) (<= l0 5))",
+                                              Integer.MIN_VALUE),
+                                box.toSMTFormula("l0"));
+    }
     }
 }

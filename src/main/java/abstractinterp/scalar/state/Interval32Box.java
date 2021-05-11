@@ -71,7 +71,7 @@ public class Interval32Box {
     }
 
     public boolean isTop() {
-        return (!this.isBottom() && !this.isBounded());
+        return (!this.isBottom() && !this.isLowerBounded() && !this.isUpperBounded());
     }
 
     public boolean isMax() {
@@ -145,11 +145,14 @@ public class Interval32Box {
     }
 
     public void wideningAssign(Interval32Box box) {
-        if (this.isBottom() && !box.isBottom()) {
-            this.bottom = false;
+        if (this.isTop() || box.isTop()) {
+            this.lowerBound = null;
+            this.upperBound = null;
+        } else {
+            minWidenAssign(box);
+            maxWidenAssign(box);
         }
-        minWidenAssign(box);
-        maxWidenAssign(box);
+        this.bottom = this.bottom && box.bottom;
     }
 
     public byte intersectionPosition(Interval32Box box) {
@@ -280,12 +283,32 @@ public class Interval32Box {
             return String.format("(or (>= %s 0) (< %s 0))", local, local);
         } else if (this.isBounded() && this.lowerBound == this.upperBound) {
             return String.format("(= %s %d)", local, this.lowerBound);
-        } else {
+        } else if (this.isBounded()) {
             return String.format("(and (>= %s %d) (<= %s %d))",
                                  local,
                                  this.lowerBound,
                                  local,
                                  this.upperBound);
+        } else if (this.isLowerBounded()) {
+            return String.format("(and (>= %s %d) (<= %s %d))",
+                                 local,
+                                 this.lowerBound,
+                                 local,
+                                 Integer.MAX_VALUE);
+        } else if (this.isUpperBounded()) {
+            return String.format("(and (>= %s %d) (<= %s %d))",
+                                 local,
+                                 Integer.MIN_VALUE,
+                                 local,
+                                 this.upperBound);
+        } else {
+            return String.format("(and (>= %s %d) (<= %s %d))",
+                                 local,
+                                 Integer.MIN_VALUE,
+                                 local,
+                                 Integer.MAX_VALUE);
+        }
+    }
         }
     }
 }
