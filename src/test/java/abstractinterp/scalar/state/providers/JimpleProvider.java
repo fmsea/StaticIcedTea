@@ -105,6 +105,7 @@ public class JimpleProvider implements ArbitraryProvider {
         Unit trueTarget = Jimple.v().newAssignStmt(l3, IntConstant.v(6));
         Unit falseTarget = Jimple.v().newAssignStmt(l3, Jimple.v().newDivExpr(l1, l2));
         units.add(Jimple.v().newAssignStmt(l0, IntConstant.v(4)));
+        units.add(Jimple.v().newAssignStmt(l1, IntConstant.v(0)));
         units.add(Jimple.v().newAssignStmt(l2, IntConstant.v(0)));
         units.add(Jimple.v().newIfStmt(Jimple.v().newGeExpr(l0, IntConstant.v(3)),
                                        trueTarget));

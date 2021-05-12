@@ -98,11 +98,12 @@ public class IntervalNumericalTest {
         String[] actual = analysis.generateReport().split("\n");
         assertReportOutputEquals(new String[] {
                 "l0 = 4 class soot.jimple.internal.JAssignStmt f->{l0=4, l1=⟙, l2=⟙, l3=⟙}",
-                "l2 = 0 class soot.jimple.internal.JAssignStmt f->{l0=4, l1=⟙, l2=0, l3=⟙}",
-                "if l0 >= 3 goto l3 = 6 class soot.jimple.internal.JIfStmt f->{l0=4, l1=⟙, l2=0, l3=⟙}",
-                "if l0 >= 3 goto l3 = 6 b->[{l0=4, l1=⟙, l2=0, l3=⟙}]",
-                "l3 = l1 / l2 class soot.jimple.internal.JAssignStmt f->{l0=4, l1=⟙, l2=0, l3=⟙}",
-                "l3 = 6 class soot.jimple.internal.JAssignStmt f->{l0=4, l1=⟙, l2=0, l3=6}",
+                "l1 = 0 class soot.jimple.internal.JAssignStmt f->{l0=4, l1=0, l2=⟙, l3=⟙}",
+                "l2 = 0 class soot.jimple.internal.JAssignStmt f->{l0=4, l1=0, l2=0, l3=⟙}",
+                "if l0 >= 3 goto l3 = 6 class soot.jimple.internal.JIfStmt f->{l0=4, l1=0, l2=0, l3=⟙}",
+                "if l0 >= 3 goto l3 = 6 b->[{l0=4, l1=0, l2=0, l3=⟙}]",
+                "l3 = l1 / l2 class soot.jimple.internal.JAssignStmt f->{l0=4, l1=0, l2=0, l3=[-2147483648, 2147483647]}",
+                "l3 = 6 class soot.jimple.internal.JAssignStmt f->{l0=4, l1=0, l2=0, l3=6}",
                 "return class soot.jimple.internal.JReturnVoidStmt f->{l3=⟙, l1=⟙, l2=⟙, l0=⟙}"},
             actual);
     }
@@ -116,14 +117,16 @@ public class IntervalNumericalTest {
         String[] expected = new String[] {
             "1 l0 = 4:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
             "l0->(= l0 4)",
-            "2 l2 = 0:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
+            "2 l1 = 0:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
+            "l1->(= l1 0)",
+            "3 l2 = 0:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
             "l2->(= l2 0)",
-            "3 if l0 >= 3 goto l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
+            "4 if l0 >= 3 goto l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
             "l0->(= l0 4)",
             "l0f->(= l0 4)",
-            "4 l3 = l1 / l2:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
-            "l3->(or (>= l3 0) (< l3 0))",
-            "5 l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
+            "5 l3 = l1 / l2:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
+            "l3->(and (>= l3 (- 2147483648)) (<= l3 2147483647))",
+            "6 l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
             "l3->(= l3 6)"
         };
         Assertions.assertEquals(expected.length, actual.length);
