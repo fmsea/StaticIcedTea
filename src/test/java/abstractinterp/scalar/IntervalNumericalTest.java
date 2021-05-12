@@ -2,6 +2,8 @@ package abstractinterp.scalar;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import soot.Scene;
 import soot.Body;
@@ -195,11 +197,12 @@ public class IntervalNumericalTest {
     }
 
     private Map<String, String> parseLocals(String statement) {
+        Pattern pattern = Pattern.compile("([a-z0-9]{2})=(\\[-*\\d+, -*\\d+\\]|\\d+|⟙|⟘)");
         Map<String, String> locals = new HashMap<>();
-        String[] values = statement.substring(statement.indexOf('{') + 1, statement.indexOf('}')).split(",");
-        for (int i = 0; i < values.length; i++) {
-            String[] parts = values[i].split("=", 2);
-            locals.put(parts[0].trim(), parts[1].trim());
+        String values = statement.substring(statement.indexOf('{') + 1, statement.indexOf('}'));
+        Matcher r = pattern.matcher(values);
+        while (r.find()) {
+            locals.put(r.group(1), r.group(2));
         }
         return locals;
     }
