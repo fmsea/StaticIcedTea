@@ -89,11 +89,11 @@ public class Interval32Box {
     }
 
     public boolean isLowerBounded() {
-        return this.lowerBound != null;
+        return (this.bottom == false && this.lowerBound != null);
     }
 
     public boolean isUpperBounded() {
-        return this.upperBound != null;
+        return (this.bottom == false && this.upperBound != null);
     }
 
     public boolean isBounded() {
@@ -105,7 +105,7 @@ public class Interval32Box {
         return (this.isValid() && (this.isTop() || this.lowerBound <= this.upperBound));
     }
 
-    public void minAssign(Interval32Box box) {
+    private void minAssign(Interval32Box box) {
         if (!this.isLowerBounded()) {
             this.lowerBound = box.lowerBound;
         } else if (box.isLowerBounded() && this.lowerBound > box.lowerBound) {
@@ -113,7 +113,7 @@ public class Interval32Box {
         }
     }
 
-    public void maxAssign(Interval32Box box) {
+    private void maxAssign(Interval32Box box) {
         if (!this.isUpperBounded()) {
             this.upperBound = box.upperBound;
         } else if (box.isUpperBounded() && this.upperBound < box.upperBound) {

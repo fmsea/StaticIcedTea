@@ -125,48 +125,21 @@ public class Interval32BoxTest {
     }
 
     @Test
-    void testMinAssign() {
-        Interval32Box bot = Interval32Box.BOT();
-        Interval32Box top = Interval32Box.TOP();
-        Interval32Box max = Interval32Box.MAX();
-        bot.minAssign(top);
-        Assertions.assertFalse(bot.isLowerBounded());
-        Assertions.assertFalse(bot.isUpperBounded());
-        bot.minAssign(max);
-        Assertions.assertTrue(bot.isLowerBounded());
-        Assertions.assertFalse(bot.isUpperBounded());
-        Interval32Box x = new Interval32Box(0, null);
-        Interval32Box y = new Interval32Box(-1, null);
-        x.minAssign(y);
-        Assertions.assertEquals(-1, x.lowerBound());
-    }
-
-    @Test
-    void testMaxAssign() {
-        Interval32Box bot = Interval32Box.BOT();
-        Interval32Box top = Interval32Box.TOP();
-        Interval32Box max = Interval32Box.MAX();
-        bot.maxAssign(top);
-        Assertions.assertFalse(bot.isUpperBounded());
-        Assertions.assertFalse(bot.isLowerBounded());
-        bot.maxAssign(max);
-        Assertions.assertTrue(bot.isUpperBounded());
-        Assertions.assertFalse(bot.isLowerBounded());
-        Interval32Box x = new Interval32Box(null, 0);
-        Interval32Box y = new Interval32Box(null, 1);
-        x.maxAssign(y);
-        Assertions.assertEquals(1, x.upperBound());
-    }
-
-    @Test
     void testUpperBoundAssign() {
         Interval32Box bot = Interval32Box.BOT();
         Interval32Box ano_bot = Interval32Box.BOT();
         Interval32Box top = Interval32Box.TOP();
+        Interval32Box max = Interval32Box.MAX();
         bot.upperBoundAssign(ano_bot);
         Assertions.assertTrue(bot.isBottom());
         ano_bot.upperBoundAssign(top);
+        Assertions.assertFalse(ano_bot.isUpperBounded());
+        Assertions.assertFalse(ano_bot.isLowerBounded());
         Assertions.assertTrue(ano_bot.isTop());
+        bot.upperBoundAssign(max);
+        Assertions.assertTrue(bot.isUpperBounded());
+        Assertions.assertTrue(bot.isLowerBounded());
+        Assertions.assertEquals(max, bot);
         Interval32Box x = new Interval32Box(0, 1);
         Interval32Box y = new Interval32Box(1, 2);
         x.upperBoundAssign(y);

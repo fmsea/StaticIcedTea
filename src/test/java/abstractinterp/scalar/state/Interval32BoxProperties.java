@@ -27,22 +27,6 @@ public class Interval32BoxProperties {
     }
 
     @Property
-    void minAssignLowerQuantity(@ForAll int x, @ForAll int y) {
-        Interval32Box xBox = new Interval32Box(x, null);
-        Interval32Box yBox = new Interval32Box(y, null);
-        xBox.minAssign(yBox);
-        int min = Math.min(x, y);
-        Assertions.assertEquals(min, xBox.lowerBound());
-    }
-
-    @Property
-    void maxAssignUpperQuantity(@ForAll int x, @ForAll int y) {
-        Interval32Box xBox = new Interval32Box(null, x);
-        Interval32Box yBox = new Interval32Box(null, y);
-        xBox.maxAssign(yBox);
-        int max = Math.max(x, y);
-        Assertions.assertEquals(max, xBox.upperBound());
-    }
 
     @Property
     void upperBoundAssignment(@ForAll int x1,
