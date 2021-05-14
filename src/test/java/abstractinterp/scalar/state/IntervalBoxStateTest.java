@@ -3,6 +3,8 @@ package abstractinterp.scalar.state;
 import java.util.Set;
 import java.util.List;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,5 +66,24 @@ public class IntervalBoxStateTest {
         IntervalBoxState box = new IntervalBoxState(locals, false);
         locals.forEach(l -> box.update(l, new Interval32Box(-5, 5)));
         Assertions.assertEquals("l0->(and (>= l0 (- 5)) (<= l0 5))\n", box.toSMTFormula(this.solver));
+    }
+
+    @Test
+    void testMergeWith() {
+        Map<Local, Interval32Box> state = new HashMap<>();
+        state.put(Jimple.v().newLocal("l0", IntType.v()), new Interval32Box(-5, 5));
+        Set<Local> locals = state.keySet();
+        IntervalBoxState box = new IntervalBoxState(locals, false);
+        state.forEach((l, b) -> box.update(l, b));
+        IntervalBoxState merge = new IntervalBoxState(locals, false);
+        //locals.forEach(l -> merge.update(l, Interval32Box.
+        box.mergeWith(merge);
+        state.forEach((l, b) -> Assertions.assertEquals(b, box.getValue(l)));
+        state.forEach((l, b) -> {
+                state.put(l, Interval32Box.TOP());
+                merge.update(l, Interval32Box.TOP());
+            });
+        box.mergeWith(merge);
+        state.forEach((l, b) -> Assertions.assertEquals(b, box.getValue(l)));
     }
 }
