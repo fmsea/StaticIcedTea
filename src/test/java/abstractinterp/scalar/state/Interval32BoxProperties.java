@@ -2,16 +2,28 @@ package abstractinterp.scalar.state;
 
 import net.jqwik.api.Property;
 import net.jqwik.api.ForAll;
+import net.jqwik.api.constraints.Negative;
+import net.jqwik.api.constraints.Positive;
 import org.junit.jupiter.api.Assertions;
 import soot.Local;
 
 public class Interval32BoxProperties {
 
     @Property
-    void boundedBoxesAreBounded(@ForAll int lower,
-                                @ForAll int upper) {
+    void boundedBoxesAreBounded(@ForAll int x,
+                                @ForAll int y) {
+        int lower = Math.min(x, y);
+        int upper = Math.max(x, y);
         Interval32Box box = new Interval32Box(lower, upper);
         Assertions.assertTrue(box.isBounded());
+    }
+
+    @Property
+    void unboundedBoxesAreUnbounded(@ForAll @Negative int x,
+                                    @ForAll @Positive int y) {
+        Interval32Box box = new Interval32Box(y, x);
+        Assertions.assertFalse(box.isBounded());
+        Assertions.assertTrue(box.isBottom());
     }
 
     @Property
