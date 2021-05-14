@@ -218,22 +218,10 @@ public class Interval32Box {
     }
 
     public void negate() {
-        if (this.isBounded()) {
-            int lower = this.upperBound.intValue() * -1;
-            int upper = this.lowerBound.intValue() * -1;
-            this.lowerBound = Integer.valueOf(lower);
-            this.upperBound = Integer.valueOf(upper);
-        } else if (this.isLowerBounded()) {
-            int upper = this.lowerBound.intValue() * -1;
-            this.lowerBound = null;
-            this.upperBound = Integer.valueOf(upper);
-        } else if (this.isUpperBounded()) {
-            int lower = this.upperBound.intValue() * -1;
-            this.upperBound = null;
-            this.lowerBound = Integer.valueOf(lower);
-        } else {
-            // Bottom, leave it alone
-        }
+        Integer lower = this.upperBound != null ? this.upperBound.intValue() * -1 : null;
+        Integer upper = this.lowerBound != null ? this.lowerBound.intValue() * -1 : null;
+        this.lowerBound = lower;
+        this.upperBound = upper;
         this.checkAndSetBottom();
     }
 

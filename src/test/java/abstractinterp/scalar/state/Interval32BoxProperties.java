@@ -27,16 +27,10 @@ public class Interval32BoxProperties {
     }
 
     @Property
-
-    @Property
-    void upperBoundAssignment(@ForAll int x1,
-                              @ForAll int x2,
-                              @ForAll int y1,
-                              @ForAll int y2) {
-        Interval32Box x = new Interval32Box(x1, y1);
-        Interval32Box y = new Interval32Box(x2, y2);
-        int lower = Math.min(x1, x2);
-        int upper = Math.max(y1, y2);
+    void upperBoundAssignment(@ForAll Interval32Box x,
+                              @ForAll Interval32Box y) {
+        int lower = Math.min(x.lowerBound(), y.lowerBound());
+        int upper = Math.max(x.upperBound(), y.upperBound());
         x.upperBoundAssign(y);
         Assertions.assertEquals(lower, x.lowerBound());
         Assertions.assertEquals(upper, x.upperBound());
