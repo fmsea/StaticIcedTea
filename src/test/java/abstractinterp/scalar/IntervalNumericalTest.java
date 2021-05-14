@@ -144,12 +144,12 @@ public class IntervalNumericalTest {
         assertReportOutputEquals(new String[] {
                 "l0 = 5 class soot.jimple.internal.JAssignStmt f->{l0=5, l2=⟙, l1=⟙, l3=⟙}",
                 "l1 = 0 class soot.jimple.internal.JAssignStmt f->{l0=5, l2=⟙, l1=0, l3=⟙}",
-                "if l1 >= 5 goto l3 = l0 + l1 class soot.jimple.internal.JIfStmt f->{l0=5, l2=⟙, l1=⟘, l3=⟙}",
-                "if l1 >= 5 goto l3 = l0 + l1 b->[{l0=5, l2=⟙, l1=⟘, l3=⟙}]",
-                "l1 = l1 + 1 class soot.jimple.internal.JAssignStmt f->{l0=5, l2=⟙, l1=⟘, l3=⟙}",
+                "if l1 >= 5 goto l3 = l0 + l1 class soot.jimple.internal.JIfStmt f->{l0=⟙, l2=⟙, l1=⟙, l3=⟙}",
+                "if l1 >= 5 goto l3 = l0 + l1 b->[{l0=⟙, l2=⟙, l1=⟙, l3=⟙}]",
+                "l1 = l1 + 1 class soot.jimple.internal.JAssignStmt f->{l0=⟙, l2=⟙, l1=⟙, l3=⟙}",
                 "goto [?= (branch)] class soot.jimple.internal.JGotoStmt f->{l0=⟙, l2=⟙, l1=⟙, l3=⟙}",
-                "goto [?= (branch)] b->[{l0=5, l2=⟙, l1=⟘, l3=⟙}]",
-                "l3 = l0 + l1 class soot.jimple.internal.JAssignStmt f->{l0=5, l2=⟙, l1=⟘, l3=⟙}",
+                "goto [?= (branch)] b->[{l0=⟙, l2=⟙, l1=⟙, l3=⟙}]",
+                "l3 = l0 + l1 class soot.jimple.internal.JAssignStmt f->{l0=⟙, l2=⟙, l1=⟙, l3=⟙}",
                 "return class soot.jimple.internal.JReturnVoidStmt f->{l0=⟙, l2=⟙, l1=⟙, l3=⟙}"},
             actual);
     }
@@ -165,7 +165,13 @@ public class IntervalNumericalTest {
             "l0->(= l0 5)",
             "2 l1 = 0:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
             "l1->(= l1 0)",
-            "3 if l1 >= 5 goto l3 = l0 + l1:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>"
+            "3 if l1 >= 5 goto l3 = l0 + l1:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
+            "l1->(or (>= l1 0) (< l1 0))",
+            "l1f->(or (>= l1 0) (< l1 0))",
+            "4 l1 = l1 + 1:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
+            "l1->(or (>= l1 0) (< l1 0))",
+            "6 l3 = l0 + l1:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
+            "l3->(or (>= l3 0) (< l3 0))"
         };
         Assertions.assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {

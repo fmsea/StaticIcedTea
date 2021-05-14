@@ -140,6 +140,8 @@ public class Interval32BoxTest {
         Assertions.assertTrue(bot.isUpperBounded());
         Assertions.assertTrue(bot.isLowerBounded());
         Assertions.assertEquals(max, bot);
+        top.upperBoundAssign(Interval32Box.BOT());
+        Assertions.assertEquals(Interval32Box.TOP(), top);
         Interval32Box x = new Interval32Box(0, 1);
         Interval32Box y = new Interval32Box(1, 2);
         x.upperBoundAssign(y);
@@ -150,6 +152,8 @@ public class Interval32BoxTest {
         x.upperBoundAssign(y);
         Assertions.assertEquals(-1, x.lowerBound());
         Assertions.assertEquals(2, x.upperBound());
+        y.upperBoundAssign(top);
+        Assertions.assertEquals(Interval32Box.TOP(), y);
     }
 
     @Test

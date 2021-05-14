@@ -144,11 +144,15 @@ public class Interval32Box {
     }
 
     public void upperBoundAssign(Interval32Box box) {
-        if (this.isBottom() && !box.isBottom()) {
+        if (this.isTop() || box.isTop()) {
             this.bottom = false;
+            this.lowerBound = null;
+            this.upperBound = null;
+        } else {
+            this.bottom = this.bottom && box.bottom;
+            this.minAssign(box);
+            this.maxAssign(box);
         }
-        this.minAssign(box);
-        this.maxAssign(box);
     }
 
     public void wideningAssign(Interval32Box box) {
