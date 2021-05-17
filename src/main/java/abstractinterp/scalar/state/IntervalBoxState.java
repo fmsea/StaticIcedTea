@@ -222,7 +222,7 @@ public class IntervalBoxState {
         state.put(l, Interval32Box.TOP());
     }
 
-    public void updateCond(IntervalBoxState inState, Value left, Value right, byte type) {
+    public void updateCond(IntervalBoxState inState, Value left, Value right, PredicateType type) {
         // update to new values so that the condition holds with that type
         Interval32Box leftBox = eval(inState, left);
         Interval32Box rightBox = eval(inState, right);
@@ -235,7 +235,7 @@ public class IntervalBoxState {
         }
     }
 
-    public static List<Interval32Box> transferCond(Interval32Box lhs, Interval32Box rhs, byte type) {
+    public static List<Interval32Box> transferCond(Interval32Box lhs, Interval32Box rhs, PredicateType type) {
         List<Interval32Box> ret = new ArrayList<Interval32Box>(2);
         if (lhs.isBottom() || rhs.isBottom()) {
             // return bottom if either value is bottom
@@ -274,7 +274,7 @@ public class IntervalBoxState {
             int y2_new = y2;
             int y1_new = y1;
             switch (type) {
-            case 0: // equal
+            case Eq: // equal
                 switch (position) {
                 case 0:// infeasible if do not intersect
                     x2_new = Integer.MIN_VALUE;
@@ -306,7 +306,7 @@ public class IntervalBoxState {
                     break;
                 }
                 break;
-            case 1: // not equal
+            case Ne: // not equal
                 // check if there is only one point at it is is the same point
                 if (x1 == x2 && x2 == y2 && y2 == y1) {
                     // infeasible
@@ -317,7 +317,7 @@ public class IntervalBoxState {
                 }
                 // otherwise the previous values
                 break;
-            case 2: // <=
+            case Le: // <=
                 switch (position) {
                 case 0:// all x's are <= than y's so leave the same
                     break;
@@ -345,7 +345,7 @@ public class IntervalBoxState {
                     break;
                 }
                 break;
-            case 3: // < - should be similar to case 3, just need to add +1 ?
+            case Gt: // < - should be similar to case 3, just need to add +1 ?
                 switch (position) {
                 case 0:// the same
                     break;
@@ -382,7 +382,7 @@ public class IntervalBoxState {
                     break;
                 }
                 break;
-            case 4: // >=
+            case Ge: // >=
                 switch (position) {
                 case 0:
                     // infeasible
@@ -410,7 +410,7 @@ public class IntervalBoxState {
                     break;
                 }
                 break;
-            case 5: // > similar to case 4 only +/- 1
+            case Lt: // > similar to case 4 only +/- 1
                 switch (position) {
                 case 0:
                     // infeasible

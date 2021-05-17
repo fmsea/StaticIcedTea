@@ -47,6 +47,7 @@ import soot.toolkits.graph.DirectedGraph;
 
 import abstractinterp.scalar.state.Interval32Box;
 import abstractinterp.scalar.state.IntervalBoxState;
+import abstractinterp.scalar.state.PredicateType;
 
 public class ForwardBranchedFlowIntervalNumericalBox
         extends ForwardBranchedFlowWidening<Unit, IntervalBoxState> {
@@ -149,35 +150,10 @@ public class ForwardBranchedFlowIntervalNumericalBox
                 this.outputStmt.add(s);
                 Set<Value> track = new HashSet<>();
                 this.changedVariables.put(s, track);
-                byte type = -1;
-                if (condExpr instanceof EqExpr) {
-                    type = 0;
-                } else if (condExpr instanceof NeExpr) {
-                    type = 1;
-                } else if (condExpr instanceof LeExpr) {
-                    type = 2;
-                } else if (condExpr instanceof GtExpr) {
-                    type = 3;
-                } else if (condExpr instanceof GeExpr) {
-                    type = 4;
-                } else if (condExpr instanceof LtExpr) {
-                    type = 5;
-                }
+                PredicateType type = PredicateType.fromJimple(condExpr);
                 ifStmtFall.updateCond(inState, left, right, type);// false branch
                 // rotate type;
-                if (type == 0) {
-                    type = 1;
-                } else if (type == 1) {
-                    type = 0;
-                } else if (type == 2) {
-                    type = 3;
-                } else if (type == 3) {
-                    type = 2;
-                } else if (type == 4) {
-                    type = 5;
-                } else if (type == 5) {
-                    type = 4;
-                }
+                type = type.rotate();
                 ifStmtBranch.updateCond(inState, left, right, type);// true branch
                 if (left instanceof JimpleLocal) {
                     track.add(left);

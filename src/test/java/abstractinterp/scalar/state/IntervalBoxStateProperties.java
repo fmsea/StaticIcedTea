@@ -106,8 +106,8 @@ public class IntervalBoxStateProperties {
     @Property
     void transferCondReturns2Intervals(@ForAll Interval32Box x,
                                        @ForAll Interval32Box y,
-                                       @ForAll @IntRange(min=0, max=5) int t) {
-        List<Interval32Box> z = IntervalBoxState.transferCond(x, y, (byte) t);
+                                       @ForAll PredicateType t) {
+        List<Interval32Box> z = IntervalBoxState.transferCond(x, y, t);
         Assertions.assertEquals(2, z.size());
     }
 
@@ -115,7 +115,7 @@ public class IntervalBoxStateProperties {
     void transferConditionEquals(@ForAll Interval32Box x,
                                  @ForAll Interval32Box y) {
         byte position = x.intersectionPosition(y);
-        List<Interval32Box> zs = IntervalBoxState.transferCond(x, y, (byte) 0);
+        List<Interval32Box> zs = IntervalBoxState.transferCond(x, y, PredicateType.Eq);
         if (position == 0 || position == 4) {
             for (Interval32Box z : zs) {
                 Assertions.assertTrue(z.isBottom());
@@ -144,7 +144,7 @@ public class IntervalBoxStateProperties {
     @Property
     void transferConditionNotEquals(@ForAll Interval32Box x,
                                     @ForAll Interval32Box y) {
-        List<Interval32Box> zs = IntervalBoxState.transferCond(x, y, (byte) 1);
+        List<Interval32Box> zs = IntervalBoxState.transferCond(x, y, PredicateType.Ne);
         if (x.lowerBound() == x.upperBound() &&
             x.upperBound() == y.lowerBound() &&
             y.lowerBound() == y.upperBound()) {
@@ -161,7 +161,7 @@ public class IntervalBoxStateProperties {
     void transferConditionLTE(@ForAll Interval32Box x,
                               @ForAll Interval32Box y) {
         byte position = x.intersectionPosition(y);
-        List<Interval32Box> zs = IntervalBoxState.transferCond(x, y, (byte) 2);
+        List<Interval32Box> zs = IntervalBoxState.transferCond(x, y, PredicateType.Le);
         if (position == 0 || position == 1) {
             Assertions.assertEquals(x, zs.get(0));
             Assertions.assertEquals(y, zs.get(1));
@@ -188,7 +188,7 @@ public class IntervalBoxStateProperties {
     void transferConditionLT(@ForAll Interval32Box x,
                              @ForAll Interval32Box y) {
         byte position = x.intersectionPosition(y);
-        List<Interval32Box> zs = IntervalBoxState.transferCond(x, y, (byte) 3);
+        List<Interval32Box> zs = IntervalBoxState.transferCond(x, y, PredicateType.Lt);
         if (position == 0 || position == 1) {
             Assertions.assertEquals(x, zs.get(0));
             Assertions.assertEquals(y, zs.get(1));
@@ -230,7 +230,7 @@ public class IntervalBoxStateProperties {
     void transferConditionGTE(@ForAll Interval32Box x,
                               @ForAll Interval32Box y) {
         byte position = x.intersectionPosition(y);
-        List<Interval32Box> zs = IntervalBoxState.transferCond(x, y, (byte) 4);
+        List<Interval32Box> zs = IntervalBoxState.transferCond(x, y, PredicateType.Ge);
         if (position == 0) {
             for (Interval32Box z : zs) {
                 Assertions.assertTrue(z.isBottom());
@@ -258,7 +258,7 @@ public class IntervalBoxStateProperties {
     void transferConditionGT(@ForAll Interval32Box x,
                              @ForAll Interval32Box y) {
         byte position = x.intersectionPosition(y);
-        List<Interval32Box> zs = IntervalBoxState.transferCond(x, y, (byte) 5);
+        List<Interval32Box> zs = IntervalBoxState.transferCond(x, y, PredicateType.Gt);
         if (position == 0) {
             for (Interval32Box z : zs) {
                 Assertions.assertTrue(z.isBottom());

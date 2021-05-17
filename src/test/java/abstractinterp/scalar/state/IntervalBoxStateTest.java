@@ -38,11 +38,11 @@ public class IntervalBoxStateTest {
     void transferConditionReturnsTopWhenUnbounded() {
         Interval32Box x = new Interval32Box(null, 1);
         Interval32Box y = new Interval32Box(1, null);
-        List<Interval32Box> zs = IntervalBoxState.transferCond(x, y, (byte) 6);
+        List<Interval32Box> zs = IntervalBoxState.transferCond(x, y, PredicateType.Invalid);
         for (Interval32Box b : zs) {
             Assertions.assertEquals(Interval32Box.TOP(), b);
         }
-        zs = IntervalBoxState.transferCond(y, x, (byte) 5);
+        zs = IntervalBoxState.transferCond(y, x, PredicateType.Invalid);
         for (Interval32Box b : zs) {
             Assertions.assertEquals(Interval32Box.TOP(), b);
         }
@@ -52,11 +52,11 @@ public class IntervalBoxStateTest {
     void transferConditionReturnsBottomWhenBottomValue() {
         Interval32Box x = new Interval32Box(null, 1);
         Interval32Box y = Interval32Box.BOT();
-        List<Interval32Box> zs = IntervalBoxState.transferCond(x, y, (byte) 6);
+        List<Interval32Box> zs = IntervalBoxState.transferCond(x, y, PredicateType.Invalid);
         for (Interval32Box b : zs) {
             Assertions.assertEquals(Interval32Box.BOT(), b);
         }
-        zs = IntervalBoxState.transferCond(y, x, (byte) 6);
+        zs = IntervalBoxState.transferCond(y, x, PredicateType.Invalid);
         for (Interval32Box b : zs) {
             Assertions.assertEquals(Interval32Box.BOT(), b);
         }

@@ -1,3 +1,4 @@
 abstractinterp.scalar.state.providers.Interval32BoxProvider
 abstractinterp.scalar.state.providers.JimpleProvider
 abstractinterp.scalar.state.providers.LocalProvider
+abstractinterp.scalar.state.providers.PredicateTypeProvider
