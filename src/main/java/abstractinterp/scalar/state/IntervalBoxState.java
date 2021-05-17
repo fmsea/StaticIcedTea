@@ -235,7 +235,11 @@ public class IntervalBoxState {
 
     public static List<Interval32Box> transferCond(Interval32Box lhs, Interval32Box rhs, byte type) {
         List<Interval32Box> ret = new ArrayList<Interval32Box>(2);
-        if (lhs.isBounded() && rhs.isBounded()) {
+        if (lhs.isBottom() || rhs.isBottom()) {
+            // return bottom if either value is bottom
+            ret.add(Interval32Box.BOT());
+            ret.add(Interval32Box.BOT());
+        } else if (lhs.isBounded() && rhs.isBounded()) {
             int x1 = lhs.lowerBound().intValue();
             int x2 = lhs.upperBound().intValue();
             int y1 = rhs.lowerBound().intValue();

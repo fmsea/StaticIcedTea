@@ -49,6 +49,20 @@ public class IntervalBoxStateTest {
     }
 
     @Test
+    void transferConditionReturnsBottomWhenBottomValue() {
+        Interval32Box x = new Interval32Box(null, 1);
+        Interval32Box y = Interval32Box.BOT();
+        List<Interval32Box> zs = IntervalBoxState.transferCond(x, y, (byte) 6);
+        for (Interval32Box b : zs) {
+            Assertions.assertEquals(Interval32Box.BOT(), b);
+        }
+        zs = IntervalBoxState.transferCond(y, x, (byte) 6);
+        for (Interval32Box b : zs) {
+            Assertions.assertEquals(Interval32Box.BOT(), b);
+        }
+    }
+
+    @Test
     void transferBinaryDivisionDivideByZero() {
         Interval32Box x = new Interval32Box(-4, 3);
         Interval32Box y = new Interval32Box(0, 0);
