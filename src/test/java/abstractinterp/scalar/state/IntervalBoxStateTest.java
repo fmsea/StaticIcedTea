@@ -63,6 +63,16 @@ public class IntervalBoxStateTest {
     }
 
     @Test
+    void transferBinaryReturnBottomWhenBottomValue() {
+        Interval32Box x = new Interval32Box(null, 1);
+        Interval32Box y = Interval32Box.BOT();
+        Interval32Box z = IntervalBoxState.transferBinary(x, y, (byte) 5);
+        Assertions.assertEquals(Interval32Box.BOT(), z);
+        z = IntervalBoxState.transferBinary(y, x, (byte) 5);
+        Assertions.assertEquals(Interval32Box.BOT(), z);
+    }
+
+    @Test
     void transferBinaryDivisionDivideByZero() {
         Interval32Box x = new Interval32Box(-4, 3);
         Interval32Box y = new Interval32Box(0, 0);

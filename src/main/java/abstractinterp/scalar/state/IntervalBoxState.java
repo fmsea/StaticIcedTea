@@ -96,7 +96,9 @@ public class IntervalBoxState {
     public static Interval32Box transferBinary(Interval32Box lhs, Interval32Box rhs, byte type) {
         Interval32Box ret;
         // find low of lhs
-        if (lhs.isBounded() && rhs.isBounded()) {
+        if (lhs.isBottom() || rhs.isBottom()) {
+            ret = Interval32Box.BOT();
+        } else if (lhs.isBounded() && rhs.isBounded()) {
             // isBounded suggests none of these Integers are null
             int x1 = lhs.lowerBound().intValue();
             int x2 = lhs.upperBound().intValue();
