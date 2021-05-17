@@ -48,7 +48,8 @@ import soot.toolkits.graph.DirectedGraph;
 import abstractinterp.scalar.state.Interval32Box;
 import abstractinterp.scalar.state.IntervalBoxState;
 
-public class ForwardBranchedFlowIntervalNumericalBox extends ForwardBranchedFlowWidening<Unit, IntervalBoxState> {
+public class ForwardBranchedFlowIntervalNumericalBox
+        extends ForwardBranchedFlowWidening<Unit, IntervalBoxState> {
 
     private Set<Unit> outputStmt;
     private Map<Unit, Set<Value>> changedVariables;
@@ -56,13 +57,14 @@ public class ForwardBranchedFlowIntervalNumericalBox extends ForwardBranchedFlow
 
     public ForwardBranchedFlowIntervalNumericalBox(DirectedGraph<Unit> graph,
                                                    List<Unit> order,
-                                                   Map<Unit,  IntervalBoxState> unitToBeforeFlow,
+                                                   Map<Unit, IntervalBoxState> unitToBeforeFlow,
                                                    Map<Unit, List<IntervalBoxState>> unitToAfterBranchFlow,
                                                    Map<Unit, List<IntervalBoxState>> unitToAfterFallFlow,
                                                    Set<Unit> wideningNodes,
                                                    int iters,
                                                    Set<Local> local) {
-        super(graph, order, unitToBeforeFlow, unitToAfterBranchFlow, unitToAfterFallFlow, wideningNodes, iters);
+        super(graph, order, unitToBeforeFlow, unitToAfterBranchFlow, unitToAfterFallFlow,
+                wideningNodes, iters);
         this.outputStmt = new HashSet<>();
         this.changedVariables = new HashMap<>();
         this.localVars = local;
@@ -84,7 +86,7 @@ public class ForwardBranchedFlowIntervalNumericalBox extends ForwardBranchedFlow
 
     @Override
     protected void copy(IntervalBoxState source, IntervalBoxState dest) {
-        //copy
+        // copy
         source.copyTo(dest);
     }
 
@@ -95,34 +97,37 @@ public class ForwardBranchedFlowIntervalNumericalBox extends ForwardBranchedFlow
     }
 
     @Override
-    protected void flowThrough(IntervalBoxState in, Unit s, List<IntervalBoxState> fallOut, List<IntervalBoxState> branchOut) {
+    protected void flowThrough(IntervalBoxState in,
+                               Unit s,
+                               List<IntervalBoxState> fallOut,
+                               List<IntervalBoxState> branchOut) {
         IntervalBoxState inState = in;
         // System.err.println(s + " in " + in);
         IntervalBoxState ifStmtFall = new IntervalBoxState(localVars, true);
         inState.copyTo(ifStmtFall);
         IntervalBoxState ifStmtBranch = new IntervalBoxState(localVars, true);
         inState.copyTo(ifStmtBranch);
-        //make sure it is a feasible incoming state
-        if(in.isFeasible()){
-            if(s instanceof AssignStmt){
+        // make sure it is a feasible incoming state
+        if (in.isFeasible()) {
+            if (s instanceof AssignStmt) {
                 AssignStmt stmt = (AssignStmt) s;
                 Value lhs = stmt.getLeftOp();
-                if(lhs instanceof Local && isIntType(lhs)){
+                if (lhs instanceof Local && isIntType(lhs)) {
                     this.outputStmt.add(s);
                     Set<Value> track = new HashSet<>();
                     track.add(lhs);
                     this.changedVariables.put(s, track);
                     Local lVar = (Local) lhs;
                     Value rhs = stmt.getRightOp();
-                    if(rhs instanceof BinopExpr){
+                    if (rhs instanceof BinopExpr) {
                         byte type = -1;
-                        if(rhs instanceof AddExpr){
+                        if (rhs instanceof AddExpr) {
                             type = 0;
-                        } else if (rhs instanceof SubExpr){
+                        } else if (rhs instanceof SubExpr) {
                             type = 1;
-                        } else if (rhs instanceof MulExpr){
+                        } else if (rhs instanceof MulExpr) {
                             type = 2;
-                        } else if (rhs instanceof DivExpr){
+                        } else if (rhs instanceof DivExpr) {
                             type = 3;
                         }
                         Value left = ((BinopExpr) rhs).getOp1();
@@ -130,50 +135,50 @@ public class ForwardBranchedFlowIntervalNumericalBox extends ForwardBranchedFlow
 
                         ifStmtFall.updateState(lVar, inState, left, right, type);
 
-                    } else if (rhs instanceof JimpleLocal || rhs instanceof NumericConstant ||
-                            rhs instanceof JNegExpr){
+                    } else if (rhs instanceof JimpleLocal || rhs instanceof NumericConstant
+                            || rhs instanceof JNegExpr) {
                         ifStmtFall.updateState(lVar, inState, rhs);
                     }
                 }
-            } else if(s instanceof IfStmt){
-                //process if stmt
+            } else if (s instanceof IfStmt) {
+                // process if stmt
                 IfStmt stmt = (IfStmt) s;
-                ConditionExpr condExpr = (ConditionExpr)stmt.getCondition();
+                ConditionExpr condExpr = (ConditionExpr) stmt.getCondition();
                 Value left = condExpr.getOp1();
                 Value right = condExpr.getOp2();
                 this.outputStmt.add(s);
                 Set<Value> track = new HashSet<>();
                 this.changedVariables.put(s, track);
                 byte type = -1;
-                if(condExpr instanceof EqExpr){
+                if (condExpr instanceof EqExpr) {
                     type = 0;
-                } else if(condExpr instanceof NeExpr){
+                } else if (condExpr instanceof NeExpr) {
                     type = 1;
-                } else if(condExpr instanceof LeExpr){
+                } else if (condExpr instanceof LeExpr) {
                     type = 2;
-                } else if(condExpr instanceof GtExpr){
+                } else if (condExpr instanceof GtExpr) {
                     type = 3;
-                } else if(condExpr instanceof GeExpr){
+                } else if (condExpr instanceof GeExpr) {
                     type = 4;
-                } else if(condExpr instanceof LtExpr){
+                } else if (condExpr instanceof LtExpr) {
                     type = 5;
                 }
-                ifStmtFall.updateCond(inState, left, right, type);//false branch
-                //rotate type;
-                if(type == 0){
+                ifStmtFall.updateCond(inState, left, right, type);// false branch
+                // rotate type;
+                if (type == 0) {
                     type = 1;
-                } else if (type == 1){
+                } else if (type == 1) {
                     type = 0;
-                } else if (type == 2){
+                } else if (type == 2) {
                     type = 3;
-                } else if (type == 3){
+                } else if (type == 3) {
                     type = 2;
-                } else if (type == 4){
+                } else if (type == 4) {
                     type = 5;
-                } else if (type == 5){
+                } else if (type == 5) {
                     type = 4;
                 }
-                ifStmtBranch.updateCond(inState, left, right, type);//true branch
+                ifStmtBranch.updateCond(inState, left, right, type);// true branch
                 if (left instanceof JimpleLocal) {
                     track.add(left);
                 }
@@ -183,38 +188,37 @@ public class ForwardBranchedFlowIntervalNumericalBox extends ForwardBranchedFlow
 
             }
         }
-            if(s instanceof IdentityStmt){
-                IdentityStmt param = (IdentityStmt)s;
-                if (isIntType(param.getLeftOp())){
-                    //will update to top
-                    ifStmtFall.updateTop((Local) param.getLeftOp());
-                }
+        if (s instanceof IdentityStmt) {
+            IdentityStmt param = (IdentityStmt) s;
+            if (isIntType(param.getLeftOp())) {
+                // will update to top
+                ifStmtFall.updateTop((Local) param.getLeftOp());
             }
+        }
 
-        //System.out.println(s + " out " + ifStmtFall);
-            // System.err.println(String.format("DEBUG: in:\n\t%s\n", in.toString()));
-        for(Iterator<IntervalBoxState> it = fallOut.iterator(); it.hasNext(); ){
+        // System.out.println(s + " out " + ifStmtFall);
+        // System.err.println(String.format("DEBUG: in:\n\t%s\n", in.toString()));
+        for (Iterator<IntervalBoxState> it = fallOut.iterator(); it.hasNext();) {
             IntervalBoxState boxState = it.next();
-            // System.err.println(String.format("DEBUG: IfStamtFall:\n\t%s\n", boxState.toString()));
+            // System.err.println(String.format("DEBUG: IfStamtFall:\n\t%s\n",
+            // boxState.toString()));
             copy(ifStmtFall, boxState);
         }
 
-        for(Iterator<IntervalBoxState> it = branchOut.iterator(); it.hasNext();){
+        for (Iterator<IntervalBoxState> it = branchOut.iterator(); it.hasNext();) {
             IntervalBoxState boxState = it.next();
-            // System.err.println(String.format("DEBUG: IfStamtBranch:\n\t%s\n", boxState.toString()));
+            // System.err.println(String.format("DEBUG: IfStamtBranch:\n\t%s\n",
+            // boxState.toString()));
             copy(ifStmtBranch, boxState);
         }
     }
 
 
-    public static boolean isIntType(Value val){
+    public static boolean isIntType(Value val) {
         Type t = val.getType();
-        return !(val instanceof ArrayRef) &&
-            !(val instanceof InstanceFieldRef) &&
-            (t instanceof IntType ||
-             t instanceof ByteType ||
-             t instanceof ShortType ||
-             t instanceof BooleanType);
+        return !(val instanceof ArrayRef) && !(val instanceof InstanceFieldRef)
+                && (t instanceof IntType || t instanceof ByteType || t instanceof ShortType
+                        || t instanceof BooleanType);
     }
 
     @Override
@@ -223,11 +227,11 @@ public class ForwardBranchedFlowIntervalNumericalBox extends ForwardBranchedFlow
     }
 
 
-    protected IntervalBoxState entryInitialFlow(){
+    protected IntervalBoxState entryInitialFlow() {
         return new IntervalBoxState(localVars, true);
     }
 
-    public boolean treatTrapHandlersAsEntries(){
+    public boolean treatTrapHandlersAsEntries() {
         return false;
     }
 }
