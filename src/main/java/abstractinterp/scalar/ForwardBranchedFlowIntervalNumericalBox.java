@@ -151,10 +151,10 @@ public class ForwardBranchedFlowIntervalNumericalBox
                 Set<Value> track = new HashSet<>();
                 this.changedVariables.put(s, track);
                 PredicateType type = PredicateType.fromJimple(condExpr);
-                ifStmtFall.updateCond(inState, left, right, type);// false branch
+                ifStmtBranch.updateCond(inState, left, right, type);// true branch
                 // rotate type;
                 type = type.rotate();
-                ifStmtBranch.updateCond(inState, left, right, type);// true branch
+                ifStmtFall.updateCond(inState, left, right, type);// false branch
                 if (left instanceof JimpleLocal) {
                     track.add(left);
                 }
