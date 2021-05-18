@@ -229,6 +229,12 @@ public class Interval32Box {
         this.checkAndSetBottom();
     }
 
+    public boolean isSingleton() {
+        return (!this.isBottom() &&
+                this.isBounded() &&
+                this.lowerBound.equals(this.upperBound));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o instanceof Interval32Box) {

@@ -250,6 +250,24 @@ public class Interval32BoxTest {
     }
 
     @Test
+    void testSingletonInterval() {
+        Interval32Box bot = Interval32Box.BOT();
+        Interval32Box top = Interval32Box.TOP();
+        Interval32Box max = Interval32Box.MAX();
+        Assertions.assertFalse(bot.isSingleton());
+        Assertions.assertFalse(top.isSingleton());
+        Assertions.assertFalse(max.isSingleton());
+        Interval32Box box = new Interval32Box(null, 3);
+        Assertions.assertFalse(box.isSingleton());
+        box = new Interval32Box(3, null);
+        Assertions.assertFalse(box.isSingleton());
+        box = new Interval32Box(0, 3);
+        Assertions.assertFalse(box.isSingleton());
+        box = new Interval32Box(0, 0);
+        Assertions.assertTrue(box.isSingleton());
+    }
+
+    @Test
     void testEquals() {
         Interval32Box bot = Interval32Box.BOT();
         Assertions.assertFalse(bot.equals(null));

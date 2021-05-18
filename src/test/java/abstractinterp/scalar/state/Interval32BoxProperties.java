@@ -99,6 +99,12 @@ public class Interval32BoxProperties {
     }
 
     @Property
+    boolean intervalsCanBeSingletons(@ForAll int x) {
+        Interval32Box box = new Interval32Box(x, x);
+        return box.isSingleton();
+    }
+
+    @Property
     void equalIntervalsAreEqual(@ForAll int x, @ForAll int y) {
         Interval32Box xBox = new Interval32Box(null, x);
         Interval32Box yBox = new Interval32Box(null, x);
