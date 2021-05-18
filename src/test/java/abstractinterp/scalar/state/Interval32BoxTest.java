@@ -1,5 +1,6 @@
 package abstractinterp.scalar.state;
 
+import java.util.List;
 import soot.IntType;
 import soot.Local;
 import soot.jimple.Jimple;
@@ -318,5 +319,444 @@ public class Interval32BoxTest {
         Assertions.assertEquals("l0 >= -5", box.toGrimpExpr(l).toString());
         box = new Interval32Box(-5, 5);
         Assertions.assertEquals("l0 >= -5 & l0 <= 5", box.toGrimpExpr(l).toString());
+    }
+
+    @Test
+    void testTransferConditionEqPosition0() {
+        // position 0
+        Interval32Box x = new Interval32Box(-1, 0);
+        Interval32Box y = new Interval32Box(1, 2);
+        Assertions.assertEquals(0, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Eq);
+        Assertions.assertEquals(2, actual.size());
+        for (Interval32Box b : actual) {
+            Assertions.assertTrue(b.isBottom());
+        }
+    }
+
+    @Test
+    void testTransferConditionEqPosition1() {
+        // position 1
+        Interval32Box x = new Interval32Box(-1, 1);
+        Interval32Box y = new Interval32Box(0, 2);
+        Assertions.assertEquals(1, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Eq);
+        Assertions.assertEquals(2, actual.size());
+        for (Interval32Box b : actual) {
+            Assertions.assertEquals(new Interval32Box(0, 1), b);
+        }
+    }
+
+    @Test
+    void testTransferConditionEqPosition2() {
+        // position 2
+        Interval32Box x = new Interval32Box(-2, 2);
+        Interval32Box y = new Interval32Box(-1, 1);
+        Assertions.assertEquals(2, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Eq);
+        Assertions.assertEquals(2, actual.size());
+        for (Interval32Box b : actual) {
+            Assertions.assertEquals(new Interval32Box(-1, 1), b);
+        }
+    }
+
+    @Test
+    void testTransferConditionEqPosition3() {
+        // position 3
+        Interval32Box x = new Interval32Box(0, 2);
+        Interval32Box y = new Interval32Box(-1, 1);
+        Assertions.assertEquals(3, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Eq);
+        Assertions.assertEquals(2, actual.size());
+        for (Interval32Box b : actual) {
+            Assertions.assertEquals(new Interval32Box(0, 1), b);
+        }
+    }
+
+    @Test
+    void testTransferConditionEqPosition4() {
+        // position 4
+        Interval32Box x = new Interval32Box(1, 2);
+        Interval32Box y = new Interval32Box(-1, 0);
+        Assertions.assertEquals(4, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Eq);
+        Assertions.assertEquals(2, actual.size());
+        for (Interval32Box b: actual) {
+            Assertions.assertTrue(b.isBottom());
+        }
+    }
+
+    @Test
+    void testTransferConditionEqPosition5() {
+        // position 5
+        Interval32Box x = new Interval32Box(-1, 1);
+        Interval32Box y = new Interval32Box(-2, 2);
+        Assertions.assertEquals(5, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Eq);
+        Assertions.assertEquals(2, actual.size());
+        for (Interval32Box b : actual) {
+            Assertions.assertEquals(new Interval32Box(-1, 1), b);
+        }
+    }
+
+    @Test
+    void testTransferConditionNeWhenEqual() {
+        Interval32Box x = new Interval32Box(0, 1);
+        Interval32Box y = new Interval32Box(0, 1);
+
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Ne);
+        Assertions.assertEquals(2, actual.size());
+        for (Interval32Box b : actual) {
+            Assertions.assertTrue(b.isBottom());
+        }
+    }
+
+    @Test
+    void testTransferConditionNeWhenNotEqual() {
+        Interval32Box x = new Interval32Box(0, 1);
+        Interval32Box y = new Interval32Box(-1, 1);
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Ne);
+        Assertions.assertEquals(2, actual.size());
+        Assertions.assertEquals(new Interval32Box(0, 1), actual.get(0));
+        Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(1));
+    }
+
+    @Test
+    void testTransferConditionLePosition0() {
+        // position 0
+        Interval32Box x = new Interval32Box(-1, 0);
+        Interval32Box y = new Interval32Box(1, 2);
+        Assertions.assertEquals(0, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Le);
+        Assertions.assertEquals(2, actual.size());
+        Assertions.assertEquals(new Interval32Box(-1, 0), actual.get(0));
+        Assertions.assertEquals(new Interval32Box(1, 2), actual.get(1));
+    }
+
+    @Test
+    void testTransferConditionLePosition1() {
+        // position 1
+        Interval32Box x = new Interval32Box(-1, 1);
+        Interval32Box y = new Interval32Box(0, 2);
+        Assertions.assertEquals(1, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Le);
+        Assertions.assertEquals(2, actual.size());
+        Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(0));
+        Assertions.assertEquals(new Interval32Box(0, 2), actual.get(1));
+    }
+
+    @Test
+    void testTransferConditionLePosition2() {
+        // position 2
+        Interval32Box x = new Interval32Box(-2, 2);
+        Interval32Box y = new Interval32Box(-1, 1);
+        Assertions.assertEquals(2, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Le);
+        Assertions.assertEquals(2, actual.size());
+        Assertions.assertEquals(new Interval32Box(-2, 1), actual.get(0));
+        Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(1));
+    }
+
+    @Test
+    void testTransferConditionLePositon3() {
+        // position 3
+        Interval32Box x = new Interval32Box(0, 2);
+        Interval32Box y = new Interval32Box(-1, 1);
+        Assertions.assertEquals(3, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Le);
+        Assertions.assertEquals(2, actual.size());
+        for (Interval32Box b : actual) {
+            Assertions.assertEquals(new Interval32Box(0, 1), b);
+        }
+    }
+
+    @Test
+    void testTransferConditionLePosition4() {
+        // position 4
+        Interval32Box x = new Interval32Box(1, 2);
+        Interval32Box y = new Interval32Box(-1, 0);
+        Assertions.assertEquals(4, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Le);
+        Assertions.assertEquals(2, actual.size());
+        for (Interval32Box b: actual) {
+            Assertions.assertTrue(b.isBottom());
+        }
+    }
+
+    @Test
+    void testTransferConditionLePosition5() {
+        // position 5
+        Interval32Box x = new Interval32Box(-1, 1);
+        Interval32Box y = new Interval32Box(-2, 2);
+        Assertions.assertEquals(5, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Le);
+        Assertions.assertEquals(2, actual.size());
+        Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(0));
+        Assertions.assertEquals(new Interval32Box(-1, 2), actual.get(1));
+    }
+
+    @Test
+    void testTransferConditionLtPosition0() {
+        List<Interval32Box> actual;
+        // position 0
+        Interval32Box x = new Interval32Box(-1, 0);
+        Interval32Box y = new Interval32Box(1, 2);
+        Assertions.assertEquals(0, x.intersectionPosition(y));
+        actual = Interval32Box.transferCondition(x, y, PredicateType.Lt);
+        Assertions.assertEquals(2, actual.size());
+        Assertions.assertEquals(new Interval32Box(-1, 0), actual.get(0));
+        Assertions.assertEquals(new Interval32Box(1, 2), actual.get(1));
+    }
+
+    @Test
+    void testTransferConditionLtPosition1() {
+        // position 1
+        Interval32Box x = new Interval32Box(-1, 1);
+        Interval32Box y = new Interval32Box(0, 2);
+        Assertions.assertEquals(1, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Lt);
+        Assertions.assertEquals(2, actual.size());
+        Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(0));
+        Assertions.assertEquals(new Interval32Box(0, 2), actual.get(1));
+    }
+
+    @Test
+    void testTransferConditionLtPosition2Eq() {
+        // position 2
+        Interval32Box x = new Interval32Box(-2, 2);
+        Interval32Box y = new Interval32Box(-2, 2);
+        Assertions.assertEquals(2, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Lt);
+        Assertions.assertEquals(2, actual.size());
+        for (Interval32Box b : actual) {
+            Assertions.assertTrue(b.isBottom());
+        }
+    }
+
+    @Test
+    void testTransferConditionLtPosition2Ne() {
+        // position 2
+        Interval32Box x = new Interval32Box(-2, 2);
+        Interval32Box y = new Interval32Box(-1, 1);
+        Assertions.assertEquals(2, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Lt);
+        Assertions.assertEquals(2, actual.size());
+        Assertions.assertEquals(new Interval32Box(-2, 0), actual.get(0));
+        Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(1));
+    }
+
+    @Test
+    void testTransferConditionLtPosition2NeEq() {
+        // position 2
+        Interval32Box x = new Interval32Box(-2, 2);
+        Interval32Box y = new Interval32Box(-2, 1);
+        Assertions.assertEquals(2, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Lt);
+        Assertions.assertEquals(2, actual.size());
+        Assertions.assertEquals(new Interval32Box(-2, 0), actual.get(0));
+        Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(1));
+    }
+
+    @Test
+    void testTransferConditionLtPosition3() {
+        // position 3
+        Interval32Box x = new Interval32Box(0, 2);
+        Interval32Box y = new Interval32Box(-1, 1);
+        Assertions.assertEquals(3, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Lt);
+        Assertions.assertEquals(2, actual.size());
+        Assertions.assertEquals(new Interval32Box(0), actual.get(0));
+        Assertions.assertEquals(new Interval32Box(1), actual.get(1));
+
+    }
+
+    @Test
+    void testTransferConditionLtPosition4() {
+        // position 4
+        Interval32Box x = new Interval32Box(1, 2);
+        Interval32Box y = new Interval32Box(-1, 0);
+        Assertions.assertEquals(4, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Lt);
+        Assertions.assertEquals(2, actual.size());
+        for (Interval32Box b: actual) {
+            Assertions.assertTrue(b.isBottom());
+        }
+    }
+
+    @Test
+    void testTransferConditionLtPosition5() {
+        // position 5
+        Interval32Box x = new Interval32Box(-1, 1);
+        Interval32Box y = new Interval32Box(-2, 2);
+        Assertions.assertEquals(5, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Lt);
+        Assertions.assertEquals(2, actual.size());
+        Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(0));
+        Assertions.assertEquals(new Interval32Box(0, 2), actual.get(1));
+    }
+
+    @Test
+    void testTransferConditionGePosition0() {
+        List<Interval32Box> actual;
+        // position 0
+        Interval32Box x = new Interval32Box(-1, 0);
+        Interval32Box y = new Interval32Box(1, 2);
+        Assertions.assertEquals(0, x.intersectionPosition(y));
+        actual = Interval32Box.transferCondition(x, y, PredicateType.Ge);
+        Assertions.assertEquals(2, actual.size());
+        for (Interval32Box b : actual) {
+            Assertions.assertTrue(b.isBottom());
+        }
+    }
+
+    @Test
+    void testTransferConditionGePosition1() {
+        // position 1
+        Interval32Box x = new Interval32Box(-1, 1);
+        Interval32Box y = new Interval32Box(0, 2);
+        Assertions.assertEquals(1, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Ge);
+        Assertions.assertEquals(2, actual.size());
+        for (Interval32Box b : actual) {
+            Assertions.assertEquals(new Interval32Box(0, 1), b);
+        }
+    }
+
+    @Test
+    void testTransferConditionGePosition2() {
+        // position 2
+        Interval32Box x = new Interval32Box(-2, 2);
+        Interval32Box y = new Interval32Box(-1, 1);
+        Assertions.assertEquals(2, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Ge);
+        Assertions.assertEquals(2, actual.size());
+        Assertions.assertEquals(new Interval32Box(-1, 2), actual.get(0));
+        Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(1));
+    }
+
+    @Test
+    void testTransferConditionGePosition3() {
+        // position 3
+        Interval32Box x = new Interval32Box(0, 2);
+        Interval32Box y = new Interval32Box(-1, 1);
+        Assertions.assertEquals(3, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Ge);
+        Assertions.assertEquals(2, actual.size());
+        Assertions.assertEquals(new Interval32Box(0, 2), actual.get(0));
+        Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(1));
+
+    }
+
+    @Test
+    void testTransferConditionGePosition4() {
+        // position 4
+        Interval32Box x = new Interval32Box(1, 2);
+        Interval32Box y = new Interval32Box(-1, 0);
+        Assertions.assertEquals(4, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Ge);
+        Assertions.assertEquals(2, actual.size());
+        Assertions.assertEquals(new Interval32Box(1, 2), actual.get(0));
+        Assertions.assertEquals(new Interval32Box(-1, 0), actual.get(1));
+    }
+
+    @Test
+    void testTransferConditionGePosition5() {
+        // position 5
+        Interval32Box x = new Interval32Box(-1, 1);
+        Interval32Box y = new Interval32Box(-2, 2);
+        Assertions.assertEquals(5, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Ge);
+        Assertions.assertEquals(2, actual.size());
+        for (Interval32Box b : actual) {
+            Assertions.assertEquals(new Interval32Box(-1, 1), b);
+        }
+    }
+
+    @Test
+    void testTransferConditionGtPosition0() {
+        List<Interval32Box> actual;
+        // position 0
+        Interval32Box x = new Interval32Box(-1, 0);
+        Interval32Box y = new Interval32Box(1, 2);
+        Assertions.assertEquals(0, x.intersectionPosition(y));
+        actual = Interval32Box.transferCondition(x, y, PredicateType.Gt);
+        Assertions.assertEquals(2, actual.size());
+        for (Interval32Box b : actual) {
+            Assertions.assertTrue(b.isBottom());
+        }
+    }
+
+    @Test
+    void testTransferConditionGtPosition1() {
+        // position 1
+        Interval32Box x = new Interval32Box(-1, 1);
+        Interval32Box y = new Interval32Box(0, 2);
+        Assertions.assertEquals(1, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Gt);
+        Assertions.assertEquals(2, actual.size());
+        Assertions.assertEquals(new Interval32Box(1), actual.get(0));
+        Assertions.assertEquals(new Interval32Box(0), actual.get(1));
+    }
+
+    @Test
+    void testTransferConditionGtPosition2Eq() {
+        // position 2
+        Interval32Box x = new Interval32Box(-1, 1);
+        Interval32Box y = new Interval32Box(-1, 1);
+        Assertions.assertEquals(2, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Gt);
+        Assertions.assertEquals(2, actual.size());
+        for (Interval32Box b : actual) {
+            Assertions.assertTrue(b.isBottom());
+        }
+    }
+
+    @Test
+    void testTransferConditionGtPosition2NeEq() {
+        // position 2
+        Interval32Box x = new Interval32Box(-2, 2);
+        Interval32Box y = new Interval32Box(-2, 1);
+        Assertions.assertEquals(2, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Gt);
+        Assertions.assertEquals(2, actual.size());
+        Assertions.assertEquals(new Interval32Box(-1, 2), actual.get(0));
+        Assertions.assertEquals(new Interval32Box(-2, 1), actual.get(1));
+    }
+
+    @Test
+    void testTransferConditionGtPosition3() {
+        // position 3
+        Interval32Box x = new Interval32Box(0, 2);
+        Interval32Box y = new Interval32Box(-1, 1);
+        Assertions.assertEquals(3, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Gt);
+        Assertions.assertEquals(2, actual.size());
+        Assertions.assertEquals(new Interval32Box(0, 2), actual.get(0));
+        Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(1));
+
+    }
+
+    @Test
+    void testTransferConditionGtPosition4() {
+        // position 4
+        Interval32Box x = new Interval32Box(1, 2);
+        Interval32Box y = new Interval32Box(-1, 0);
+        Assertions.assertEquals(4, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Gt);
+        Assertions.assertEquals(2, actual.size());
+        Assertions.assertEquals(new Interval32Box(1, 2), actual.get(0));
+        Assertions.assertEquals(new Interval32Box(-1, 0), actual.get(1));
+    }
+
+    @Test
+    void testTransferConditionGtPosition5() {
+        // position 5
+        Interval32Box x = new Interval32Box(-1, 1);
+        Interval32Box y = new Interval32Box(-2, 2);
+        Assertions.assertEquals(5, x.intersectionPosition(y));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Gt);
+        Assertions.assertEquals(2, actual.size());
+        Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(0));
+        Assertions.assertEquals(new Interval32Box(0), actual.get(1));
     }
 }
