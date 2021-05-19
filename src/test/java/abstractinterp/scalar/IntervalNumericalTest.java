@@ -175,6 +175,66 @@ public class IntervalNumericalTest {
         }
     }
 
+    @Test
+    void testExample5() {
+        Body body = JimpleProvider.example5();
+        IntervalNumerical analysis = new IntervalNumerical(body, 2);
+        analysis.runAnalysis();
+        String[] actual = analysis.generateReport().split("\n");
+        String[] expected = new String[] {
+            "i1 := @parameter0: int class soot.jimple.internal.JIdentityStmt f->" +
+            "{b3=⟙, i1=⟙, b2=⟙, $i0=⟙, i4=⟙, i5=⟙}",
+            "b2 = 1 class soot.jimple.internal.JAssignStmt f->" +
+            "{b3=⟙, i1=⟙, b2=1, $i0=⟙, i4=⟙, i5=⟙}",
+            "b3 = 3 class soot.jimple.internal.JAssignStmt f->" +
+            "{b3=3, i1=⟙, b2=1, $i0=⟙, i4=⟙, i5=⟙}",
+            "if b3 != 0 goto i4 = b3 + b2 class soot.jimple.internal.JIfStmt f->" +
+            "{b3=⟘, i1=⟙, b2=1, $i0=⟙, i4=⟙, i5=⟙}",
+            "if b3 != 0 goto i4 = b3 + b2 b->" +
+            "[{b3=3, i1=⟙, b2=1, $i0=⟙, i4=⟙, i5=⟙}]",
+            "i4 = b3 - b2 class soot.jimple.internal.JAssignStmt f->" +
+            "{b3=⟘, i1=⟙, b2=1, $i0=⟙, i4=⟙, i5=⟙}",
+            "goto [?= $i0 = b3 * i4] class soot.jimple.internal.JGotoStmt f->" +
+            "{b3=⟙, i1=⟙, b2=⟙, $i0=⟙, i4=⟙, i5=⟙}",
+            "goto [?= $i0 = b3 * i4] b->" +
+            "[{b3=⟘, i1=⟙, b2=1, $i0=⟙, i4=⟙, i5=⟙}]",
+            "i4 = b3 + b2 class soot.jimple.internal.JAssignStmt f->" +
+            "{b3=3, i1=⟙, b2=1, $i0=⟙, i4=4, i5=⟙}",
+            "$i0 = b3 * i4 class soot.jimple.internal.JAssignStmt f->" +
+            "{b3=3, i1=⟙, b2=1, $i0=12, i4=4, i5=⟙}",
+            "i5 = $i0 - 18 class soot.jimple.internal.JAssignStmt f->" +
+            "{b3=3, i1=⟙, b2=1, $i0=12, i4=4, i5=-6}",
+            "return i5 class soot.jimple.internal.JReturnStmt f->" +
+            "{b3=⟙, i1=⟙, b2=⟙, $i0=⟙, i4=⟙, i5=⟙}"
+        };
+        assertReportOutputEquals(expected, actual);
+    }
+
+    @Test
+    void testSMTExample5() {
+        Body body = JimpleProvider.example5();
+        IntervalNumerical analysis = new IntervalNumerical(body, 2);
+        analysis.runAnalysis();
+        String[] actual = analysis.generateSMTFormulaReport().split("\n");
+        String[] expected = new String[] {
+            "2 b2 = 1:<test.Example1M: int example_5(int)>",
+            "b2->(= b2 1)",
+            "3 b3 = 3:<test.Example1M: int example_5(int)>",
+            "b3->(= b3 3)",
+            "4 if b3 != 0 goto i4 = b3 + b2:<test.Example1M: int example_5(int)>",
+            "7 i4 = b3 + b2:<test.Example1M: int example_5(int)>",
+            "i4->(= i4 4)",
+            "8 $i0 = b3 * i4:<test.Example1M: int example_5(int)>",
+            "$i0->(= $i0 12)",
+            "9 i5 = $i0 - 18:<test.Example1M: int example_5(int)>",
+            "i5->(= i5 (- 6))",
+        };
+        Assertions.assertEquals(expected.length, actual.length);
+        for (int i = 0; i < expected.length; i++) {
+            Assertions.assertEquals(expected[i], actual[i]);
+        }
+    }
+
     private void assertReportOutputEquals(String[] expected, String[] actual) {
         Assertions.assertEquals(expected.length, actual.length);
         for (int i = 0; i < actual.length; i++) {

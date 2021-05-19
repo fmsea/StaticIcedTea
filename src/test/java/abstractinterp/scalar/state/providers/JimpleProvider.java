@@ -145,4 +145,44 @@ public class JimpleProvider implements ArbitraryProvider {
         return body;
     }
 
+    public static Body example5() {
+        SootClass testClass = new SootClass("test.Example1M", Modifier.PUBLIC);
+        testClass.setSuperclass(Scene.v().getSootClass("java.lang.Object"));
+        SootMethod method = new SootMethod("example_5",
+                                           Arrays.asList(new Type[] {IntType.v()}),
+                                           IntType.v(),
+                                           Modifier.PUBLIC | Modifier.STATIC);
+        Scene.v().addClass(testClass);
+        testClass.addMethod(method);
+        JimpleBody body = Jimple.v().newBody(method);
+        Chain units = body.getUnits();
+        Local i0 = Jimple.v().newLocal("$i0", IntType.v());
+        Local i1 = Jimple.v().newLocal("i1", IntType.v());
+        Local i4 = Jimple.v().newLocal("i4", IntType.v());
+        Local i5 = Jimple.v().newLocal("i5", IntType.v());
+        Local b2 = Jimple.v().newLocal("b2", ByteType.v());
+        Local b3 = Jimple.v().newLocal("b3", ByteType.v());
+        body.getLocals().add(i0);
+        body.getLocals().add(i1);
+        body.getLocals().add(i4);
+        body.getLocals().add(i5);
+        body.getLocals().add(b2);
+        body.getLocals().add(b3);
+        units.add(Jimple.v().newIdentityStmt(i1,
+                                             Jimple.v().newParameterRef(IntType.v(), 0)));
+        units.add(Jimple.v().newAssignStmt(b2, IntConstant.v(1)));
+        units.add(Jimple.v().newAssignStmt(b3, IntConstant.v(3)));
+        Unit label1 = Jimple.v().newAssignStmt(i4, Jimple.v().newAddExpr(b3, b2));
+        Unit label2 = Jimple.v().newAssignStmt(i0, Jimple.v().newMulExpr(b3, i4));
+        units.add(Jimple.v().newIfStmt(Jimple.v().newNeExpr(b3, IntConstant.v(0)),
+                                       label1));
+        units.add(Jimple.v().newAssignStmt(i4, Jimple.v().newSubExpr(b3, b2)));
+        units.add(Jimple.v().newGotoStmt(label2));
+        units.add(label1);
+        units.add(label2);
+        units.add(Jimple.v().newAssignStmt(i5, Jimple.v().newSubExpr(i0, IntConstant.v(18))));
+        units.add(Jimple.v().newReturnStmt(i5));
+        return body;
+    }
+
 }
