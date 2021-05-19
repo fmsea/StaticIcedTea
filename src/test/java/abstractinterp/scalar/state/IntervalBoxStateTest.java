@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import soot.Local;
 import soot.IntType;
+import soot.jimple.IntConstant;
 import soot.jimple.Jimple;
 
 import solver.SolverWrapper;
@@ -35,31 +36,41 @@ public class IntervalBoxStateTest {
     }
 
     @Test
-    void transferConditionReturnsTopWhenUnbounded() {
-        Interval32Box x = new Interval32Box(null, 1);
-        Interval32Box y = new Interval32Box(1, null);
-        List<Interval32Box> zs = IntervalBoxState.transferCond(x, y, PredicateType.Invalid);
-        for (Interval32Box b : zs) {
-            Assertions.assertEquals(Interval32Box.TOP(), b);
-        }
-        zs = IntervalBoxState.transferCond(y, x, PredicateType.Invalid);
-        for (Interval32Box b : zs) {
-            Assertions.assertEquals(Interval32Box.TOP(), b);
-        }
+    void testUpdateConditionReturnsTopWhenUnbounded() {
+        Local l0 = Jimple.v().newLocal("l0", IntType.v());
+        Set<Local> states = new HashSet<>();
+        states.add(l0);
+        IntervalBoxState inState = new IntervalBoxState(states, true);
+        IntervalBoxState out1 = new IntervalBoxState(states, true);
+        states.forEach(l -> inState.update(l, new Interval32Box(null, 1)));
+        out1.updateCond(inState, l0, IntConstant.v(3), PredicateType.Invalid);
+        states.forEach(l -> {
+                Assertions.assertEquals(Interval32Box.TOP(), out1.getValue(l));
+            });
+        IntervalBoxState out2 = new IntervalBoxState(states, true);
+        out2.updateCond(inState, IntConstant.v(3), l0, PredicateType.Invalid);
+        states.forEach(l -> {
+                Assertions.assertEquals(Interval32Box.TOP(), out2.getValue(l));
+            });
     }
 
     @Test
-    void transferConditionReturnsBottomWhenBottomValue() {
-        Interval32Box x = new Interval32Box(null, 1);
-        Interval32Box y = Interval32Box.BOT();
-        List<Interval32Box> zs = IntervalBoxState.transferCond(x, y, PredicateType.Invalid);
-        for (Interval32Box b : zs) {
-            Assertions.assertEquals(Interval32Box.BOT(), b);
-        }
-        zs = IntervalBoxState.transferCond(y, x, PredicateType.Invalid);
-        for (Interval32Box b : zs) {
-            Assertions.assertEquals(Interval32Box.BOT(), b);
-        }
+    void testUpdateConditionReturnsBottomWhenBottomValue() {
+        Local l0 = Jimple.v().newLocal("l0", IntType.v());
+        Set<Local> states = new HashSet<>();
+        states.add(l0);
+        IntervalBoxState inState = new IntervalBoxState(states, false);
+        states.forEach(l -> inState.update(l, Interval32Box.BOT()));
+        IntervalBoxState out1 = new IntervalBoxState(states, true);
+        out1.updateCond(inState, l0, IntConstant.v(4), PredicateType.Invalid);
+        states.forEach(l -> {
+                Assertions.assertEquals(Interval32Box.BOT(), out1.getValue(l));
+            });
+        IntervalBoxState out2 = new IntervalBoxState(states, true);
+        out2.updateCond(inState, IntConstant.v(4), l0, PredicateType.Invalid);
+        states.forEach(l -> {
+                Assertions.assertEquals(Interval32Box.BOT(), out2.getValue(l));
+            });
     }
 
     @Test
