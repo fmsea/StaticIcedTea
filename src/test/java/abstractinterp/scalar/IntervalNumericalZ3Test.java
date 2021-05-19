@@ -109,10 +109,6 @@ public class IntervalNumericalZ3Test {
             "3 l2 = 0:<z3_simpleIfSootClass: void z3_simpleIf()>\n" +
             "l2->(= l2 0)\n" +
             "4 if l0 >= 3 goto l3 = 6:<z3_simpleIfSootClass: void z3_simpleIf()>\n" +
-            "l0->(= l0 4)\n" +
-            "l0f->(= l0 4)\n" +
-            "5 l3 = l1 / l2:<z3_simpleIfSootClass: void z3_simpleIf()>\n" +
-            "l3->(and (>= l3 (- 2147483648)) (<= l3 2147483647))\n" +
             "6 l3 = 6:<z3_simpleIfSootClass: void z3_simpleIf()>\n" +
             "l3->(= l3 6)\n";
         String expected = "1 l0 = 4:<z3_simpleIfSootClass: void z3_simpleIf()>\n" +
@@ -122,10 +118,10 @@ public class IntervalNumericalZ3Test {
             "3 l2 = 0:<z3_simpleIfSootClass: void z3_simpleIf()>\n" +
             "l2\nsat\nsat\n" +
             "4 if l0 >= 3 goto l3 = 6:<z3_simpleIfSootClass: void z3_simpleIf()>\n" +
-            "l0\nsat\nsat\n" +
-            "l0f\nsat\nsat\n" +
-            "5 l3 = l1 / l2:<z3_simpleIfSootClass: void z3_simpleIf()>\n" +
-            "l3\nsat\nsat\n" +
+            "\n(error \"line 40 column 22: invalid sorted variables invalid sort, unexpected ')'\")\n" +
+            "sat\n" +
+            "(error \"line 45 column 22: invalid sorted variables invalid sort, unexpected ')'\")\n" +
+            "sat\n" +
             "6 l3 = 6:<z3_simpleIfSootClass: void z3_simpleIf()>\n" +
             "l3\nsat\nsat";
         Assertions.assertTrue(runAnalysis(body, oracle, expected));

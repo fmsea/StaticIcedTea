@@ -100,16 +100,16 @@ public class IntervalNumericalTest {
                 "l0 = 4 class soot.jimple.internal.JAssignStmt f->{l0=4, l1=⟙, l2=⟙, l3=⟙}",
                 "l1 = 0 class soot.jimple.internal.JAssignStmt f->{l0=4, l1=0, l2=⟙, l3=⟙}",
                 "l2 = 0 class soot.jimple.internal.JAssignStmt f->{l0=4, l1=0, l2=0, l3=⟙}",
-                "if l0 >= 3 goto l3 = 6 class soot.jimple.internal.JIfStmt f->{l0=4, l1=0, l2=0, l3=⟙}",
+                "if l0 >= 3 goto l3 = 6 class soot.jimple.internal.JIfStmt f->{l0=⟘, l1=0, l2=0, l3=⟙}",
                 "if l0 >= 3 goto l3 = 6 b->[{l0=4, l1=0, l2=0, l3=⟙}]",
-                "l3 = l1 / l2 class soot.jimple.internal.JAssignStmt f->{l0=4, l1=0, l2=0, l3=[-2147483648, 2147483647]}",
+                "l3 = l1 / l2 class soot.jimple.internal.JAssignStmt f->{l0=⟘, l1=0, l2=0, l3=⟙}",
                 "l3 = 6 class soot.jimple.internal.JAssignStmt f->{l0=4, l1=0, l2=0, l3=6}",
                 "return class soot.jimple.internal.JReturnVoidStmt f->{l3=⟙, l1=⟙, l2=⟙, l0=⟙}"},
             actual);
     }
 
     @Test
-    void testSMTFormlaReportWhenIfStatement() {
+    void testSMTFormulaReportWhenIfStatement() {
         Body body = JimpleProvider.simpleIfStatement("anotherSimpleIf");
         IntervalNumerical analysis = new IntervalNumerical(body, 2);
         analysis.runAnalysis();
@@ -122,10 +122,6 @@ public class IntervalNumericalTest {
             "3 l2 = 0:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
             "l2->(= l2 0)",
             "4 if l0 >= 3 goto l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
-            "l0->(= l0 4)",
-            "l0f->(= l0 4)",
-            "5 l3 = l1 / l2:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
-            "l3->(and (>= l3 (- 2147483648)) (<= l3 2147483647))",
             "6 l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
             "l3->(= l3 6)"
         };
