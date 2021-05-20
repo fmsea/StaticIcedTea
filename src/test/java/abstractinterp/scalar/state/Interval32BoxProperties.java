@@ -123,12 +123,19 @@ public class Interval32BoxProperties {
 
     @Property
     void toGrimpExprStringsAreCorrect(@ForAll Interval32Box b, @ForAll Local l) {
-        Assertions.assertEquals(String.format("%s >= %d & %s <= %d",
-                                              l.toString(),
-                                              b.lowerBound(),
-                                              l.toString(),
-                                              b.upperBound()),
-                                b.toGrimpExpr(l).toString());
+        if (b.isSingleton()) {
+            Assertions.assertEquals(String.format("%s == %d",
+                                                  l.toString(),
+                                                  b.lowerBound()),
+                                    b.toGrimpExpr(l).toString());
+        } else {
+            Assertions.assertEquals(String.format("%s >= %d & %s <= %d",
+                                                  l.toString(),
+                                                  b.lowerBound(),
+                                                  l.toString(),
+                                                  b.upperBound()),
+                                    b.toGrimpExpr(l).toString());
+    }
     }
 
     @Property

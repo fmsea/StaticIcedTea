@@ -523,7 +523,7 @@ public class Interval32Box {
         } else if (this.isTop()) {
             r = Grimp.v().newOrExpr(Grimp.v().newGeExpr(local, IntConstant.v(0)),
                                     Grimp.v().newLtExpr(local, IntConstant.v(0)));
-        } else if (this.isBounded() && this.lowerBound == this.upperBound) {
+        } else if (this.isSingleton()) {
             r = Grimp.v().newEqExpr(local, IntConstant.v(this.lowerBound));
         } else if (this.isBounded()) {
             r = Grimp.v().newAndExpr(Grimp.v().newGeExpr(local, IntConstant.v(this.lowerBound)),
