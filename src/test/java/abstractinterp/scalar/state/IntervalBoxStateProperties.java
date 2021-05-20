@@ -95,7 +95,7 @@ public class IntervalBoxStateProperties {
         } else if (y.lowerBound() == 0 && y.upperBound() != 0) {
             low = minimum(x.lowerBound() / y.upperBound(),
                           x.upperBound() / y.upperBound());
-        } else if (y.upperBound() == 0) {
+        } else if (y.upperBound() == 0 && y.lowerBound() != 0) {
             high = maximum(x.lowerBound() / y.lowerBound(),
                            x.upperBound() / y.lowerBound());
         }
