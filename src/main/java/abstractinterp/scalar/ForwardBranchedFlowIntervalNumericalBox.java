@@ -93,8 +93,20 @@ public class ForwardBranchedFlowIntervalNumericalBox
 
     @Override
     protected void merge(IntervalBoxState in1, IntervalBoxState in2, IntervalBoxState out) {
-        in1.copyTo(out);
-        out.mergeWith(in2);
+        boolean in1Feasible = in1.isFeasible();
+        boolean in2Feasible = in2.isFeasible();
+        if (in1Feasible && in2Feasible) {
+            in1.copyTo(out);
+            // only merge when we know both paths are feasible
+            out.mergeWith(in2);
+        } else if (in1Feasible) {
+            in1.copyTo(out);
+        } else if (in2Feasible) {
+            in2.copyTo(out);
+        } else {
+            // both paths are infeasible, out box should be infeasible
+            out.getMap().forEach((l, b) -> out.update(l, Interval32Box.BOT()));
+        }
     }
 
     @Override
