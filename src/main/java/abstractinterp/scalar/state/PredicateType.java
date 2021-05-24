@@ -55,4 +55,25 @@ public enum PredicateType {
             return Invalid;
         }
     }
+
+    @Override
+    public String toString() {
+        switch (this) {
+        case Eq:
+            return "==";
+        case Ne:
+            return "!=";
+        case Gt:
+            return ">";
+        case Ge:
+            return ">=";
+        case Lt:
+            return "<";
+        case Le:
+            return "<=";
+        case Invalid:
+        default:
+            return "<invalid>";
+        }
+    }
 }
