@@ -26,4 +26,52 @@ public class PredicateTypeTest {
         Assertions.assertEquals(PredicateType.Eq, PredicateType.Eq.negate());
         Assertions.assertEquals(PredicateType.Ne, PredicateType.Ne.negate());
     }
+
+    @Test
+    void testPredicatePreorderEquality() {
+        Assertions.assertEquals(PredicateType.Eq, PredicateType.minimum(PredicateType.Eq,
+                                                                        PredicateType.Eq));
+        Assertions.assertEquals(PredicateType.Ne, PredicateType.minimum(PredicateType.Ne,
+                                                                        PredicateType.Ne));
+        Assertions.assertEquals(PredicateType.Le, PredicateType.minimum(PredicateType.Le,
+                                                                        PredicateType.Le));
+        Assertions.assertEquals(PredicateType.Lt, PredicateType.minimum(PredicateType.Lt,
+                                                                        PredicateType.Lt));
+        Assertions.assertEquals(PredicateType.Ge, PredicateType.minimum(PredicateType.Ge,
+                                                                        PredicateType.Ge));
+        Assertions.assertEquals(PredicateType.Gt, PredicateType.minimum(PredicateType.Gt,
+                                                                        PredicateType.Gt));
+    }
+
+    @Test
+    void testPredicatePreorderLeLt() {
+        Assertions.assertEquals(PredicateType.Lt, PredicateType.minimum(PredicateType.Le,
+                                                                        PredicateType.Lt));
+        Assertions.assertEquals(PredicateType.Lt, PredicateType.minimum(PredicateType.Lt,
+                                                                        PredicateType.Le));
+    }
+
+    @Test
+    void testPredicatePreorderGeGt() {
+        Assertions.assertEquals(PredicateType.Gt, PredicateType.minimum(PredicateType.Ge,
+                                                                        PredicateType.Gt));
+        Assertions.assertEquals(PredicateType.Gt, PredicateType.minimum(PredicateType.Gt,
+                                                                        PredicateType.Ge));
+    }
+
+    @Test
+    void testPredicatePreorderEqLe() {
+        Assertions.assertEquals(PredicateType.Le, PredicateType.minimum(PredicateType.Eq,
+                                                                        PredicateType.Le));
+        Assertions.assertEquals(PredicateType.Le, PredicateType.minimum(PredicateType.Le,
+                                                                        PredicateType.Eq));
+    }
+
+    @Test
+    void testPredicatePreorderEqGe() {
+        Assertions.assertEquals(PredicateType.Ge, PredicateType.minimum(PredicateType.Eq,
+                                                                        PredicateType.Ge));
+        Assertions.assertEquals(PredicateType.Ge, PredicateType.minimum(PredicateType.Ge,
+                                                                        PredicateType.Eq));
+    }
 }

@@ -64,6 +64,25 @@ public enum PredicateType {
         }
     }
 
+    public static PredicateType minimum(PredicateType a, PredicateType b) {
+        if (a == b) {
+            return a;
+        } else if ((a == Le && b == Lt) || (a == Lt && b == Le)) {
+            return Lt;
+        } else if ((a == Ge && b == Gt) || (a == Gt && b == Ge)) {
+            return Gt;
+        } else if ((a == Eq && b == Le) ||
+                   (a == Le && b == Eq)) {
+            return Le;
+        } else if ((a == Eq && b == Ge) ||
+                   (a == Ge && b == Eq)) {
+            return Ge;
+        } else {
+            // incomparable
+            return Invalid;
+        }
+    }
+
     public static PredicateType fromJimple(ConditionExpr expr) {
         if (expr instanceof EqExpr) {
             return Eq;
