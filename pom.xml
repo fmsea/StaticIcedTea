@@ -70,7 +70,7 @@
               <repositoryLayout>default</repositoryLayout>
               <groupId>com.microsoft</groupId>
               <artifactId>z3</artifactId>
-              <version>4.8.9</version>
+              <version>4.8.10</version>
               <packaging>jar</packaging>
               <generatePom>true</generatePom>
             </configuration>
@@ -164,7 +164,7 @@
     <dependency>
       <groupId>com.microsoft</groupId>
       <artifactId>z3</artifactId>
-      <version>4.8.9</version>
+      <version>4.8.10</version>
     </dependency>
     <dependency>
       <groupId>info.picocli</groupId>
