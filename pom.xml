@@ -63,22 +63,6 @@
         <version>2.5.2</version>
         <executions>
           <execution>
-            <id>install-ppl-dep</id>
-            <phase>process-resources</phase>
-            <configuration>
-              <file>${env.PPL_DIR}/lib/ppl/ppl_java.jar</file>
-              <repositoryLayout>default</repositoryLayout>
-              <groupId>com.bugseng</groupId>
-              <artifactId>ppl_java</artifactId>
-              <version>1.2</version>
-              <packaging>jar</packaging>
-              <generatePom>true</generatePom>
-            </configuration>
-            <goals>
-              <goal>install-file</goal>
-            </goals>
-          </execution>
-          <execution>
             <id>install-z3-dep</id>
             <phase>process-resources</phase>
             <configuration>
@@ -171,11 +155,6 @@
       <groupId>org.antlr</groupId>
       <artifactId>antlr4-runtime</artifactId>
       <version>4.7</version>
-    </dependency>
-    <dependency>
-      <groupId>com.bugseng</groupId>
-      <artifactId>ppl_java</artifactId>
-      <version>1.2</version>
     </dependency>
     <dependency>
       <groupId>org.soot-oss</groupId>

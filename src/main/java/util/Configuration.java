@@ -6,15 +6,6 @@ import java.nio.file.Paths;
 
 public class Configuration {
 
-    public static String PPLLibraryPath() {
-        String pplDir = System.getenv("PPL_JNI");
-        if (pplDir.isEmpty()) {
-            return "/usr/local/lib/ppl/libppl_java.jnilib";
-        } else {
-            return pplDir;
-        }
-    }
-
     public static void LoadArtifactsIntoSootPath() {
         LoadArtifactsIntoSootPath("artifacts/");
     }
