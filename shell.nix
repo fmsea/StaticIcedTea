@@ -1,7 +1,7 @@
 { pkgs ? import <nixpkgs> {} }:
 
 let
-  jdk = pkgs.openjdk8;
+  jdk = pkgs.openjdk11;
   maven = (pkgs.maven.override {
     jdk = jdk;
   });
