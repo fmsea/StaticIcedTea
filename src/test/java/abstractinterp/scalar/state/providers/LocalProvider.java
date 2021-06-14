@@ -14,6 +14,7 @@ import soot.IntType;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 
 public class LocalProvider implements ArbitraryProvider {
     @Override
@@ -47,5 +48,12 @@ public class LocalProvider implements ArbitraryProvider {
 
     public static Local generateLocal(String name) {
         return Jimple.v().newLocal(name, IntType.v());
+    }
+
+    public class Unique implements Function<Local, Object> {
+        @Override
+        public Object apply(Local l) {
+            return l.toString();
+        }
     }
 }
