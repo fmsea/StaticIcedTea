@@ -64,23 +64,57 @@ public enum PredicateType {
         }
     }
 
-    public static PredicateType minimum(PredicateType a, PredicateType b) {
+    public static int compare(PredicateType a, PredicateType b) {
+        int order;
         if (a == b) {
-            return a;
-        } else if ((a == Le && b == Lt) || (a == Lt && b == Le)) {
-            return Lt;
-        } else if ((a == Ge && b == Gt) || (a == Gt && b == Ge)) {
-            return Gt;
+            order = 0;
         } else if ((a == Eq && b == Le) ||
+                   (a == Eq && b == Ge) ||
+                   (a == Lt && b == Le) ||
+                   (a == Gt && b == Ge)) {
+            order = -1;
+        } else if ((a == Le && b == Lt) ||
+                   (a == Ge && b == Gt) ||
+                   (a == Ge && b == Eq) ||
                    (a == Le && b == Eq)) {
-            return Le;
-        } else if ((a == Eq && b == Ge) ||
-                   (a == Ge && b == Eq)) {
-            return Ge;
+            order = 1;
         } else {
-            // incomparable
+            // Incomparable
+            order = 2;
+        }
+        return order;
+    }
+
+    public static PredicateType superior(PredicateType a, PredicateType b) {
+        int order = compare(a, b);
+        if (order == 0) {
+            return a;
+        } else if (order == -1) {
+            return b;
+        } else if (order == +1) {
+            return a;
+        } else {
+            // Incomparable (order == 2)
             return Invalid;
         }
+    }
+
+    public static PredicateType inferior(PredicateType a, PredicateType b) {
+        int order = compare(a, b);
+        if (order == 0) {
+            return a;
+        } else if (order == -1) {
+            return a;
+        } else if (order == +1) {
+            return b;
+        } else {
+            // Incomparable (order == 2)
+            return Invalid;
+        }
+    }
+
+    public static PredicateType minimum(PredicateType a, PredicateType b) {
+        return inferior(a, b);
     }
 
     public static PredicateType fromJimple(ConditionExpr expr) {

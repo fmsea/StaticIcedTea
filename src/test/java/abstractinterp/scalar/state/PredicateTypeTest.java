@@ -61,17 +61,118 @@ public class PredicateTypeTest {
 
     @Test
     void testPredicatePreorderEqLe() {
-        Assertions.assertEquals(PredicateType.Le, PredicateType.minimum(PredicateType.Eq,
+        Assertions.assertEquals(PredicateType.Eq, PredicateType.minimum(PredicateType.Eq,
                                                                         PredicateType.Le));
-        Assertions.assertEquals(PredicateType.Le, PredicateType.minimum(PredicateType.Le,
+        Assertions.assertEquals(PredicateType.Eq, PredicateType.minimum(PredicateType.Le,
                                                                         PredicateType.Eq));
     }
 
     @Test
     void testPredicatePreorderEqGe() {
-        Assertions.assertEquals(PredicateType.Ge, PredicateType.minimum(PredicateType.Eq,
+        Assertions.assertEquals(PredicateType.Eq, PredicateType.minimum(PredicateType.Eq,
                                                                         PredicateType.Ge));
-        Assertions.assertEquals(PredicateType.Ge, PredicateType.minimum(PredicateType.Ge,
+        Assertions.assertEquals(PredicateType.Eq, PredicateType.minimum(PredicateType.Ge,
                                                                         PredicateType.Eq));
+    }
+
+    @Test
+    void testPredicateParitalOrderEqual() {
+        Assertions.assertEquals(0, PredicateType.compare(PredicateType.Eq,
+                                                         PredicateType.Eq));
+        Assertions.assertEquals(0, PredicateType.compare(PredicateType.Ne,
+                                                         PredicateType.Ne));
+        Assertions.assertEquals(0, PredicateType.compare(PredicateType.Le,
+                                                         PredicateType.Le));
+        Assertions.assertEquals(0, PredicateType.compare(PredicateType.Lt,
+                                                         PredicateType.Lt));
+        Assertions.assertEquals(0, PredicateType.compare(PredicateType.Ge,
+                                                         PredicateType.Ge));
+        Assertions.assertEquals(0, PredicateType.compare(PredicateType.Gt,
+                                                         PredicateType.Gt));
+    }
+
+    @Test
+    void testPredicatePartialOrderEqLe() {
+        Assertions.assertEquals(-1, PredicateType.compare(PredicateType.Eq,
+                                                          PredicateType.Le));
+        Assertions.assertEquals(+1, PredicateType.compare(PredicateType.Le,
+                                                          PredicateType.Eq));
+    }
+
+    @Test
+    void testPredicatePartialOrderEqGe() {
+        Assertions.assertEquals(-1, PredicateType.compare(PredicateType.Eq,
+                                                          PredicateType.Ge));
+        Assertions.assertEquals(+1, PredicateType.compare(PredicateType.Ge,
+                                                          PredicateType.Eq));
+    }
+
+    @Test
+    void testPredicateParitalOrderLeLt() {
+        Assertions.assertEquals(-1, PredicateType.compare(PredicateType.Lt,
+                                                          PredicateType.Le));
+        Assertions.assertEquals(+1, PredicateType.compare(PredicateType.Le,
+                                                          PredicateType.Lt));
+    }
+
+    @Test
+    void testPredicatePartialOrderGeGt() {
+        Assertions.assertEquals(-1, PredicateType.compare(PredicateType.Gt,
+                                                          PredicateType.Ge));
+        Assertions.assertEquals(+1, PredicateType.compare(PredicateType.Ge,
+                                                          PredicateType.Gt));
+    }
+
+    @Test
+    void testPredicatePartialOrderIncomp() {
+        Assertions.assertEquals(2, PredicateType.compare(PredicateType.Eq,
+                                                         PredicateType.Lt));
+        Assertions.assertEquals(2, PredicateType.compare(PredicateType.Lt,
+                                                         PredicateType.Eq));
+        Assertions.assertEquals(2, PredicateType.compare(PredicateType.Eq,
+                                                         PredicateType.Gt));
+        Assertions.assertEquals(2, PredicateType.compare(PredicateType.Gt,
+                                                         PredicateType.Eq));
+        Assertions.assertEquals(2, PredicateType.compare(PredicateType.Eq,
+                                                         PredicateType.Ne));
+        Assertions.assertEquals(2, PredicateType.compare(PredicateType.Ne,
+                                                         PredicateType.Eq));
+        Assertions.assertEquals(2, PredicateType.compare(PredicateType.Ne,
+                                                         PredicateType.Lt));
+        Assertions.assertEquals(2, PredicateType.compare(PredicateType.Ne,
+                                                         PredicateType.Le));
+        Assertions.assertEquals(2, PredicateType.compare(PredicateType.Ne,
+                                                         PredicateType.Gt));
+        Assertions.assertEquals(2, PredicateType.compare(PredicateType.Ne,
+                                                         PredicateType.Ge));
+        Assertions.assertEquals(2, PredicateType.compare(PredicateType.Lt,
+                                                         PredicateType.Ne));
+        Assertions.assertEquals(2, PredicateType.compare(PredicateType.Le,
+                                                         PredicateType.Ne));
+        Assertions.assertEquals(2, PredicateType.compare(PredicateType.Gt,
+                                                         PredicateType.Ne));
+        Assertions.assertEquals(2, PredicateType.compare(PredicateType.Ge,
+                                                         PredicateType.Ne));
+        // Invalid comparisons
+        Assertions.assertEquals(2, PredicateType.compare(PredicateType.Eq,
+                                                         PredicateType.Invalid));
+        Assertions.assertEquals(2, PredicateType.compare(PredicateType.Invalid,
+                                                         PredicateType.Eq));
+        Assertions.assertEquals(2, PredicateType.compare(PredicateType.Invalid,
+                                                         PredicateType.Lt));
+        Assertions.assertEquals(2, PredicateType.compare(PredicateType.Invalid,
+                                                         PredicateType.Le));
+        Assertions.assertEquals(2, PredicateType.compare(PredicateType.Invalid,
+                                                         PredicateType.Gt));
+        Assertions.assertEquals(2, PredicateType.compare(PredicateType.Invalid,
+                                                         PredicateType.Ge));
+        Assertions.assertEquals(2, PredicateType.compare(PredicateType.Lt,
+                                                         PredicateType.Invalid));
+        Assertions.assertEquals(2, PredicateType.compare(PredicateType.Le,
+                                                         PredicateType.Invalid));
+        Assertions.assertEquals(2, PredicateType.compare(PredicateType.Gt,
+                                                         PredicateType.Invalid));
+        Assertions.assertEquals(2, PredicateType.compare(PredicateType.Ge,
+                                                         PredicateType.Invalid));
     }
 }

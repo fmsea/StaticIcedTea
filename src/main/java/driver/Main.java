@@ -14,7 +14,8 @@ import driver.commands.*;
          description = "Run various dfa-smt utilities",
          subcommands = {
              StartIntervalNumericalCommand.class,
-             StartDisjointAnalysisCommand.class
+             StartDisjointAnalysisCommand.class,
+             StartDBSNumericalCommand.class,
          })
 public class Main implements Callable<Integer> {
 
