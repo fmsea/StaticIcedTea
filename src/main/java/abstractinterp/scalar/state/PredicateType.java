@@ -38,6 +38,32 @@ public enum PredicateType {
         }
     }
 
+    /** negate the inequality expression
+     *
+     * This is different than rotation because we are multiplying the
+     * expression by -1.
+     * Rotation is considering the "side" of the inequality.
+     */
+    public PredicateType negate() {
+        switch (this) {
+        case Le:
+            return Ge;
+        case Lt:
+            return Gt;
+        case Ge:
+            return Le;
+        case Gt:
+            return Lt;
+        case Eq:
+            return Eq;
+        case Ne:
+            return Ne;
+        case Invalid:
+        default:
+            return Invalid;
+        }
+    }
+
     public static PredicateType fromJimple(ConditionExpr expr) {
         if (expr instanceof EqExpr) {
             return Eq;
