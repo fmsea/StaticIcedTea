@@ -5,6 +5,8 @@ import soot.UnitBox;
 import soot.toolkits.graph.DirectedGraph;
 import soot.toolkits.graph.UnitGraph;
 import soot.util.Chain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.ArrayList;
@@ -27,12 +29,16 @@ public abstract class ForwardBranchedFlowBasic<N extends Unit, A> {
 	/** Graph with nodes */
 	DirectedGraph<N> graph;
 
+    /** Logger **/
+    Logger LOGGER;
+
 	/**
 	 * Constructor - can start with the results of a
 	 * previous analysis.
 	 */
 	public ForwardBranchedFlowBasic(DirectedGraph<N> graph){
 		this.graph = graph;
+        this.LOGGER = LoggerFactory.getLogger("ForwardBranched");
 	}
 	
 	public void setOrder(List<N> order){
