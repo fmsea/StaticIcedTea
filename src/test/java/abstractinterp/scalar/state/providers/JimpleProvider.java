@@ -2,7 +2,6 @@ package abstractinterp.scalar.state.providers;
 
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
-import net.jqwik.api.Combinators;
 import net.jqwik.api.providers.ArbitraryProvider;
 import net.jqwik.api.providers.TypeUsage;
 import soot.*;
@@ -12,8 +11,6 @@ import soot.jimple.IntConstant;
 import soot.util.Chain;
 
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Random;
 import java.util.Set;
 import java.util.Arrays;
 import java.util.List;
@@ -45,7 +42,7 @@ public class JimpleProvider implements ArbitraryProvider {
         testClass.addMethod(method);
         JimpleBody body = Jimple.v().newBody(method);
         method.setActiveBody(body);
-        Chain units = body.getUnits();
+        Chain<Unit> units = body.getUnits();
         Local parameter = Jimple.v().newLocal("l0", IntType.v());
         Local constant = Jimple.v().newLocal("l1", IntType.v());
         if (addParameter) {
@@ -67,7 +64,7 @@ public class JimpleProvider implements ArbitraryProvider {
         testClass.addMethod(method);
         JimpleBody body = Jimple.v().newBody(method);
         method.setActiveBody(body);
-        Chain units = body.getUnits();
+        Chain<Unit> units = body.getUnits();
         Local l0 = Jimple.v().newLocal("l0", IntType.v());
         Local l1 = Jimple.v().newLocal("l1", IntType.v());
         Local l2 = Jimple.v().newLocal("l2", IntType.v());
@@ -93,7 +90,7 @@ public class JimpleProvider implements ArbitraryProvider {
         testClass.addMethod(method);
         JimpleBody body = Jimple.v().newBody(method);
         method.setActiveBody(body);
-        Chain units = body.getUnits();
+        Chain<Unit> units = body.getUnits();
         Local l0 = Jimple.v().newLocal("l0", IntType.v());
         Local l1 = Jimple.v().newLocal("l1", IntType.v());
         Local l2 = Jimple.v().newLocal("l2", IntType.v());
@@ -123,7 +120,7 @@ public class JimpleProvider implements ArbitraryProvider {
         testClass.addMethod(method);
         JimpleBody body = Jimple.v().newBody(method);
         method.setActiveBody(body);
-        Chain units = body.getUnits();
+        Chain<Unit> units = body.getUnits();
         Local l0 = Jimple.v().newLocal("l0", IntType.v());
         Local l1 = Jimple.v().newLocal("l1", IntType.v());
         Local l2 = Jimple.v().newLocal("l2", IntType.v());
@@ -155,7 +152,7 @@ public class JimpleProvider implements ArbitraryProvider {
         Scene.v().addClass(testClass);
         testClass.addMethod(method);
         JimpleBody body = Jimple.v().newBody(method);
-        Chain units = body.getUnits();
+        Chain<Unit> units = body.getUnits();
         Local i0 = Jimple.v().newLocal("$i0", IntType.v());
         Local i1 = Jimple.v().newLocal("i1", IntType.v());
         Local i4 = Jimple.v().newLocal("i4", IntType.v());
