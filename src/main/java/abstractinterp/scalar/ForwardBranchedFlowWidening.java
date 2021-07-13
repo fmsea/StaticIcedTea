@@ -63,7 +63,7 @@ public abstract class ForwardBranchedFlowWidening<N extends Unit, A> extends For
                 if (mergeCounts == 0) {
                     widen(beforeFlow, prevBeforeFlow);
                 } else if (mergeCounts < 0) {
-                    System.err.println("Widening is not working for " + node);
+                    LOGGER.error("Widening is not working for {}", node);
                 }
                 mergeCounts--;
                 itersCount.put(node, mergeCounts);
