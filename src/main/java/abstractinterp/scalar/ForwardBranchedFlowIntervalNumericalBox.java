@@ -115,7 +115,7 @@ public class ForwardBranchedFlowIntervalNumericalBox
                                List<IntervalBoxState> fallOut,
                                List<IntervalBoxState> branchOut) {
         IntervalBoxState inState = in;
-        // System.err.println(s + " in " + in);
+        LOGGER.debug("{} flow in: {}", s, in);
         IntervalBoxState ifStmtFall = new IntervalBoxState(localVars, true);
         inState.copyTo(ifStmtFall);
         IntervalBoxState ifStmtBranch = new IntervalBoxState(localVars, true);
@@ -184,19 +184,15 @@ public class ForwardBranchedFlowIntervalNumericalBox
             }
         }
 
-        // System.out.println(s + " out " + ifStmtFall);
-        // System.err.println(String.format("DEBUG: in:\n\t%s\n", in.toString()));
         for (Iterator<IntervalBoxState> it = fallOut.iterator(); it.hasNext();) {
             IntervalBoxState boxState = it.next();
-            // System.err.println(String.format("DEBUG: IfStamtFall:\n\t%s\n",
-            // boxState.toString()));
+            LOGGER.debug("{} flow out: {}", s, ifStmtFall);
             copy(ifStmtFall, boxState);
         }
 
         for (Iterator<IntervalBoxState> it = branchOut.iterator(); it.hasNext();) {
             IntervalBoxState boxState = it.next();
-            // System.err.println(String.format("DEBUG: IfStamtBranch:\n\t%s\n",
-            // boxState.toString()));
+            LOGGER.debug("{} branch out: {}", s, ifStmtBranch);
             copy(ifStmtBranch, boxState);
         }
     }
