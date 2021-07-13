@@ -57,6 +57,8 @@ public abstract class ForwardBranchedFlowWidening<N extends Unit, A> extends For
             //x_back are the rest one in the list
             basicMergeFlows(node, beforeFlow, preds);
             //if different
+            LOGGER.trace("previous before flow: {}", prevBeforeFlow);
+            LOGGER.trace("current before flow: {}", beforeFlow);
             if (!prevBeforeFlow.equals(beforeFlow)) {
                 //check the count
                 int mergeCounts = itersCount.get(node);
