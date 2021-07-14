@@ -37,8 +37,6 @@ import abstractinterp.scalar.state.BinaryOperator;
 public class ForwardBranchedFlowDifferenceBoundedNumerical
     extends ForwardBranchedFlowWidening<Unit, DifferenceBoundedState> {
 
-    private Set<Unit> outputStmt;
-    private Map<Unit, Set<Value>> changedVariables;
     protected Set<Local> locals;
 
     public ForwardBranchedFlowDifferenceBoundedNumerical(DirectedGraph<Unit> graph,
@@ -56,18 +54,7 @@ public class ForwardBranchedFlowDifferenceBoundedNumerical
               unitToAfterFallFlow,
               wideningNodes,
               iters);
-
-        this.outputStmt = new HashSet<>();
-        this.changedVariables = new HashMap<>();
         this.locals = locals;
-    }
-
-    public Set<Unit> getOutputStatements() {
-        return this.outputStmt;
-    }
-
-    public Map<Unit, Set<Value>> getChangedVariables() {
-        return this.changedVariables;
     }
 
     @Override

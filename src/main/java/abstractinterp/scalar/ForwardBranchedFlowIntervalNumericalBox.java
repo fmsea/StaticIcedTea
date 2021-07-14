@@ -37,8 +37,6 @@ import abstractinterp.scalar.state.PredicateType;
 public class ForwardBranchedFlowIntervalNumericalBox
         extends ForwardBranchedFlowWidening<Unit, IntervalBoxState> {
 
-    private Set<Unit> outputStmt;
-    private Map<Unit, Set<Value>> changedVariables;
     protected Set<Local> localVars;
 
     public ForwardBranchedFlowIntervalNumericalBox(DirectedGraph<Unit> graph,
@@ -51,17 +49,7 @@ public class ForwardBranchedFlowIntervalNumericalBox
                                                    Set<Local> local) {
         super(graph, order, unitToBeforeFlow, unitToAfterBranchFlow, unitToAfterFallFlow,
                 wideningNodes, iters);
-        this.outputStmt = new HashSet<>();
-        this.changedVariables = new HashMap<>();
         this.localVars = local;
-    }
-
-    public Set<Unit> getOutputStatements() {
-        return this.outputStmt;
-    }
-
-    public Map<Unit, Set<Value>> getChangedVariables() {
-        return this.changedVariables;
     }
 
     @Override

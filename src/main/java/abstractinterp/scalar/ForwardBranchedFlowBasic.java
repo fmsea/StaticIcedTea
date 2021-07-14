@@ -2,6 +2,7 @@ package abstractinterp.scalar;
 
 import soot.Unit;
 import soot.UnitBox;
+import soot.Value;
 import soot.toolkits.graph.DirectedGraph;
 import soot.toolkits.graph.UnitGraph;
 import soot.util.Chain;
@@ -12,8 +13,10 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 public abstract class ForwardBranchedFlowBasic<N extends Unit, A> {
@@ -32,12 +35,34 @@ public abstract class ForwardBranchedFlowBasic<N extends Unit, A> {
     /** Logger **/
     Logger LOGGER;
 
+    /** Tracking for reporting **/
+    protected Set<Unit> outputStmt;
+    protected Map<Unit, Set<Value>> changedVariables;
+
     /**
      * Constructor - can start with the results of a previous analysis.
      */
     public ForwardBranchedFlowBasic(DirectedGraph<N> graph) {
         this.graph = graph;
+        this.outputStmt = new HashSet<>();
+        this.changedVariables = new HashMap<>();
         this.LOGGER = LoggerFactory.getLogger("ForwardBranched");
+    }
+
+    /** Return statements which have changed variables
+     *
+     * @return set of statements
+     */
+    public Set<Unit> getOutputStatements() {
+        return this.outputStmt;
+    }
+
+    /** Return map of statments to changed variables
+     *
+     * @return map of output statements with changed variables
+     */
+    public Map<Unit, Set<Value>> getChangedVariables() {
+        return this.changedVariables;
     }
 
     public void setOrder(List<N> order) {
