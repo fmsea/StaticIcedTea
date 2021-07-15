@@ -1,5 +1,7 @@
 package abstractinterp.scalar;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -186,6 +188,10 @@ public class DBSNumerical {
             }
         }
         return sb.toString();
+    }
+
+    public void writeSMTReport(Writer writer) throws IOException {
+        writer.write(generateSMTReport());
     }
 
     public void report() {

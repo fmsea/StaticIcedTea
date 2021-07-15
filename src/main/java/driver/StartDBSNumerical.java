@@ -1,13 +1,20 @@
 package driver;
 
+import java.io.IOException;
+import java.io.FileWriter;
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 import abstractinterp.scalar.DBSNumerical;
 import soot.Body;
 import soot.Scene;
 import soot.SootClass;
 import soot.SootMethod;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Driver for full version of reaching definitions analysis
@@ -16,26 +23,28 @@ import soot.SootMethod;
  * args[1] is the class name
  * args[2] is the class path for class
  * args[3] is the method id in this class
- * args[4] is whether to write the computed invariants (only set to no to compute average run)
+ * args[4] is whether to persist computed invariants to a file (only set to no to compute average run)
  *
  */
 public class StartDBSNumerical {
     private static String resultsPath = "ScratchData/resultsRD/";
+    private static Logger LOGGER;
 
     public static void main(String[] args) {
+        LOGGER = LoggerFactory.getLogger(StartDBSNumerical.class);
         String className = "test.Example1M";
         String classPath = Paths.get("artifacts/").toAbsolutePath().toString();
         int methodId = 6;
-        boolean writeInv = true;
+        boolean writeOutputToFile = false;
         if (args.length >= 5) {
             resultsPath = args[0];
             className = args[1];
             classPath = Paths.get(args[2]).toAbsolutePath().toString();
             methodId = Integer.parseInt(args[3]);
-            writeInv = args[4].equals("y");
+            writeOutputToFile = args[4].equals("y");
         }
 
-        String fileName = resultsPath + "/invariants/" + className + "_" + methodId;
+        Path fileName = Paths.get(resultsPath, className + "_" + methodId);
         Scene.v().setSootClassPath(Scene.v().getSootClassPath() +
                                    File.pathSeparator +
                                    System.getProperty("java.class.path") +
@@ -50,11 +59,20 @@ public class StartDBSNumerical {
 
         Body b = m.retrieveActiveBody();
 
-        System.out.println("=======================================");
-        System.out.println(m.toString() + " " + writeInv);
-
         DBSNumerical num = new DBSNumerical(b, 2);
         num.runAnalysis();
-        num.report();
+
+        if (writeOutputToFile) {
+            try (FileWriter writer = new FileWriter(fileName.toFile())) {
+                num.writeSMTReport(writer);
+            } catch (IOException ex) {
+                LOGGER.error("Unable to write results to file: {}", ex.toString());
+                LOGGER.trace(Stream.of(ex.getStackTrace())
+                             .map(StackTraceElement::toString)
+                             .collect(Collectors.joining("\n")));
+            }
+        } else {
+            num.report();
+        }
     }
 }

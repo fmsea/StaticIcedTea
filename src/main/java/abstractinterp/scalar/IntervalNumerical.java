@@ -1,5 +1,7 @@
 package abstractinterp.scalar;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -188,6 +190,10 @@ public class IntervalNumerical {
             }
         }
         return sb.toString();
+    }
+
+    public void writeSMTReport(Writer writer) throws IOException {
+        writer.write(generateSMTFormulaReport());
     }
 
     public void report() {
