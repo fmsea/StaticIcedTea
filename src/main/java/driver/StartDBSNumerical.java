@@ -59,6 +59,9 @@ public class StartDBSNumerical {
 
         Body b = m.retrieveActiveBody();
 
+        LOGGER.info("Analyzing Method -- {}", m.getName());
+        LOGGER.trace("Soot Body: {}", b);
+
         DBSNumerical num = new DBSNumerical(b, 2);
         num.runAnalysis();
 

@@ -60,6 +60,9 @@ public class StartIntervalNumerical {
 
         Body b = m.retrieveActiveBody();
 
+        LOGGER.info("Analyzing Method -- {}", m.getName());
+        LOGGER.trace("Soot Body: {}", b);
+
         IntervalNumerical num = new IntervalNumerical(b, 2);
         num.runAnalysis();
 
