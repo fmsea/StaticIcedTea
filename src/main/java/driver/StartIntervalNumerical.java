@@ -8,7 +8,9 @@ import java.nio.file.Paths;
 import java.util.stream.Stream;
 import java.util.stream.Collectors;
 
-import abstractinterp.scalar.IntervalNumerical;
+import abstractinterp.scalar.IntegerAnalysis;
+import abstractinterp.scalar.state.IntervalBoxState;
+import abstractinterp.scalar.state.factory.IntervalBoxStateFactory;
 import soot.Body;
 import soot.Scene;
 import soot.SootClass;
@@ -63,12 +65,12 @@ public class StartIntervalNumerical {
         LOGGER.info("Analyzing Method -- {}", m.getName());
         LOGGER.trace("Soot Body: {}", b);
 
-        IntervalNumerical num = new IntervalNumerical(b, 2);
-        num.runAnalysis();
+        IntegerAnalysis<IntervalBoxState> analysis = new IntegerAnalysis<>(b, 2, new IntervalBoxStateFactory());
+        analysis.runAnalysis();
 
         if (writeOutputToFile) {
             try (FileWriter writer = new FileWriter(fileName.toFile())) {
-                num.writeSMTReport(writer);
+                analysis.writeSMTReport(writer);
             } catch (IOException ex) {
                 LOGGER.error("Unable to write results to file: {}", ex.toString());
                 LOGGER.trace(Stream.of(ex.getStackTrace())
@@ -76,7 +78,7 @@ public class StartIntervalNumerical {
                              .collect(Collectors.joining("\n")));
             }
         } else {
-            num.report();
+            analysis.report();
         }
     }
 }

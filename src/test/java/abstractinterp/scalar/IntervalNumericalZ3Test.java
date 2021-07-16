@@ -22,6 +22,8 @@ import org.junit.jupiter.api.Test;
 import soot.Body;
 import soot.Scene;
 
+import abstractinterp.scalar.state.IntervalBoxState;
+import abstractinterp.scalar.state.factory.IntervalBoxStateFactory;
 import abstractinterp.scalar.state.providers.JimpleProvider;
 import processing.Smt2Format;
 import solver.SolverWrapper;
@@ -155,9 +157,10 @@ public class IntervalNumericalZ3Test {
     }
 
     private boolean runAnalysis(Body body, String oracle, String expectedZ3Output) {
-        IntervalNumerical analysis = new IntervalNumerical(this.solver, body, 2);
+        IntegerAnalysis<IntervalBoxState> analysis =
+            new IntegerAnalysis<>(this.solver, body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
-        Reader actual = new StringReader(analysis.generateSMTFormulaReport());
+        Reader actual = new StringReader(analysis.generateSMTReport());
         Reader expected = new StringReader(oracle);
         try {
             Writer writer = new FileWriter(this.z3TestFile.toFile());

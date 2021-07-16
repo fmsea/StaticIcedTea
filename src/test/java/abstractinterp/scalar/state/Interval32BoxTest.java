@@ -286,19 +286,19 @@ public class Interval32BoxTest {
     void testToSMTFormula() {
         Local l = Jimple.v().newLocal("l0", IntType.v());
         Interval32Box bot = Interval32Box.BOT();
-        Assertions.assertEquals("(and (>= l0 0) (< l0 0))", bot.toSMTFormula(this.solver, l));
+        Assertions.assertEquals("(and (>= l0 0) (< l0 0))", bot.toSMT(l, this.solver));
         Interval32Box top = Interval32Box.TOP();
-        Assertions.assertEquals("(or (>= l0 0) (< l0 0))", top.toSMTFormula(this.solver, l));
+        Assertions.assertEquals("(or (>= l0 0) (< l0 0))", top.toSMT(l, this.solver));
         Interval32Box max = Interval32Box.MAX();
         Assertions.assertEquals("(and (>= l0 (- 2147483648)) (<= l0 2147483647))",
-                                max.toSMTFormula(this.solver, l));
+                                max.toSMT(l, this.solver));
         Interval32Box box = new Interval32Box(5);
-        Assertions.assertEquals("(= l0 5)", box.toSMTFormula(this.solver, l));
+        Assertions.assertEquals("(= l0 5)", box.toSMT(l, this.solver));
         box = new Interval32Box(-5, 5);
         Assertions.assertEquals("(and (>= l0 (- 5)) (<= l0 5))",
-                                box.toSMTFormula(this.solver, l));
+                                box.toSMT(l, this.solver));
         box = new Interval32Box(null, 5);
-        Assertions.assertEquals("(<= l0 5)", box.toSMTFormula(this.solver, l));
+        Assertions.assertEquals("(<= l0 5)", box.toSMT(l, this.solver));
     }
 
     @Test

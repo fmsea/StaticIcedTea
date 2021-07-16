@@ -12,21 +12,23 @@ import soot.jimple.Jimple;
 import soot.jimple.IntConstant;
 import abstractinterp.scalar.state.IntervalBoxState;
 import abstractinterp.scalar.state.Interval32Box;
+import abstractinterp.scalar.state.factory.IntervalBoxStateFactory;
 
 public class ForwardBranchedFlowIntervalNumericalBoxTest {
 
-    private ForwardBranchedFlowIntervalNumericalBox flow;
+    private ForwardBranchedFlowNumerical<IntervalBoxState> flow;
 
     @BeforeEach
     void setup() {
-        this.flow = new ForwardBranchedFlowIntervalNumericalBox(null,
-                                                                null,
-                                                                null,
-                                                                null,
-                                                                null,
-                                                                new HashSet<>(),
-                                                                2,
-                                                                null);
+        this.flow = new ForwardBranchedFlowNumerical<>(null,
+                                                       null,
+                                                       null,
+                                                       null,
+                                                       null,
+                                                       new HashSet<>(),
+                                                       2,
+                                                       null,
+                                                       new IntervalBoxStateFactory());
     }
 
     @AfterEach

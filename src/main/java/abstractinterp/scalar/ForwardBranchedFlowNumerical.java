@@ -1,20 +1,17 @@
 package abstractinterp.scalar;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.List;
+import java.util.Set;
 
 import soot.jimple.ArrayRef;
 import soot.jimple.InstanceFieldRef;
 import soot.jimple.AssignStmt;
 import soot.jimple.BinopExpr;
-import soot.jimple.IdentityStmt;
-import soot.jimple.NegExpr;
-import soot.jimple.IfStmt;
-import soot.jimple.IntConstant;
 import soot.jimple.ConditionExpr;
+import soot.jimple.IdentityStmt;
+import soot.jimple.IfStmt;
 import soot.jimple.NumericConstant;
 import soot.jimple.internal.JimpleLocal;
 import soot.jimple.internal.JNegExpr;
@@ -26,27 +23,28 @@ import soot.ShortType;
 import soot.Type;
 import soot.Unit;
 import soot.Value;
-
 import soot.toolkits.graph.DirectedGraph;
 
-import abstractinterp.scalar.state.DifferenceBoundedState;
-import abstractinterp.scalar.state.PredicateType;
+import abstractinterp.scalar.state.State;
+import abstractinterp.scalar.state.factory.StateFactory;
 import abstractinterp.scalar.state.BinaryOperator;
+import abstractinterp.scalar.state.PredicateType;
 
+public class ForwardBranchedFlowNumerical<S extends State>
+    extends ForwardBranchedFlowWidening<Unit, S> {
 
-public class ForwardBranchedFlowDifferenceBoundedNumerical
-    extends ForwardBranchedFlowWidening<Unit, DifferenceBoundedState> {
+    protected Set<Local> variables;
+    private StateFactory<S> stateFactory;
 
-    protected Set<Local> locals;
-
-    public ForwardBranchedFlowDifferenceBoundedNumerical(DirectedGraph<Unit> graph,
-                                                         List<Unit> order,
-                                                         Map<Unit, DifferenceBoundedState> unitToBeforeFlow,
-                                                         Map<Unit, List<DifferenceBoundedState>> unitToAfterBranchFlow,
-                                                         Map<Unit, List<DifferenceBoundedState>> unitToAfterFallFlow,
-                                                         Set<Unit> wideningNodes,
-                                                         int iters,
-                                                         Set<Local> locals) {
+    public ForwardBranchedFlowNumerical(DirectedGraph<Unit> graph,
+                                        List<Unit> order,
+                                        Map<Unit, S> unitToBeforeFlow,
+                                        Map<Unit, List<S>> unitToAfterBranchFlow,
+                                        Map<Unit, List<S>> unitToAfterFallFlow,
+                                        Set<Unit> wideningNodes,
+                                        int iters,
+                                        Set<Local> locals,
+                                        StateFactory<S> stateFactory) {
         super(graph,
               order,
               unitToBeforeFlow,
@@ -54,25 +52,24 @@ public class ForwardBranchedFlowDifferenceBoundedNumerical
               unitToAfterFallFlow,
               wideningNodes,
               iters);
-        this.locals = locals;
+        this.variables = locals;
+        this.stateFactory = stateFactory;
     }
 
     @Override
-    protected void widen(DifferenceBoundedState beforeFlow,
-                         DifferenceBoundedState prevBeforeFlow) {
+    protected void widen(S beforeFlow, S prevBeforeFlow) {
+        LOGGER.trace("widening {} with {}", beforeFlow, prevBeforeFlow);
         beforeFlow.widenWith(prevBeforeFlow);
     }
 
     @Override
-    protected void copy(DifferenceBoundedState source,
-                        DifferenceBoundedState dest) {
+    protected void copy(S source, S dest) {
         source.copyTo(dest);
     }
 
     @Override
-    protected void merge(DifferenceBoundedState in1,
-                         DifferenceBoundedState in2,
-                         DifferenceBoundedState out) {
+    protected void merge(S in1, S in2, S out) {
+        LOGGER.trace("merging {} with {}", in1, in2);
         boolean in1Feasible = in1.isFeasible();
         boolean in2Feasible = in2.isFeasible();
         if (in1Feasible && in2Feasible) {
@@ -85,19 +82,14 @@ public class ForwardBranchedFlowDifferenceBoundedNumerical
         } else {
             out.makeInfeasible();
         }
-        LOGGER.debug("Merged {} ({}) and {} ({}) ==> {}",
-                     in1, in1Feasible, in2, in2Feasible, out);
+        LOGGER.trace("merge result: {}", out);
     }
 
     @Override
-    protected void flowThrough(DifferenceBoundedState in,
-                               Unit s,
-                               List<DifferenceBoundedState> fallOut,
-                               List<DifferenceBoundedState> branchOut) {
-        DifferenceBoundedState ifStmtFall = new DifferenceBoundedState(in);
-        DifferenceBoundedState ifStmtBranch = new DifferenceBoundedState(in);
-
-        LOGGER.debug("{} flow in: {}", s, in);
+    protected void flowThrough(S in, Unit s, List<S> fallOut, List<S> branchOut) {
+        LOGGER.debug("{} flow through: {}", s, in);
+        S ifStmtFall = this.stateFactory.copy(in);
+        S ifStmtBranch = this.stateFactory.copy(in);
         if (in.isFeasible()) {
             if (s instanceof AssignStmt) {
                 AssignStmt stmt = (AssignStmt)s;
@@ -114,17 +106,19 @@ public class ForwardBranchedFlowDifferenceBoundedNumerical
                         Value left = ((BinopExpr) rhs).getOp1();
                         Value right = ((BinopExpr) rhs).getOp2();
 
-                        LOGGER.debug("assigning {} to {} ({}) {}, within {}",
+                        LOGGER.debug("assigning {} to {} ({}) {}, using {}",
                                      lVar, left, op, right, in);
                         ifStmtFall.updateState(lVar, in, left, right, op);
                     } else if (rhs instanceof JimpleLocal ||
                                rhs instanceof NumericConstant ||
                                rhs instanceof JNegExpr) {
                         ifStmtFall.updateState(lVar, in, rhs);
+                    } else {
+                        LOGGER.warn("Binary int expression without handle: {}", stmt);
                     }
                 }
             } else if (s instanceof IfStmt) {
-                IfStmt stmt = (IfStmt) s;
+                IfStmt stmt = (IfStmt)s;
                 ConditionExpr condExpr = (ConditionExpr) stmt.getCondition();
                 Value left = condExpr.getOp1();
                 Value right = condExpr.getOp2();
@@ -133,11 +127,12 @@ public class ForwardBranchedFlowDifferenceBoundedNumerical
                 this.changedVariables.put(s, track);
                 PredicateType type = PredicateType.fromJimple(condExpr);
 
-                ifStmtBranch.updateCond(in, left, right, type); // true branch
+                ifStmtBranch.updateCond(in, left, right, type);
 
-                //rotate type
                 type = type.rotate();
-                ifStmtFall.updateCond(in, left, right, type);  // false branch
+
+                ifStmtFall.updateCond(in, left, right, type);
+
                 if (left instanceof JimpleLocal) {
                     track.add(left);
                 }
@@ -145,6 +140,7 @@ public class ForwardBranchedFlowDifferenceBoundedNumerical
                     track.add(right);
                 }
             }
+
             if (s instanceof IdentityStmt) {
                 IdentityStmt param = (IdentityStmt) s;
                 if (isIntType(param.getLeftOp())) {
@@ -152,40 +148,39 @@ public class ForwardBranchedFlowDifferenceBoundedNumerical
                 }
             }
         } else {
-            // copy infeasible graph since the state may not be marked
-            // infeasible until _after_ invoking isFeasible()
-            ifStmtFall = new DifferenceBoundedState(in);
-            ifStmtBranch = new DifferenceBoundedState(in);
+            // recopy infeasible input to outputs
+            ifStmtFall = this.stateFactory.copy(in);
+            ifStmtBranch = this.stateFactory.copy(in);
         }
 
-        for (DifferenceBoundedState state : fallOut) {
-            copy(ifStmtFall, state);
-            LOGGER.debug("fallOut: {}", state);
+        for (S state : fallOut) {
+            this.copy(ifStmtFall, state);
+            LOGGER.debug("fall out: {}", state);
         }
 
-        for (DifferenceBoundedState state : branchOut) {
-            copy(ifStmtBranch, state);
-            LOGGER.debug("branchOut: {}", branchOut);
+        for (S state : branchOut) {
+            this.copy(ifStmtBranch, state);
+            LOGGER.debug("branch out: {}", state);
         }
     }
 
     public static boolean isIntType(Value val) {
         Type t = val.getType();
-        return (!(val instanceof ArrayRef) &&
-                !(val instanceof InstanceFieldRef) &&
-                (t instanceof IntType ||
-                 t instanceof ByteType ||
-                 t instanceof ShortType ||
-                 t instanceof BooleanType));
+        return !(val instanceof ArrayRef)
+            && !(val instanceof InstanceFieldRef)
+            && (t instanceof IntType ||
+                t instanceof ByteType ||
+                t instanceof ShortType ||
+                t instanceof BooleanType);
     }
 
     @Override
-    protected DifferenceBoundedState newInitialFlow() {
-        return new DifferenceBoundedState(this.locals, false);
+    protected S newInitialFlow() {
+        return this.stateFactory.initialFlow(this.variables);
     }
 
-    protected DifferenceBoundedState entryInitialFlow() {
-        return new DifferenceBoundedState(this.locals, true);
+    protected S entryInitialFlow() {
+        return this.stateFactory.entryFlow(this.variables);
     }
 
     public boolean treatTrapHandlersAsEntries() {

@@ -32,7 +32,7 @@ import soot.jimple.internal.JNegExpr;
 
 import solver.SolverWrapper;
 
-public class DifferenceBoundedState {
+public class DifferenceBoundedState implements State {
 
     private Graph<Local, Constraint> graph;
     private boolean feasible = true;
@@ -69,6 +69,18 @@ public class DifferenceBoundedState {
      */
     public Set<Local> getLocals() {
         return this.graph.vertexSet();
+    }
+
+    public State copy() {
+        return new DifferenceBoundedState(this);
+    }
+
+    public void copyTo(State destination) {
+        if (destination instanceof DifferenceBoundedState) {
+            this.copyTo((DifferenceBoundedState) destination);
+        } else {
+            throw new RuntimeException("invalid type for copyTo");
+        }
     }
 
     /** Add a constraint through the ZERO element.
@@ -268,6 +280,15 @@ public class DifferenceBoundedState {
         return this.feasible;
     }
 
+
+    public void widenWith(State inState) {
+        if (inState instanceof DifferenceBoundedState) {
+            widenWith((DifferenceBoundedState) inState);
+        } else {
+            throw new RuntimeException("invlaid types for widen");
+        }
+    }
+
     public void widenWith(DifferenceBoundedState inState) {
         LOGGER.debug("widening this {} with {}", this.graph, inState.graph);
         Graph<Local, Constraint> copy = new DefaultDirectedGraph<>(Constraint.class);
@@ -285,6 +306,14 @@ public class DifferenceBoundedState {
             if (!(c1.isBottom() || c2.isBottom()) && c1.compareTo(c2) == -1) {
                 this.add(s, t, Constraint.TOP());
             }
+        }
+    }
+
+    public void mergeWith(State inState) {
+        if (inState instanceof DifferenceBoundedState) {
+            mergeWith((DifferenceBoundedState) inState);
+        } else {
+            throw new RuntimeException("invalid types for merge");
         }
     }
 
@@ -341,6 +370,10 @@ public class DifferenceBoundedState {
             });
     }
 
+    public static State initialFlow(Set<Local> locals, boolean top) {
+        return new DifferenceBoundedState(locals, top);
+    }
+
     public void copyTo(DifferenceBoundedState out) {
         if (out != null) {
             out.feasible = this.feasible;
@@ -352,6 +385,14 @@ public class DifferenceBoundedState {
         Constraint c = constraint.copy();
         c.negate();
         return c;
+    }
+
+    public void updateState(Local lVar, State inState, Value v) {
+        if (inState instanceof DifferenceBoundedState) {
+            updateState(lVar, (DifferenceBoundedState) inState, v);
+        } else {
+            throw new RuntimeException("invalid type for updateState");
+        }
     }
 
     /** Assign lVar to the unary expression of v
@@ -373,6 +414,18 @@ public class DifferenceBoundedState {
             this.add(lVar, (Local) v, new Constraint(0, PredicateType.Eq));
         } else {
             this.add(lVar, this.ZERO, Constraint.TOP());
+        }
+    }
+
+    public void updateState(Local lVar,
+                            State inState,
+                            Value left,
+                            Value right,
+                            BinaryOperator operator) {
+        if (inState instanceof DifferenceBoundedState) {
+            updateState(lVar, (DifferenceBoundedState) inState, left, right, operator);
+        } else {
+            throw new RuntimeException("invalid type for updateState");
         }
     }
 
@@ -714,7 +767,7 @@ public class DifferenceBoundedState {
         return this.graph.toString();
     }
 
-    public String toSMTFormula(SolverWrapper solver) {
+    public String toSMT(SolverWrapper solver) {
         StringBuilder sb = new StringBuilder();
         this.graph.edgeSet().forEach(c -> {
                 Local s = this.graph.getEdgeSource(c);
@@ -727,7 +780,7 @@ public class DifferenceBoundedState {
         return sb.toString();
     }
 
-    public String LocalToSMTFormula(SolverWrapper solver, Local l) {
+    public String toSMT(Local l, SolverWrapper solver) {
         StringBuilder sb = new StringBuilder();
         Set<Constraint> edges = this.graph.edgesOf(l);
         LOGGER.debug("edges: {}", edges);
@@ -852,6 +905,14 @@ public class DifferenceBoundedState {
                 Local t = this.graph.getEdgeTarget(e);
                 this.add(s, t, Constraint.BOT());
             });
+    }
+
+    public void updateCond(State inState, Value left, Value right, PredicateType type) {
+        if (inState instanceof DifferenceBoundedState) {
+            updateCond((DifferenceBoundedState) inState, left, right, type);
+        } else {
+            throw new RuntimeException("invalid state for update condition");
+        }
     }
 
     public void updateCond(DifferenceBoundedState inState,

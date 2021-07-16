@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 
+import abstractinterp.scalar.state.IntervalBoxState;
+import abstractinterp.scalar.state.factory.IntervalBoxStateFactory;
 import abstractinterp.scalar.state.providers.JimpleProvider;
 
 public class IntervalNumericalTest {
@@ -26,7 +28,7 @@ public class IntervalNumericalTest {
     @Test
     void testConstantValuePropagation() {
         Body body = JimpleProvider.constantJimpleMethod("constant_test");
-        IntervalNumerical analysis = new IntervalNumerical(body, 2);
+        IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateReport().split("\n");
         assertReportOutputEquals(new String[] {
@@ -38,9 +40,9 @@ public class IntervalNumericalTest {
     @Test
     void testSMTFomulaReportWithConstantValuePropagation() {
         Body body = JimpleProvider.constantJimpleMethod("constant_test", true);
-        IntervalNumerical analysis = new IntervalNumerical(body, 2);
+        IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
-        String[] actual = analysis.generateSMTFormulaReport().split("\n");
+        String[] actual = analysis.generateSMTReport().split("\n");
         String[] expected = new String[] {
             "2 l1 = 6:<constant_testSootClass: int constant_test(int)>",
             "l1->(= l1 6)"};
@@ -53,7 +55,7 @@ public class IntervalNumericalTest {
     @Test
     void testConstantMathPropagation() {
         Body body = JimpleProvider.binaryArithmaticMethod("constantMath");
-        IntervalNumerical analysis = new IntervalNumerical(body, 2);
+        IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateReport().split("\n");
         assertReportOutputEquals(new String[] {
@@ -69,9 +71,9 @@ public class IntervalNumericalTest {
     @Test
     void testSMTFormulaReportWithConstantArithmaticPropagation() {
         Body body = JimpleProvider.binaryArithmaticMethod("moreConstantMath");
-        IntervalNumerical analysis = new IntervalNumerical(body, 2);
+        IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
-        String[] actual = analysis.generateSMTFormulaReport().split("\n");
+        String[] actual = analysis.generateSMTReport().split("\n");
         String[] expected = new String[] {
                 "1 l0 = 3:<moreConstantMathSootClass: void moreConstantMath()>",
                 "l0->(= l0 3)",
@@ -93,7 +95,7 @@ public class IntervalNumericalTest {
     @Test
     void testIfStatementPropagation() {
         Body body = JimpleProvider.simpleIfStatement("simpleIf");
-        IntervalNumerical analysis = new IntervalNumerical(body, 2);
+        IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateReport().split("\n");
         assertReportOutputEquals(new String[] {
@@ -111,9 +113,9 @@ public class IntervalNumericalTest {
     @Test
     void testSMTFormulaReportWhenIfStatement() {
         Body body = JimpleProvider.simpleIfStatement("anotherSimpleIf");
-        IntervalNumerical analysis = new IntervalNumerical(body, 2);
+        IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
-        String[] actual = analysis.generateSMTFormulaReport().split("\n");
+        String[] actual = analysis.generateSMTReport().split("\n");
         String[] expected = new String[] {
             "1 l0 = 4:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
             "l0->(= l0 4)",
@@ -134,7 +136,7 @@ public class IntervalNumericalTest {
     @Test
     void testWhileStatementPropagation() {
         Body body = JimpleProvider.simpleLoopStatement("simpleLoop");
-        IntervalNumerical analysis = new IntervalNumerical(body, 2);
+        IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateReport().split("\n");
         assertReportOutputEquals(new String[] {
@@ -153,9 +155,9 @@ public class IntervalNumericalTest {
     @Test
     void testSMTFormulaWhenWhileStatement() {
         Body body = JimpleProvider.simpleLoopStatement("anotherSimpleLoop");
-        IntervalNumerical analysis = new IntervalNumerical(body, 2);
+        IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
-        String[] actual = analysis.generateSMTFormulaReport().split("\n");
+        String[] actual = analysis.generateSMTReport().split("\n");
         String[] expected = new String[] {
             "1 l0 = 5:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
             "l0->(= l0 5)",
@@ -178,7 +180,7 @@ public class IntervalNumericalTest {
     @Test
     void testExample5() {
         Body body = JimpleProvider.example5();
-        IntervalNumerical analysis = new IntervalNumerical(body, 2);
+        IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateReport().split("\n");
         String[] expected = new String[] {
@@ -213,9 +215,9 @@ public class IntervalNumericalTest {
     @Test
     void testSMTExample5() {
         Body body = JimpleProvider.example5();
-        IntervalNumerical analysis = new IntervalNumerical(body, 2);
+        IntegerAnalysis<IntervalBoxState> analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
-        String[] actual = analysis.generateSMTFormulaReport().split("\n");
+        String[] actual = analysis.generateSMTReport().split("\n");
         String[] expected = new String[] {
             "2 b2 = 1:<test.Example1M: int example_5(int)>",
             "b2->(= b2 1)",

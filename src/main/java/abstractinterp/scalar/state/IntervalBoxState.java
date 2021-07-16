@@ -13,7 +13,7 @@ import soot.jimple.internal.JNegExpr;
 
 import solver.SolverWrapper;
 
-public class IntervalBoxState {
+public class IntervalBoxState implements State {
     // map of variables to its interval abstract state
 
     private Map<Local, Interval32Box> state;
@@ -36,6 +36,11 @@ public class IntervalBoxState {
         }
     }
 
+    public IntervalBoxState(IntervalBoxState inState) {
+        this(inState.state.keySet(), false);
+        inState.copyTo(this);
+    }
+
     public boolean isFeasible() {
         boolean ret = true;
         for (Interval32Box v : state.values()) {
@@ -47,6 +52,14 @@ public class IntervalBoxState {
         return ret;
     }
 
+    public void copyTo(State dest) {
+        if (dest instanceof IntervalBoxState) {
+            this.copyTo((IntervalBoxState) dest);
+        } else {
+            throw new RuntimeException("Invalid copy attempt");
+        }
+    }
+
     public void copyTo(IntervalBoxState dest) {
         for (Entry<Local, Interval32Box> entry : state.entrySet()) {
             Local l = entry.getKey();
@@ -55,6 +68,12 @@ public class IntervalBoxState {
             Interval32Box newVal = new Interval32Box(val);
             dest.update(l, newVal);
         }
+    }
+
+    public State copy() {
+        IntervalBoxState copy = new IntervalBoxState(this.state.keySet(), false);
+        this.copyTo(copy);
+        return copy;
     }
 
     public Map<Local, Interval32Box> getMap() {
@@ -69,12 +88,28 @@ public class IntervalBoxState {
         return state.get(l);
     }
 
+    public void mergeWith(State in) {
+        if (in instanceof IntervalBoxState) {
+            mergeWith((IntervalBoxState) in);
+        } else {
+            throw new RuntimeException("Invalid merge. The types are wrong!");
+        }
+    }
+
     public void mergeWith(IntervalBoxState in) {
         // merge in1 and in2 and assign the result to this
         for (Local l : state.keySet()) {
             getValue(l).upperBoundAssign(in.getValue(l)); // smallet box containing the union of two
         }
 
+    }
+
+    public void widenWith(State prevBeforeFlow) {
+        if (prevBeforeFlow instanceof IntervalBoxState) {
+            widenWith((IntervalBoxState) prevBeforeFlow);
+        } else {
+            throw new RuntimeException("Invalid widen. The types are wrong!");
+        }
     }
 
     public void widenWith(IntervalBoxState prevBeforeFlow) {
@@ -93,7 +128,7 @@ public class IntervalBoxState {
      *             multiplication, 3 - division
      * @return
      */
-    public static Interval32Box transferBinary(Interval32Box lhs, Interval32Box rhs, byte type) {
+    public static Interval32Box transferBinary(Interval32Box lhs, Interval32Box rhs, BinaryOperator operator) {
         Interval32Box ret;
         // find low of lhs
         if (lhs.isBottom() || rhs.isBottom()) {
@@ -107,20 +142,20 @@ public class IntervalBoxState {
             // adding them up
             int new_high = Integer.MAX_VALUE;
             int new_low = Integer.MIN_VALUE;
-            switch (type) {
-            case 0:
+            switch (operator) {
+            case ADDITION:
                 new_low = x1 == Integer.MIN_VALUE || y1 == Integer.MIN_VALUE ? Integer.MIN_VALUE : x1 + y1;
                 new_high = x2 == Integer.MAX_VALUE || y2 == Integer.MAX_VALUE ? Integer.MAX_VALUE : x2 + y2;
                 break;
-            case 1:
+            case SUBTRACTION:
                 new_low = x1 - y2; // do more checks here too
                 new_high = x2 - y1;
                 break;
-            case 2:
+            case MULTIPLICATION:
                 new_high = Math.max(x1 * y1, Math.max(x1 * y2, Math.max(x2 * y1, x2 * y2)));
                 new_low = Math.min(x1 * y1, Math.min(x1 * y2, Math.min(x2 * y1, x2 * y2)));
                 break;
-            case 3:
+            case DIVISION:
                 if (y1 > 0 || y2 < 0) {
                     // if 0 not in [y1,y2] range
                     new_high = Math.max(x1 / y2, Math.max(x1 / y1, Math.max(x2 / y2, x2 / y1)));
@@ -135,6 +170,11 @@ public class IntervalBoxState {
                 // 0 in between y1 and y2 - use the top values as set above
 
                 break;// just use the default for now
+            case MODULUS:
+            case INVALID:
+            default:
+                // use default max values
+                break;
             }
             // create a new constraint
             ret = new Interval32Box(new_low, new_high);
@@ -161,10 +201,22 @@ public class IntervalBoxState {
         return ret;
     }
 
-    public void updateState(Local lVar, IntervalBoxState inState, Value left, Value right, byte type) {
+    public void updateState(Local lVar, State inState, Value left, Value right, BinaryOperator operator) {
+        if (inState instanceof IntervalBoxState) {
+            updateState(lVar, (IntervalBoxState) inState, left, right, operator);
+        } else {
+            throw new RuntimeException("Invalid types for update state");
+        }
+    }
+
+    public void updateState(Local lVar,
+                            IntervalBoxState inState,
+                            Value left,
+                            Value right,
+                            BinaryOperator operator) {
         Interval32Box leftBox = eval(inState, left);
         Interval32Box rightBox = eval(inState, right);
-        state.put(lVar, transferBinary(leftBox, rightBox, type));
+        state.put(lVar, transferBinary(leftBox, rightBox, operator));
     }
 
     private static Interval32Box eval(IntervalBoxState inState, Value v) {
@@ -178,6 +230,14 @@ public class IntervalBoxState {
         }
 
         return ret;
+    }
+
+    public void updateState(Local lVar, State inState, Value v) {
+        if (inState instanceof IntervalBoxState) {
+            updateState(lVar, (IntervalBoxState) inState, v);
+        } else {
+            throw new RuntimeException("Invalid types for update state");
+        }
     }
 
     public void updateState(Local lVar, IntervalBoxState inState, Value v) {
@@ -194,16 +254,21 @@ public class IntervalBoxState {
         return state.toString();
     }
 
-    public String toSMTFormula(SolverWrapper solver) {
+    public String toSMT(SolverWrapper solver) {
         StringBuilder sb = new StringBuilder();
-        for (Map.Entry<Local, Interval32Box> e : this.state.entrySet()) {
-            Local l = e.getKey();
-            Interval32Box interval = e.getValue();
+        for (Local l : this.state.keySet()) {
             sb.append(l.toString());
             sb.append("->");
-            sb.append(solver.smt2(interval.toGrimpExpr(l)));
+            sb.append(this.toSMT(l, solver));
             sb.append("\n");
         }
+        return sb.toString();
+    }
+
+    public String toSMT(Local l, SolverWrapper solver) {
+        StringBuilder sb = new StringBuilder();
+        Interval32Box interval = this.state.get(l);
+        sb.append(solver.smt2(interval.toGrimpExpr(l)));
         return sb.toString();
     }
 
@@ -222,7 +287,21 @@ public class IntervalBoxState {
         state.put(l, Interval32Box.TOP());
     }
 
-    public void updateCond(IntervalBoxState inState, Value left, Value right, PredicateType type) {
+    public void makeInfeasible() {
+        for (Local l : this.state.keySet()) {
+            this.state.put(l, Interval32Box.BOT());
+        }
+    }
+
+    public boolean updateCond(State inState, Value left, Value right, PredicateType type) {
+        if (inState instanceof IntervalBoxState) {
+            return updateCond((IntervalBoxState) inState, left, right, type);
+        } else {
+            throw new RuntimeException("the types are wrong!");
+        }
+    }
+
+    public boolean updateCond(IntervalBoxState inState, Value left, Value right, PredicateType type) {
         // update to new values so that the condition holds with that type
         Interval32Box leftBox = eval(inState, left);
         Interval32Box rightBox = eval(inState, right);
@@ -233,5 +312,6 @@ public class IntervalBoxState {
         if (right instanceof Local) {
             state.put((Local) right, result.get(1));
         }
+        return this.isFeasible();
     }
 }

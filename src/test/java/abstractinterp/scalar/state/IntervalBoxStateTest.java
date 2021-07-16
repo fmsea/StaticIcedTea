@@ -29,9 +29,9 @@ public class IntervalBoxStateTest {
     void transferBinaryReturnsTopWhenUnbounded() {
         Interval32Box x = new Interval32Box(null, 1);
         Interval32Box y = new Interval32Box(1, null);
-        Interval32Box z = IntervalBoxState.transferBinary(x, y, (byte) 6);
+        Interval32Box z = IntervalBoxState.transferBinary(x, y, BinaryOperator.INVALID);
         Assertions.assertEquals(Interval32Box.TOP(), z);
-        z = IntervalBoxState.transferBinary(y, x, (byte)5);
+        z = IntervalBoxState.transferBinary(y, x, BinaryOperator.INVALID);
         Assertions.assertEquals(Interval32Box.TOP(), z);
     }
 
@@ -77,9 +77,9 @@ public class IntervalBoxStateTest {
     void transferBinaryReturnBottomWhenBottomValue() {
         Interval32Box x = new Interval32Box(null, 1);
         Interval32Box y = Interval32Box.BOT();
-        Interval32Box z = IntervalBoxState.transferBinary(x, y, (byte) 5);
+        Interval32Box z = IntervalBoxState.transferBinary(x, y, BinaryOperator.INVALID);
         Assertions.assertEquals(Interval32Box.BOT(), z);
-        z = IntervalBoxState.transferBinary(y, x, (byte) 5);
+        z = IntervalBoxState.transferBinary(y, x, BinaryOperator.INVALID);
         Assertions.assertEquals(Interval32Box.BOT(), z);
     }
 
@@ -87,20 +87,20 @@ public class IntervalBoxStateTest {
     void transferBinaryDivisionDivideByZero() {
         Interval32Box x = new Interval32Box(-4, 3);
         Interval32Box y = new Interval32Box(0, 0);
-        Interval32Box z = IntervalBoxState.transferBinary(x, y, (byte) 3);
+        Interval32Box z = IntervalBoxState.transferBinary(x, y, BinaryOperator.DIVISION);
         Assertions.assertTrue(z.isMax());
         x = new Interval32Box(y);
-        z = IntervalBoxState.transferBinary(x, y, (byte) 3);
+        z = IntervalBoxState.transferBinary(x, y, BinaryOperator.DIVISION);
         Assertions.assertTrue(z.isMax());
     }
 
     @Test
-    void testToSMTFormula() {
+    void testToSMT() {
         Set<Local> locals = new HashSet<>();
         locals.add(Jimple.v().newLocal("l0", IntType.v()));
         IntervalBoxState box = new IntervalBoxState(locals, false);
         locals.forEach(l -> box.update(l, new Interval32Box(-5, 5)));
-        Assertions.assertEquals("l0->(and (>= l0 (- 5)) (<= l0 5))\n", box.toSMTFormula(this.solver));
+        Assertions.assertEquals("l0->(and (>= l0 (- 5)) (<= l0 5))\n", box.toSMT(this.solver));
     }
 
     @Test

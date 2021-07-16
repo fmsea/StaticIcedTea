@@ -1,8 +1,5 @@
 package abstractinterp.scalar;
 
-import java.util.Map;
-import java.util.HashMap;
-
 import soot.Scene;
 import soot.Body;
 
@@ -11,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 
 import abstractinterp.scalar.state.DifferenceBoundedState;
-import abstractinterp.scalar.state.Constraint;
+import abstractinterp.scalar.state.factory.DifferenceBoundedStateFactory;
 import abstractinterp.scalar.state.providers.JimpleProvider;
 
 public class DBSNumericalTest {
@@ -26,7 +23,8 @@ public class DBSNumericalTest {
     @Test
     void testSMTFormulaReportWithConstantValuePropagation() {
         Body body = JimpleProvider.constantJimpleMethod("constant_test", true);
-        DBSNumerical analysis = new DBSNumerical(body, 2);
+        IntegerAnalysis<DifferenceBoundedState> analysis =
+            new IntegerAnalysis<>(body, 2, new DifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
         String[] expected = new String[] {
@@ -42,7 +40,8 @@ public class DBSNumericalTest {
     @Test
     void testSMTFormulaReportWithConstantMathPropagation() {
         Body body = JimpleProvider.binaryArithmaticMethod("moreConstantMath");
-        DBSNumerical analysis = new DBSNumerical(body, 2);
+        IntegerAnalysis<DifferenceBoundedState> analysis =
+            new IntegerAnalysis<>(body, 2, new DifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
         String[] expected = new String[]{
@@ -66,7 +65,8 @@ public class DBSNumericalTest {
     @Test
     void testSMTWhenBranching() {
         Body body = JimpleProvider.simpleIfStatement("anotherSimpleIf");
-        DBSNumerical analysis = new DBSNumerical(body, 2);
+        IntegerAnalysis<DifferenceBoundedState> analysis =
+            new IntegerAnalysis<>(body, 2, new DifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
         String[] expected = new String[] {
@@ -89,7 +89,8 @@ public class DBSNumericalTest {
     @Test
     void testSMTWhenLooping() {
         Body body = JimpleProvider.simpleLoopStatement("anotherSimpleLoop");
-        DBSNumerical analysis = new DBSNumerical(body, 2);
+        IntegerAnalysis<DifferenceBoundedState> analysis =
+            new IntegerAnalysis<>(body, 2, new DifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
         String[] expected = new String[] {
@@ -114,7 +115,8 @@ public class DBSNumericalTest {
     @Test
     void testSMTExample5() {
         Body body = JimpleProvider.example5();
-        DBSNumerical analysis = new DBSNumerical(body, 2);
+        IntegerAnalysis<DifferenceBoundedState> analysis =
+            new IntegerAnalysis<>(body, 2, new DifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
         String[] expected = new String[] {

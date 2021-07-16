@@ -690,6 +690,6 @@ public class DifferenceBoundedStateTest {
         Assertions.assertEquals("x0->(<= x0 (+ 3 x1))\n" +
                                 "x1->(= x1 (+ 2 x2))\n" +
                                 "x2->(<= x2 4)\n",
-                                state.toSMTFormula(solver));
+                                state.toSMT(solver));
     }
 }

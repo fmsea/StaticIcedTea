@@ -511,7 +511,7 @@ public class Interval32Box {
         }
     }
 
-    public String toSMTFormula(SolverWrapper solver, Local local) {
+    public String toSMT(Local local, SolverWrapper solver) {
         return solver.smt2(this.toGrimpExpr(local));
     }
 

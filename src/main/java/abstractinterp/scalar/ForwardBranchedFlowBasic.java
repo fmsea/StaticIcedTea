@@ -101,6 +101,11 @@ public abstract class ForwardBranchedFlowBasic<N extends Unit, A> {
      */
     protected abstract A newInitialFlow();
 
+    /**
+     * Returns the flow object corresponding to the entry values for each graph node.
+     */
+    protected abstract A entryInitialFlow();
+
     /** the core algorithm that computes fixed point */
     protected void doAnalysis() {
         final Map<N, Integer> numbers = new HashMap<>();
