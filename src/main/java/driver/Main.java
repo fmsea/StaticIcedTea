@@ -16,6 +16,8 @@ import driver.commands.*;
              StartIntervalNumericalCommand.class,
              StartDisjointAnalysisCommand.class,
              StartDBSNumericalCommand.class,
+             Smt2FormatCommand.class,
+             Smt2FormatDirectoryCommand.class,
          })
 public class Main implements Callable<Integer> {
 
