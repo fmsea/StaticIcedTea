@@ -5,6 +5,7 @@ import soot.jimple.AddExpr;
 import soot.jimple.SubExpr;
 import soot.jimple.MulExpr;
 import soot.jimple.DivExpr;
+import org.slf4j.LoggerFactory;
 
 public enum BinaryOperator {
     ADDITION,
@@ -25,6 +26,8 @@ public enum BinaryOperator {
         } else if (expr instanceof DivExpr) {
             op = DIVISION;
         } else {
+            LoggerFactory.getLogger(BinaryOperator.class)
+                .error("No conversion for binary operation: {}", expr);
             op = INVALID;
         }
         return op;
