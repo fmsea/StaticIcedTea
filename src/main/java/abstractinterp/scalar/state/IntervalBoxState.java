@@ -283,6 +283,10 @@ public class IntervalBoxState implements State {
         return equal;
     }
 
+    public void forget(Local local) {
+        this.updateTop(local);
+    }
+
     public void updateTop(Local l) {
         state.put(l, Interval32Box.TOP());
     }

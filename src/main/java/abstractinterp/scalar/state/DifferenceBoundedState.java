@@ -712,6 +712,18 @@ public class DifferenceBoundedState implements State {
 
     /** Remove all relations containing the provided Local
      *
+     * First computes the closure of the graph then removes any constraint
+     * connecting through <i>local</i>
+     *
+     * @param local Remove connecting edges passing through this variable
+     */
+    public void forget(Local local) {
+        this.computeClosure();
+        this.forgetConstraints(local);
+    }
+
+    /** Remove all relations containing the provided Local
+     *
      * @param l Local to remove connecting edges
      */
     public void forgetConstraints(Local l) {

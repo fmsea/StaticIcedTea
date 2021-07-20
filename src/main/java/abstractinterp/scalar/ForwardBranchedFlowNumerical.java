@@ -114,7 +114,7 @@ public class ForwardBranchedFlowNumerical<S extends State>
                                rhs instanceof JNegExpr) {
                         ifStmtFall.updateState(lVar, in, rhs);
                     } else {
-                        LOGGER.warn("Binary int expression without handle: {}", stmt);
+                        ifStmtFall.forget(lVar);
                     }
                 }
             } else if (s instanceof IfStmt) {

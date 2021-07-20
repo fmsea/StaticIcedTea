@@ -692,4 +692,19 @@ public class DifferenceBoundedStateTest {
                                 "x2->(<= x2 4)\n",
                                 state.toSMT(solver));
     }
+
+    @Test
+    void testForgetTransfer() {
+        DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
+        state.add(xs[0], xs[1], new Constraint(2));
+        state.add(xs[1], xs[2], new Constraint(3));
+        state.add(xs[3], xs[0], new Constraint(1));
+        state.forget(xs[0]);
+        Assertions.assertEquals(Constraint.TOP(), state.getValue(xs[0], xs[1]));
+        Assertions.assertEquals(Constraint.TOP(), state.getValue(xs[3], xs[0]));
+        Assertions.assertEquals(new Constraint(3),
+                                state.getValue(xs[3], xs[1]));
+        Assertions.assertEquals(new Constraint(6),
+                                state.getValue(xs[3], xs[2]));
+    }
 }
