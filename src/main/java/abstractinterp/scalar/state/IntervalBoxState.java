@@ -10,11 +10,15 @@ import soot.Local;
 import soot.Value;
 import soot.jimple.IntConstant;
 import soot.jimple.internal.JNegExpr;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import solver.SolverWrapper;
 
 public class IntervalBoxState implements State {
     // map of variables to its interval abstract state
+
+    private static Logger LOGGER = LoggerFactory.getLogger(IntervalBoxState.class);
 
     private Map<Local, Interval32Box> state;
 
@@ -179,7 +183,7 @@ public class IntervalBoxState implements State {
             // create a new constraint
             ret = new Interval32Box(new_low, new_high);
         } else {
-            System.err.println("Not dealing yet - we assume there is always an interval");
+            LOGGER.warn("Not dealing yet - we assume there is always an interval");
             ret = Interval32Box.TOP();
         }
         return ret;
