@@ -175,6 +175,12 @@ public class IntervalBoxState implements State {
 
                 break;// just use the default for now
             case MODULUS:
+            case BAND:
+            case BOR:
+            case BSHL:
+            case BSHR:
+            case BUSHR:
+            case XOR:
             case INVALID:
             default:
                 // use default max values

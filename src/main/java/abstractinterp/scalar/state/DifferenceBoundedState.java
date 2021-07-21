@@ -556,6 +556,12 @@ public class DifferenceBoundedState implements State {
                 break;
             }
         case MODULUS:
+        case BAND:
+        case BOR:
+        case BSHL:
+        case BSHR:
+        case BUSHR:
+        case XOR:
         case INVALID:
         default:
             // update edges containing lVar to ⟙
@@ -628,6 +634,12 @@ public class DifferenceBoundedState implements State {
                 break;
             }
         case MODULUS:
+        case BAND:
+        case BOR:
+        case BSHL:
+        case BSHR:
+        case BUSHR:
+        case XOR:
         case INVALID:
         default:
             // update edges containing lVar to ⟙
@@ -699,6 +711,12 @@ public class DifferenceBoundedState implements State {
                 break;
             }
         case MODULUS:
+        case BAND:
+        case BOR:
+        case BSHL:
+        case BSHR:
+        case BUSHR:
+        case XOR:
         case INVALID:
         default:
             inState.graph.edgesOf(lVar).forEach(e -> {
