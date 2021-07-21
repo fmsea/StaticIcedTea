@@ -10,11 +10,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class Smt2Format {
     private static String resultsPathFull;
     private static String resultsPathCombined;
     private static String smt2FilesPath;
+    private static Logger LOGGER = LoggerFactory.getLogger(Smt2Format.class);
 
     /**
      * Creates an smt2 formula to if file1Name implies file2Name
@@ -51,14 +55,14 @@ public class Smt2Format {
                     // call the Smt2Format
                     String combinedPath =
                             className + "_" + methodId + "_" + String.valueOf(pathId) + domain;
-                    System.out.println(combinedPath + " " + fullPath);
+                    LOGGER.info(combinedPath + " " + fullPath);
                     SMT2Format(combinedPath, fullPath);
                     pathId++;
                 }
             }
             sPath.close();
         } else {
-            System.out.println("Cannot find " + pathFileName);
+            LOGGER.warn("Cannot find {}", pathFileName);
         }
 
 
@@ -84,7 +88,7 @@ public class Smt2Format {
         String var = "";
         while (scanner.hasNext()) {
             String line = scanner.nextLine();
-            // System.out.println(line);
+            LOGGER.debug(line);
             // if line starts as integer then
             // it is a statement
             if (line.matches("^[0-9].*")) {
@@ -95,7 +99,7 @@ public class Smt2Format {
                     var = "";
                     formula = "";
                 }
-                // System.out.println("Stmt " + line);
+                LOGGER.debug("Stmt {}", line);
                 // found a new statement
                 // create a map for it
                 stmtTo = new HashMap<String, String>();
@@ -112,7 +116,7 @@ public class Smt2Format {
                 String[] data = line.split("->");
                 var = data[0];
                 formula = data[1];
-                // System.out.println("formula " + formula);
+                LOGGER.debug("formula {}", formula);
             } else {
                 // formula might have several lines
                 // so all other lines are nothing else
@@ -125,7 +129,7 @@ public class Smt2Format {
             stmtTo.put(var, formula);
         }
         scanner.close();
-        // System.out.println(file1Map);
+        LOGGER.debug("Map of file1: {}", file1Map);
 
         // now traverse similarly the other file
         // only write a new formula out of it
@@ -152,7 +156,7 @@ public class Smt2Format {
                 stmt = line;
                 constraint = "(echo \"" + stmt + "\")\n";
                 if (stmtTo == null) {
-                    System.out.println("Stmt not present " + line);
+                    LOGGER.warn("Stmt not present {}", line);
                     // System.exit(2);
                     var = "";
                     formula = "";
@@ -198,24 +202,24 @@ public class Smt2Format {
 
     private static String writeConstraint(Map<String, String> stmtTo, String constraint, String var,
             String formula) throws IOException {
-        // System.out.println(stmtTo + " " + constraint + " " + var + " " + formula);
+        LOGGER.debug("stmtTo {} {} {}", constraint, var, formula);
         String formula1 = stmtTo.get(var);
         if (formula1 == null) {
-            System.out.println("No formula for var " + var + " in stmt " + stmtTo);
+            LOGGER.warn("No formula for var {} in stmt {}", var, stmtTo);
             // set it to unsat
             // need to make var to be without f
             String varF = var;
             if (var.endsWith("f")) {
                 // false branch need to remove f
                 varF = var.substring(0, var.length() - 1);
-                // System.out.println("var " + var);
+                LOGGER.debug("var {}", var);
             }
             formula1 = "(and (> " + varF + " 0) (< " + varF + " 0))";
             // System.exit(2);
         }
         String forward = Smt2Format.implies(var, formula1, formula);
         String backward = Smt2Format.implies(var, formula, formula1);
-        // System.out.println(forward + backward);
+        LOGGER.debug("forward: {} -> backward {}", forward, backward);
         // constraint += "(echo \"" + var + "\") \n" + forward + backward;
         return "(echo \"" + var + "\")\n" + forward + backward;
     }
@@ -224,7 +228,7 @@ public class Smt2Format {
         if (var.endsWith("f")) {
             // false branch need to remove f
             var = var.substring(0, var.length() - 1);
-            // System.out.println("var " + var);
+            LOGGER.debug("var {}", var);
         }
         String implies = "(push)\n" + "(assert (forall ((" + var + " Int))\n" + "(=> " + from + " "
                 + to + ")))\n" + "(check-sat)\n(pop)\n";
