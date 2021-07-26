@@ -48,13 +48,13 @@ public class DBSNumericalTest {
             "1 l0 = 3:<moreConstantMathSootClass: void moreConstantMath()>",
             "l0->(= l0 3)",
             "2 l1 = l0 + 6:<moreConstantMathSootClass: void moreConstantMath()>",
-            "l1->(and (= l1 (+ 6 l0)) (= l1 9))",
+            "l1->(and (= l1 9) (= l1 (+ 6 l0)))",
             "3 l2 = l1 - l0:<moreConstantMathSootClass: void moreConstantMath()>",
             "l2->(= l2 6)",
             "4 l3 = l2 * -1:<moreConstantMathSootClass: void moreConstantMath()>",
             "l3->(= l3 (- 6))",
             "5 l0 = l3 / l2:<moreConstantMathSootClass: void moreConstantMath()>",
-            "l0->(and (= l1 (+ 6 l0)) (= l0 (- 1)))"
+            "l0->(and (= l0 (- 1)) (= l1 (+ 6 l0)))"
         };
         Assertions.assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
@@ -77,8 +77,11 @@ public class DBSNumericalTest {
             "3 l2 = 0:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
             "l2->(= l2 0)",
             "4 if l0 >= 3 goto l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
+            "l0->(= l0 2)",
+            "l0f->(and (= l0 4) (>= l0 3) (<= l1 (+ (- 3) l0)) (<= l2 (+ (- 3) l0)))",
+            "5 l3 = l1 / l2:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
             "6 l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
-            "l3->(= l3 6)",
+            "l3->(and (= l3 6) (<= l3 (+ 3 l0)))",
         };
         Assertions.assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
@@ -125,6 +128,10 @@ public class DBSNumericalTest {
             "3 b3 = 3:<test.Example1M: int example_5(int)>",
             "b3->(= b3 3)",
             "4 if b3 != 0 goto i4 = b3 + b2:<test.Example1M: int example_5(int)>",
+            "b3->(= b3 0)",
+            "b3f->(= b3 3)",
+            "5 i4 = b3 - b2:<test.Example1M: int example_5(int)>",
+            "i4->(= i4 (- 1))",
             "7 i4 = b3 + b2:<test.Example1M: int example_5(int)>",
             "i4->(= i4 4)",
             "8 $i0 = b3 * i4:<test.Example1M: int example_5(int)>",

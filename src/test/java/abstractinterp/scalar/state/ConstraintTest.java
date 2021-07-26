@@ -6,6 +6,13 @@ import org.junit.jupiter.api.Test;
 public class ConstraintTest {
 
     @Test
+    void testIsTop() {
+        Assertions.assertFalse(Constraint.BOT().isTop());
+        Assertions.assertFalse(new Constraint(0, PredicateType.Lt).isTop());
+        Assertions.assertTrue(Constraint.TOP().isTop());
+    }
+
+    @Test
     void testConstraintTopNegate() {
         Assertions.assertEquals(new Constraint(Integer.MIN_VALUE + 1,
                                                PredicateType.Ge),

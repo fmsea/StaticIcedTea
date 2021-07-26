@@ -1,74 +1,47 @@
 package abstractinterp.scalar.state;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
-import org.jgrapht.Graph;
-import org.jgrapht.GraphPath;
-import org.jgrapht.Graphs;
-import org.jgrapht.alg.shortestpath.BFSShortestPath;
-import org.jgrapht.alg.shortestpath.BellmanFordShortestPath;
-import org.jgrapht.alg.shortestpath.FloydWarshallShortestPaths;
-import org.jgrapht.alg.shortestpath.NegativeCycleDetectedException;
-import org.jgrapht.graph.DefaultDirectedGraph;
-import org.jgrapht.graph.DefaultDirectedWeightedGraph;
-import org.jgrapht.graph.DefaultEdge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import soot.IntType;
 import soot.Local;
 import soot.Value;
 import soot.grimp.Grimp;
 import soot.jimple.BinopExpr;
 import soot.jimple.IntConstant;
-import soot.jimple.Jimple;
 import soot.jimple.internal.JNegExpr;
 
 import solver.SolverWrapper;
 
 public class DifferenceBoundedState implements State {
 
-    private Graph<Local, Constraint> graph;
-    private boolean feasible = true;
-    private Logger LOGGER;
-    public final Local ZERO;
+    private DifferenceBoundedGraph dbs;
+    private static Logger LOGGER = LoggerFactory.getLogger(DifferenceBoundedState.class);
+    public static final Local ZERO = Variable.ZERO;
 
     public DifferenceBoundedState(Set<Local> locals, boolean top) {
-        this(locals, top, true);
+        Set<Local> localsWithZero = new HashSet<>();
+        localsWithZero.addAll(locals);
+        localsWithZero.add(ZERO);
+        this.dbs = new DifferenceBoundedGraph(localsWithZero);
     }
 
     public DifferenceBoundedState(DifferenceBoundedState state) {
-        this(state.graph.vertexSet(), false, state.feasible);
-        copyGraph(state.graph, this.graph);
-    }
-
-    public DifferenceBoundedState(Set<Local> locals, boolean top, boolean feasible) {
-        this.LOGGER = LoggerFactory.getLogger(DifferenceBoundedState.class);
-        this.feasible = feasible;
-        this.graph = new DefaultDirectedGraph<>(Constraint.class);
-        this.ZERO = Variable.ZERO;
-        this.graph.addVertex(this.ZERO);
-        for (Local l : locals) {
-            this.graph.addVertex(l);
-            // if (top) {
-            //     this.graph.addEdge(l, this.ZERO, Constraint.TOP());
-            // } else {
-            //     // this probably will need to change to Max or something different...
-            //     this.graph.addEdge(l, this.ZERO, Constraint.BOT());
-            // }
-        }
+        this(state.getLocals(), false);
+        state.dbs.copyTo(this.dbs);
     }
 
     /** Return the set of known locals of the graph.
      */
     public Set<Local> getLocals() {
-        return this.graph.vertexSet();
+        return this.dbs.getLocals();
     }
 
     public State copy() {
@@ -88,7 +61,7 @@ public class DifferenceBoundedState implements State {
      * We remove any existing edge before adding the new edge/constraint.
      */
     public void add(Local l, Constraint constraint) {
-        this.add(l, this.ZERO, constraint);
+        this.add(l, ZERO, constraint);
     }
 
     /** Add a constraint through the two provided locals.
@@ -99,30 +72,17 @@ public class DifferenceBoundedState implements State {
      * Remove the edge before adding the new edge of the constraint.
      */
     public void add(Local l, Local r, Constraint constraint) {
-        this.graph.removeEdge(l, r);
-        this.graph.addEdge(l, r, constraint);
+        this.dbs.add(l, r, constraint);
     }
 
-    public boolean intersection(DifferenceBoundedState inState) {
-        for (Constraint c : inState.graph.edgeSet()) {
-            Local s = inState.graph.getEdgeSource(c);
-            Local t = inState.graph.getEdgeTarget(c);
-            if (this.getValue(s, t).compareTo(c) == 1) {
-                this.add(s, t, c);
-            }
-        }
-        return this.isFeasible();
-    }
-
-
-    /** Get the constraint through the ZERO element.
+    /** Get the constraint connecting <i>l</i> through <i>ZERO</i>
      *
-     * If no edge exists, we return TOP automatically.
+     * If no edge directly connects the two locals, we return TOP.
      *
      * This method shall never return null.
      */
-    public Constraint getValue(Local l) {
-        return this.getValue(l, this.ZERO);
+    public Constraint getConstraint(Local l) {
+        return this.eval(l);
     }
 
     /** Get the constraint connecting the two locals.
@@ -131,24 +91,22 @@ public class DifferenceBoundedState implements State {
      *
      * This method shall never return null.
      */
-    public Constraint getValue(Local l, Local r) {
-        Constraint c = this.eval(l, r);
-        if (c == null) {
-            c = Constraint.TOP();
-        }
-        return c;
+    public Constraint getConstraint(Local s, Local t) {
+        return this.eval(s, t);
     }
 
-    private Constraint eval(Value v) {
-        Constraint c;
-        if (v instanceof IntConstant) {
-            c = this.eval((IntConstant) v);
-        } else if (v instanceof Local) {
-            c = this.eval((Local) v);
-        } else {
-            c = Constraint.TOP();
-        }
-        return c;
+    public Optional<Constraint> getValue(Local l) {
+        return this.getValue(l, ZERO);
+    }
+
+    /** Get the constraint connecting the two locals.
+     *
+     * If no edge directly connects the two locals, we return TOP.
+     *
+     * This method shall never return null.
+     */
+    public Optional<Constraint> getValue(Local s, Local t) {
+        return this.dbs.getValue(s, t);
     }
 
     private Constraint eval(IntConstant constant) {
@@ -156,128 +114,15 @@ public class DifferenceBoundedState implements State {
     }
 
     private Constraint eval(Local l) {
-        return this.eval(l, this.ZERO);
+        return this.eval(l, ZERO);
     }
 
     private Constraint eval(Local l, Local r) {
-        return this.graph.getEdge(l, r);
-    }
-
-    private boolean computeClosure() {
-        // early exit, no point if graph contains bottoms
-        if (this.anyBottoms()) {
-            return false;
-        }
-        Set<Local> vertices = this.graph.vertexSet();
-        int dim = vertices.size();
-        Map<Local, Integer> indices = new HashMap<>();
-        Map<Integer, Local> indicesToVertices = new HashMap<>();
-        {
-            int i = 0;
-            for (Local l : vertices) {
-                indices.put(l, i);
-                indicesToVertices.put(i, l);
-                i++;
-            }
-        }
-        Constraint[][] dbm = new Constraint[dim][dim];
-        for (int i = 0; i < dim; i++) {
-            Arrays.fill(dbm[i], Constraint.TOP());
-            dbm[i][i] = new Constraint(0, PredicateType.Le);
-        }
-
-        for (Constraint c : this.graph.edgeSet()) {
-            Local s = this.graph.getEdgeSource(c);
-            Local t = this.graph.getEdgeTarget(c);
-            int si = indices.get(s);
-            int ti = indices.get(t);
-            dbm[si][ti] = c;
-        }
-
-        // Floyd-Warshall Shortest Paths
-        for (int k = 0; k < dim; k++) {
-            for (int i = 0; i < dim; i++) {
-                for (int j = 0; j < dim; j++) {
-                    Constraint c = Constraint.add(dbm[i][k], dbm[k][j]);
-                    Constraint m = Constraint.min(dbm[i][j], c);
-                    dbm[i][j] = m;
-                }
-            }
-        }
-
-        // Update Graph with computed Constraints
-        for (Local v1 : vertices) {
-            for (Local v2 : vertices) {
-                int v1i = indices.get(v1);
-                int v2i = indices.get(v2);
-                // only copy non-top edges to graph
-                if (v1i == v2i && dbm[v1i][v2i].bound() == 0) {
-                    continue;
-                } else if (dbm[v1i][v2i].isTop()) {
-                    // if the computed edge is top, remove the edge
-                    this.graph.removeEdge(v1, v2);
-                } else {
-                    this.add(v1, v2, dbm[v1i][v2i]);
-                }
-            }
-        }
-
-        this.feasible = true;
-        for (int i = 0; i < dim; i++) {
-            if (dbm[i][i].bound() < 0) {
-                this.feasible = false;
-            }
-        }
-        return this.feasible;
-    }
-
-    private boolean computeClosureBF() {
-        Graph<Local, DefaultEdge> g = new DefaultDirectedWeightedGraph<>(DefaultEdge.class);
-        this.graph.vertexSet().forEach(v -> g.addVertex(v));
-        this.graph.vertexSet().forEach(v1 -> {
-                this.graph.vertexSet().forEach(v2 -> {
-                        DefaultEdge e;
-                        if (v1.equals(v2)) {
-                            e = g.addEdge(v1, v2);
-                            g.setEdgeWeight(e, 0.0);
-                        } else {
-                            e = g.addEdge(v1, v2);
-                            g.setEdgeWeight(e, Double.POSITIVE_INFINITY);
-                        }
-                    });
-            });
-        this.graph.edgeSet().forEach(c -> {
-                Local s = this.graph.getEdgeSource(c);
-                Local t = this.graph.getEdgeTarget(c);
-                DefaultEdge e = g.getEdge(s, t);
-                g.setEdgeWeight(e, c.bound());
-            });
-        BellmanFordShortestPath<Local, DefaultEdge> sps = new BellmanFordShortestPath<>(g);
-        for (Local v : g.vertexSet()) {
-            try {
-                sps.getPaths(v);
-            } catch (NegativeCycleDetectedException ex) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean anyBottoms() {
-        for (Constraint b : this.graph.edgeSet()) {
-            if (b.isBottom()) {
-                return true;
-            }
-        }
-        return false;
+        return this.dbs.eval(l, r);
     }
 
     public boolean isFeasible() {
-        DifferenceBoundedState state = new DifferenceBoundedState(this);
-        this.feasible = state.computeClosure() && !state.anyBottoms();
-        LOGGER.trace("this graph: {}", this.graph);
-        LOGGER.trace("closed graph: {}", state.graph);
-        return this.feasible;
+        return this.dbs.isFeasible();
     }
 
 
@@ -290,28 +135,13 @@ public class DifferenceBoundedState implements State {
     }
 
     public void widenWith(DifferenceBoundedState inState) {
-        LOGGER.debug("widening this {} with {}", this.graph, inState.graph);
-        Graph<Local, Constraint> copy = new DefaultDirectedGraph<>(Constraint.class);
-        copyGraph(this.graph, copy);
-
-        // Close inState
-        inState.computeClosure();
-
-        for (Constraint c1 : copy.edgeSet()) {
-            Local s = copy.getEdgeSource(c1);
-            Local t = copy.getEdgeTarget(c1);
-            Constraint c2 = inState.getValue(s, t);
-            LOGGER.trace("Widening edge: {} < {} ? {}",
-                         c1, c2, c1.compareTo(c2));
-            if (!(c1.isBottom() || c2.isBottom()) && c1.compareTo(c2) == -1) {
-                this.add(s, t, Constraint.TOP());
-            }
-        }
+        LOGGER.debug("Widening ...");
+        this.dbs.widenWith(inState.dbs);
     }
 
     public void mergeWith(State inState) {
         if (inState instanceof DifferenceBoundedState) {
-            mergeWith((DifferenceBoundedState) inState);
+            this.union((DifferenceBoundedState) inState);
         } else {
             throw new RuntimeException("invalid types for merge");
         }
@@ -320,54 +150,17 @@ public class DifferenceBoundedState implements State {
     public void mergeWith(DifferenceBoundedState inState) {
         // To ensure the best results, both graphs need to be "strongly closed"...
         LOGGER.debug("Merging Paths...");
-        LOGGER.trace("Merge {} with {}", this.graph, inState.graph);
-        this.computeClosure();
-        inState.computeClosure();
-        LOGGER.debug("isFeasible ? {} and {}", this.feasible, inState.feasible);
-        Graph<Local, Constraint> copy = new DefaultDirectedGraph<>(Constraint.class);
-        copyGraph(this.graph, copy);
-        Map<Local, Local> visited = new HashMap<>();
-        for (Constraint c1 : copy.edgeSet()) {
-            Local s = copy.getEdgeSource(c1);
-            Local t = copy.getEdgeTarget(c1);
-            Constraint c2 = inState.graph.getEdge(s, t);
-            visited.put(s, t);
-            if (c2 != null) {
-                LOGGER.trace("Join: max({}, {}) = {}", c1, c2, Constraint.max(c1, c2));
-                this.add(s, t, Constraint.max(c1, c2));
-            } else {
-                LOGGER.trace("Join: max({}, ∅) = {}", c1, c1);
-                this.add(s, t, c1);
-            }
-        }
-        for (Constraint c1 : inState.graph.edgeSet()) {
-            Local s = inState.graph.getEdgeSource(c1);
-            Local t = inState.graph.getEdgeTarget(c1);
-            Local v;
-            if ((v = visited.get(s)) != null && v.equals(t)) {
-                continue;
-            } else {
-                Constraint c2 = copy.getEdge(s, t);
-                if (c2 != null) {
-                    LOGGER.trace("Join: max({}, {}) = {}", c2, c1, Constraint.max(c2, c1));
-                    this.add(s, t, Constraint.max(c2, c1));
-                } else {
-                    LOGGER.trace("Join: max(∅, {}) = {}", c1, c1);
-                    this.add(s, t, c1);
-                }
-            }
-        }
+        this.dbs.union(inState.dbs);
     }
 
-    private static void copyGraph(Graph<Local, Constraint> in,
-                                  Graph<Local, Constraint> out) {
-        in.vertexSet().forEach(v -> out.addVertex(v));
-        in.edgeSet().forEach(e -> {
-                Local s = in.getEdgeSource(e);
-                Local t = in.getEdgeTarget(e);
-                out.removeEdge(s, t);
-                out.addEdge(s, t, e.copy());
-            });
+    public void union(DifferenceBoundedState inState) {
+        LOGGER.debug("joining paths...");
+        this.dbs.union(inState.dbs);
+    }
+
+    public void intersection(DifferenceBoundedState inState) {
+        LOGGER.debug("intersecting paths...");
+        this.dbs.intersection(inState.dbs);
     }
 
     public static State initialFlow(Set<Local> locals, boolean top) {
@@ -376,8 +169,7 @@ public class DifferenceBoundedState implements State {
 
     public void copyTo(DifferenceBoundedState out) {
         if (out != null) {
-            out.feasible = this.feasible;
-            copyGraph(this.graph, out.graph);
+            this.dbs.copyTo(out.dbs);
         }
     }
 
@@ -405,15 +197,15 @@ public class DifferenceBoundedState implements State {
         if (v instanceof JNegExpr) {
             v = ((JNegExpr) v).getOp();
             Constraint c = eval(inState, v);
-            this.add(this.ZERO, lVar, c);
+            this.add(ZERO, lVar, c);
         } else if (v instanceof IntConstant) {
             IntConstant ic = (IntConstant) v;
             Constraint c = new Constraint(ic.value, PredicateType.Eq);
-            this.add(lVar, this.ZERO, c);
+            this.add(lVar, ZERO, c);
         } else if (v instanceof Local) {
             this.add(lVar, (Local) v, new Constraint(0, PredicateType.Eq));
         } else {
-            this.add(lVar, this.ZERO, Constraint.TOP());
+            this.add(lVar, ZERO, Constraint.TOP());
         }
     }
 
@@ -450,7 +242,7 @@ public class DifferenceBoundedState implements State {
         } else if (left instanceof Local && right instanceof Local) {
             this.updateState(lVar, inState, (Local) left, (Local) right, type);
         } else {
-            this.add(lVar, this.ZERO, Constraint.TOP());
+            this.add(lVar, ZERO, Constraint.TOP());
         }
     }
 
@@ -468,7 +260,7 @@ public class DifferenceBoundedState implements State {
                             IntConstant right,
                             BinaryOperator op) {
         Constraint c = Constraint.transferBinary(left, right, op);
-        this.add(lVar, this.ZERO, c);
+        this.add(lVar, ZERO, c);
     }
 
     /** Assign lVar constraint with respect to a single local.
@@ -488,27 +280,14 @@ public class DifferenceBoundedState implements State {
                             Local left,
                             IntConstant right,
                             BinaryOperator op) {
-        Constraint leftConstraint;
+        Optional<Constraint> leftConstraint;
         Constraint rightConstraint = this.eval(right);
         switch (op) {
         case ADDITION:
             if (lVar.equals(left)) {
-                inState.graph.outgoingEdgesOf(lVar).forEach(e -> {
-                        Constraint x = e.copy();
-                        Constraint c = new Constraint(right.value);
-                        x.add(c);
-                        Local s = inState.graph.getEdgeSource(e);
-                        Local t = inState.graph.getEdgeTarget(e);
-                        this.add(s, t, x);
-                    });
-                inState.graph.incomingEdgesOf(lVar).forEach(e -> {
-                        Constraint x = e.copy();
-                        Constraint c = new Constraint(right.value);
-                        x.subtract(c);
-                        Local s = inState.graph.getEdgeSource(e);
-                        Local t = inState.graph.getEdgeTarget(e);
-                        this.add(s, t, x);
-                    });
+                Constraint c = this.eval(right);
+                this.dbs.addOutgoingFrom(lVar, c, inState.dbs);
+                this.dbs.subIncomingFrom(lVar, c, inState.dbs);
             } else {
                 forgetConstraints(lVar);
                 this.add(lVar, left, new Constraint(right.value));
@@ -516,22 +295,9 @@ public class DifferenceBoundedState implements State {
             break;
         case SUBTRACTION:
             if (lVar.equals(left)) {
-                inState.graph.outgoingEdgesOf(lVar).forEach(e -> {
-                        Constraint x = e.copy();
-                        Constraint c = new Constraint(right.value, PredicateType.Eq);
-                        x.subtract(c);
-                        Local s = inState.graph.getEdgeSource(e);
-                        Local t = inState.graph.getEdgeTarget(e);
-                        this.add(s, t, x);
-                    });
-                inState.graph.incomingEdgesOf(lVar).forEach(e -> {
-                        Constraint x = e.copy();
-                        Constraint c = new Constraint(right.value, PredicateType.Eq);
-                        x.add(c);
-                        Local s = inState.graph.getEdgeSource(e);
-                        Local t = inState.graph.getEdgeTarget(e);
-                        this.add(s, t, x);
-                    });
+                Constraint c = this.eval(right);
+                this.dbs.subOutgoingFrom(lVar, c, inState.dbs);
+                this.dbs.addIncomingFrom(lVar, c, inState.dbs);
             } else {
                 forgetConstraints(lVar);
                 this.add(lVar, left, new Constraint(right.value * -1));
@@ -540,19 +306,17 @@ public class DifferenceBoundedState implements State {
         case MULTIPLICATION:
             this.projectInterval(left, inState);
             forgetConstraints(lVar);
-            if ((leftConstraint = this.eval(left)) != null) {
-                Constraint c = leftConstraint.copy();
-                c.multiply(rightConstraint);
-                this.add(lVar, c);
+            if ((leftConstraint = this.getValue(left, ZERO)).isPresent()) {
+                Constraint c = leftConstraint.get();
+                this.add(lVar, Constraint.multiply(c, rightConstraint));
                 break;
             }
         case DIVISION:
             this.projectInterval(left, inState);
             forgetConstraints(lVar);
-            if ((leftConstraint = this.eval(left)) != null) {
-                Constraint c = leftConstraint.copy();
-                c.divide(rightConstraint);
-                this.add(lVar, c);
+            if ((leftConstraint = this.getValue(left, ZERO)).isPresent()) {
+                Constraint c = leftConstraint.get();
+                this.add(lVar, Constraint.divide(c, rightConstraint));
                 break;
             }
         case MODULUS:
@@ -565,11 +329,7 @@ public class DifferenceBoundedState implements State {
         case INVALID:
         default:
             // update edges containing lVar to ⟙
-            inState.graph.edgesOf(lVar).forEach(e -> {
-                    Local s = inState.graph.getEdgeSource(e);
-                    Local t = inState.graph.getEdgeTarget(e);
-                    this.add(s, t, Constraint.TOP());
-                });
+            this.updateTop(lVar);
         }
         this.projectInterval(lVar, this);
     }
@@ -587,50 +347,37 @@ public class DifferenceBoundedState implements State {
                             Local right,
                             BinaryOperator op) {
         Constraint leftConstraint = this.eval(left);
-        Constraint rightConstraint;
+        Optional<Constraint> rightConstraint;
         switch (op) {
         case ADDITION:
             if (lVar.equals(right)) {
-                inState.graph.outgoingEdgesOf(lVar).forEach(e -> {
-                        Constraint x = e.copy();
-                        Constraint c = new Constraint(left.value, PredicateType.Eq);
-                        x.add(c);
-                        Local s = inState.graph.getEdgeSource(e);
-                        Local t = inState.graph.getEdgeTarget(e);
-                        this.add(s, t, x);
-                    });
-                inState.graph.incomingEdgesOf(lVar).forEach(e -> {
-                        Constraint x = e.copy();
-                        Constraint c = new Constraint(left.value, PredicateType.Eq);
-                        x.subtract(c);
-                        Local s = inState.graph.getEdgeSource(e);
-                        Local t = inState.graph.getEdgeTarget(e);
-                        this.add(s, t, x);
-                    });
+                Constraint c = this.eval(left);
+                this.dbs.addOutgoingFrom(lVar, c, inState.dbs);
+                this.dbs.subIncomingFrom(lVar, c, inState.dbs);
             } else {
                 this.forgetConstraints(lVar);
-                this.add(lVar, right, new Constraint(left.value));
+                this.add(lVar, right, this.eval(left));
             }
             break;
         case SUBTRACTION:
             this.projectInterval(right, inState);
             this.forgetConstraints(lVar);
-            if ((rightConstraint = this.eval(right)) != null) {
-                this.add(lVar, leftConstraint.subtract(rightConstraint));
+            if ((rightConstraint = this.getValue(right, ZERO)).isPresent()) {
+                this.add(lVar, Constraint.subtract(leftConstraint, rightConstraint.get()));
                 break;
             }
         case MULTIPLICATION:
             this.projectInterval(right, inState);
             this.forgetConstraints(lVar);
-            if ((rightConstraint = this.eval(right)) != null) {
-                this.add(lVar, leftConstraint.multiply(rightConstraint));
+            if ((rightConstraint = this.getValue(right, ZERO)).isPresent()) {
+                this.add(lVar, Constraint.multiply(leftConstraint, rightConstraint.get()));
                 break;
             }
         case DIVISION:
             this.projectInterval(right, inState);
             this.forgetConstraints(lVar);
-            if ((rightConstraint = this.eval(right)) != null) {
-                this.add(lVar, leftConstraint.divide(rightConstraint));
+            if ((rightConstraint = this.getValue(right, ZERO)).isPresent()) {
+                this.add(lVar, Constraint.divide(leftConstraint, rightConstraint.get()));
                 break;
             }
         case MODULUS:
@@ -643,11 +390,7 @@ public class DifferenceBoundedState implements State {
         case INVALID:
         default:
             // update edges containing lVar to ⟙
-            inState.graph.edgesOf(lVar).forEach(e -> {
-                    Local s = inState.graph.getEdgeSource(e);
-                    Local t = inState.graph.getEdgeTarget(e);
-                    this.add(s, t, Constraint.TOP());
-                });
+            this.updateTop(lVar);
         }
         this.projectInterval(lVar, this);
     }
@@ -663,51 +406,44 @@ public class DifferenceBoundedState implements State {
                             Local left,
                             Local right,
                             BinaryOperator op) {
-        Constraint c;
-        Constraint d;
+        Optional<Constraint> c;
+        Optional<Constraint> d;
         switch (op) {
         case ADDITION:
-            if ((c = inState.graph.getEdge(left, right)) != null) {
-                this.add(lVar, this.ZERO, c.copy());
-            } else if ((c =  inState.graph.getEdge(right, left)) != null) {
-                this.add(lVar, this.ZERO, c.copy());
-            } else if ((c = inState.graph.getEdge(left, this.ZERO)) != null &&
-                       (d = inState.graph.getEdge(right, this.ZERO)) != null) {
-                this.add(lVar, this.ZERO, c.copy().add(d));
+            if ((c = inState.getValue(left, right)).isPresent()) {
+                this.add(lVar, ZERO, c.get());
+            } else if ((c =  inState.getValue(right, left)).isPresent()) {
+                this.add(lVar, ZERO, c.get());
+            } else if ((c = inState.getValue(left, ZERO)).isPresent() &&
+                       (d = inState.getValue(right, ZERO)).isPresent()) {
+                this.add(lVar, ZERO, Constraint.add(c.get(), d.get()));
             } else {
-                this.graph.edgesOf(lVar).forEach(e -> {
-                        Local s = this.graph.getEdgeSource(e);
-                        Local t = this.graph.getEdgeTarget(e);
-                        this.add(s, t, Constraint.TOP());
-                    });
+                this.updateTop(lVar);
             }
             break;
         case SUBTRACTION:
-            if ((c = inState.graph.getEdge(left, right)) != null) {
-                this.add(lVar, this.ZERO, c.copy());
-            } else if ((c = inState.graph.getEdge(right, left)) != null) {
-                this.add(lVar, this.ZERO, new Constraint(c.bound() * -1, c.predicate()));
-            } else if ((c = inState.graph.getEdge(left, this.ZERO)) != null &&
-                         (d = inState.graph.getEdge(right, this.ZERO)) != null) {
-                this.add(lVar, this.ZERO, c.copy().subtract(d));
+            if ((c = inState.getValue(left, right)).isPresent()) {
+                this.add(lVar, ZERO, c.get());
+            } else if ((c = inState.getValue(right, left)).isPresent()) {
+                Constraint x = c.get();
+                this.add(lVar, ZERO, new Constraint(x.bound() * -1, x.predicate()));
+            } else if ((c = inState.getValue(left, ZERO)).isPresent() &&
+                       (d = inState.getValue(right, ZERO)).isPresent()) {
+                this.add(lVar, ZERO, Constraint.subtract(c.get(), d.get()));
             } else {
-                this.graph.edgesOf(lVar).forEach(e -> {
-                        Local s = this.graph.getEdgeSource(e);
-                        Local t = this.graph.getEdgeTarget(e);
-                        this.add(s, t, Constraint.TOP());
-                    });
+                this.updateTop(lVar);
             }
             break;
         case MULTIPLICATION:
-            if ((c = inState.graph.getEdge(left, this.ZERO)) != null &&
-                (d = inState.graph.getEdge(right, this.ZERO)) != null) {
-                this.add(lVar, this.ZERO, c.copy().multiply(d));
+            if ((c = inState.getValue(left, ZERO)).isPresent() &&
+                (d = inState.getValue(right, ZERO)).isPresent()) {
+                this.add(lVar, ZERO, Constraint.multiply(c.get(), d.get()));
                 break;
             }
         case DIVISION:
-            if ((c = inState.graph.getEdge(left, this.ZERO)) != null &&
-                (d = inState.graph.getEdge(right, this.ZERO)) != null) {
-                this.add(lVar, this.ZERO, c.copy().divide(d));
+            if ((c = inState.getValue(left, ZERO)).isPresent() &&
+                (d = inState.getValue(right, ZERO)).isPresent()) {
+                this.add(lVar, ZERO, Constraint.divide(c.get(), d.get()));
                 break;
             }
         case MODULUS:
@@ -719,11 +455,7 @@ public class DifferenceBoundedState implements State {
         case XOR:
         case INVALID:
         default:
-            inState.graph.edgesOf(lVar).forEach(e -> {
-                    Local s = inState.graph.getEdgeSource(e);
-                    Local t = inState.graph.getEdgeTarget(e);
-                    this.add(s, t, Constraint.TOP());
-                });
+            this.updateTop(lVar);
         }
         this.projectInterval(lVar, this);
     }
@@ -736,8 +468,7 @@ public class DifferenceBoundedState implements State {
      * @param local Remove connecting edges passing through this variable
      */
     public void forget(Local local) {
-        this.computeClosure();
-        this.forgetConstraints(local);
+        this.dbs.forget(local);
     }
 
     /** Remove all relations containing the provided Local
@@ -745,9 +476,7 @@ public class DifferenceBoundedState implements State {
      * @param l Local to remove connecting edges
      */
     public void forgetConstraints(Local l) {
-        this.graph.edgesOf(l).forEach(e -> {
-                this.graph.removeEdge(e);
-            });
+        this.dbs.forgetConstraints(l);
     }
 
     private static Constraint eval(DifferenceBoundedState inState, Value v) {
@@ -757,7 +486,7 @@ public class DifferenceBoundedState implements State {
             c = new Constraint(value, PredicateType.Eq);
         } else if (v instanceof Local) {
             Local l = (Local) v;
-            c = inState.getValue(l, Variable.ZERO);
+            c = inState.eval(l, Variable.ZERO);
         } else {
             c = Constraint.TOP();
         }
@@ -768,9 +497,7 @@ public class DifferenceBoundedState implements State {
      *
      */
     public void projectIntervals(DifferenceBoundedState inState) {
-        this.graph.vertexSet().forEach(v -> {
-                this.projectInterval(v, inState);
-            });
+        this.dbs.projectIntervalsFrom(ZERO, inState.dbs);
     }
 
     /** Project Interval Bounds for local l
@@ -778,60 +505,52 @@ public class DifferenceBoundedState implements State {
      * @param l Local to Project
      */
     public void projectInterval(Local l, DifferenceBoundedState inState) {
-        LOGGER.debug("Projecting Interval for {}", l);
-        LOGGER.trace("Before Projection: {}", inState.graph);
-        BFSShortestPath<Local, Constraint> bfs = new BFSShortestPath<>(inState.graph);
-        GraphPath<Local, Constraint> path = bfs.getPath(l, this.ZERO);
-        if (path != null) {
-            Constraint newEdge = new Constraint(0, PredicateType.Eq);
-            for (Constraint c : path.getEdgeList()) {
-                newEdge.add(c);
-            }
-            this.add(l, this.ZERO, newEdge);
-        }
-        LOGGER.debug("new projected graph: {}", this.graph);
+        this.dbs.projectIntervalFrom(l, ZERO, inState.dbs);
     }
 
     @Override
     public String toString() {
-        return this.graph.toString();
+        return this.dbs.toString();
     }
 
     public String toSMT(SolverWrapper solver) {
         StringBuilder sb = new StringBuilder();
-        this.graph.edgeSet().forEach(c -> {
-                Local s = this.graph.getEdgeSource(c);
-                Local t = this.graph.getEdgeTarget(c);
-                sb.append(s.toString());
-                sb.append("->");
-                sb.append(solver.smt2(this.toGrimpExpr(s, t, c)));
-                sb.append("\n");
-            });
+        for (DBSTriple triple : this.dbs.getConstraints()) {
+            sb.append(triple.source.toString());
+            sb.append("->");
+            sb.append(solver.smt2(this.toGrimpExpr(triple)));
+            sb.append("\n");
+        }
         return sb.toString();
     }
 
     public String toSMT(Local l, SolverWrapper solver) {
         StringBuilder sb = new StringBuilder();
-        Set<Constraint> edges = this.graph.edgesOf(l);
-        LOGGER.debug("edges: {}", edges);
-        if (edges.size() == 0) {
-            sb.append(solver.smt2(this.toGrimpExpr(l, this.ZERO, Constraint.TOP())));
-        } else if (edges.size() == 1) {
-            Constraint c = edges.iterator().next();
-            Local s = this.graph.getEdgeSource(c);
-            Local t = this.graph.getEdgeTarget(c);
-            sb.append(solver.smt2(this.toGrimpExpr(s, t, c)));
+        List<DBSTriple> triples = this.dbs.getConstraints(l)
+            .stream()
+            .filter(t -> !t.constraint.isTop())
+            .filter(t -> !t.source.equals(t.target)) // remove over specified constraints: e.g., l0 - l0 <= 1
+            .collect(Collectors.toList());
+        Collections.sort(triples, (a, b) -> (a.target.toString().compareTo(b.target.toString())));
+        LOGGER.debug("edges: {}", triples);
+        if (triples.size() == 0) {
+            sb.append(solver.smt2(this.toGrimpExpr(l, ZERO, Constraint.TOP())));
+        } else if (triples.size() == 1) {
+            DBSTriple triple = triples.iterator().next();
+            sb.append(solver.smt2(this.toGrimpExpr(triple)));
         } else {
             sb.append("(and");
-            for (Constraint c : edges) {
-                Local s = this.graph.getEdgeSource(c);
-                Local t = this.graph.getEdgeTarget(c);
+            for (DBSTriple triple : triples) {
                 sb.append(" ");
-                sb.append(solver.smt2(this.toGrimpExpr(s, t, c)));
+                sb.append(solver.smt2(this.toGrimpExpr(triple)));
             }
             sb.append(")");
         }
         return sb.toString();
+    }
+
+    private BinopExpr toGrimpExpr(DBSTriple triple) {
+        return this.toGrimpExpr(triple.source, triple.target, triple.constraint);
     }
 
     private BinopExpr toGrimpExpr(Local s, Local t, Constraint c) {
@@ -863,9 +582,9 @@ public class DifferenceBoundedState implements State {
                                                      Grimp.v().newGtExpr(t, IntConstant.v(0)));
             BinopExpr sBottom = Grimp.v().newAndExpr(Grimp.v().newLeExpr(s, IntConstant.v(0)),
                                                      Grimp.v().newGtExpr(s, IntConstant.v(0)));
-            if (s.equals(this.ZERO)) {
+            if (s.equals(ZERO)) {
                 r = tBottom;
-            } else if (t.equals(this.ZERO)) {
+            } else if (t.equals(ZERO)) {
                 r = sBottom;
             } else {
                 r = Grimp.v().newAndExpr(sBottom, tBottom);
@@ -877,7 +596,7 @@ public class DifferenceBoundedState implements State {
         } else if (t.equals(ZERO)) {
             IntConstant k = IntConstant.v(c.bound());
             r = predExpr.apply(c.predicate()).apply(s, k);
-        } else if (s.equals(this.ZERO)) {
+        } else if (s.equals(ZERO)) {
             Constraint negated = c.copy().negate();
             IntConstant k = IntConstant.v(negated.bound());
             r = predExpr.apply(negated.predicate()).apply(t, k);
@@ -893,36 +612,17 @@ public class DifferenceBoundedState implements State {
         boolean equal = false;
         if (o != null && o instanceof DifferenceBoundedState) {
             DifferenceBoundedState state = (DifferenceBoundedState)o;
-            equal = (this.feasible == state.feasible &&
-                     equivalentGraphs(this.graph, state.graph));
+            equal = (this.dbs.equals(state.dbs));
         }
         return equal;
     }
 
-    private static boolean equivalentGraphs(Graph<Local, Constraint> g1,
-                                            Graph<Local, Constraint> g2) {
-        boolean equivalent = true;
-        equivalent = equivalent && g1.vertexSet().size() == g2.vertexSet().size();
-        // equivalent = equivalent && g1.edgeSet().size() == g2.edgeSet().size();
-        for (Constraint c : g1.edgeSet()) {
-            Local s = g1.getEdgeSource(c);
-            Local t = g1.getEdgeTarget(c);
-            Constraint c2 = g2.getEdge(s, t);
-            equivalent = equivalent && c.equals(c2);
-        }
-        return equivalent;
-    }
-
     public void updateTop(Local l) {
-        this.graph.outgoingEdgesOf(l).forEach(e -> {
-                Local s = this.graph.getEdgeSource(e); // === l;
-                Local t = this.graph.getEdgeTarget(e);
-                this.add(s, t, Constraint.TOP());
-            });
+        this.dbs.updateTop(l);
     }
 
     public void updateTop(Local l, Local r) {
-        this.add(l, r, Constraint.TOP());
+        this.dbs.updateTop(l, r);
     }
 
     /** Make all edges infeasible
@@ -930,204 +630,123 @@ public class DifferenceBoundedState implements State {
      * Deletes all existing edges and replaces them with bottom constraints
      */
     public void makeInfeasible() {
-        this.graph.edgeSet().forEach(e -> {
-                Local s = this.graph.getEdgeSource(e);
-                Local t = this.graph.getEdgeTarget(e);
-                this.add(s, t, Constraint.BOT());
-            });
+        this.dbs.makeInfeasible();
     }
 
-    public void updateCond(State inState, Value left, Value right, PredicateType type) {
+    public boolean updateCond(State inState, Value left, Value right, PredicateType type) {
         if (inState instanceof DifferenceBoundedState) {
-            updateCond((DifferenceBoundedState) inState, left, right, type);
+            return updateCond((DifferenceBoundedState) inState, left, right, type);
         } else {
             throw new RuntimeException("invalid state for update condition");
         }
     }
 
-    public void updateCond(DifferenceBoundedState inState,
+    public boolean updateCond(DifferenceBoundedState inState,
                            Value left,
                            Value right,
                            PredicateType type) {
+        boolean feasible;
         LOGGER.trace("transfer condition: {} : {} {} {}", inState, left, type, right);
         if (left instanceof Local && right instanceof Local) {
-            this.updateCond(inState, (Local) left, (Local) right, type);
+            feasible = this.updateCond(inState, (Local) left, (Local) right, type);
         } else if (left instanceof Local && right instanceof IntConstant) {
-            this.updateCond(inState, (Local) left, (IntConstant) right, type);
+            feasible = this.updateCond(inState, (Local) left, (IntConstant) right, type);
         } else if (left instanceof IntConstant && right instanceof Local) {
-            this.updateCond(inState, (IntConstant) left, (Local) right, type);
+            feasible = this.updateCond(inState, (IntConstant) left, (Local) right, type);
         } else {
             LOGGER.error("missing handler for x-condition: {} {} {}", left, type, right);
+            feasible = true;
         }
+        return feasible;
     }
 
-    private boolean transferConditional(Local s, Constraint constraint, DifferenceBoundedState inState) {
-        return this.transferConditional(s, this.ZERO, constraint, inState);
-    }
-
-    private boolean transferConditional(Local s, Local t, Constraint constraint, DifferenceBoundedState inState) {
-        DifferenceBoundedState state = new DifferenceBoundedState(inState);
-        if (state.computeClosure()) {
-            // only add if constraint is more restrictive
-            Constraint c1 = state.getValue(s, t);
-            Constraint left = state.getValue(s).copy();
-            Constraint right = state.getValue(t).copy();
-            left.subtract(right);
-            LOGGER.trace("{} - {} -> {} conflicts with {} ? {}",
-                         s, t, c1, constraint, c1.conflicts(constraint));
-            if (!c1.conflicts(constraint) && !left.conflicts(constraint)) {
-                this.add(s, t, constraint);
-                this.feasible = true;
-            } else {
-                this.add(s, t, Constraint.BOT());
-                this.feasible = false;
-            }
-        } else {
-            this.add(s, t, Constraint.BOT());
-            this.feasible = false;
-        }
-        LOGGER.debug("{} - {} -> {} path is feasible? {}",
-                     s, t, constraint, this.feasible);
-        return this.feasible;
-    }
-
-    public void updateCond(DifferenceBoundedState inState,
+    public boolean updateCond(DifferenceBoundedState inState,
                            Local left,
                            IntConstant right,
                            PredicateType type) {
         switch (type) {
         case Le:
-            this.transferConditional(left,
-                                     new Constraint(right.value, PredicateType.Le),
-                                     inState);
+            this.add(left, ZERO, new Constraint(right.value, PredicateType.Le));
             break;
         case Lt:
-            this.transferConditional(left,
-                                     new Constraint(right.value - 1, PredicateType.Le),
-                                     inState);
+            this.add(left, ZERO, new Constraint(right.value - 1, PredicateType.Le));
             break;
         case Eq:
-            this.transferConditional(left,
-                                     new Constraint(right.value),
-                                     inState);
+            this.add(left, ZERO, new Constraint(right.value));
             break;
         case Ge:
-            this.transferConditional(this.ZERO,
-                                     left,
-                                     new Constraint(right.value * -1, PredicateType.Le),
-                                     inState);
+            this.add(ZERO, left, new Constraint(right.value * -1, PredicateType.Le));
             break;
         case Gt:
-            this.transferConditional(this.ZERO,
-                                     left,
-                                     new Constraint((right.value * -1) - 1, PredicateType.Le),
-                                     inState);
+            this.add(ZERO, left, new Constraint((right.value * - 1) - 1, PredicateType.Le));
             break;
         case Ne:
-            Constraint c = inState.eval(left);
-            if (c != null && c.bound() == right.value) {
-                this.feasible = false;
-                this.add(left, Constraint.BOT());
-                break;
-            }
+            break;
         case Invalid:
-        default:
-            // We cannot represent the condition, do nothing.
+            this.makeInfeasible();
+            return false;
         }
+        this.intersection(inState);
+        return this.isFeasible();
     }
 
-    public void updateCond(DifferenceBoundedState inState,
+    public boolean updateCond(DifferenceBoundedState inState,
                            IntConstant left,
                            Local right,
                            PredicateType type) {
         switch (type) {
         case Le:
-            this.transferConditional(this.ZERO,
-                                     right,
-                                     new Constraint(left.value * -1, PredicateType.Le),
-                                     inState);
+            this.add(ZERO, right, new Constraint(left.value * - 1, PredicateType.Le));
             break;
         case Lt:
-            this.transferConditional(this.ZERO,
-                                     right,
-                                     new Constraint((left.value * -1) - 1, PredicateType.Le),
-                                     inState);
+            this.add(ZERO, right, new Constraint((left.value * - 1) - 1, PredicateType.Le));
             break;
         case Eq:
-            this.transferConditional(right,
-                                     new Constraint(left.value),
-                                     inState);
+            this.add(right, ZERO, new Constraint(left.value));
             break;
         case Ge:
-            this.transferConditional(right,
-                                     new Constraint(left.value, PredicateType.Le),
-                                     inState);
+            this.add(right, ZERO, new Constraint(left.value, PredicateType.Le));
             break;
         case Gt:
-            this.transferConditional(right,
-                                     new Constraint(left.value + 1, PredicateType.Le),
-                                     inState);
+            this.add(right, ZERO, new Constraint(left.value + 1, PredicateType.Le));
             break;
         case Ne:
-            Constraint c = inState.eval(right);
-            if (c != null && c.bound() == left.value) {
-                this.feasible = false;
-                this.add(right, Constraint.BOT());
-                break;
-            }
+            break;
         case Invalid:
-        default:
-            // We cannot represent the condition, do nothing.
+            this.makeInfeasible();
+            return false;
         }
+        this.intersection(inState);
+        return this.isFeasible();
     }
 
-    public void updateCond(DifferenceBoundedState inState,
+    public boolean updateCond(DifferenceBoundedState inState,
                            Local left,
                            Local right,
                            PredicateType type) {
         switch (type) {
         case Le:
-            this.transferConditional(left,
-                                     right,
-                                     new Constraint(0, PredicateType.Le),
-                                     inState);
+            this.add(left, right, new Constraint(0, PredicateType.Le));
             break;
         case Lt:
-            this.transferConditional(left,
-                                     right,
-                                     new Constraint(-1, PredicateType.Le),
-                                     inState);
+            this.add(left, right, new Constraint(-1, PredicateType.Le));
             break;
         case Eq:
-            this.transferConditional(left,
-                                     right,
-                                     new Constraint(0),
-                                     inState);
+            this.add(left, right, new Constraint(0));
             break;
         case Ge:
-            this.transferConditional(right,
-                                     left,
-                                     new Constraint(0, PredicateType.Le),
-                                     inState);
+            this.add(right, left, new Constraint(0, PredicateType.Le));
             break;
         case Gt:
-            this.transferConditional(right,
-                                     left,
-                                     new Constraint(-1, PredicateType.Le),
-                                     inState);
+            this.add(right, left, new Constraint(-1, PredicateType.Le));
             break;
         case Ne:
-            Constraint c1 = inState.eval(left);
-            Constraint c2 = inState.eval(right);
-            if (c1 != null && c2 != null && c1.bound() == c2.bound()) {
-                this.feasible = false;
-                this.add(left, Constraint.BOT());
-                this.add(right, Constraint.BOT());
-                break;
-            }
+            break;
         case Invalid:
-        default:
-            // There's nothing we can do here...
+            this.makeInfeasible();
+            return false;
         }
+        this.intersection(inState);
+        return this.isFeasible();
     }
 }
