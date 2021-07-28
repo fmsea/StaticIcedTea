@@ -524,6 +524,10 @@ public class DifferenceBoundedState implements State {
         return sb.toString();
     }
 
+    public void toDOT(String name) {
+        this.dbs.toDot(name);
+    }
+
     public String toSMT(Local l, SolverWrapper solver) {
         StringBuilder sb = new StringBuilder();
         List<DBSTriple> triples = this.dbs.getConstraints(l)

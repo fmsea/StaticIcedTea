@@ -1,5 +1,8 @@
 package abstractinterp.scalar.state;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,6 +12,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.HashMap;
+import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 import soot.Local;
 import org.jgrapht.Graph;
@@ -16,6 +21,9 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.BFSShortestPath;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.nio.dot.DOTExporter;
+import org.jgrapht.nio.Attribute;
+import org.jgrapht.nio.DefaultAttribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -428,6 +436,33 @@ public class DifferenceBoundedGraph {
         }
         sb.append("]");
         return sb.toString();
+    }
+
+    public void toDot(String filename) {
+         try (Writer w = new FileWriter(filename)) {
+             this.toDot(w);
+         } catch (IOException ex) {
+            LOGGER.error("Unable to export graph to DOT: {}", ex.toString());
+            LOGGER.trace(Stream.of(ex.getStackTrace())
+                         .map(StackTraceElement::toString)
+                         .collect(Collectors.joining("\n")));
+        }
+    }
+
+    public void toDot(Writer writer) {
+        DOTExporter<Local, DefaultEdge> exporter = new DOTExporter<>();
+        exporter.setEdgeAttributeProvider(e -> {
+                Map<String, Attribute> map = new HashMap<>(2);
+                map.put("label", DefaultAttribute.createAttribute(this.eval(e).toString()));
+                return map;
+            });
+        exporter.setVertexAttributeProvider(v -> {
+                Map<String, Attribute> map = new HashMap<>(2);
+                map.put("label", DefaultAttribute.createAttribute(v.toString()));
+                map.put("shape", DefaultAttribute.createAttribute("circle"));
+                return map;
+            });
+        exporter.exportGraph(this.graph, writer);
     }
 
     @Override
