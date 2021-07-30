@@ -8,7 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
@@ -54,10 +55,10 @@ public class DomainReader {
     private Domain instantateDomain(String domain) {
         Domain ret = null;
         try {
-            ANTLRInputStream domainInput = new ANTLRInputStream(domain);
-            DomainLexer domainLexer = new DomainLexer(domainInput);
+            CharStream domainInput = CharStreams.fromString(domain);
+            DisjointDomainLexer domainLexer = new DisjointDomainLexer(domainInput);
             CommonTokenStream domainTokens = new CommonTokenStream(domainLexer);
-            DomainParser domainParser = new DomainParser(domainTokens);
+            DisjointDomainParser domainParser = new DisjointDomainParser(domainTokens);
             ParseTree domainTree = domainParser.intervals();
             DomainInstantiator createDomain = new DomainInstantiator();
             createDomain.visit(domainTree);

@@ -1,7 +1,5 @@
 grammar DisjointDomain;
-@header {
-package disjoint.domain.reader;
-}
+
 intervals : (interval | singleton)*;
 
 interval: open=('(' | '[') lhs=(INT|INF) del=(',' | '..') rhs=(INT|INF) close=(']' | ')');

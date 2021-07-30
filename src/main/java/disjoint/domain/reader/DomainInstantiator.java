@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import soot.IntType;
@@ -19,14 +18,14 @@ import disjoint.domain.Domain;
 import disjoint.domain.IntervalPredicate;
 import solver.SolverWrapperZ3;
 
-public class DomainInstantiator extends DomainBaseVisitor {
+public class DomainInstantiator extends DisjointDomainBaseVisitor {
 	
 	Domain domain;
 	
 	public DomainInstantiator() throws Z3Exception{
 		domain = new Domain();
 	}
-	@Override public BaseElement visitIntervals(@NotNull DomainParser.IntervalsContext ctx) { 
+	@Override public BaseElement visitIntervals(DisjointDomainParser.IntervalsContext ctx) {
 		//whatever children return add to the domain
 		for( ParseTree child : ctx.children){
 			//System.out.println("Ctx " + ctx.getText());
@@ -81,19 +80,19 @@ public class DomainInstantiator extends DomainBaseVisitor {
 	}
 
 
-		@Override public  Object visitInterval(@NotNull DomainParser.IntervalContext ctx) { 
+		@Override public  Object visitInterval(DisjointDomainParser.IntervalContext ctx) {
 			Set<BaseElement> ret = new HashSet<BaseElement>();
 			String name = ctx.getText();
 			//get the lhs number
 			//get open parent
 			boolean lhsIncl = false;
 			switch(ctx.open.getType()){
-			case DomainParser.OPENL:{
+			case DisjointDomainParser.OPENL:{
 				// have '(' - lhs exclusive
 				lhsIncl = false;
 			}; 
 			break;
-			case DomainParser.CLSDL:{
+			case DisjointDomainParser.CLSDL:{
 				// have '[' -- lhs inclusive
 				lhsIncl = true;
 			};
@@ -101,18 +100,18 @@ public class DomainInstantiator extends DomainBaseVisitor {
 			}
 			String lhsVal = ctx.lhs.getText();
 			boolean lhsInfty = false;
-			if(ctx.lhs.getType() == DomainParser.INF){
+			if(ctx.lhs.getType() == DisjointDomainParser.INF){
 				lhsInfty = true;
 			}
 			
 			boolean rhsIncl = false;
 			switch(ctx.close.getType()){
-			case DomainParser.OPENR:{
+			case DisjointDomainParser.OPENR:{
 				// have '(' - lhs exclusive
 				rhsIncl = false;
 			}; 
 			break;
-			case DomainParser.CLSDR:{
+			case DisjointDomainParser.CLSDR:{
 				// have '[' -- lhs inclusive
 				rhsIncl = true;
 			};
@@ -120,14 +119,14 @@ public class DomainInstantiator extends DomainBaseVisitor {
 			}
 			String rhsVal = ctx.rhs.getText();
 			boolean rhsInfty = false;
-			if(ctx.rhs.getType() == DomainParser.INF){
+			if(ctx.rhs.getType() == DisjointDomainParser.INF){
 				rhsInfty = true;
 			}
 			
 			//System.out.println("lhsIcl " + lhsIncl + " rhsIncl " + rhsIncl);
 			//figure out the delimiter
 			switch(ctx.del.getType()){
-				case DomainParser.COMMA:{
+				case DisjointDomainParser.COMMA:{
 					//if comma then creat a range
 					BaseElement be = new BaseElement();
 					//add be to the set
@@ -157,7 +156,7 @@ public class DomainInstantiator extends DomainBaseVisitor {
 					
 				};
 				break;
-				case DomainParser.DOTS: {
+				case DisjointDomainParser.DOTS: {
 					//iterate inclusively or 
 					//Exclusively over the interval
 					//range should not have empty lhs/rhs
@@ -186,7 +185,7 @@ public class DomainInstantiator extends DomainBaseVisitor {
 			
 		}
 		
-		@Override public Object visitSingleton(@NotNull DomainParser.SingletonContext ctx) { 
+		@Override public Object visitSingleton(DisjointDomainParser.SingletonContext ctx) {
 			Set<BaseElement> ret = new HashSet<BaseElement>();
 			String val = ctx.getText();
 			BaseElement be = new BaseElement();
