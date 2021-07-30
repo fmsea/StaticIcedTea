@@ -182,4 +182,35 @@ public class JimpleProvider implements ArbitraryProvider {
         return body;
     }
 
+
+    public static Body neqLoop() {
+        SootClass testClass = new SootClass("test.neqBranch", Modifier.PUBLIC);
+        testClass.setSuperclass(Scene.v().getSootClass("java.lang.Object"));
+        SootMethod method = new SootMethod("neq", null, VoidType.v());
+        testClass.addMethod(method);
+        Scene.v().addClass(testClass);
+        JimpleBody body = Jimple.v().newBody(method);
+        method.setActiveBody(body);
+        Chain<Unit> units = body.getUnits();
+
+        Local[] locals = new Local[] {
+            Jimple.v().newLocal("l0", IntType.v()),
+            Jimple.v().newLocal("l1", IntType.v()),
+            Jimple.v().newLocal("l2", IntType.v()),
+        };
+
+        for (int i = 0; i < locals.length; i++) {
+            body.getLocals().add(locals[i]);
+        }
+
+        units.add(Jimple.v().newAssignStmt(locals[1], IntConstant.v(4)));
+        Unit exit = Jimple.v().newReturnVoidStmt();
+        Unit loop = Jimple.v().newIfStmt(Jimple.v().newNeExpr(locals[0], IntConstant.v(0)), exit);
+        units.add(loop);
+        units.add(Jimple.v().newAssignStmt(locals[2], Jimple.v().newAddExpr(locals[1], IntConstant.v(1))));
+        units.add(Jimple.v().newGotoStmt(loop));
+        units.add(exit);
+
+        return body;
+    }
 }

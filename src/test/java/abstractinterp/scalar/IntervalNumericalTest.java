@@ -237,6 +237,28 @@ public class IntervalNumericalTest {
         }
     }
 
+    @Test
+    void testNeqLoop() {
+        Body body = JimpleProvider.neqLoop();
+        IntegerAnalysis<IntervalBoxState> analysis =
+            new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
+        analysis.runAnalysis();
+        String[] actual = analysis.generateSMTReport().split("\n");
+        String[] expected = new String[] {
+            "1 l1 = 4:<test.neqBranch: void neq()>",
+            "l1->(= l1 4)",
+            "2 if l0 != 0 goto return:<test.neqBranch: void neq()>",
+            "l0->(or (>= l0 0) (< l0 0))",
+            "l0f->(or (>= l0 0) (< l0 0))",
+            "3 l2 = l1 + 1:<test.neqBranch: void neq()>",
+            "l2->(or (>= l2 0) (< l2 0))",
+        };
+        Assertions.assertEquals(expected.length, actual.length);
+        for (int i = 0; i < expected.length; i++) {
+            Assertions.assertEquals(expected[i], actual[i]);
+        }
+    }
+
     private void assertReportOutputEquals(String[] expected, String[] actual) {
         Assertions.assertEquals(expected.length, actual.length);
         for (int i = 0; i < actual.length; i++) {
