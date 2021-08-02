@@ -181,7 +181,7 @@ public abstract class ConditionalForwardBranchedFlowAnalysis<A> extends Branched
 			int i = 1;
 			for (Unit u : orderedWorkList) { //for (Unit u: orderedUnits){
 				//System.out.println(u);
-				numbers.put(u, new Integer(i));
+				numbers.put(u, Integer.valueOf(i));
 				i++;
 
 			}
