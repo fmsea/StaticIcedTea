@@ -182,6 +182,47 @@ public class JimpleProvider implements ArbitraryProvider {
         return body;
     }
 
+    public static Body nonsense() {
+        SootClass testClass = new SootClass("test.Nonsense", Modifier.PUBLIC);
+        testClass.setSuperclass(Scene.v().getSootClass("java.lang.Object"));
+        SootMethod method = new SootMethod("decode", null, VoidType.v());
+        testClass.addMethod(method);
+        Scene.v().addClass(testClass);
+        JimpleBody body = Jimple.v().newBody(method);
+        method.setActiveBody(body);
+        Chain<Unit> units = body.getUnits();
+
+        Local[] locals = new Local[] {
+            Jimple.v().newLocal("l0", IntType.v()),
+            Jimple.v().newLocal("l1", IntType.v()),
+            Jimple.v().newLocal("l2", IntType.v()),
+            Jimple.v().newLocal("l3", IntType.v()),
+            Jimple.v().newLocal("l4", IntType.v()),
+        };
+
+        for (int i = 0; i < locals.length; i++) {
+            body.getLocals().add(locals[i]);
+        }
+
+        units.add(Jimple.v().newAssignStmt(locals[0], IntConstant.v(3)));
+        units.add(Jimple.v().newAssignStmt(locals[1], IntConstant.v(4)));
+        units.add(Jimple.v().newAssignStmt(locals[2], IntConstant.v(1)));
+        Unit exit = Jimple.v().newReturnVoidStmt();
+        Unit loop = Jimple.v().newIfStmt(Jimple.v().newGtExpr(locals[3], IntConstant.v(20)), exit);
+        Unit label01 = Jimple.v().newAssignStmt(locals[3], Jimple.v().newAddExpr(locals[3], IntConstant.v(1)));
+        Unit label01f = Jimple.v().newAssignStmt(locals[3], Jimple.v().newSubExpr(locals[0], IntConstant.v(2)));
+        Unit branch = Jimple.v().newIfStmt(Jimple.v().newEqExpr(locals[1], IntConstant.v(0)), label01);
+        units.add(loop);
+        units.add(Jimple.v().newAssignStmt(locals[4], Jimple.v().newRemExpr(locals[3], IntConstant.v(2))));
+        units.add(branch);
+        units.add(label01f);
+        units.add(Jimple.v().newGotoStmt(loop));
+        units.add(label01);
+        units.add(Jimple.v().newGotoStmt(loop));
+        units.add(exit);
+
+        return body;
+    }
 
     public static Body neqLoop() {
         SootClass testClass = new SootClass("test.neqBranch", Modifier.PUBLIC);

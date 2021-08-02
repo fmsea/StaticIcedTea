@@ -238,6 +238,38 @@ public class IntervalNumericalTest {
     }
 
     @Test
+    void testNonsenseExample() {
+        Body body = JimpleProvider.nonsense();
+        IntegerAnalysis<IntervalBoxState> analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
+        analysis.runAnalysis();
+        String[] actual = analysis.generateSMTReport().split("\n");
+        String[] expected = new String[] {
+            "1 l0 = 3:<test.Nonsense: void decode()>",
+            "l0->(= l0 3)",
+            "2 l1 = 4:<test.Nonsense: void decode()>",
+            "l1->(= l1 4)",
+            "3 l2 = 1:<test.Nonsense: void decode()>",
+            "l2->(= l2 1)",
+            "4 if l3 > 20 goto return:<test.Nonsense: void decode()>",
+            "l3->(or (>= l3 0) (< l3 0))",
+            "l3f->(or (>= l3 0) (< l3 0))",
+            "5 l4 = l3 % 2:<test.Nonsense: void decode()>",
+            "l4->(or (>= l4 0) (< l4 0))",
+            "6 if l1 == 0 goto l3 = l3 + 1:<test.Nonsense: void decode()>",
+            "l1->(or (>= l1 0) (< l1 0))",
+            "l1f->(or (>= l1 0) (< l1 0))",
+            "7 l3 = l0 - 2:<test.Nonsense: void decode()>",
+            "l3->(or (>= l3 0) (< l3 0))",
+            "9 l3 = l3 + 1:<test.Nonsense: void decode()>",
+            "l3->(or (>= l3 0) (< l3 0))",
+        };
+        Assertions.assertEquals(expected.length, actual.length);
+        for (int i = 0; i < expected.length; i++) {
+            Assertions.assertEquals(expected[i], actual[i]);
+        }
+    }
+
+    @Test
     void testNeqLoop() {
         Body body = JimpleProvider.neqLoop();
         IntegerAnalysis<IntervalBoxState> analysis =
