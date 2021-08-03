@@ -1,8 +1,9 @@
 package disjoint.domain.reader;
 
-import java.io.File;
+import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -17,54 +18,59 @@ import disjoint.domain.Domain;
 
 public class DomainReader {
 
-	List<Domain> readDomains;
-	
-	public DomainReader(String fileName){
-		//holds the domain descriptions read from the file
-		List<String> domains = new ArrayList<String>();
-		//for each line in the file create
-		//the corresponding domain
-		File file = new File(fileName);
-		try {
-			Scanner scanner = new Scanner(new FileReader(file));
-			while(scanner.hasNextLine()){
-				domains.add(scanner.nextLine());
-			}
-			scanner.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		//iterate over the domain description and
-		//instantiate domain for each of them
-		readDomains = new ArrayList<Domain>();
-		for(String domain : domains){
-			readDomains.add(instantateDomain(domain));
-		}
-		
-	}
+    List<Domain> readDomains;
 
-	private Domain instantateDomain(String domain) {
-		Domain ret = null;
-		ANTLRInputStream domainInput = new ANTLRInputStream(domain);
-		DomainLexer domainLexer = new DomainLexer(domainInput);
-		CommonTokenStream domainTokens = new CommonTokenStream(domainLexer);
-		DomainParser domainParser = new DomainParser(domainTokens);
-		ParseTree domainTree = domainParser.intervals();
-		try {
-			DomainInstantiator createDomain = new DomainInstantiator();
-			createDomain.visit(domainTree);
-			ret = createDomain.domain;
-		} catch (Z3Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return ret;
-	}
-	
-	public List<Domain> getReadDomains(){
-		return readDomains;
-	}
+    public DomainReader(String fileName) {
+        try (Reader reader = new FileReader(fileName)) {
+        } catch (FileNotFoundException ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        }
+    }
+
+    public DomainReader(Reader reader) {
+        // holds the domain descriptions read from the file
+        List<String> domains = new ArrayList<String>();
+        // for each line in the file create
+        // the corresponding domain
+        Scanner scanner = new Scanner(reader);
+        while (scanner.hasNextLine()) {
+            domains.add(scanner.nextLine());
+        }
+        scanner.close();
+
+        // iterate over the domain description and
+        // instantiate domain for each of them
+        readDomains = new ArrayList<Domain>();
+        for (String domain : domains) {
+            readDomains.add(instantateDomain(domain));
+        }
+
+    }
+
+    private Domain instantateDomain(String domain) {
+        Domain ret = null;
+        try {
+            ANTLRInputStream domainInput = new ANTLRInputStream(domain);
+            DomainLexer domainLexer = new DomainLexer(domainInput);
+            CommonTokenStream domainTokens = new CommonTokenStream(domainLexer);
+            DomainParser domainParser = new DomainParser(domainTokens);
+            ParseTree domainTree = domainParser.intervals();
+            DomainInstantiator createDomain = new DomainInstantiator();
+            createDomain.visit(domainTree);
+            ret = createDomain.domain;
+        } catch (Z3Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return ret;
+    }
+
+    public List<Domain> getReadDomains() {
+        return readDomains;
+    }
 
 }
