@@ -197,7 +197,7 @@ public class DifferenceBoundedState implements State {
         if (v instanceof JNegExpr) {
             v = ((JNegExpr) v).getOp();
             Constraint c = eval(inState, v);
-            this.add(ZERO, lVar, c);
+            this.add(lVar, c.negate());
         } else if (v instanceof IntConstant) {
             IntConstant ic = (IntConstant) v;
             Constraint c = new Constraint(ic.value, PredicateType.Eq);

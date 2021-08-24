@@ -254,4 +254,37 @@ public class JimpleProvider implements ArbitraryProvider {
 
         return body;
     }
+
+    public static Body ballonGetArrow() {
+        SootClass testClass = new SootClass("test.ballonFactory", Modifier.PUBLIC);
+        testClass.setSuperclass(Scene.v().getSootClass("java.lang.Object"));
+        SootMethod method = new SootMethod("getArrow", null, VoidType.v());
+        testClass.addMethod(method);
+        Scene.v().addClass(testClass);
+        JimpleBody body = Jimple.v().newBody(method);
+        method.setActiveBody(body);
+        Chain<Unit> units = body.getUnits();
+
+        Local[] locals = new Local[] {
+            Jimple.v().newLocal("b0", IntType.v()),
+            Jimple.v().newLocal("b1", IntType.v()),
+            Jimple.v().newLocal("b2", IntType.v()),
+            Jimple.v().newLocal("$b25", IntType.v()),
+            Jimple.v().newLocal("$i26", IntType.v()),
+        };
+
+        for (int i = 0; i < locals.length; i++) {
+            body.getLocals().add(locals[i]);
+        }
+
+        units.add(Jimple.v().newAssignStmt(locals[0], IntConstant.v(0)));
+        units.add(Jimple.v().newAssignStmt(locals[1], IntConstant.v(50)));
+        units.add(Jimple.v().newAssignStmt(locals[2], IntConstant.v(60)));
+        units.add(Jimple.v().newAssignStmt(locals[3], Jimple.v().newNegExpr(locals[2])));
+        units.add(Jimple.v().newAssignStmt(locals[4], Jimple.v().newDivExpr(locals[3], IntConstant.v(2))));
+
+        units.add(Jimple.v().newReturnVoidStmt());
+
+        return body;
+    }
 }

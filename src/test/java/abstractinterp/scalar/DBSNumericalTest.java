@@ -200,4 +200,30 @@ public class DBSNumericalTest {
             Assertions.assertEquals(expected[i], actual[i]);
         }
     }
+
+    @Test
+    void testGetArrowSubset() {
+        Body body = JimpleProvider.ballonGetArrow();
+        IntegerAnalysis<DifferenceBoundedState> analysis =
+            new IntegerAnalysis<>(body, 2, new DifferenceBoundedStateFactory());
+        analysis.runAnalysis();
+        String[] actual = analysis.generateSMTReport().split("\n");
+        String[] expected = new String[] {
+            "1 b0 = 0:<test.ballonFactory: void getArrow()>",
+            "b0->(= b0 0)",
+            "2 b1 = 50:<test.ballonFactory: void getArrow()>",
+            "b1->(= b1 50)",
+            "3 b2 = 60:<test.ballonFactory: void getArrow()>",
+            "b2->(= b2 60)",
+            "4 $b25 = neg b2:<test.ballonFactory: void getArrow()>",
+            "$b25->(= $b25 (- 60))",
+            "5 $i26 = $b25 / 2:<test.ballonFactory: void getArrow()>",
+            "$i26->(= $i26 (- 30))",
+        };
+
+        Assertions.assertEquals(expected.length, actual.length);
+        for (int i = 0; i < expected.length; i++) {
+            Assertions.assertEquals(expected[i], actual[i]);
+        }
+    }
 }
