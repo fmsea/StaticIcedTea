@@ -199,6 +199,6 @@ public class IntegerAnalysis<S extends State> {
     }
 
     public void report() {
-        System.out.print(generateReport());
+        System.out.print(generateSMTReport());
     }
 }
