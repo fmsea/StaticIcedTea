@@ -103,8 +103,7 @@ public class Interval32Box {
     }
 
     public boolean containsIntegerPoint() {
-        // very rough translation from ppl/Interval_defs.hh
-        return (this.isValid() && (this.isTop() || this.lowerBound <= this.upperBound));
+        return this.isValid();
     }
 
     private void minAssign(Interval32Box box) {
