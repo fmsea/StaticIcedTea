@@ -36,25 +36,6 @@ public class IntervalBoxStateTest {
     }
 
     @Test
-    void testUpdateConditionReturnsTopWhenUnbounded() {
-        Local l0 = Jimple.v().newLocal("l0", IntType.v());
-        Set<Local> states = new HashSet<>();
-        states.add(l0);
-        IntervalBoxState inState = new IntervalBoxState(states, true);
-        IntervalBoxState out1 = new IntervalBoxState(states, true);
-        states.forEach(l -> inState.update(l, new Interval32Box(null, 1)));
-        out1.updateCond(inState, l0, IntConstant.v(3), PredicateType.Invalid);
-        states.forEach(l -> {
-                Assertions.assertEquals(Interval32Box.TOP(), out1.getValue(l));
-            });
-        IntervalBoxState out2 = new IntervalBoxState(states, true);
-        out2.updateCond(inState, IntConstant.v(3), l0, PredicateType.Invalid);
-        states.forEach(l -> {
-                Assertions.assertEquals(Interval32Box.TOP(), out2.getValue(l));
-            });
-    }
-
-    @Test
     void testUpdateConditionReturnsBottomWhenBottomValue() {
         Local l0 = Jimple.v().newLocal("l0", IntType.v());
         Set<Local> states = new HashSet<>();
@@ -155,14 +136,16 @@ public class IntervalBoxStateTest {
         IntervalBoxState path2 = new IntervalBoxState(locals, true);
         locals.forEach(l -> path2.update(l, Interval32Box.BOT()));
         path1.mergeWith(path2);
-        Assertions.assertEquals(new Interval32Box(1, 3),
+        Assertions.assertEquals(Interval32Box.TOP(),
                                 path1.getValue(l0));
-        Assertions.assertEquals(new Interval32Box(3, 5),
+        Assertions.assertEquals(Interval32Box.TOP(),
                                 path1.getValue(l1));
+        path1.update(l0, new Interval32Box(1, 3));
+        path1.update(l1, new Interval32Box(3, 5));
         path2.mergeWith(path1);
-        Assertions.assertEquals(new Interval32Box(1, 3),
+        Assertions.assertEquals(Interval32Box.TOP(),
                                 path2.getValue(l0));
-        Assertions.assertEquals(new Interval32Box(3, 5),
+        Assertions.assertEquals(Interval32Box.TOP(),
                                 path2.getValue(l1));
     }
 
@@ -180,7 +163,7 @@ public class IntervalBoxStateTest {
         path2.update(l0, Interval32Box.BOT());
         path2.update(l1, Interval32Box.TOP());
         path1.mergeWith(path2);
-        Assertions.assertEquals(new Interval32Box(3),
+        Assertions.assertEquals(Interval32Box.TOP(),
                                 path1.getValue(l0));
         Assertions.assertEquals(Interval32Box.TOP(),
                                 path1.getValue(l1));
@@ -188,7 +171,7 @@ public class IntervalBoxStateTest {
         path1.update(l0, new Interval32Box(3));
         path1.update(l1, new Interval32Box(5));
         path2.mergeWith(path1);
-        Assertions.assertEquals(new Interval32Box(3),
+        Assertions.assertEquals(Interval32Box.TOP(),
                                 path2.getValue(l0));
         Assertions.assertEquals(Interval32Box.TOP(),
                                 path2.getValue(l1));

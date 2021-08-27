@@ -45,30 +45,30 @@ public class Interval32BoxProperties {
     @Property
     void upperBoundAssignment(@ForAll Interval32Box x,
                               @ForAll Interval32Box y) {
-        int lower = Math.min(x.lowerBound(), y.lowerBound());
-        int upper = Math.max(x.upperBound(), y.upperBound());
+        int lower = Math.min(x.lowerBoundOrElse(), y.lowerBoundOrElse());
+        int upper = Math.max(x.upperBoundOrElse(), y.upperBoundOrElse());
         x.upperBoundAssign(y);
-        assertAll(() -> assertEquals(lower, x.lowerBound()),
-                  () -> assertEquals(upper, x.upperBound()));
+        assertAll(() -> assertEquals(lower, x.lowerBound().get()),
+                  () -> assertEquals(upper, x.upperBound().get()));
     }
 
     @Property
     void widenAssign(@ForAll Interval32Box x,
                      @ForAll Interval32Box y) {
-        int x1 = x.lowerBound();
-        int y1 = x.upperBound();
-        int x2 = y.lowerBound();
-        int y2 = y.upperBound();
+        int x1 = x.lowerBoundOrElse();
+        int y1 = x.upperBoundOrElse();
+        int x2 = y.lowerBoundOrElse();
+        int y2 = y.upperBoundOrElse();
         x.wideningAssign(y);
         if (x2 < x1) {
-            assertEquals(Integer.MIN_VALUE, x.lowerBound());
+            assertEquals(Integer.MIN_VALUE, x.lowerBound().get());
         } else {
-            assertEquals(x1, x.lowerBound());
+            assertEquals(x1, x.lowerBound().get());
         }
         if (y1 < y2) {
-            assertEquals(Integer.MAX_VALUE, x.upperBound());
+            assertEquals(Integer.MAX_VALUE, x.upperBound().get());
         } else {
-            assertEquals(y1, x.upperBound());
+            assertEquals(y1, x.upperBound().get());
         }
     }
 
@@ -76,8 +76,8 @@ public class Interval32BoxProperties {
     void negateInterval(@ForAll int x, @ForAll int y) {
         Interval32Box box = new Interval32Box(x, y);
         box.negate();
-        assertAll(() -> assertEquals(y * -1, box.lowerBound()),
-                  () -> assertEquals(x * -1, box.upperBound()));
+        assertAll(() -> assertEquals(y * -1, box.lowerBound().get()),
+                  () -> assertEquals(x * -1, box.upperBound().get()));
     }
 
     @Property
@@ -136,14 +136,14 @@ public class Interval32BoxProperties {
         if (b.isSingleton()) {
             assertEquals(String.format("%s == %d",
                                        l.toString(),
-                                       b.lowerBound()),
+                                       b.lowerBoundOrElse()),
                          b.toGrimpExpr(l).toString());
         } else {
             assertEquals(String.format("%s >= %d & %s <= %d",
                                        l.toString(),
-                                       b.lowerBound(),
+                                       b.lowerBoundOrElse(),
                                        l.toString(),
-                                       b.upperBound()),
+                                       b.upperBoundOrElse()),
                          b.toGrimpExpr(l).toString());
         }
     }
@@ -251,27 +251,27 @@ public class Interval32BoxProperties {
             assertAll(() -> assertEquals(x, result.get(0)),
                       () -> assertEquals(y, result.get(1)));
         } else if (position == (byte) 2) {
-            Interval32Box x_expected = new Interval32Box(Integer.valueOf(x.lowerBound()),
-                                                         Integer.valueOf(y.upperBound() - 1));
+            Interval32Box x_expected = new Interval32Box(x.lowerBound().map(l -> Integer.valueOf(l)),
+                                                         y.upperBound().map(u -> Integer.valueOf(u - 1)));
             assertEquals(x_expected, result.get(0));
             if (x.lowerBound().equals(y.lowerBound())) {
-                assertEquals(new Interval32Box(Integer.valueOf(y.lowerBound() + 1),
-                                               Integer.valueOf(y.upperBound())),
+                assertEquals(new Interval32Box(y.lowerBound().map(l -> Integer.valueOf(l + 1)),
+                                               y.upperBound().map(u -> Integer.valueOf(u))),
                              result.get(1));
             } else {
                 assertEquals(y, result.get(1));
             }
         } else if (position == (byte) 3) {
-            assertAll(() -> assertEquals(new Interval32Box(Integer.valueOf(x.lowerBound()),
-                                                           Integer.valueOf(y.upperBound() - 1)),
+            assertAll(() -> assertEquals(new Interval32Box(x.lowerBound().map(l -> Integer.valueOf(l)),
+                                                           y.upperBound().map(u -> Integer.valueOf(u - 1))),
                                          result.get(0)),
-                      () -> assertEquals(new Interval32Box(Integer.valueOf(x.lowerBound() + 1),
-                                                           Integer.valueOf(y.upperBound())),
+                      () -> assertEquals(new Interval32Box(x.lowerBound().map(l -> Integer.valueOf(l + 1)),
+                                                           y.upperBound().map(u -> Integer.valueOf(u))),
                                          result.get(1)));
         } else if (position == (byte) 5) {
             assertAll(() -> assertEquals(x, result.get(0)),
-                      () -> assertEquals(new Interval32Box(Integer.valueOf(x.lowerBound() + 1),
-                                                           Integer.valueOf(y.upperBound())),
+                      () -> assertEquals(new Interval32Box(x.lowerBound().map(l -> Integer.valueOf(l + 1)),
+                                                           y.upperBound().map(u -> Integer.valueOf(u))),
                                          result.get(1)));
         }
     }
@@ -320,21 +320,21 @@ public class Interval32BoxProperties {
             assertAll(() -> assertEquals(x, result.get(0)),
                       () -> assertEquals(y, result.get(1)));
         } else if (position == (byte) 1) {
-            assertAll(() -> assertEquals(new Interval32Box(Integer.valueOf(y.lowerBound() + 1),
-                                                           Integer.valueOf(x.upperBound())),
+            assertAll(() -> assertEquals(new Interval32Box(y.lowerBound().map(l -> Integer.valueOf(l + 1)),
+                                                           x.upperBound().map(u -> Integer.valueOf(u))),
                                          result.get(0)),
-                      () -> assertEquals(new Interval32Box(Integer.valueOf(y.lowerBound()),
-                                                           Integer.valueOf(x.upperBound() - 1)),
+                      () -> assertEquals(new Interval32Box(y.lowerBound().map(l -> Integer.valueOf(l)),
+                                                           x.upperBound().map(u -> Integer.valueOf(u - 1))),
                                          result.get(1)));
         } else if (position == (byte) 2) {
-            assertAll(() -> assertEquals(new Interval32Box(Integer.valueOf(y.lowerBound() + 1),
-                                                           Integer.valueOf(x.upperBound())),
+            assertAll(() -> assertEquals(new Interval32Box(y.lowerBound().map(l -> Integer.valueOf(l + 1)),
+                                                           x.upperBound().map(u -> Integer.valueOf(u))),
                                          result.get(0)),
                       () -> assertEquals(y, result.get(1)));
         } else if (position == (byte) 5) {
             assertAll(() -> assertEquals(x, result.get(0)),
-                      () -> assertEquals(new Interval32Box(Integer.valueOf(x.lowerBound() + 1),
-                                                           Integer.valueOf(x.upperBound() - 1)),
+                      () -> assertEquals(new Interval32Box(x.lowerBound().map(l -> Integer.valueOf(l + 1)),
+                                                           x.upperBound().map(u -> Integer.valueOf(u - 1))),
                                          result.get(1)));
         }
     }

@@ -2,6 +2,7 @@ package abstractinterp.scalar.state;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Optional;
 import soot.Local;
 import soot.grimp.Grimp;
 import soot.jimple.IntConstant;
@@ -12,15 +13,23 @@ import solver.SolverWrapper;
 public class Interval32Box {
 
     private boolean bottom = false;
-    private Integer lowerBound = null;
-    private Integer upperBound = null;
+    private Optional<Integer> lowerBound = Optional.empty();
+    private Optional<Integer> upperBound = Optional.empty();
 
-    public Integer lowerBound() {
+    public Optional<Integer> lowerBound() {
         return this.lowerBound;
     }
 
-    public Integer upperBound() {
+    public Integer lowerBoundOrElse() {
+        return this.lowerBound.orElse(Integer.MIN_VALUE);
+    }
+
+    public Optional<Integer> upperBound() {
         return this.upperBound;
+    }
+
+    public Integer upperBoundOrElse() {
+        return this.upperBound.orElse(Integer.MAX_VALUE);
     }
 
     public Interval32Box() {
@@ -36,14 +45,20 @@ public class Interval32Box {
     }
 
     public Interval32Box(int lowerBound, int upperBound) {
-        this(Integer.valueOf(lowerBound), Integer.valueOf(upperBound));
+        this(Optional.of(Integer.valueOf(lowerBound)),
+             Optional.of(Integer.valueOf(upperBound)));
     }
 
     public Interval32Box(Integer lowerBound, Integer upperBound) {
+        this(lowerBound != null ? Optional.of(lowerBound) : Optional.empty(),
+             upperBound != null ? Optional.of(upperBound) : Optional.empty());
+    }
+
+    public Interval32Box(Optional<Integer> lowerBound, Optional<Integer> upperBound) {
         this(lowerBound, upperBound, !areValidBounds(lowerBound, upperBound));
     }
 
-    private Interval32Box(Integer lowerBound, Integer upperBound, boolean bottom) {
+    private Interval32Box(Optional<Integer> lowerBound, Optional<Integer> upperBound, boolean bottom) {
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
         this.bottom = bottom;
@@ -58,15 +73,15 @@ public class Interval32Box {
     }
 
     public static Interval32Box BOT() {
-        return new Interval32Box(null, null, true);
+        return new Interval32Box(Optional.empty(), Optional.empty(), true);
     }
 
     public boolean isValid() {
-        return (!this.bottom && (!this.isBounded() || this.lowerBound <= this.upperBound));
+        return (!this.bottom && (!this.isBounded() || this.lowerBound.get() <= this.upperBound.get()));
     }
 
-    private static boolean areValidBounds(Integer lower, Integer upper) {
-        return (lower == null || upper == null || lower <= upper);
+    private static boolean areValidBounds(Optional<Integer> lower, Optional<Integer> upper) {
+        return lower.flatMap(l -> upper.map(u -> l <= u)).orElse(true);
     }
 
     private boolean checkAndSetBottom() {
@@ -86,16 +101,16 @@ public class Interval32Box {
     public boolean isMax() {
         return (!this.isBottom() &&
                 this.isBounded() &&
-                this.lowerBound.equals(Integer.MIN_VALUE) &&
-                this.upperBound.equals(Integer.MAX_VALUE));
+                this.lowerBound.get().equals(Integer.MIN_VALUE) &&
+                this.upperBound.get().equals(Integer.MAX_VALUE));
     }
 
     public boolean isLowerBounded() {
-        return (this.bottom == false && this.lowerBound != null);
+        return (this.bottom == false && this.lowerBound.isPresent());
     }
 
     public boolean isUpperBounded() {
-        return (this.bottom == false && this.upperBound != null);
+        return (this.bottom == false && this.upperBound.isPresent());
     }
 
     public boolean isBounded() {
@@ -107,63 +122,46 @@ public class Interval32Box {
     }
 
     private void minAssign(Interval32Box box) {
-        if (!this.isLowerBounded()) {
-            this.lowerBound = box.lowerBound;
-        } else if (box.isLowerBounded() && this.lowerBound > box.lowerBound) {
+        if (!this.isLowerBounded() || !box.isLowerBounded()) {
+            this.lowerBound = Optional.empty();
+        } else if (box.isLowerBounded() && this.lowerBound.get() > box.lowerBound.get()) {
             this.lowerBound = box.lowerBound;
         }
     }
 
     private void maxAssign(Interval32Box box) {
-        if (!this.isUpperBounded()) {
-            this.upperBound = box.upperBound;
-        } else if (box.isUpperBounded() && this.upperBound < box.upperBound) {
+        if (!this.isUpperBounded() || !box.isUpperBounded()) {
+            this.upperBound = Optional.empty();
+        } else if (box.isUpperBounded() && this.upperBound.get() < box.upperBound.get()) {
             this.upperBound = box.upperBound;
         }
     }
 
     private void minWidenAssign(Interval32Box box) {
-        if ((!this.isLowerBounded() && !box.isLowerBounded()) ||
-            (this.isLowerBounded() && !box.isLowerBounded())) {
-            // skip?
-        } else if (!this.isLowerBounded() && box.isLowerBounded()) {
-            this.lowerBound = box.lowerBound;
-        } else if (box.lowerBound < this.lowerBound) {
-            this.lowerBound = Integer.MIN_VALUE;
+        if (!this.isLowerBounded() || !box.isLowerBounded()) {
+            this.lowerBound = Optional.empty();
+        } else if (box.lowerBound.get() < this.lowerBound.get()) {
+            this.lowerBound = Optional.of(Integer.MIN_VALUE);
         }
     }
 
     private void maxWidenAssign(Interval32Box box) {
-        if ((!this.isUpperBounded() && !box.isUpperBounded()) ||
-            (this.isUpperBounded() && !box.isUpperBounded())) {
-            // skip?
-        } else if (!this.isUpperBounded() && box.isUpperBounded()) {
-            this.upperBound = box.upperBound;
-        } else if (box.upperBound > this.upperBound) {
-            this.upperBound = Integer.MAX_VALUE;
+        if (!this.isUpperBounded() || !box.isUpperBounded()) {
+            this.upperBound = Optional.empty();
+        } else if (box.upperBound.get() > this.upperBound.get()) {
+            this.upperBound = Optional.of(Integer.MAX_VALUE);
         }
     }
 
     public void upperBoundAssign(Interval32Box box) {
-        if (this.isTop() || box.isTop()) {
-            this.bottom = false;
-            this.lowerBound = null;
-            this.upperBound = null;
-        } else {
-            this.bottom = this.bottom && box.bottom;
-            this.minAssign(box);
-            this.maxAssign(box);
-        }
+        this.minAssign(box);
+        this.maxAssign(box);
+        this.bottom = this.bottom && box.bottom;
     }
 
     public void wideningAssign(Interval32Box box) {
-        if (this.isTop() || box.isTop()) {
-            this.lowerBound = null;
-            this.upperBound = null;
-        } else {
-            minWidenAssign(box);
-            maxWidenAssign(box);
-        }
+        minWidenAssign(box);
+        maxWidenAssign(box);
         this.bottom = this.bottom && box.bottom;
     }
 
@@ -171,35 +169,44 @@ public class Interval32Box {
         byte position = -1;
         if (box == null ||
             this.bottom ||
-            box.bottom ||
-            !(this.isBounded() || box.isBounded())) {
+            box.bottom) {
             position = -1;
         } else if (this.isTop()) {
             position = 2;
         } else if (box.isTop()) {
             position = 5;
-        } else if (this.upperBound.compareTo(box.lowerBound) < 0) {
+        } else if (this.isUpperBounded() &&
+                   box.isLowerBounded() &&
+                   this.upperBound.get().compareTo(box.lowerBound.get()) < 0) {
             // [x1,x2] ... [y1,y2]
             position = 0;
-        } else if (this.lowerBound.compareTo(box.lowerBound) < 0 &&
-                   box.lowerBound.compareTo(this.upperBound) <= 0 &&
-                   this.upperBound.compareTo(box.upperBound) < 0) {
+        } else if (this.isUpperBounded() &&
+                   box.isLowerBounded() &&
+                   (!this.isLowerBounded() || this.lowerBound.get().compareTo(box.lowerBound.get()) < 0) &&
+                   box.lowerBound.get().compareTo(this.upperBound.get()) <= 0 &&
+                   (!box.isUpperBounded() || this.upperBound.get().compareTo(box.upperBound.get()) < 0)) {
             // [x1, y1, x2, y2]
             position = 1;
-        } else if (this.lowerBound.compareTo(box.lowerBound) <= 0 &&
-                   box.upperBound.compareTo(this.upperBound) <= 0) {
+        } else if (box.isBounded() &&
+                   (!this.isLowerBounded() || this.lowerBound.get().compareTo(box.lowerBound.get()) <= 0) &&
+                   (!this.isUpperBounded() || box.upperBound.get().compareTo(this.upperBound.get()) <= 0)) {
             // [x1,y1,y2,x2]
             position = 2;
-        } else if (box.lowerBound.compareTo(this.lowerBound) < 0 &&
-                   this.lowerBound.compareTo(box.upperBound) <= 0 &&
-                   box.upperBound.compareTo(this.upperBound) < 0) {
+        } else if (this.isLowerBounded() &&
+                   box.isUpperBounded() &&
+                   (!box.isLowerBounded() || box.lowerBound.get().compareTo(this.lowerBound.get()) < 0) &&
+                   this.lowerBound.get().compareTo(box.upperBound.get()) <= 0 &&
+                   (!this.isUpperBounded() || box.upperBound.get().compareTo(this.upperBound.get()) < 0)) {
             // [y1,x1,y2,x2]
             position = 3;
-        } else if (box.upperBound.compareTo(this.lowerBound) < 0) {
+        } else if (this.isLowerBounded() &&
+                   box.isUpperBounded() &&
+                   box.upperBound.get().compareTo(this.lowerBound.get()) < 0) {
             // [y1,y2] .. [x1,x2]
             position = 4;
-        } else if (box.lowerBound.compareTo(this.lowerBound) <= 0 &&
-                   this.upperBound.compareTo(box.upperBound) <= 0) {
+        } else if (this.isBounded() &&
+                   (!box.isLowerBounded() || box.lowerBound.get().compareTo(this.lowerBound.get()) <= 0) &&
+                   (!box.isUpperBounded() || this.upperBound.get().compareTo(box.upperBound.get()) <= 0)) {
             // [y1,x1,x2,y2]
             position = 5;
         }
@@ -213,7 +220,7 @@ public class Interval32Box {
         if (lhs.isBottom() || rhs.isBottom()) {
             ret.add(BOT());
             ret.add(BOT());
-        } else if (lhs.isBounded() && rhs.isBounded()) {
+        } else {
             switch (type) {
             case Eq:
                 ret.addAll(transferConditionEq(lhs, rhs));
@@ -238,9 +245,6 @@ public class Interval32Box {
                 ret.add(BOT());
                 break;
             }
-        } else {
-            ret.add(TOP());
-            ret.add(TOP());
         }
         return ret;
     }
@@ -337,9 +341,9 @@ public class Interval32Box {
                 ret.add(BOT());
             } else {
                 ret.add(new Interval32Box(lhs.lowerBound,
-                                          Integer.valueOf(rhs.upperBound - 1)));
-                if (lhs.lowerBound.equals(rhs.lowerBound)) {
-                    ret.add(new Interval32Box(Integer.valueOf(rhs.lowerBound + 1),
+                                          rhs.upperBound.map(u -> Integer.valueOf(u - 1))));
+                if (lhs.isLowerBounded() && lhs.lowerBound.equals(rhs.lowerBound)) {
+                    ret.add(new Interval32Box(rhs.lowerBound.map(l -> Integer.valueOf(l + 1)),
                                               rhs.upperBound));
                 } else {
                     ret.add(new Interval32Box(rhs));
@@ -348,8 +352,8 @@ public class Interval32Box {
             break;
         case 3:
             ret.add(new Interval32Box(lhs.lowerBound,
-                                      Integer.valueOf(rhs.upperBound - 1)));
-            ret.add(new Interval32Box(Integer.valueOf(lhs.lowerBound + 1),
+                                      rhs.upperBound.map(u -> Integer.valueOf(u - 1))));
+            ret.add(new Interval32Box(lhs.lowerBound.map(l -> Integer.valueOf(l + 1)),
                                       rhs.upperBound));
             break;
         case 4:
@@ -358,7 +362,7 @@ public class Interval32Box {
             break;
         case 5:
             ret.add(new Interval32Box(lhs));
-            ret.add(new Interval32Box(Integer.valueOf(lhs.lowerBound + 1),
+            ret.add(new Interval32Box(lhs.lowerBound.map(l -> Integer.valueOf(l + 1)),
                                       rhs.upperBound));
             break;
         }
@@ -405,18 +409,18 @@ public class Interval32Box {
             ret.add(BOT());
             break;
         case 1:
-            ret.add(new Interval32Box(Integer.valueOf(rhs.lowerBound + 1),
-                                      Integer.valueOf(lhs.upperBound)));
-            ret.add(new Interval32Box(Integer.valueOf(rhs.lowerBound),
-                                      Integer.valueOf(lhs.upperBound - 1)));
+            ret.add(new Interval32Box(rhs.lowerBound.map(l -> Integer.valueOf(l + 1)),
+                                      lhs.upperBound));
+            ret.add(new Interval32Box(rhs.lowerBound,
+                                      lhs.upperBound.map(u -> Integer.valueOf(u - 1))));
             break;
         case 2:
             if (lhs.equals(rhs)) {
                 ret.add(BOT());
                 ret.add(BOT());
             } else {
-                ret.add(new Interval32Box(Integer.valueOf(rhs.lowerBound + 1),
-                                          Integer.valueOf(lhs.upperBound)));
+                ret.add(new Interval32Box(rhs.lowerBound.map(l -> Integer.valueOf(l + 1)),
+                                          lhs.upperBound));
                 ret.add(new Interval32Box(rhs));
             }
             break;
@@ -427,8 +431,8 @@ public class Interval32Box {
             break;
         case 5:
             ret.add(new Interval32Box(lhs));
-            ret.add(new Interval32Box(Integer.valueOf(lhs.lowerBound + 1),
-                                      Integer.valueOf(lhs.upperBound - 1)));
+            ret.add(new Interval32Box(lhs.lowerBound.map(l -> Integer.valueOf(l + 1)),
+                                      lhs.upperBound.map(u -> Integer.valueOf(u - 1))));
             break;
         }
         return ret;
@@ -451,8 +455,8 @@ public class Interval32Box {
     }
 
     public void negate() {
-        Integer lower = this.upperBound != null ? this.upperBound.intValue() * -1 : null;
-        Integer upper = this.lowerBound != null ? this.lowerBound.intValue() * -1 : null;
+        Optional<Integer> lower = this.upperBound.map((u) -> u * -1);
+        Optional<Integer> upper = this.lowerBound.map((l) -> l * -1);
         this.lowerBound = lower;
         this.upperBound = upper;
         this.checkAndSetBottom();
@@ -503,10 +507,16 @@ public class Interval32Box {
             return "⟘";
         } else if (this.isTop()) {
             return "⟙";
-        } else if (this.isBounded() && this.lowerBound == this.upperBound) {
-            return String.format("%d", this.lowerBound);
+        } else if (this.isSingleton()) {
+            return String.format("%d", this.lowerBound.get());
         } else {
-            return String.format("[%d, %d]", this.lowerBound, this.upperBound);
+            if (this.isLowerBounded() && !this.isUpperBounded()) {
+                return String.format("[%d, ∞)", this.lowerBound.get());
+            } else if (this.isUpperBounded() && !this.isLowerBounded()) {
+                return String.format("(-∞, %d]", this.upperBound.get());
+            } else {
+            return String.format("[%d, %d]", this.lowerBound.get(), this.upperBound.get());
+            }
         }
     }
 
@@ -523,14 +533,14 @@ public class Interval32Box {
             r = Grimp.v().newOrExpr(Grimp.v().newGeExpr(local, IntConstant.v(0)),
                                     Grimp.v().newLtExpr(local, IntConstant.v(0)));
         } else if (this.isSingleton()) {
-            r = Grimp.v().newEqExpr(local, IntConstant.v(this.lowerBound));
+            r = Grimp.v().newEqExpr(local, IntConstant.v(this.lowerBound.get()));
         } else if (this.isBounded()) {
-            r = Grimp.v().newAndExpr(Grimp.v().newGeExpr(local, IntConstant.v(this.lowerBound)),
-                                     Grimp.v().newLeExpr(local, IntConstant.v(this.upperBound)));
+            r = Grimp.v().newAndExpr(Grimp.v().newGeExpr(local, IntConstant.v(this.lowerBound.get())),
+                                     Grimp.v().newLeExpr(local, IntConstant.v(this.upperBound.get())));
         } else if (this.isLowerBounded()) {
-            r = Grimp.v().newGeExpr(local, IntConstant.v(this.lowerBound));
+            r = Grimp.v().newGeExpr(local, IntConstant.v(this.lowerBound.get()));
         } else if (this.isUpperBounded()) {
-            r = Grimp.v().newLeExpr(local, IntConstant.v(this.upperBound));
+            r = Grimp.v().newLeExpr(local, IntConstant.v(this.upperBound.get()));
         } else {
             r = Grimp.v().newAndExpr(Grimp.v().newGeExpr(local, IntConstant.v(Integer.MIN_VALUE)),
                                      Grimp.v().newLeExpr(local, IntConstant.v(Integer.MAX_VALUE)));

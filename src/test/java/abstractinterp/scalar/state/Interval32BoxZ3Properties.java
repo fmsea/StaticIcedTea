@@ -23,8 +23,8 @@ public class Interval32BoxZ3Properties {
     @Property
     boolean testToGrimpExprEqualsZ3SMT(@ForAll Interval32Box b, @ForAll Local l) {
         Grimp g = Grimp.v();
-        IntConstant lower = IntConstant.v(b.lowerBound());
-        IntConstant upper = IntConstant.v(b.upperBound());
+        IntConstant lower = IntConstant.v(b.lowerBoundOrElse());
+        IntConstant upper = IntConstant.v(b.upperBoundOrElse());
         return this.solver.equals(g.newAndExpr(g.newGeExpr(l, lower),
                                                g.newLeExpr(l, upper)),
                                   b.toGrimpExpr(l));

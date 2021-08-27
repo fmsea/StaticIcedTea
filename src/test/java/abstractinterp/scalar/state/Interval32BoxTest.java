@@ -1,6 +1,7 @@
 package abstractinterp.scalar.state;
 
 import java.util.List;
+import java.util.Optional;
 import soot.IntType;
 import soot.Local;
 import soot.jimple.Jimple;
@@ -138,21 +139,21 @@ public class Interval32BoxTest {
         Assertions.assertFalse(ano_bot.isLowerBounded());
         Assertions.assertTrue(ano_bot.isTop());
         bot.upperBoundAssign(max);
-        Assertions.assertTrue(bot.isUpperBounded());
-        Assertions.assertTrue(bot.isLowerBounded());
-        Assertions.assertEquals(max, bot);
+        Assertions.assertFalse(bot.isUpperBounded());
+        Assertions.assertFalse(bot.isLowerBounded());
+        Assertions.assertTrue(bot.isTop());
         top.upperBoundAssign(Interval32Box.BOT());
         Assertions.assertEquals(Interval32Box.TOP(), top);
         Interval32Box x = new Interval32Box(0, 1);
         Interval32Box y = new Interval32Box(1, 2);
         x.upperBoundAssign(y);
-        Assertions.assertEquals(0, x.lowerBound());
-        Assertions.assertEquals(2, x.upperBound());
+        Assertions.assertEquals(0, x.lowerBound().get());
+        Assertions.assertEquals(2, x.upperBound().get());
         x = new Interval32Box(0, 1);
         y = new Interval32Box(-1, 2);
         x.upperBoundAssign(y);
-        Assertions.assertEquals(-1, x.lowerBound());
-        Assertions.assertEquals(2, x.upperBound());
+        Assertions.assertEquals(-1, x.lowerBound().get());
+        Assertions.assertEquals(2, x.upperBound().get());
         y.upperBoundAssign(top);
         Assertions.assertEquals(Interval32Box.TOP(), y);
     }
@@ -170,22 +171,22 @@ public class Interval32BoxTest {
         top.wideningAssign(a);
         Assertions.assertTrue(top.isTop());
         a.wideningAssign(b);
-        Assertions.assertEquals(0, a.lowerBound());
-        Assertions.assertEquals(0, a.upperBound());
+        Assertions.assertFalse(a.isLowerBounded());
+        Assertions.assertFalse(a.isUpperBounded());
         bot = Interval32Box.BOT();
         a = new Interval32Box(1, 10);
         bot.wideningAssign(a);
         Assertions.assertFalse(bot.isBottom());
-        Assertions.assertEquals(1, bot.lowerBound());
-        Assertions.assertEquals(10, bot.upperBound());
+        Assertions.assertFalse(bot.isLowerBounded());
+        Assertions.assertFalse(bot.isUpperBounded());
         b = new Interval32Box(1, 11);
         a.wideningAssign(b);
-        Assertions.assertEquals(1, a.lowerBound());
-        Assertions.assertEquals(Integer.MAX_VALUE, a.upperBound());
+        Assertions.assertEquals(1, a.lowerBound().get());
+        Assertions.assertEquals(Integer.MAX_VALUE, a.upperBound().get());
         b = new Interval32Box(0, 12);
         a.wideningAssign(b);
-        Assertions.assertEquals(Integer.MIN_VALUE, a.lowerBound());
-        Assertions.assertEquals(Integer.MAX_VALUE, a.upperBound());
+        Assertions.assertEquals(Integer.MIN_VALUE, a.lowerBound().get());
+        Assertions.assertEquals(Integer.MAX_VALUE, a.upperBound().get());
     }
 
     @Test
@@ -199,16 +200,16 @@ public class Interval32BoxTest {
         Assertions.assertTrue(top.isTop());
         max.negate();
         Assertions.assertTrue(max.isBottom());
-        Assertions.assertEquals(-1 * Integer.MAX_VALUE, max.lowerBound());
-        Assertions.assertEquals(-1 * Integer.MIN_VALUE, max.upperBound());
+        Assertions.assertEquals(-1 * Integer.MAX_VALUE, max.lowerBound().get());
+        Assertions.assertEquals(-1 * Integer.MIN_VALUE, max.upperBound().get());
         Interval32Box box = new Interval32Box(0, 1);
         box.negate();
-        Assertions.assertEquals(-1, box.lowerBound());
-        Assertions.assertEquals(0, box.upperBound());
+        Assertions.assertEquals(-1, box.lowerBound().get());
+        Assertions.assertEquals(0, box.upperBound().get());
         box = new Interval32Box(-5, 1);
         box.negate();
-        Assertions.assertEquals(-1, box.lowerBound());
-        Assertions.assertEquals(5, box.upperBound());
+        Assertions.assertEquals(-1, box.lowerBound().get());
+        Assertions.assertEquals(5, box.upperBound().get());
     }
 
     @Test
@@ -237,6 +238,31 @@ public class Interval32BoxTest {
     }
 
     @Test
+    void testIntersectionPositionWhenUnbounded() {
+        Interval32Box x = new Interval32Box(null, 19);
+        Interval32Box y = new Interval32Box(20);
+        Assertions.assertEquals(0, x.intersectionPosition(y));
+        Assertions.assertEquals(4, y.intersectionPosition(x));
+        y = new Interval32Box(20, null);
+        Assertions.assertEquals(0, x.intersectionPosition(y));
+        Assertions.assertEquals(4, y.intersectionPosition(x));
+        x = new Interval32Box(1, null);
+        y = new Interval32Box(null, 2);
+        Assertions.assertEquals(3, x.intersectionPosition(y));
+        Assertions.assertEquals(1, y.intersectionPosition(x));
+        x = new Interval32Box(2, null);
+        Assertions.assertEquals(3, x.intersectionPosition(y));
+        Assertions.assertEquals(1, y.intersectionPosition(x));
+        x = Interval32Box.TOP();
+        y = new Interval32Box(2);
+        Assertions.assertEquals(2, x.intersectionPosition(y));
+        Assertions.assertEquals(5, y.intersectionPosition(x));
+        x = new Interval32Box(null, 3);
+        Assertions.assertEquals(2, x.intersectionPosition(y));
+        Assertions.assertEquals(5, y.intersectionPosition(x));
+    }
+
+    @Test
     void testToString() {
         Interval32Box bot = Interval32Box.BOT();
         Interval32Box top = Interval32Box.TOP();
@@ -248,6 +274,12 @@ public class Interval32BoxTest {
         Assertions.assertEquals("[-4, 16]", box.toString());
         box = new Interval32Box(1, 1);
         Assertions.assertEquals("1", box.toString());
+        box = new Interval32Box(null, 1);
+        Assertions.assertEquals("(-∞, 1]", box.toString());
+        box = new Interval32Box(1, null);
+        Assertions.assertEquals("[1, ∞)", box.toString());
+        box = new Interval32Box(Optional.empty(), Optional.empty());
+        Assertions.assertEquals("⟙", box.toString());
     }
 
     @Test

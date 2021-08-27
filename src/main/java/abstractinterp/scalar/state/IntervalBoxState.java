@@ -139,10 +139,10 @@ public class IntervalBoxState implements State {
             ret = Interval32Box.BOT();
         } else if (lhs.isBounded() && rhs.isBounded()) {
             // isBounded suggests none of these Integers are null
-            int x1 = lhs.lowerBound().intValue();
-            int x2 = lhs.upperBound().intValue();
-            int y1 = rhs.lowerBound().intValue();
-            int y2 = rhs.upperBound().intValue();
+            int x1 = lhs.lowerBound().get().intValue();
+            int x2 = lhs.upperBound().get().intValue();
+            int y1 = rhs.lowerBound().get().intValue();
+            int y2 = rhs.upperBound().get().intValue();
             // adding them up
             int new_high = Integer.MAX_VALUE;
             int new_low = Integer.MIN_VALUE;
