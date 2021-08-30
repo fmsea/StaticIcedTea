@@ -287,4 +287,36 @@ public class JimpleProvider implements ArbitraryProvider {
 
         return body;
     }
+
+    public static Body intervalComparison() {
+        SootClass testClass = new SootClass("test.ints", Modifier.PUBLIC);
+        testClass.setSuperclass(Scene.v().getSootClass("java.lang.Object"));
+        SootMethod method = new SootMethod("compareIntervals", null, IntType.v());
+        testClass.addMethod(method);
+        Scene.v().addClass(testClass);
+        JimpleBody body = Jimple.v().newBody(method);
+        method.setActiveBody(body);
+        Chain<Unit> units = body.getUnits();
+
+        Local u = Jimple.v().newLocal("u0", IntType.v());
+        Local w = Jimple.v().newLocal("w0", IntType.v());
+        Local x = Jimple.v().newLocal("x0", IntType.v());
+
+        body.getLocals().add(u);
+        body.getLocals().add(w);
+        body.getLocals().add(x);
+
+        Unit exit = Jimple.v().newReturnStmt(w);
+        Unit wAssign = Jimple.v().newAssignStmt(w, Jimple.v().newAddExpr(x, u));
+        Unit innerIf = Jimple.v().newIfStmt(Jimple.v().newGeExpr(x, IntConstant.v(0)), wAssign);
+        units.add(Jimple.v().newAssignStmt(u, x));
+        units.add(Jimple.v().newIfStmt(Jimple.v().newLtExpr(x, IntConstant.v(20)), innerIf));
+        units.add(Jimple.v().newGotoStmt(exit));
+        units.add(innerIf);
+        units.add(Jimple.v().newGotoStmt(exit));
+        units.add(wAssign);
+        units.add(exit);
+
+        return body;
+    }
 }

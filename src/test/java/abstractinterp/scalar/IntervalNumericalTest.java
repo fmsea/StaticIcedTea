@@ -317,6 +317,32 @@ public class IntervalNumericalTest {
         }
     }
 
+    @Test
+    void testIntervalComparison() {
+        Body body = JimpleProvider.intervalComparison();
+        IntegerAnalysis<IntervalBoxState> analysis =
+            new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
+        analysis.runAnalysis();
+        String[] actual = analysis.generateSMTReport().split("\n");
+        String[] expected = new String[] {
+            "1 u0 = x0:<test.ints: int compareIntervals()>",
+            "u0->(or (>= u0 0) (< u0 0))",
+            "2 if x0 < 20 goto (branch):<test.ints: int compareIntervals()>",
+            "x0->(>= x0 20)",
+            "x0f->(<= x0 19)",
+            "4 if x0 >= 0 goto w0 = x0 + u0:<test.ints: int compareIntervals()>",
+            "x0->(<= x0 (- 1))",
+            "x0f->(and (>= x0 0) (<= x0 19))",
+            "6 w0 = x0 + u0:<test.ints: int compareIntervals()>",
+            "w0->(or (>= w0 0) (< w0 0))",
+        };
+
+        Assertions.assertEquals(expected.length, actual.length);
+        for (int i = 0; i < expected.length; i++) {
+            Assertions.assertEquals(expected[i], actual[i]);
+        }
+    }
+
     private void assertReportOutputEquals(String[] expected, String[] actual) {
         Assertions.assertEquals(expected.length, actual.length);
         for (int i = 0; i < actual.length; i++) {
