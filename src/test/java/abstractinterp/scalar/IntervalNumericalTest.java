@@ -4,10 +4,13 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 import soot.Scene;
 import soot.Body;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
@@ -341,6 +344,30 @@ public class IntervalNumericalTest {
         for (int i = 0; i < expected.length; i++) {
             Assertions.assertEquals(expected[i], actual[i]);
         }
+    }
+
+    @Test
+    void testTransverseZero() {
+        Body body = JimpleProvider.transverseZero();
+        IntegerAnalysis<IntervalBoxState> analysis =
+            new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
+        analysis.runAnalysis();
+        String[] actual = analysis.generateSMTReport().split("\n");
+        String[] expected = new String[] {
+            "1 x0 = 60:<test.transverse: int zero()>",
+            "x0->(= x0 60)",
+            "2 y0 = neg x0:<test.transverse: int zero()>",
+            "y0->(= y0 (- 60))",
+            "3 u0 = x0 - y0:<test.transverse: int zero()>",
+            "u0->(= u0 120)",
+            "4 if u0 > 120 goto r0 = 1:<test.transverse: int zero()>",
+            "u0->(= u0 120)",
+            "5 r0 = neg 1:<test.transverse: int zero()>",
+            "r0->(= r0 (- 1))",
+        };
+        assertEquals(expected.length, actual.length);
+        assertAll(IntStream.range(0, expected.length)
+                             .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
     }
 
     private void assertReportOutputEquals(String[] expected, String[] actual) {

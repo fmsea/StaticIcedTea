@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class JimpleProvider implements ArbitraryProvider {
     @Override
@@ -315,6 +316,37 @@ public class JimpleProvider implements ArbitraryProvider {
         units.add(innerIf);
         units.add(Jimple.v().newGotoStmt(exit));
         units.add(wAssign);
+        units.add(exit);
+
+        return body;
+    }
+
+    public static Body transverseZero() {
+        SootClass testClass = new SootClass("test.transverse", Modifier.PUBLIC);
+        testClass.setSuperclass(Scene.v().getSootClass("java.lang.Object"));
+        SootMethod method = new SootMethod("zero", null, IntType.v());
+        testClass.addMethod(method);
+        Scene.v().addClass(testClass);
+        JimpleBody body = Jimple.v().newBody(method);
+        method.setActiveBody(body);
+        Chain<Unit> units = body.getUnits();
+
+        Local r = Jimple.v().newLocal("r0", IntType.v());
+        Local u = Jimple.v().newLocal("u0", IntType.v());
+        Local x = Jimple.v().newLocal("x0", IntType.v());
+        Local y = Jimple.v().newLocal("y0", IntType.v());
+
+        Stream.of(r, u, x, y).forEach(l -> body.getLocals().add(l));
+
+        Unit exit = Jimple.v().newReturnStmt(r);
+        Unit rAssign = Jimple.v().newAssignStmt(r, IntConstant.v(1));
+        units.add(Jimple.v().newAssignStmt(x, IntConstant.v(60)));
+        units.add(Jimple.v().newAssignStmt(y, Jimple.v().newNegExpr(x)));
+        units.add(Jimple.v().newAssignStmt(u, Jimple.v().newSubExpr(x, y)));
+        units.add(Jimple.v().newIfStmt(Jimple.v().newGtExpr(u, IntConstant.v(120)), rAssign));
+        units.add(Jimple.v().newAssignStmt(r, Jimple.v().newNegExpr(IntConstant.v(1))));
+        units.add(Jimple.v().newGotoStmt(exit));
+        units.add(rAssign);
         units.add(exit);
 
         return body;
