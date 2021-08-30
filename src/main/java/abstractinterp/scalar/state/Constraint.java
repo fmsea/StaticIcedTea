@@ -156,9 +156,9 @@ public class Constraint implements Comparable<Constraint> {
         } else if (this.isTop() || c.isTop()) {
             this.makeTop();
         } else {
+            this.predicate = PredicateType.superior(this.predicate, c.predicate);
             try {
                 this.bound = Math.addExact(this.bound, c.bound);
-                this.predicate = PredicateType.superior(this.predicate, c.predicate);
             } catch (ArithmeticException ex) {
                 this.makeTop();
             }
@@ -172,9 +172,9 @@ public class Constraint implements Comparable<Constraint> {
         } else if (this.isTop() || c.isTop()) {
             this.makeTop();
         } else {
+            this.predicate = PredicateType.superior(this.predicate, c.predicate);
             try {
                 this.bound = Math.subtractExact(this.bound, c.bound);
-                this.predicate = PredicateType.superior(this.predicate, c.predicate);
             } catch (ArithmeticException ex) {
                 this.makeTop();
             }
@@ -188,9 +188,9 @@ public class Constraint implements Comparable<Constraint> {
         } else if (this.isTop() || c.isTop()) {
             this.makeTop();
         } else {
+            this.predicate = PredicateType.superior(this.predicate, c.predicate);
             try {
                 this.bound = Math.multiplyExact(this.bound, c.bound);
-                this.predicate = PredicateType.superior(this.predicate, c.predicate);
             } catch (ArithmeticException ex) {
                 this.makeTop();
             }
@@ -199,6 +199,7 @@ public class Constraint implements Comparable<Constraint> {
     }
 
     public Constraint divide(Constraint c) {
+        this.predicate = PredicateType.superior(this.predicate, c.predicate);
         if (c.bound == 0 || this.isBottom() || c.isBottom()) {
             // ⟘
             this.makeBottom();
@@ -207,12 +208,12 @@ public class Constraint implements Comparable<Constraint> {
             this.makeTop();
         } else {
             this.bound = this.bound / c.bound;
-            this.predicate = PredicateType.superior(this.predicate, c.predicate);
         }
         return this;
     }
 
     public Constraint modulus(Constraint c) {
+        this.predicate = PredicateType.superior(this.predicate, c.predicate);
         if (c.bound == 0 || this.isBottom() || c.isBottom()) {
             // ⟘
             this.makeBottom();
@@ -220,7 +221,6 @@ public class Constraint implements Comparable<Constraint> {
             this.makeTop();
         } else {
             this.bound = this.bound % c.bound;
-            this.predicate = PredicateType.superior(this.predicate, c.predicate);
         }
         return this;
     }
