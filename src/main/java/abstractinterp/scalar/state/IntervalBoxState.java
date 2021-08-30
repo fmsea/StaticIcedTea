@@ -137,43 +137,20 @@ public class IntervalBoxState implements State {
         // find low of lhs
         if (lhs.isBottom() || rhs.isBottom()) {
             ret = Interval32Box.BOT();
-        } else if (lhs.isBounded() && rhs.isBounded()) {
-            // isBounded suggests none of these Integers are null
-            int x1 = lhs.lowerBound().get().intValue();
-            int x2 = lhs.upperBound().get().intValue();
-            int y1 = rhs.lowerBound().get().intValue();
-            int y2 = rhs.upperBound().get().intValue();
-            // adding them up
-            int new_high = Integer.MAX_VALUE;
-            int new_low = Integer.MIN_VALUE;
+        } else {
             switch (operator) {
             case ADDITION:
-                new_low = x1 == Integer.MIN_VALUE || y1 == Integer.MIN_VALUE ? Integer.MIN_VALUE : x1 + y1;
-                new_high = x2 == Integer.MAX_VALUE || y2 == Integer.MAX_VALUE ? Integer.MAX_VALUE : x2 + y2;
+                ret = Interval32Box.add(lhs, rhs);
                 break;
             case SUBTRACTION:
-                new_low = x1 - y2; // do more checks here too
-                new_high = x2 - y1;
+                ret = Interval32Box.subtract(lhs, rhs);
                 break;
             case MULTIPLICATION:
-                new_high = Math.max(x1 * y1, Math.max(x1 * y2, Math.max(x2 * y1, x2 * y2)));
-                new_low = Math.min(x1 * y1, Math.min(x1 * y2, Math.min(x2 * y1, x2 * y2)));
+                ret = Interval32Box.multiply(lhs, rhs);
                 break;
             case DIVISION:
-                if (y1 > 0 || y2 < 0) {
-                    // if 0 not in [y1,y2] range
-                    new_high = Math.max(x1 / y2, Math.max(x1 / y1, Math.max(x2 / y2, x2 / y1)));
-                    new_low = Math.min(x1 / y2, Math.min(x1 / y1, Math.min(x2 / y2, x2 / y1)));
-                } else if (y1 == 0 && y2 != 0) {
-                    // y1 is zero but y2 is not
-                    new_low = Math.min(x1 / y2, x2 / y2);
-                } else if (y2 == 0 && y1 != 0) {
-                    // y2 is zero but y1 is not
-                    new_high = Math.max(x1 / y1, x2 / y1);
-                }
-                // 0 in between y1 and y2 - use the top values as set above
-
-                break;// just use the default for now
+                ret = Interval32Box.divide(lhs, rhs);
+                break;
             case MODULUS:
             case BAND:
             case BOR:
@@ -184,13 +161,9 @@ public class IntervalBoxState implements State {
             case INVALID:
             default:
                 // use default max values
+                ret = Interval32Box.TOP();
                 break;
             }
-            // create a new constraint
-            ret = new Interval32Box(new_low, new_high);
-        } else {
-            LOGGER.warn("Not dealing yet - we assume there is always an interval");
-            ret = Interval32Box.TOP();
         }
         return ret;
     }

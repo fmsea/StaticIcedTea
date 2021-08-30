@@ -2,7 +2,10 @@ package abstractinterp.scalar.state;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.stream.Stream;
 import soot.Local;
 import soot.grimp.Grimp;
 import soot.jimple.IntConstant;
@@ -211,6 +214,151 @@ public class Interval32Box {
             position = 5;
         }
         return position;
+    }
+
+    public static Interval32Box add(Interval32Box x, Interval32Box y) {
+        Interval32Box r = Interval32Box.TOP();
+        Integer l = null;
+        Integer u = null;
+        // lower bound
+        if (x.isLowerBounded() && y.isLowerBounded()) {
+            try {
+                l = Math.addExact(x.lowerBound.get(), y.lowerBound.get());
+            } catch (ArithmeticException ex) {
+            }
+        }
+
+        // upper bound
+        if (x.isUpperBounded() && y.isUpperBounded()) {
+            try {
+                u = Math.addExact(x.upperBound.get(), y.upperBound.get());
+            } catch (ArithmeticException ex) {
+            }
+        }
+
+        r.lowerBound = Optional.ofNullable(l);
+        r.upperBound = Optional.ofNullable(u);
+        r.checkAndSetBottom();
+        return r;
+    }
+
+    public static Interval32Box subtract(Interval32Box x, Interval32Box y) {
+        Interval32Box r = Interval32Box.TOP();
+        Integer l = null;
+        Integer u = null;
+
+        // lower bound
+        if (x.isLowerBounded() && y.isUpperBounded()) {
+            try {
+                l = Math.subtractExact(x.lowerBound.get(), y.upperBound.get());
+            } catch (ArithmeticException ex) {
+            }
+        }
+
+        // upper bound
+        if (x.isUpperBounded() && y.isLowerBounded()) {
+            try {
+                u = Math.subtractExact(x.upperBound.get(), y.lowerBound.get());
+            } catch (ArithmeticException ex) {
+            }
+        }
+
+        r.lowerBound = Optional.ofNullable(l);
+        r.upperBound = Optional.ofNullable(u);
+        r.checkAndSetBottom();
+        return r;
+    }
+
+    public static Interval32Box multiply(Interval32Box x, Interval32Box y) {
+        Interval32Box r = Interval32Box.TOP();
+        Integer l = null;
+        Integer u = null;
+
+        if (x.isBounded() && y.isBounded()) {
+            // lower bound
+            try {
+                l = Stream.of(new Integer[] {
+                        Math.multiplyExact(x.lowerBound.get(), y.lowerBound.get()),
+                        Math.multiplyExact(x.lowerBound.get(), y.upperBound.get()),
+                        Math.multiplyExact(x.upperBound.get(), y.lowerBound.get()),
+                        Math.multiplyExact(x.upperBound.get(), y.upperBound.get()),
+                    }).min(Integer::compareTo).orElse(null);
+            } catch (ArithmeticException ex) {
+            }
+            // upper bound
+            try {
+                u = Stream.of(new Integer[] {
+                        Math.multiplyExact(x.lowerBound.get(), y.lowerBound.get()),
+                        Math.multiplyExact(x.lowerBound.get(), y.upperBound.get()),
+                        Math.multiplyExact(x.upperBound.get(), y.lowerBound.get()),
+                        Math.multiplyExact(x.upperBound.get(), y.upperBound.get()),
+                    }).max(Integer::compareTo).orElse(null);
+            } catch (ArithmeticException ex) {
+            }
+        }
+
+        r.lowerBound = Optional.ofNullable(l);
+        r.upperBound = Optional.ofNullable(u);
+        r.checkAndSetBottom();
+        return r;
+    }
+
+    public static Interval32Box divide(Interval32Box x, Interval32Box y) {
+        Interval32Box r = Interval32Box.TOP();
+        Optional<Integer> l = Optional.empty();
+        Optional<Integer> u = Optional.empty();
+
+        BiFunction<Integer, Integer, Integer> div = (a, b) -> {
+            if (a == Integer.MIN_VALUE && b == -1) {
+                // overflow
+                return Integer.MAX_VALUE;
+            } else {
+                return a / b;
+            }
+        };
+
+        Comparator<Optional<Integer>> optionalMin = new Comparator<>() {
+                public int compare(Optional<Integer> a, Optional<Integer> b) {
+                    return a.map(av -> b.map(bv -> av.compareTo(bv)).orElse(1)).orElse(-1);
+                }
+            };
+
+        Comparator<Optional<Integer>> optionalMax = new Comparator<>() {
+                public int compare(Optional<Integer> a, Optional<Integer> b) {
+                    return a.map(av -> b.map(bv -> av.compareTo(bv)).orElse(-1)).orElse(1);
+                }
+            };
+
+        if (y.isBounded()) {
+            if (y.lowerBound().get() > 0 || y.upperBound().get() < 0) {
+                // no zero in y
+                l = Stream.of(x.lowerBound.map(xl -> div.apply(xl, y.lowerBound.get())),
+                              x.lowerBound.map(xl -> div.apply(xl, y.upperBound.get())),
+                              x.upperBound.map(xu -> div.apply(xu, y.lowerBound.get())),
+                              x.upperBound.map(xu -> div.apply(xu, y.upperBound.get()))
+                              ).min(optionalMin).get();
+                u = Stream.of(x.lowerBound.map(xl -> div.apply(xl, y.lowerBound.get())),
+                              x.lowerBound.map(xl -> div.apply(xl, y.upperBound.get())),
+                              x.upperBound.map(xu -> div.apply(xu, y.lowerBound.get())),
+                              x.upperBound.map(xu -> div.apply(xu, y.upperBound.get()))
+                              ).max(optionalMax).get();
+            } else if (Integer.valueOf(0).equals(y.lowerBound.get()) &&
+                       !Integer.valueOf(0).equals(y.upperBound.get())) {
+                l = Stream.of(x.lowerBound.map(xl -> div.apply(xl, y.upperBound.get())),
+                              x.upperBound.map(xl -> div.apply(xl, y.upperBound.get()))
+                              ).min(optionalMin).get();
+            } else if (Integer.valueOf(0).equals(y.upperBound.get()) &&
+                       !Integer.valueOf(0).equals(y.lowerBound.get())) {
+                u = Stream.of(x.lowerBound.map(xl -> div.apply(xl, y.lowerBound.get())),
+                              x.upperBound.map(xl -> div.apply(xl, y.lowerBound.get()))
+                              ).max(optionalMax).get();
+            }
+        }
+
+        r.lowerBound = l;
+        r.upperBound = u;
+        r.checkAndSetBottom();
+        return r;
     }
 
     public static List<Interval32Box> transferCondition(Interval32Box lhs,

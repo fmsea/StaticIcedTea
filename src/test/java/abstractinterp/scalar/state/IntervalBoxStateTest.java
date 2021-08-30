@@ -69,10 +69,10 @@ public class IntervalBoxStateTest {
         Interval32Box x = new Interval32Box(-4, 3);
         Interval32Box y = new Interval32Box(0, 0);
         Interval32Box z = IntervalBoxState.transferBinary(x, y, BinaryOperator.DIVISION);
-        Assertions.assertTrue(z.isMax());
+        Assertions.assertTrue(z.isTop());
         x = new Interval32Box(y);
         z = IntervalBoxState.transferBinary(x, y, BinaryOperator.DIVISION);
-        Assertions.assertTrue(z.isMax());
+        Assertions.assertTrue(z.isTop());
     }
 
     @Test

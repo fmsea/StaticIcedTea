@@ -791,4 +791,196 @@ public class Interval32BoxTest {
         Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(0));
         Assertions.assertEquals(new Interval32Box(0), actual.get(1));
     }
+
+    @Test
+    void testTransferAddition() {
+        {
+            Interval32Box x = new Interval32Box(null, 0);
+            Interval32Box y = new Interval32Box(0, null);
+            Assertions.assertAll(() -> Assertions.assertEquals(Interval32Box.TOP(),
+                                                               Interval32Box.add(x, y)),
+                                 () -> Assertions.assertEquals(Interval32Box.TOP(),
+                                                               Interval32Box.add(y, x)));
+        }
+
+        {
+            Interval32Box x = new Interval32Box(null, 0);
+            Interval32Box y = new Interval32Box(0, 1);
+            Assertions.assertAll(() -> Assertions.assertEquals(new Interval32Box(null, 1),
+                                                               Interval32Box.add(x, y)),
+                                 () -> Assertions.assertEquals(new Interval32Box(null, 1),
+                                                               Interval32Box.add(y, x)));
+        }
+
+        {
+            Interval32Box x = new Interval32Box(0, null);
+            Interval32Box y = new Interval32Box(0, 1);
+            Assertions.assertAll(() -> Assertions.assertEquals(new Interval32Box(0, null),
+                                                               Interval32Box.add(x, y)),
+                                 () -> Assertions.assertEquals(new Interval32Box(0, null),
+                                                               Interval32Box.add(y, x)));
+        }
+
+        {
+            Interval32Box x = new Interval32Box(null, 0);
+            Interval32Box y = new Interval32Box(null, 1);
+            Assertions.assertAll(() -> Assertions.assertEquals(new Interval32Box(null, 1),
+                                                               Interval32Box.add(x, y)),
+                                 () -> Assertions.assertEquals(new Interval32Box(null, 1),
+                                                               Interval32Box.add(y, x)));
+        }
+
+        {
+            Interval32Box x = new Interval32Box(0, null);
+            Interval32Box y = new Interval32Box(1, null);
+            Assertions.assertAll(() -> Assertions.assertEquals(new Interval32Box(1, null),
+                                                               Interval32Box.add(x, y)),
+                                 () -> Assertions.assertEquals(new Interval32Box(1, null),
+                                                               Interval32Box.add(y, x)));
+        }
+    }
+
+    @Test
+    void testTransferSubtraction() {
+        {
+            Interval32Box x = new Interval32Box(null, 0);
+            Interval32Box y = new Interval32Box(0, null);
+            Assertions.assertAll(() -> Assertions.assertEquals(Interval32Box.TOP(),
+                                                               Interval32Box.subtract(x, y)),
+                                 () -> Assertions.assertEquals(Interval32Box.TOP(),
+                                                               Interval32Box.subtract(y, x)));
+        }
+
+        {
+            Interval32Box x = new Interval32Box(null, 0);
+            Interval32Box y = new Interval32Box(0, 1);
+            Assertions.assertAll(() -> Assertions.assertEquals(new Interval32Box(null, 0),
+                                                               Interval32Box.subtract(x, y)),
+                                 () -> Assertions.assertEquals(new Interval32Box(0, null),
+                                                               Interval32Box.subtract(y, x)));
+        }
+
+        {
+            Interval32Box x = new Interval32Box(0, null);
+            Interval32Box y = new Interval32Box(0, 1);
+            Assertions.assertAll(() -> Assertions.assertEquals(new Interval32Box(-1, null),
+                                                               Interval32Box.subtract(x, y)),
+                                 () -> Assertions.assertEquals(new Interval32Box(null, 1),
+                                                               Interval32Box.subtract(y, x)));
+        }
+
+        {
+            Interval32Box x = new Interval32Box(null, 0);
+            Interval32Box y = new Interval32Box(null, 1);
+            Assertions.assertAll(() -> Assertions.assertEquals(new Interval32Box(null, 1),
+                                                               Interval32Box.subtract(x, y)),
+                                 () -> Assertions.assertEquals(new Interval32Box(null, 1),
+                                                               Interval32Box.subtract(y, x)));
+        }
+
+        {
+            Interval32Box x = new Interval32Box(0, null);
+            Interval32Box y = new Interval32Box(1, null);
+            Assertions.assertAll(() -> Assertions.assertEquals(new Interval32Box(1, null),
+                                                               Interval32Box.subtract(x, y)),
+                                 () -> Assertions.assertEquals(new Interval32Box(1, null),
+                                                               Interval32Box.subtract(y, x)));
+        }
+    }
+
+    @Test
+    void testTransferMultiplication() {
+        {
+            Interval32Box x = new Interval32Box(null, 0);
+            Interval32Box y = new Interval32Box(0, null);
+            Assertions.assertAll(() -> Assertions.assertEquals(Interval32Box.TOP(),
+                                                               Interval32Box.multiply(x, y)),
+                                 () -> Assertions.assertEquals(Interval32Box.TOP(),
+                                                               Interval32Box.multiply(y, x)));
+        }
+
+        {
+            Interval32Box x = new Interval32Box(null, 1);
+            Interval32Box y = new Interval32Box(0, 1);
+            Assertions.assertAll(() -> Assertions.assertEquals(Interval32Box.TOP(),
+                                                               Interval32Box.multiply(x, y)),
+                                 () -> Assertions.assertEquals(Interval32Box.TOP(),
+                                                               Interval32Box.multiply(y, x)));
+        }
+
+        {
+            Interval32Box x = new Interval32Box(1, null);
+            Interval32Box y = new Interval32Box(0, 1);
+            Assertions.assertAll(() -> Assertions.assertEquals(Interval32Box.TOP(),
+                                                               Interval32Box.multiply(x, y)),
+                                 () -> Assertions.assertEquals(Interval32Box.TOP(),
+                                                               Interval32Box.multiply(y, x)));
+        }
+    }
+
+    @Test
+    void testTransferDivision() {
+        {
+            Interval32Box x = new Interval32Box(null, 1);
+            Interval32Box y = new Interval32Box(1, null);
+            Assertions.assertAll(() -> Assertions.assertEquals(Interval32Box.TOP(),
+                                                               Interval32Box.divide(x, y)),
+                                 () -> Assertions.assertEquals(Interval32Box.TOP(),
+                                                               Interval32Box.divide(y, x)));
+        }
+
+        {
+            Interval32Box x = new Interval32Box(null, 1);
+            Interval32Box y = new Interval32Box(1, 2);
+            Assertions.assertAll(() -> Assertions.assertEquals(Interval32Box.TOP(),
+                                                               Interval32Box.divide(x, y)),
+                                 () -> Assertions.assertEquals(Interval32Box.TOP(),
+                                                               Interval32Box.divide(y, x)));
+        }
+
+        {
+            Interval32Box x = new Interval32Box(1, null);
+            Interval32Box y = new Interval32Box(1, 2);
+            Assertions.assertAll(() -> Assertions.assertEquals(Interval32Box.TOP(),
+                                                               Interval32Box.divide(x, y)),
+                                 () -> Assertions.assertEquals(Interval32Box.TOP(),
+                                                               Interval32Box.divide(y, x)));
+        }
+
+        {
+            Interval32Box x = new Interval32Box(0, 2);
+            Interval32Box y = new Interval32Box(1, 2);
+            Assertions.assertAll(() -> Assertions.assertEquals(new Interval32Box(0, 2),
+                                                               Interval32Box.divide(x, y)),
+                                 () -> Assertions.assertEquals(new Interval32Box(1, null),
+                                                               Interval32Box.divide(y, x)));
+        }
+
+        {
+            Interval32Box x = new Interval32Box(2, 0);
+            Interval32Box y = new Interval32Box(1, 2);
+            Assertions.assertAll(() -> Assertions.assertEquals(new Interval32Box(0, 2),
+                                                               Interval32Box.divide(x, y)),
+                                 () -> Assertions.assertEquals(new Interval32Box(null, 2),
+                                                               Interval32Box.divide(y, x)));
+        }
+
+        {
+            Interval32Box x = new Interval32Box(1, 2);
+            Interval32Box y = new Interval32Box(-1, 2);
+            Assertions.assertAll(() -> Assertions.assertEquals(Interval32Box.TOP(),
+                                                               Interval32Box.divide(x, y)),
+                                 () -> Assertions.assertEquals(new Interval32Box(-1, 2),
+                                                               Interval32Box.divide(y, x)));
+        }
+
+        {
+            Interval32Box x = new Interval32Box(Integer.MAX_VALUE);
+            Interval32Box y = Interval32Box.MAX();
+            Assertions.assertAll(() -> Assertions.assertEquals(Interval32Box.TOP(),
+                                                               Interval32Box.divide(x, y)),
+                                 () -> Assertions.assertEquals(new Interval32Box(-1, 1),
+                                                               Interval32Box.divide(y, x)));
+        }
+    }
 }

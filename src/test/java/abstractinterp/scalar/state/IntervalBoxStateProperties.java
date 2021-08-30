@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import net.jqwik.api.Property;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.lifecycle.BeforeProperty;
@@ -42,22 +43,24 @@ public class IntervalBoxStateProperties {
         Interval32Box z = IntervalBoxState.transferBinary(x, y, BinaryOperator.ADDITION);
         if (x.lowerBound().isEmpty() || y.lowerBound().isEmpty()) {
             assertEquals(Optional.empty(), z.lowerBound());
-        } else if (Optional.of(Integer.MIN_VALUE).equals(x.lowerBound()) ||
-            Optional.of(Integer.MIN_VALUE).equals(y.lowerBound())) {
-            assertEquals(Integer.MIN_VALUE, z.lowerBoundOrElse());
         } else {
-            assertEquals(x.lowerBound().get() + y.lowerBound().get(),
-                         z.lowerBound().get());
+            try {
+                assertEquals(Math.addExact(x.lowerBound().get(), y.lowerBound().get()),
+                             z.lowerBound().get());
+            } catch (ArithmeticException ex) {
+                assertTrue(z.lowerBound().isEmpty());
+            }
         }
 
         if (x.upperBound().isEmpty() || y.upperBound().isEmpty()) {
             assertEquals(Optional.empty(), z.upperBound());
-        } else if (Optional.of(Integer.MAX_VALUE).equals(x.upperBound()) ||
-                   Optional.of(Integer.MAX_VALUE).equals(y.upperBound())) {
-            assertEquals(Integer.MAX_VALUE, z.upperBoundOrElse());
         } else {
-            assertEquals(x.upperBound().get() + y.upperBound().get(),
-                         z.upperBound().get());
+            try {
+                assertEquals(Math.addExact(x.upperBound().get(), y.upperBound().get()),
+                             z.upperBound().get());
+            } catch (ArithmeticException ex) {
+                assertTrue(z.upperBound().isEmpty());
+            }
         }
     }
 
@@ -67,22 +70,24 @@ public class IntervalBoxStateProperties {
         Interval32Box z = IntervalBoxState.transferBinary(x, y, BinaryOperator.SUBTRACTION);
         if (x.lowerBound().isEmpty() || y.upperBound().isEmpty()) {
             assertEquals(Optional.empty(), z.lowerBound());
-        } else if (Optional.of(Integer.MIN_VALUE).equals(x.lowerBound()) ||
-                   Optional.of(Integer.MAX_VALUE).equals(y.upperBound())) {
-            assertEquals(Integer.MIN_VALUE, z.lowerBoundOrElse());
         } else {
-            assertEquals(x.lowerBound().get() - y.upperBound().get(),
-                         z.lowerBound().get());
+            try {
+                assertEquals(Math.subtractExact(x.lowerBound().get(), y.upperBound().get()),
+                             z.lowerBound().get());
+            } catch (ArithmeticException ex) {
+                assertTrue(z.lowerBound().isEmpty());
+            }
         }
 
         if (x.upperBound().isEmpty() || y.lowerBound().isEmpty()) {
             assertEquals(Optional.empty(), z.upperBound());
-        } else if (Optional.of(Integer.MAX_VALUE).equals(x.upperBound()) ||
-                   Optional.of(Integer.MIN_VALUE).equals(y.lowerBound())) {
-            assertEquals(Integer.MAX_VALUE, z.upperBoundOrElse());
         } else {
-            assertEquals(x.upperBound().get() - y.lowerBound().get(),
-                         z.upperBound().get());
+            try {
+                assertEquals(Math.subtractExact(x.upperBound().get(), y.lowerBound().get()),
+                             z.upperBound().get());
+            } catch (ArithmeticException ex) {
+                assertTrue(z.upperBound().isEmpty());
+            }
         }
     }
 
@@ -90,46 +95,60 @@ public class IntervalBoxStateProperties {
     void transferBinaryMultiplcation(@ForAll Interval32Box x,
                                      @ForAll Interval32Box y) {
         Interval32Box z = IntervalBoxState.transferBinary(x, y, BinaryOperator.MULTIPLICATION);
-        int low = minimum(x.lowerBoundOrElse() * y.lowerBoundOrElse(),
-                          x.lowerBoundOrElse() * y.upperBoundOrElse(),
-                          x.upperBoundOrElse() * y.lowerBoundOrElse(),
-                          x.upperBoundOrElse() * y.upperBoundOrElse());
-        int high = maximum(x.lowerBoundOrElse() * y.lowerBoundOrElse(),
-                           x.lowerBoundOrElse() * y.upperBoundOrElse(),
-                           x.upperBoundOrElse() * y.lowerBoundOrElse(),
-                           x.upperBoundOrElse() * y.upperBoundOrElse());
-        assertAll(() -> assertEquals(low, z.lowerBoundOrElse()),
-                  () -> assertEquals(high, z.upperBoundOrElse()));
+        try {
+            Optional<Integer> low = Optional.of(minimum(Math.multiplyExact(x.lowerBoundOrElse(), y.lowerBoundOrElse()),
+                                                        Math.multiplyExact(x.lowerBoundOrElse(), y.upperBoundOrElse()),
+                                                        Math.multiplyExact(x.upperBoundOrElse(), y.lowerBoundOrElse()),
+                                                        Math.multiplyExact(x.upperBoundOrElse(), y.upperBoundOrElse())));
+            Optional<Integer> high = Optional.of(maximum(Math.multiplyExact(x.lowerBoundOrElse(), y.lowerBoundOrElse()),
+                                                         Math.multiplyExact(x.lowerBoundOrElse(), y.upperBoundOrElse()),
+                                                         Math.multiplyExact(x.upperBoundOrElse(), y.lowerBoundOrElse()),
+                                                         Math.multiplyExact(x.upperBoundOrElse(), y.upperBoundOrElse())));
+            assertAll(() -> assertEquals(low, z.lowerBound()),
+                      () -> assertEquals(high, z.upperBound()));
+        } catch (ArithmeticException ex) {
+            assertAll(() -> assertTrue(z.lowerBound().isEmpty()),
+                      () -> assertTrue(z.upperBound().isEmpty()),
+                      () -> assertTrue(z.isTop()));
+        }
     }
 
     @Property
     void transferBinaryDivision(@ForAll Interval32Box x,
                                 @ForAll Interval32Box y) {
         Interval32Box z = IntervalBoxState.transferBinary(x, y, BinaryOperator.DIVISION);
+        BiFunction<Integer, Integer, Integer> div = (a, b) -> {
+            if (a == Integer.MIN_VALUE && b == -1) {
+                return Integer.MAX_VALUE;
+            } else {
+                return a / b;
+            }
+        };
         if (y.lowerBoundOrElse() > 0 || y.upperBoundOrElse() < 0) {
-            Integer low = minimum(x.lowerBoundOrElse() / y.lowerBoundOrElse(),
-                                  x.lowerBoundOrElse() / y.upperBoundOrElse(),
-                                  x.upperBoundOrElse() / y.lowerBoundOrElse(),
-                                  x.upperBoundOrElse() / y.upperBoundOrElse());
-            Integer high = maximum(x.lowerBoundOrElse() / y.lowerBoundOrElse(),
-                                   x.lowerBoundOrElse() / y.upperBoundOrElse(),
-                                   x.upperBoundOrElse() / y.lowerBoundOrElse(),
-                                   x.upperBoundOrElse() / y.upperBoundOrElse());
+            Integer low = minimum(div.apply(x.lowerBoundOrElse(), y.lowerBoundOrElse()),
+                                  div.apply(x.lowerBoundOrElse(), y.upperBoundOrElse()),
+                                  div.apply(x.upperBoundOrElse(), y.lowerBoundOrElse()),
+                                  div.apply(x.upperBoundOrElse(), y.upperBoundOrElse()));
+            Integer high = maximum(div.apply(x.lowerBoundOrElse(), y.lowerBoundOrElse()),
+                                   div.apply(x.lowerBoundOrElse(), y.upperBoundOrElse()),
+                                   div.apply(x.upperBoundOrElse(), y.lowerBoundOrElse()),
+                                   div.apply(x.upperBoundOrElse(), y.upperBoundOrElse()));
             assertAll(() -> assertEquals(low, z.lowerBoundOrElse()),
                       () -> assertEquals(high, z.upperBoundOrElse()));
         } else if (y.lowerBoundOrElse() == 0 && y.upperBoundOrElse() != 0) {
-            Integer low = minimum(x.lowerBoundOrElse() / y.upperBoundOrElse(),
-                                  x.upperBoundOrElse() / y.upperBoundOrElse());
+            Integer low = minimum(div.apply(x.lowerBoundOrElse(), y.upperBoundOrElse()),
+                                  div.apply(x.upperBoundOrElse(), y.upperBoundOrElse()));
             assertAll(() -> assertEquals(low, z.lowerBoundOrElse()),
                       () -> assertEquals(Integer.MAX_VALUE, z.upperBoundOrElse()));
         } else if (y.upperBoundOrElse() == 0 && y.lowerBoundOrElse() != 0) {
-            Integer high = maximum(x.lowerBoundOrElse() / y.lowerBoundOrElse(),
-                                   x.upperBoundOrElse() / y.lowerBoundOrElse());
+            Integer high = maximum(div.apply(x.lowerBoundOrElse(), y.lowerBoundOrElse()),
+                                   div.apply(x.upperBoundOrElse(), y.lowerBoundOrElse()));
             assertAll(() -> assertEquals(Integer.MIN_VALUE, z.lowerBoundOrElse()),
                       () -> assertEquals(high, z.upperBoundOrElse()));
         } else {
-            assertAll(() -> assertEquals(Integer.MIN_VALUE, z.lowerBoundOrElse()),
-                      () -> assertEquals(Integer.MAX_VALUE, z.upperBoundOrElse()));
+            assertAll(() -> assertTrue(z.lowerBound().isEmpty()),
+                      () -> assertTrue(z.upperBound().isEmpty()),
+                      () -> assertTrue(z.isTop()));
         }
     }
 

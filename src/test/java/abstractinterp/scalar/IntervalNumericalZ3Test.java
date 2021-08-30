@@ -175,7 +175,7 @@ public class IntervalNumericalZ3Test {
                 "l1->(<= l1 4)",
                 "l1f->(>= l1 5)",
                 "4 l1 = l1 + 1:<z3_simple_loopSootClass: void z3_simple_loop()>",
-                "l1->(or (>= l1 0) (< l1 0))",
+                "l1->(<= l1 5)",
                 "6 l3 = l0 + l1:<z3_simple_loopSootClass: void z3_simple_loop()>",
                 "l3->(or (>= l3 0) (< l3 0))",
             }).collect(Collectors.joining("\n"));

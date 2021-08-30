@@ -144,9 +144,9 @@ public class IntervalNumericalTest {
                 "l1 = 0 class soot.jimple.internal.JAssignStmt f->{l0=5, l2=⟙, l1=0, l3=⟙}",
                 "if l1 >= 5 goto l3 = l0 + l1 class soot.jimple.internal.JIfStmt f->{l0=⟙, l2=⟙, l1=(-∞, 4], l3=⟙}",
                 "if l1 >= 5 goto l3 = l0 + l1 b->[{l0=⟙, l2=⟙, l1=[5, ∞), l3=⟙}]",
-                "l1 = l1 + 1 class soot.jimple.internal.JAssignStmt f->{l0=⟙, l2=⟙, l1=⟙, l3=⟙}",
+                "l1 = l1 + 1 class soot.jimple.internal.JAssignStmt f->{l0=⟙, l2=⟙, l1=(-∞, 4], l3=⟙}",
                 "goto [?= (branch)] class soot.jimple.internal.JGotoStmt f->{l0=⟙, l2=⟙, l1=⟙, l3=⟙}",
-                "goto [?= (branch)] b->[{l0=⟙, l2=⟙, l1=⟙, l3=⟙}]",
+                "goto [?= (branch)] b->[{l0=⟙, l2=⟙, l1=(-∞, 5], l3=⟙}]",
                 "l3 = l0 + l1 class soot.jimple.internal.JAssignStmt f->{l0=⟙, l2=⟙, l1=[5, ∞), l3=⟙}",
                 "return class soot.jimple.internal.JReturnVoidStmt f->{l0=⟙, l2=⟙, l1=⟙, l3=⟙}"},
             actual);
@@ -167,7 +167,7 @@ public class IntervalNumericalTest {
             "l1->(<= l1 4)",
             "l1f->(>= l1 5)",
             "4 l1 = l1 + 1:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
-            "l1->(or (>= l1 0) (< l1 0))",
+            "l1->(<= l1 5)",
             "6 l3 = l0 + l1:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
             "l3->(or (>= l3 0) (< l3 0))"
         };
@@ -261,7 +261,7 @@ public class IntervalNumericalTest {
             "7 l3 = l0 - 2:<test.Nonsense: void decode()>",
             "l3->(or (>= l3 0) (< l3 0))",
             "9 l3 = l3 + 1:<test.Nonsense: void decode()>",
-            "l3->(or (>= l3 0) (< l3 0))",
+            "l3->(<= l3 21)",
         };
         Assertions.assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
