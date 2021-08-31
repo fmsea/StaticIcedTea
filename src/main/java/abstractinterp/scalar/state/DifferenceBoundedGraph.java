@@ -114,25 +114,21 @@ public class DifferenceBoundedGraph {
      * Remove the edge before adding the new edge of the constraint.
      */
     public void add(Local x, Local y, Constraint c) {
-        this.addForward(x, y, c);
-    }
-
-    private void addForward(Local x, Local y, Constraint c) {
         if (c.isBottom()) {
             this.feasible = false;
         }
 
-        DefaultEdge edge = this.graph.removeEdge(x, y);
-        this.constraints.remove(edge);
-
-        if (!c.isTop()) {
-            edge = this.graph.addEdge(x, y);
-            this.constraints.put(edge, c);
+        {
+            DefaultEdge edge = this.graph.removeEdge(x, y);
+            this.constraints.remove(edge);
         }
-    }
 
-    private void addBackward(Local x, Local y, Constraint c) {
-        this.addForward(y, x, Constraint.negate(c));
+        {
+            if (!c.isTop()) {
+                DefaultEdge edge = this.graph.addEdge(x, y);
+                this.constraints.put(edge, c);
+            }
+        }
     }
 
     private void remove(DefaultEdge edge) {
@@ -166,12 +162,6 @@ public class DifferenceBoundedGraph {
         } else {
             return Optional.empty();
         }
-    }
-
-    private Optional<Constraint> getValue(DefaultEdge edge) {
-        Local s = this.graph.getEdgeSource(edge);
-        Local t = this.graph.getEdgeTarget(edge);
-        return this.getValue(s, t);
     }
 
     public boolean computeClosure() {
