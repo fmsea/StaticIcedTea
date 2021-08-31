@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.HashMap;
+import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.stream.Stream;
 import java.util.stream.Collectors;
 
@@ -33,6 +35,7 @@ public class DifferenceBoundedGraph {
     private Graph<Local, DefaultEdge> graph;
     private Map<DefaultEdge, Constraint> constraints;
     private boolean feasible;
+    private final Local ZERO = Variable.ZERO;
 
     public DifferenceBoundedGraph(Set<Local> locals) {
         this(locals, true);
@@ -181,6 +184,21 @@ public class DifferenceBoundedGraph {
                 i++;
             }
         }
+
+        BiFunction<Integer, Integer, Optional<GraphPath<Local, DefaultEdge>>> getPath = (i, j) -> {
+            Local s = indicesToVertices.get(i);
+            Local t = indicesToVertices.get(j);
+            return Optional.ofNullable(BFSShortestPath.findPathBetween(this.graph, s, t));
+        };
+
+        BiPredicate<Integer, Integer> isPathThroughZERO = (i, j) -> {
+            Optional<GraphPath<Local, DefaultEdge>> path = getPath.apply(i, j);
+            return path.map(p -> {
+                    int index = p.getVertexList().indexOf(ZERO);
+                    return index > 0 && index != p.getLength();
+                }).orElse(false);
+        };
+
         Constraint[][] dbm = new Constraint[dim][dim];
         for (int i = 0; i < dim; i++) {
             Arrays.fill(dbm[i], Constraint.TOP());
@@ -200,6 +218,13 @@ public class DifferenceBoundedGraph {
         for (int k = 0; k < dim; k++) {
             for (int i = 0; i < dim; i++) {
                 for (int j = 0; j < dim; j++) {
+                    int pathLength = Stream.of(getPath.apply(i, k),
+                                               getPath.apply(k, j))
+                        .map(op -> op.map(p -> p.getLength()).orElse(0))
+                        .reduce(0, (a, b) -> a + b);
+                    if (isPathThroughZERO.test(i, j) && pathLength >= 2) {
+                        continue;
+                    }
                     Constraint c = Constraint.add(dbm[i][k], dbm[k][j]);
                     Constraint m = Constraint.min(dbm[i][j], c);
                     dbm[i][j] = m;

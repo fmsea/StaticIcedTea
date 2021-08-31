@@ -142,6 +142,58 @@ public class DifferenceBoundedGraphTest {
     }
 
     @Test
+    @DisplayName("closure does not find nonsense edges")
+    void testClosureDoesNotTraverseZERO() {
+        Local ZERO = Variable.ZERO;
+        locals.add(ZERO);
+
+        {
+            DifferenceBoundedGraph graph = new DifferenceBoundedGraph(locals);
+            graph.add(xs[0], ZERO, new Constraint(5));
+            graph.add(xs[1], ZERO, new Constraint(-5));
+            graph.add(xs[2], ZERO, new Constraint(10));
+            graph.add(ZERO, xs[2], new Constraint(-11));
+            assertAll("closure detects (nearby) negative cycles",
+                      () -> assertFalse(graph.computeClosure()));
+        }
+
+        {
+            DifferenceBoundedGraph graph = new DifferenceBoundedGraph(locals);
+            graph.add(xs[0], xs[1], new Constraint(3));
+            graph.add(xs[1], xs[2], new Constraint(2));
+            graph.add(xs[2], ZERO, new Constraint(5));
+            graph.add(ZERO, xs[3], new Constraint(2));
+            graph.add(xs[3], ZERO, new Constraint(-2));
+            assertAll("closure computes transitive closure without nonsense edges",
+                      () -> assertTrue(graph.computeClosure()),
+                      () -> assertEquals(new Constraint(3), graph.eval(xs[0], xs[1])),
+                      () -> assertEquals(new Constraint(2), graph.eval(xs[1], xs[2])),
+                      () -> assertEquals(new Constraint(5), graph.eval(xs[0], xs[2])),
+                      () -> assertEquals(new Constraint(5), graph.eval(xs[2], ZERO)),
+                      () -> assertEquals(new Constraint(7), graph.eval(xs[1], ZERO)),
+                      () -> assertEquals(new Constraint(10), graph.eval(xs[0], ZERO)),
+                      () -> assertEquals(new Constraint(-2), graph.eval(xs[3], ZERO)),
+                      () -> assertEquals(new Constraint(2), graph.eval(ZERO, xs[3])),
+                      () -> assertEquals(Constraint.TOP(), graph.eval(xs[0], xs[3])),
+                      () -> assertEquals(Constraint.TOP(), graph.eval(xs[1], xs[3])),
+                      () -> assertEquals(Constraint.TOP(), graph.eval(xs[2], xs[3])),
+                      () -> assertEquals(Constraint.TOP(), graph.eval(xs[3], xs[0])),
+                      () -> assertEquals(Constraint.TOP(), graph.eval(xs[3], xs[1])),
+                      () -> assertEquals(Constraint.TOP(), graph.eval(xs[3], xs[2])));
+        }
+
+        {
+            DifferenceBoundedGraph graph = new DifferenceBoundedGraph(locals);
+            graph.add(xs[0], xs[1], new Constraint(1));
+            graph.add(xs[1], xs[2], new Constraint(1));
+            graph.add(xs[2], xs[3], new Constraint(-2));
+            graph.add(xs[3], xs[0], new Constraint(-2));
+            assertAll("closure detects (far away) negative cycles",
+                      () -> assertFalse(graph.computeClosure()));
+        }
+    }
+
+    @Test
     @DisplayName("closure cannot find inner edge of transitive relation")
     void testClosureDoesNotImplyExtraThings() {
         DifferenceBoundedGraph graph = new DifferenceBoundedGraph(locals);

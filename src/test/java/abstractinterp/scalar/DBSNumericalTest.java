@@ -81,10 +81,10 @@ public class DBSNumericalTest {
             "l2->(= l2 0)",
             "4 if l0 >= 3 goto l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
             "l0->(= l0 2)",
-            "l0f->(and (= l0 4) (>= l0 3) (<= l1 (+ (- 3) l0)) (<= l2 (+ (- 3) l0)))",
+            "l0f->(and (= l0 4) (>= l0 3))",
             "5 l3 = l1 / l2:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
             "6 l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
-            "l3->(and (= l3 6) (<= l3 (+ 3 l0)))",
+            "l3->(= l3 6)",
         };
         Assertions.assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
@@ -247,7 +247,7 @@ public class DBSNumericalTest {
             "x0->(and (<= x0 (- 1)) (= u0 (+ 0 x0)))",
             "x0f->(and (<= x0 19) (>= x0 0) (= u0 (+ 0 x0)))",
             "6 w0 = x0 + u0:<test.ints: int compareIntervals()>",
-            "w0->(and (= w0 0) (<= w0 (+ 0 x0)))",
+            "w0->(= w0 0)",
         };
 
         Assertions.assertEquals(expected.length, actual.length);
