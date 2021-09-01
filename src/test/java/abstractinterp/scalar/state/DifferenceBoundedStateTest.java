@@ -23,6 +23,7 @@ public class DifferenceBoundedStateTest {
 
     private Set<Local> locals;
     private Local[] xs;
+    private Local ZERO = DifferenceBoundedState.ZERO;
     private SolverWrapper solver;
 
     @BeforeEach
@@ -108,7 +109,7 @@ public class DifferenceBoundedStateTest {
         {
             DifferenceBoundedState test = new DifferenceBoundedState(state);
             test.add(xs[0], new Constraint(0));
-            test.add(DifferenceBoundedState.ZERO, xs[0], new Constraint(-1, PredicateType.Le));
+            test.add(ZERO, xs[0], new Constraint(-1, PredicateType.Le));
             assertFalse(test.isFeasible());
         }
 
@@ -123,14 +124,14 @@ public class DifferenceBoundedStateTest {
         {
             DifferenceBoundedState test = new DifferenceBoundedState(state);
             test.add(xs[0], new Constraint(6, PredicateType.Le));
-            test.add(DifferenceBoundedState.ZERO, xs[1], new Constraint(-11, PredicateType.Le));
+            test.add(ZERO, xs[1], new Constraint(-11, PredicateType.Le));
             test.add(xs[1], xs[0], new Constraint(4, PredicateType.Le));
             assertFalse(test.isFeasible());
         }
 
         {
             DifferenceBoundedState test = new DifferenceBoundedState(state);
-            test.add(DifferenceBoundedState.ZERO, xs[0], new Constraint(1, PredicateType.Le));
+            test.add(ZERO, xs[0], new Constraint(1, PredicateType.Le));
             test.add(xs[0], xs[1], new Constraint(1, PredicateType.Le));
             test.add(xs[1], xs[2], new Constraint(2, PredicateType.Le));
             test.add(xs[2], new Constraint(-5, PredicateType.Le));
@@ -450,7 +451,7 @@ public class DifferenceBoundedStateTest {
         state = new DifferenceBoundedState(locals, true);
         state.updateState(xs[2], inState, xs[0], xs[1], BinaryOperator.SUBTRACTION);
         assertEquals(new Constraint(3, PredicateType.Le),
-                     state.getConstraint(xs[2], DifferenceBoundedState.ZERO));
+                     state.getConstraint(xs[2], ZERO));
     }
 
     @Test
@@ -480,7 +481,7 @@ public class DifferenceBoundedStateTest {
         inState.add(xs[2], new Constraint(3, PredicateType.Eq));
         state.updateState(xs[3], inState, xs[1], xs[2], BinaryOperator.ADDITION);
         assertEquals(new Constraint(7, PredicateType.Eq),
-                     state.getConstraint(xs[3], DifferenceBoundedState.ZERO));
+                     state.getConstraint(xs[3], ZERO));
     }
 
     @Test
@@ -492,7 +493,7 @@ public class DifferenceBoundedStateTest {
         inState.add(xs[2], new Constraint(3, PredicateType.Eq));
         state.updateState(xs[3], inState, xs[1], xs[2], BinaryOperator.SUBTRACTION);
         assertEquals(new Constraint(1, PredicateType.Eq),
-                     state.getConstraint(xs[3], DifferenceBoundedState.ZERO));
+                     state.getConstraint(xs[3], ZERO));
     }
 
     @Test
@@ -532,7 +533,7 @@ public class DifferenceBoundedStateTest {
             fall.updateCond(inState, xs[1], IntConstant.v(2), PredicateType.Le);
             assertAll(() -> assertTrue(fall.isFeasible()),
                       () -> assertEquals(new Constraint(2, PredicateType.Le),
-                                         fall.getConstraint(xs[1], DifferenceBoundedState.ZERO)));
+                                         fall.getConstraint(xs[1], ZERO)));
         }
 
         {
@@ -540,7 +541,7 @@ public class DifferenceBoundedStateTest {
             fall.updateCond(inState, IntConstant.v(4), xs[1], PredicateType.Le);
             assertAll(() -> assertTrue(fall.isFeasible()),
                       () -> assertEquals(new Constraint(-4, PredicateType.Le),
-                                         fall.getConstraint(DifferenceBoundedState.ZERO, xs[1])));
+                                         fall.getConstraint(ZERO, xs[1])));
         }
 
         {
@@ -583,7 +584,7 @@ public class DifferenceBoundedStateTest {
             fall.updateCond(inState, xs[1], IntConstant.v(2), PredicateType.Lt);
             assertAll(() -> assertTrue(fall.isFeasible()),
                       () -> assertEquals(new Constraint(1, PredicateType.Le),
-                                         fall.getConstraint(xs[1], DifferenceBoundedState.ZERO)));
+                                         fall.getConstraint(xs[1], ZERO)));
         }
 
         {
@@ -591,7 +592,7 @@ public class DifferenceBoundedStateTest {
             fall.updateCond(inState, IntConstant.v(2), xs[2], PredicateType.Lt);
             assertAll(() -> assertTrue(fall.isFeasible()),
                       () -> assertEquals(new Constraint(-3, PredicateType.Le),
-                                         fall.getConstraint(DifferenceBoundedState.ZERO, xs[2])));
+                                         fall.getConstraint(ZERO, xs[2])));
         }
 
         {
@@ -645,7 +646,7 @@ public class DifferenceBoundedStateTest {
             assertAll(() -> assertTrue(fall.isFeasible()),
                       () -> assertEquals(Constraint.TOP(), fall.getConstraint(xs[0])),
                       () -> assertEquals(Constraint.TOP(),
-                                         fall.getConstraint(DifferenceBoundedState.ZERO, xs[0])));
+                                         fall.getConstraint(ZERO, xs[0])));
         }
 
         {
@@ -654,7 +655,7 @@ public class DifferenceBoundedStateTest {
             assertAll(() -> assertTrue(fall.isFeasible()),
                       () -> assertEquals(Constraint.TOP(), fall.getConstraint(xs[1])),
                       () -> assertEquals(Constraint.TOP(),
-                                         fall.getConstraint(DifferenceBoundedState.ZERO, xs[1])));
+                                         fall.getConstraint(ZERO, xs[1])));
         }
 
         {
@@ -678,7 +679,7 @@ public class DifferenceBoundedStateTest {
             fall.updateCond(inState, xs[0], IntConstant.v(2), PredicateType.Ge);
             assertAll(() -> assertTrue(fall.isFeasible()),
                       () -> assertEquals(new Constraint(-2, PredicateType.Le),
-                                         fall.getConstraint(DifferenceBoundedState.ZERO, xs[0])));
+                                         fall.getConstraint(ZERO, xs[0])));
         }
 
         {
@@ -710,7 +711,7 @@ public class DifferenceBoundedStateTest {
             fall.updateCond(inState, xs[0], IntConstant.v(2), PredicateType.Gt);
             assertAll(() -> assertTrue(fall.isFeasible()),
                       () -> assertEquals(new Constraint(-3, PredicateType.Le),
-                                         fall.getConstraint(DifferenceBoundedState.ZERO, xs[0])));
+                                         fall.getConstraint(ZERO, xs[0])));
         }
 
         {
