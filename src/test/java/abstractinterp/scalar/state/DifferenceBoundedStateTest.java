@@ -293,7 +293,7 @@ public class DifferenceBoundedStateTest {
     }
 
     @Test
-    void testSingleVariableMultiplicationIntervalProjection() {
+    void testSingleVariableMultiplicationIncrementalClosure() {
         DifferenceBoundedState inState = new DifferenceBoundedState(locals, true);
         inState.add(xs[0], xs[1], new Constraint(3, PredicateType.Le));
         inState.add(xs[1], new Constraint(4));
@@ -335,7 +335,7 @@ public class DifferenceBoundedStateTest {
     }
 
     @Test
-    void testSingleVariableDivisionIntervalProjection() {
+    void testSingleVariableDivisionIncrementalClosure() {
         DifferenceBoundedState inState = new DifferenceBoundedState(locals, true);
         inState.add(xs[0], xs[1], new Constraint(3, PredicateType.Le));
         inState.add(xs[1], new Constraint(4));
@@ -378,16 +378,16 @@ public class DifferenceBoundedStateTest {
     }
 
     @Test
-    void testIntervalProjection() {
+    void testIncrementalClosure() {
         DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
         state.add(xs[0], xs[1], new Constraint(3, PredicateType.Le));
         state.add(xs[1], xs[2], new Constraint(1, PredicateType.Le));
         state.add(xs[2], xs[3], new Constraint(2, PredicateType.Le));
         state.add(xs[3], new Constraint(4, PredicateType.Eq));
         for (Local x : xs) {
-            state.projectInterval(x, state);
+            state.incrementalClosure(x, state);
         }
-        assertAll("Interval Projection",
+        assertAll("Incremental Closure",
                   () -> assertEquals(new Constraint(6, PredicateType.Le),
                                      state.getConstraint(xs[2])),
                   () -> assertEquals(new Constraint(7, PredicateType.Le),
@@ -397,14 +397,14 @@ public class DifferenceBoundedStateTest {
     }
 
     @Test
-    void testIntervalProjectionOverflow() {
+    void testIncrementalClosureOverflow() {
         DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
         state.add(xs[0], xs[1], new Constraint(0, PredicateType.Le));
         state.add(xs[1], xs[2], new Constraint(Integer.MAX_VALUE, PredicateType.Le));
         state.add(xs[2], xs[3], new Constraint(0, PredicateType.Le));
         state.add(xs[3], new Constraint(1, PredicateType.Eq));
         for (Local x : xs) {
-            state.projectInterval(x, state);
+            state.incrementalClosure(x, state);
         }
         assertEquals(new Constraint(1, PredicateType.Le),
                                 state.getConstraint(xs[2]));
@@ -413,13 +413,13 @@ public class DifferenceBoundedStateTest {
     }
 
     @Test
-    void testIntervalProjectionWhenNoEdgesToZero() {
+    void testIncrementalClosureWhenNoEdgesToZero() {
         DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
         state.add(xs[0], xs[1], new Constraint(3, PredicateType.Le));
         state.add(xs[1], xs[2], new Constraint(1, PredicateType.Le));
         state.add(xs[2], xs[3], new Constraint(2, PredicateType.Le));
         for (Local x : xs) {
-            state.projectInterval(x, state);
+            state.incrementalClosure(x, state);
         }
         for (Local x : xs) {
             assertEquals(Constraint.TOP(), state.getConstraint(x));
@@ -906,7 +906,7 @@ public class DifferenceBoundedStateTest {
     }
 
     @Test
-    void testProjectionAfterMerge() {
+    void testIncrementalClosureAfterMerge() {
         DifferenceBoundedState state1 = new DifferenceBoundedState(locals, true);
         state1.add(xs[0], xs[1], new Constraint(3));
         state1.add(xs[1], xs[2], new Constraint(2));
@@ -927,7 +927,8 @@ public class DifferenceBoundedStateTest {
                   () -> assertEquals(new Constraint(7), state1.getConstraint(xs[1])),
                   () -> assertEquals(new Constraint(11), state1.getConstraint(xs[0])));
         // this should be a no-op
-        state1.projectIntervals(state1);
+        state1.incrementalClosure(xs[1], state1);
+        state1.incrementalClosure(xs[0], state1);
         assertAll("projection no-op",
                   () -> assertEquals(new Constraint(7), state1.getConstraint(xs[1])),
                   () -> assertEquals(new Constraint(11), state1.getConstraint(xs[0])));

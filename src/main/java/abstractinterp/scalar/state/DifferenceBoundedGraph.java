@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 import soot.Local;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
+import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
+import org.jgrapht.alg.shortestpath.BellmanFordShortestPath;
 import org.jgrapht.alg.shortestpath.BFSShortestPath;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
@@ -167,6 +169,61 @@ public class DifferenceBoundedGraph {
         }
     }
 
+    public boolean incrementalClosure(Local source) {
+        return this.incrementalClosure(source, this);
+    }
+
+    public boolean  incrementalClosure(Local source, DifferenceBoundedGraph from) {
+        if (this.anyBottoms()) {
+            return false;
+        }
+
+        LOGGER.debug("Computing Incremental Closure from {}", source);
+        LOGGER.trace("Before Incremental Closure: {} from {}", this.toString(), from.toString());
+        BellmanFordShortestPath<Local, DefaultEdge> bfsp = new BellmanFordShortestPath<>(from.graph);
+        ShortestPathAlgorithm.SingleSourcePaths<Local, DefaultEdge> spa = bfsp.getPaths(source);
+        from.graph.vertexSet().forEach(target -> {
+                GraphPath<Local, DefaultEdge> path = spa.getPath(target);
+                if (path == null) {
+                } else if (isPathThroughZERO(Optional.of(path)) && path.getLength() >= 2) {
+                } else {
+                    Constraint newEdge = path.getEdgeList()
+                        .stream()
+                        .map(e -> this.eval(e))
+                        .reduce(new Constraint(0), (c1, c2) -> c1.add(c2));
+                    if (newEdge.compareTo(this.eval(source, target)) < 0 &&
+                        !source.equals(target)) {
+                        this.add(source, target, newEdge);
+                    }
+                }
+            });
+        LOGGER.trace("After Incremental Closure: {}", this.toString());
+
+        // simple feasibility check
+        for (Local local : this.graph.vertexSet()) {
+            boolean selfLoopStrictlyNegative = this.getValue(local, local)
+                .map(l -> l.compareTo(new Constraint(0)) < 0)
+                .orElse(false);
+            if (selfLoopStrictlyNegative) {
+                this.feasible = false;
+            }
+        }
+        return this.feasible;
+    }
+
+    private Optional<GraphPath<Local, DefaultEdge>> getPath(Local source, Local target) {
+        return Optional.ofNullable(BFSShortestPath.findPathBetween(this.graph, source, target));
+    }
+
+    private boolean isPathThroughZERO(Optional<GraphPath<Local, DefaultEdge>> path) {
+        // ZERO is in the path if ZERO is a member of the vertex set AND
+        // ZERO is not the last element of the path
+        return path.map(p -> {
+                int index = p.getVertexList().indexOf(ZERO);
+                return index > 0 && index != p.getLength();
+            }).orElse(false);
+    }
+
     public boolean computeClosure() {
          // early exit, no point if graph contains bottoms
         if (this.anyBottoms()) {
@@ -188,15 +245,11 @@ public class DifferenceBoundedGraph {
         BiFunction<Integer, Integer, Optional<GraphPath<Local, DefaultEdge>>> getPath = (i, j) -> {
             Local s = indicesToVertices.get(i);
             Local t = indicesToVertices.get(j);
-            return Optional.ofNullable(BFSShortestPath.findPathBetween(this.graph, s, t));
+            return getPath(s, t);
         };
 
         BiPredicate<Integer, Integer> isPathThroughZERO = (i, j) -> {
-            Optional<GraphPath<Local, DefaultEdge>> path = getPath.apply(i, j);
-            return path.map(p -> {
-                    int index = p.getVertexList().indexOf(ZERO);
-                    return index > 0 && index != p.getLength();
-                }).orElse(false);
+            return isPathThroughZERO(getPath.apply(i, j));
         };
 
         Constraint[][] dbm = new Constraint[dim][dim];
@@ -256,36 +309,6 @@ public class DifferenceBoundedGraph {
 
     private boolean anyBottoms() {
         return this.constraints.containsValue(Constraint.BOT());
-    }
-
-    public void projectIntervals(Local t) {
-        this.projectIntervalsFrom(t, this);
-    }
-
-    public void projectIntervalsFrom(Local t, DifferenceBoundedGraph from) {
-        from.graph.vertexSet().forEach(v -> {
-                this.projectIntervalFrom(v, t, from);
-            });
-    }
-
-    public void projectInterval(Local s, Local t) {
-        this.projectIntervalFrom(s, t, this);
-    }
-
-    public void projectIntervalFrom(Local s, Local t, DifferenceBoundedGraph from) {
-        LOGGER.debug("Project Interval from {} to {}", s, t);
-        LOGGER.trace("Before Projection: {} from {}", this.toString(), from.toString());
-        GraphPath<Local, DefaultEdge> path = BFSShortestPath.findPathBetween(from.graph, s, t);
-        if (path != null) {
-            Constraint newEdge = new Constraint(0);
-            for (DefaultEdge e : path.getEdgeList()) {
-                Constraint c = from.eval(e);
-                assert c != null;
-                newEdge.add(c);
-            }
-            this.add(s, t, newEdge);
-        }
-        LOGGER.trace("After Projection: {}", this.toString());
     }
 
     public void widenWith(DifferenceBoundedGraph other) {

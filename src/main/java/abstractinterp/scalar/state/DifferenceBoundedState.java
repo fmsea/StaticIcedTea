@@ -304,7 +304,8 @@ public class DifferenceBoundedState implements State {
             }
             break;
         case MULTIPLICATION:
-            this.projectInterval(left, inState);
+            this.incrementalClosure(lVar, this);
+            this.incrementalClosure(left, this);
             forgetConstraints(lVar);
             if ((leftConstraint = this.getValue(left, ZERO)).isPresent()) {
                 Constraint c = leftConstraint.get();
@@ -312,7 +313,8 @@ public class DifferenceBoundedState implements State {
                 break;
             }
         case DIVISION:
-            this.projectInterval(left, inState);
+            this.incrementalClosure(lVar, this);
+            this.incrementalClosure(left, this);
             forgetConstraints(lVar);
             if ((leftConstraint = this.getValue(left, ZERO)).isPresent()) {
                 Constraint c = leftConstraint.get();
@@ -331,7 +333,7 @@ public class DifferenceBoundedState implements State {
             // update edges containing lVar to ⟙
             this.updateTop(lVar);
         }
-        this.projectInterval(lVar, this);
+        this.incrementalClosure(lVar, this);
     }
 
     /** Assign lVar constraint with respect to single local
@@ -360,21 +362,24 @@ public class DifferenceBoundedState implements State {
             }
             break;
         case SUBTRACTION:
-            this.projectInterval(right, inState);
+            this.incrementalClosure(lVar, this);
+            this.incrementalClosure(right, this);
             this.forgetConstraints(lVar);
             if ((rightConstraint = this.getValue(right, ZERO)).isPresent()) {
                 this.add(lVar, Constraint.subtract(leftConstraint, rightConstraint.get()));
                 break;
             }
         case MULTIPLICATION:
-            this.projectInterval(right, inState);
+            this.incrementalClosure(lVar, this);
+            this.incrementalClosure(right, this);
             this.forgetConstraints(lVar);
             if ((rightConstraint = this.getValue(right, ZERO)).isPresent()) {
                 this.add(lVar, Constraint.multiply(leftConstraint, rightConstraint.get()));
                 break;
             }
         case DIVISION:
-            this.projectInterval(right, inState);
+            this.incrementalClosure(lVar, this);
+            this.incrementalClosure(right, this);
             this.forgetConstraints(lVar);
             if ((rightConstraint = this.getValue(right, ZERO)).isPresent()) {
                 this.add(lVar, Constraint.divide(leftConstraint, rightConstraint.get()));
@@ -392,7 +397,7 @@ public class DifferenceBoundedState implements State {
             // update edges containing lVar to ⟙
             this.updateTop(lVar);
         }
-        this.projectInterval(lVar, this);
+        this.incrementalClosure(lVar, this);
     }
 
     /** Assign lVar with respect to two locals
@@ -457,7 +462,7 @@ public class DifferenceBoundedState implements State {
         default:
             this.updateTop(lVar);
         }
-        this.projectInterval(lVar, this);
+        this.incrementalClosure(lVar, this);
     }
 
     /** Remove all relations containing the provided Local
@@ -493,19 +498,12 @@ public class DifferenceBoundedState implements State {
         return c;
     }
 
-    /** Project Interval Bounds for all locals
-     *
-     */
-    public void projectIntervals(DifferenceBoundedState inState) {
-        this.dbs.projectIntervalsFrom(ZERO, inState.dbs);
-    }
-
-    /** Project Interval Bounds for local l
+    /** Incrementally compute transitive closure for provided Local
      *
      * @param l Local to Project
      */
-    public void projectInterval(Local l, DifferenceBoundedState inState) {
-        this.dbs.projectIntervalFrom(l, ZERO, inState.dbs);
+    public boolean incrementalClosure(Local l, DifferenceBoundedState inState) {
+        return this.dbs.incrementalClosure(l, inState.dbs);
     }
 
     @Override

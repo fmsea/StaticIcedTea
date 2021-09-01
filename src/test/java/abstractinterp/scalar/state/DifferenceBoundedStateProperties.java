@@ -144,7 +144,7 @@ public class DifferenceBoundedStateProperties {
     }
 
     @Property
-    void testIntervalProjection(@ForAll @IntRange(min = -536870911, max = 536870911) int c,
+    void testIncrementalClosure(@ForAll @IntRange(min = -536870911, max = 536870911) int c,
                                 @ForAll @IntRange(min = -536870911, max = 536870911) int k,
                                 @ForAll @IntRange(min = -536870911, max = 536870911) int w,
                                 @ForAll @IntRange(min = -536870911, max = 536870911) int v) {
@@ -153,9 +153,8 @@ public class DifferenceBoundedStateProperties {
         state.add(xs[1], xs[2], new Constraint(k, PredicateType.Le));
         state.add(xs[2], xs[3], new Constraint(w, PredicateType.Le));
         state.add(xs[3], new Constraint(v, PredicateType.Eq));
-        for (Local x : xs) {
-            state.projectInterval(x, state);
-        }
+        Assertions.assertAll(locals.stream()
+                             .map(x -> () -> Assertions.assertTrue(state.incrementalClosure(x, state))));
         Assertions.assertEquals(new Constraint(v + w, PredicateType.Le),
                 state.getConstraint(xs[2]));
         Assertions.assertEquals(new Constraint(v + w + k, PredicateType.Le),

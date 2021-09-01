@@ -123,21 +123,66 @@ public class DifferenceBoundedGraphTest {
     }
 
     @Test
-    void testProjectionLearnsTransitiveEdge() {
-        DifferenceBoundedGraph graph = new DifferenceBoundedGraph(locals);
-        graph.add(xs[0], xs[1], new Constraint(+3, PredicateType.Le));
-        graph.add(xs[1], xs[2], new Constraint(-1, PredicateType.Le));
+    void testIncrementalClosureLearnsProperTransitiveEdges() {
+        Local ZERO = Variable.ZERO;
+        locals.add(ZERO);
 
         {
-            DifferenceBoundedGraph test = new DifferenceBoundedGraph(graph);
-            test.projectInterval(xs[0], xs[2]);
-            assertEquals(new Constraint(2, PredicateType.Le), test.eval(xs[0], xs[2]));
+            DifferenceBoundedGraph graph = new DifferenceBoundedGraph(locals);
+            graph.add(xs[0], xs[1], new Constraint(3));
+            graph.add(xs[1], xs[2], new Constraint(2));
+            graph.incrementalClosure(xs[0]);
+            assertAll("incremental closure finds transitive edges",
+                      () -> assertEquals(new Constraint(5), graph.eval(xs[0], xs[2])));
         }
 
         {
-            DifferenceBoundedGraph test = new DifferenceBoundedGraph(graph);
-            test.computeClosure();
-            assertEquals(new Constraint(2, PredicateType.Le), test.eval(xs[0], xs[2]));
+            DifferenceBoundedGraph graph = new DifferenceBoundedGraph(locals);
+            graph.add(xs[0], xs[1], new Constraint(3));
+            graph.add(xs[1], xs[2], new Constraint(2));
+            graph.add(xs[2], ZERO, new Constraint(5));
+            graph.incrementalClosure(xs[0]);
+            assertAll("incremental closure finds only searches from source",
+                      () -> assertEquals(new Constraint(5), graph.eval(xs[0], xs[2])),
+                      () -> assertEquals(new Constraint(10), graph.eval(xs[0], ZERO)),
+                      () -> assertEquals(Constraint.TOP(), graph.eval(xs[1], ZERO)));
+        }
+
+        {
+            DifferenceBoundedGraph graph = new DifferenceBoundedGraph(locals);
+            graph.add(xs[0], xs[1], new Constraint(3));
+            graph.add(xs[1], xs[2], new Constraint(2));
+            graph.add(xs[2], ZERO, new Constraint(5));
+            graph.incrementalClosure(xs[0]);
+            graph.incrementalClosure(xs[1]);
+            assertAll("incremental closure finds only searches from source",
+                      () -> assertEquals(new Constraint(5), graph.eval(xs[0], xs[2])),
+                      () -> assertEquals(new Constraint(10), graph.eval(xs[0], ZERO)),
+                      () -> assertEquals(new Constraint(7), graph.eval(xs[1], ZERO)));
+        }
+
+        {
+            DifferenceBoundedGraph graph = new DifferenceBoundedGraph(locals);
+            graph.add(xs[0], xs[1], new Constraint(3));
+            graph.add(xs[1], xs[2], new Constraint(2));
+            graph.add(xs[2], ZERO, new Constraint(5));
+            graph.add(ZERO, xs[3], new Constraint(2));
+            graph.add(xs[3], ZERO, new Constraint(-2));
+            graph.incrementalClosure(xs[0]);
+            assertAll("incremental closure does not permit nonsense transitive edges",
+                      () -> assertEquals(new Constraint(5), graph.eval(xs[0], xs[2])),
+                      () -> assertEquals(new Constraint(10), graph.eval(xs[0], ZERO)),
+                      () -> assertEquals(Constraint.TOP(), graph.eval(xs[1], ZERO)),
+                      () -> assertEquals(Constraint.TOP(), graph.eval(xs[0], xs[3])));
+        }
+
+        {
+            DifferenceBoundedGraph graph = new DifferenceBoundedGraph(locals);
+            graph.add(xs[0], ZERO, new Constraint(3));
+            graph.add(ZERO, xs[0], new Constraint(-3));
+            graph.incrementalClosure(xs[0]);
+            assertAll("incremental closure does not maintain self-loops if >= 0",
+                      () -> assertEquals(Constraint.TOP(), graph.eval(xs[0], xs[0])));
         }
     }
 
