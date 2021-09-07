@@ -82,7 +82,6 @@ public class DBSNumericalTest {
             "4 if l0 >= 3 goto l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
             "l0->(= l0 2)",
             "l0f->(and (= l0 4) (>= l0 3))",
-            "5 l3 = l1 / l2:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
             "6 l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
             "l3->(= l3 6)",
         };

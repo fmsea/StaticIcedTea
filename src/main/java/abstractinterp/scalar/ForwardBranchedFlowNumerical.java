@@ -90,67 +90,61 @@ public class ForwardBranchedFlowNumerical<S extends State>
         LOGGER.debug("{} flow through: {}", s, in);
         S ifStmtFall = this.stateFactory.copy(in);
         S ifStmtBranch = this.stateFactory.copy(in);
-        if (in.isFeasible()) {
-            if (s instanceof AssignStmt) {
-                AssignStmt stmt = (AssignStmt)s;
-                Value lhs = stmt.getLeftOp();
-                if (lhs instanceof Local && isIntType(lhs)) {
-                    this.outputStmt.add(s);
-                    Set<Value> track = new HashSet<>();
-                    track.add(lhs);
-                    this.changedVariables.put(s, track);
-                    Local lVar = (Local) lhs;
-                    Value rhs = stmt.getRightOp();
-                    if (rhs instanceof BinopExpr) {
-                        BinaryOperator op = BinaryOperator.fromJimple((BinopExpr) rhs);
-                        Value left = ((BinopExpr) rhs).getOp1();
-                        Value right = ((BinopExpr) rhs).getOp2();
-
-                        LOGGER.debug("assigning {} to {} ({}) {}, using {}",
-                                     lVar, left, op, right, in);
-                        ifStmtFall.updateState(lVar, in, left, right, op);
-                    } else if (rhs instanceof JimpleLocal ||
-                               rhs instanceof NumericConstant ||
-                               rhs instanceof JNegExpr) {
-                        ifStmtFall.updateState(lVar, in, rhs);
-                    } else {
-                        ifStmtFall.forget(lVar);
-                    }
-                }
-            } else if (s instanceof IfStmt) {
-                IfStmt stmt = (IfStmt)s;
-                ConditionExpr condExpr = (ConditionExpr) stmt.getCondition();
-                Value left = condExpr.getOp1();
-                Value right = condExpr.getOp2();
+        if (s instanceof AssignStmt) {
+            AssignStmt stmt = (AssignStmt)s;
+            Value lhs = stmt.getLeftOp();
+            if (lhs instanceof Local && isIntType(lhs)) {
                 this.outputStmt.add(s);
                 Set<Value> track = new HashSet<>();
+                track.add(lhs);
                 this.changedVariables.put(s, track);
-                PredicateType type = PredicateType.fromJimple(condExpr);
+                Local lVar = (Local) lhs;
+                Value rhs = stmt.getRightOp();
+                if (rhs instanceof BinopExpr) {
+                    BinaryOperator op = BinaryOperator.fromJimple((BinopExpr) rhs);
+                    Value left = ((BinopExpr) rhs).getOp1();
+                    Value right = ((BinopExpr) rhs).getOp2();
 
-                ifStmtBranch.updateCond(in, left, right, type);
-
-                type = type.rotate();
-
-                ifStmtFall.updateCond(in, left, right, type);
-
-                if (left instanceof JimpleLocal) {
-                    track.add(left);
-                }
-                if (right instanceof JimpleLocal) {
-                    track.add(right);
-                }
-            }
-
-            if (s instanceof IdentityStmt) {
-                IdentityStmt param = (IdentityStmt) s;
-                if (isIntType(param.getLeftOp())) {
-                    ifStmtFall.updateTop((Local) param.getLeftOp());
+                    LOGGER.debug("assigning {} to {} ({}) {}, using {}",
+                                 lVar, left, op, right, in);
+                    ifStmtFall.updateState(lVar, in, left, right, op);
+                } else if (rhs instanceof JimpleLocal ||
+                           rhs instanceof NumericConstant ||
+                           rhs instanceof JNegExpr) {
+                    ifStmtFall.updateState(lVar, in, rhs);
+                } else {
+                    ifStmtFall.forget(lVar);
                 }
             }
-        } else {
-            // recopy infeasible input to outputs
-            ifStmtFall = this.stateFactory.copy(in);
-            ifStmtBranch = this.stateFactory.copy(in);
+        } else if (s instanceof IfStmt) {
+            IfStmt stmt = (IfStmt)s;
+            ConditionExpr condExpr = (ConditionExpr) stmt.getCondition();
+            Value left = condExpr.getOp1();
+            Value right = condExpr.getOp2();
+            this.outputStmt.add(s);
+            Set<Value> track = new HashSet<>();
+            this.changedVariables.put(s, track);
+            PredicateType type = PredicateType.fromJimple(condExpr);
+
+            ifStmtBranch.updateCond(in, left, right, type);
+
+            type = type.rotate();
+
+            ifStmtFall.updateCond(in, left, right, type);
+
+            if (left instanceof JimpleLocal) {
+                track.add(left);
+            }
+            if (right instanceof JimpleLocal) {
+                track.add(right);
+            }
+        }
+
+        if (s instanceof IdentityStmt) {
+            IdentityStmt param = (IdentityStmt) s;
+            if (isIntType(param.getLeftOp())) {
+                ifStmtFall.updateTop((Local) param.getLeftOp());
+            }
         }
 
         for (S state : fallOut) {

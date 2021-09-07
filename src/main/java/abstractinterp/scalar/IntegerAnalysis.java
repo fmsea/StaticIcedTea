@@ -157,14 +157,14 @@ public class IntegerAnalysis<S extends State> {
         for (Unit u : this.g.getBody().getUnits()) {
             stmtCount++;
             if (outputStmt.contains(u)) {
-                sb.append(stmtCount);
-                sb.append(" ");
-                sb.append(u);
-                sb.append(":");
-                sb.append(methodSignature);
-                sb.append('\n');
                 S state = analysis.getFallFlowAfter(u);
                 if (state.isFeasible()) {
+                    sb.append(stmtCount);
+                    sb.append(" ");
+                    sb.append(u);
+                    sb.append(":");
+                    sb.append(methodSignature);
+                    sb.append('\n');
                     for (Local l : locals) {
                         if (changedVariables.get(u).contains(l)) {
                             sb.append(l.toString());

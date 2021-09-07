@@ -126,7 +126,6 @@ public class IntervalNumericalTest {
             "l1->(= l1 0)",
             "3 l2 = 0:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
             "l2->(= l2 0)",
-            "4 if l0 >= 3 goto l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
             "6 l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
             "l3->(= l3 6)"
         };
@@ -198,11 +197,11 @@ public class IntervalNumericalTest {
             "if b3 != 0 goto i4 = b3 + b2 b->" +
             "[{b3=3, i1=⟙, b2=1, $i0=⟙, i4=⟙, i5=⟙}]",
             "i4 = b3 - b2 class soot.jimple.internal.JAssignStmt f->" +
-            "{b3=⟘, i1=⟙, b2=1, $i0=⟙, i4=⟙, i5=⟙}",
+            "{b3=⟘, i1=⟙, b2=1, $i0=⟙, i4=⟘, i5=⟙}",
             "goto [?= $i0 = b3 * i4] class soot.jimple.internal.JGotoStmt f->" +
             "{b3=⟙, i1=⟙, b2=⟙, $i0=⟙, i4=⟙, i5=⟙}",
             "goto [?= $i0 = b3 * i4] b->" +
-            "[{b3=⟘, i1=⟙, b2=1, $i0=⟙, i4=⟙, i5=⟙}]",
+            "[{b3=⟘, i1=⟙, b2=1, $i0=⟙, i4=⟘, i5=⟙}]",
             "i4 = b3 + b2 class soot.jimple.internal.JAssignStmt f->" +
             "{b3=3, i1=⟙, b2=1, $i0=⟙, i4=4, i5=⟙}",
             "$i0 = b3 * i4 class soot.jimple.internal.JAssignStmt f->" +
@@ -226,7 +225,6 @@ public class IntervalNumericalTest {
             "b2->(= b2 1)",
             "3 b3 = 3:<test.Example1M: int example_5(int)>",
             "b3->(= b3 3)",
-            "4 if b3 != 0 goto i4 = b3 + b2:<test.Example1M: int example_5(int)>",
             "7 i4 = b3 + b2:<test.Example1M: int example_5(int)>",
             "i4->(= i4 4)",
             "8 $i0 = b3 * i4:<test.Example1M: int example_5(int)>",
