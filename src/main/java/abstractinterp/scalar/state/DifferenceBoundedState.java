@@ -5,9 +5,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -411,6 +413,26 @@ public class DifferenceBoundedState implements State {
                             Local left,
                             Local right,
                             BinaryOperator op) {
+        Consumer<BiFunction<Interval32Box, Interval32Box, Interval32Box>> computeInterval = (binop) -> {
+            Optional<Constraint> leftLower = inState.getValue(ZERO, left);
+            Optional<Constraint> leftUpper = inState.getValue(left, ZERO);
+            Optional<Constraint> rightLower = inState.getValue(ZERO, right);
+            Optional<Constraint> rightUpper = inState.getValue(right, ZERO);
+            Interval32Box interval_c = new Interval32Box(leftLower.map(x -> x.bound()),
+                                                     leftUpper.map(x -> x.bound()));
+            Interval32Box interval_d = new Interval32Box(rightLower.map(x -> x.bound()),
+                                                     rightUpper.map(x -> x.bound()));
+            PredicateType predicateType = Stream.of(Constraint.superiorPredicate(leftLower, rightLower),
+                                                    Constraint.superiorPredicate(leftLower, rightUpper),
+                                                    Constraint.superiorPredicate(leftUpper, rightLower),
+                                                    Constraint.superiorPredicate(leftUpper, rightUpper))
+            .reduce((a, b) -> PredicateType.superior(a, b)).get();
+            Interval32Box result = binop.apply(interval_c, interval_d);
+            result.lowerBound().ifPresentOrElse(l -> this.add(ZERO, lVar, new Constraint(l, predicateType)),
+                                                () -> this.updateTop(ZERO, lVar));
+            result.upperBound().ifPresentOrElse(u -> this.add(lVar, ZERO, new Constraint(u, predicateType)),
+                                                () -> this.updateTop(lVar, ZERO));
+        };
         Optional<Constraint> c;
         Optional<Constraint> d;
         switch (op) {
@@ -419,11 +441,8 @@ public class DifferenceBoundedState implements State {
                 this.add(lVar, ZERO, c.get());
             } else if ((c =  inState.getValue(right, left)).isPresent()) {
                 this.add(lVar, ZERO, c.get());
-            } else if ((c = inState.getValue(left, ZERO)).isPresent() &&
-                       (d = inState.getValue(right, ZERO)).isPresent()) {
-                this.add(lVar, ZERO, Constraint.add(c.get(), d.get()));
             } else {
-                this.updateTop(lVar);
+                computeInterval.accept((a, b) -> Interval32Box.add(a, b));
             }
             break;
         case SUBTRACTION:
@@ -435,22 +454,38 @@ public class DifferenceBoundedState implements State {
             } else if ((c = inState.getValue(left, ZERO)).isPresent() &&
                        (d = inState.getValue(right, ZERO)).isPresent()) {
                 this.add(lVar, ZERO, Constraint.subtract(c.get(), d.get()));
+            } else if ((c = inState.getValue(ZERO, left)).isPresent() &&
+                       (d = inState.getValue(ZERO, right)).isPresent()) {
+                this.add(ZERO, lVar, Constraint.subtract(Constraint.negate(c.get()),
+                                                         Constraint.negate(d.get())).negate());
             } else {
-                this.updateTop(lVar);
+                computeInterval.accept((a, b) -> Interval32Box.subtract(a, b));
             }
             break;
         case MULTIPLICATION:
             if ((c = inState.getValue(left, ZERO)).isPresent() &&
                 (d = inState.getValue(right, ZERO)).isPresent()) {
                 this.add(lVar, ZERO, Constraint.multiply(c.get(), d.get()));
-                break;
+            } else if ((c = inState.getValue(ZERO, left)).isPresent() &&
+                       (d = inState.getValue(ZERO, right)).isPresent()) {
+                this.add(ZERO, lVar, Constraint.multiply(Constraint.negate(c.get()),
+                                                         Constraint.negate(d.get())).negate());
+            } else {
+                computeInterval.accept((a, b) -> Interval32Box.multiply(a, b));
             }
+            break;
         case DIVISION:
             if ((c = inState.getValue(left, ZERO)).isPresent() &&
                 (d = inState.getValue(right, ZERO)).isPresent()) {
                 this.add(lVar, ZERO, Constraint.divide(c.get(), d.get()));
-                break;
+            } else if ((c = inState.getValue(ZERO, left)).isPresent() &&
+                       (d = inState.getValue(ZERO, right)).isPresent()) {
+                this.add(ZERO, lVar, Constraint.divide(Constraint.negate(c.get()),
+                                                       Constraint.negate(d.get())).negate());
+            } else {
+                computeInterval.accept((a, b) -> Interval32Box.divide(a, b));
             }
+            break;
         case MODULUS:
         case BAND:
         case BOR:

@@ -473,51 +473,185 @@ public class DifferenceBoundedStateTest {
     }
 
     @Test
-    void testTransferTwoVariableAdditionWithProjection() {
-        DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
-        DifferenceBoundedState inState = new DifferenceBoundedState(state);
-        inState.add(xs[0], xs[1], new Constraint(3, PredicateType.Le));
-        inState.add(xs[1], new Constraint(4, PredicateType.Eq));
-        inState.add(xs[2], new Constraint(3, PredicateType.Eq));
-        state.updateState(xs[3], inState, xs[1], xs[2], BinaryOperator.ADDITION);
-        assertEquals(new Constraint(7, PredicateType.Eq),
-                     state.getConstraint(xs[3], ZERO));
+    void testTransferTwoVariableAdditionInIntervals() {
+        {
+            DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
+            DifferenceBoundedState inState = new DifferenceBoundedState(state);
+            inState.add(xs[0], xs[1], new Constraint(3, PredicateType.Le));
+            inState.add(xs[1], new Constraint(4, PredicateType.Eq));
+            inState.add(xs[2], new Constraint(3, PredicateType.Eq));
+            state.updateState(xs[3], inState, xs[1], xs[2], BinaryOperator.ADDITION);
+            assertEquals(new Constraint(7, PredicateType.Eq),
+                         state.getConstraint(xs[3], ZERO));
+        }
+
+        {
+            DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
+            state.add(xs[1], xs[0], new Constraint(-3, PredicateType.Le));
+            state.add(ZERO, xs[1], new Constraint(-4, PredicateType.Eq));
+            state.add(ZERO, xs[2], new Constraint(-3, PredicateType.Le));
+            DifferenceBoundedState inState = new DifferenceBoundedState(state);
+            state.updateState(xs[3], inState, xs[1], xs[2], BinaryOperator.ADDITION);
+            assertEquals(new Constraint(-7, PredicateType.Le),
+                         state.getConstraint(ZERO, xs[3]));
+        }
+
+        {
+            DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
+            state.add(xs[1], ZERO, new Constraint(4));
+            state.add(ZERO, xs[2], new Constraint(-3, PredicateType.Le));
+            DifferenceBoundedState inState = new DifferenceBoundedState(state);
+            state.updateState(xs[3], inState, xs[1], xs[2], BinaryOperator.ADDITION);
+            assertAll(() -> assertEquals(Constraint.TOP(), state.getConstraint(xs[3], ZERO)),
+                      () -> assertEquals(Constraint.TOP(), state.getConstraint(ZERO, xs[3])));
+        }
+
+        {
+            DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
+            state.add(ZERO, xs[1], new Constraint(-4));
+            state.add(xs[2], ZERO, new Constraint(3, PredicateType.Le));
+            DifferenceBoundedState inState = new DifferenceBoundedState(state);
+            state.updateState(xs[3], inState, xs[1], xs[2], BinaryOperator.ADDITION);
+            assertAll(() -> assertEquals(Constraint.TOP(), state.getConstraint(xs[3], ZERO)),
+                      () -> assertEquals(Constraint.TOP(), state.getConstraint(ZERO, xs[3])));
+        }
     }
 
     @Test
-    void testTransferTwoVariableSubtractionWithProjection() {
-        DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
-        DifferenceBoundedState inState = new DifferenceBoundedState(state);
-        inState.add(xs[0], xs[1], new Constraint(3, PredicateType.Le));
-        inState.add(xs[1], new Constraint(4, PredicateType.Eq));
-        inState.add(xs[2], new Constraint(3, PredicateType.Eq));
-        state.updateState(xs[3], inState, xs[1], xs[2], BinaryOperator.SUBTRACTION);
-        assertEquals(new Constraint(1, PredicateType.Eq),
-                     state.getConstraint(xs[3], ZERO));
+    void testTransferTwoVariableSubtractionInIntervals() {
+        {
+            DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
+            DifferenceBoundedState inState = new DifferenceBoundedState(state);
+            inState.add(xs[0], xs[1], new Constraint(3, PredicateType.Le));
+            inState.add(xs[1], new Constraint(4, PredicateType.Eq));
+            inState.add(xs[2], new Constraint(3, PredicateType.Eq));
+            state.updateState(xs[3], inState, xs[1], xs[2], BinaryOperator.SUBTRACTION);
+            assertEquals(new Constraint(1, PredicateType.Eq),
+                         state.getConstraint(xs[3], ZERO));
+        }
+
+        {
+            DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
+            state.add(xs[1], xs[0], new Constraint(-3, PredicateType.Le));
+            state.add(ZERO, xs[1], new Constraint(-4, PredicateType.Eq));
+            state.add(ZERO, xs[2], new Constraint(-3, PredicateType.Le));
+            DifferenceBoundedState inState = new DifferenceBoundedState(state);
+            state.updateState(xs[3], inState, xs[1], xs[2], BinaryOperator.SUBTRACTION);
+            assertEquals(new Constraint(-1, PredicateType.Le),
+                         state.getConstraint(ZERO, xs[3]));
+        }
+
+        {
+            DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
+            state.add(xs[1], ZERO, new Constraint(4));
+            state.add(ZERO, xs[2], new Constraint(-3, PredicateType.Le));
+            DifferenceBoundedState inState = new DifferenceBoundedState(state);
+            state.updateState(xs[3], inState, xs[1], xs[2], BinaryOperator.SUBTRACTION);
+            assertAll(() -> assertEquals(new Constraint(7, PredicateType.Le),
+                                         state.getConstraint(xs[3], ZERO)),
+                      () -> assertEquals(Constraint.TOP(), state.getConstraint(ZERO, xs[3])));
+        }
+
+        {
+            DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
+            state.add(ZERO, xs[1], new Constraint(-4));
+            state.add(xs[2], ZERO, new Constraint(3, PredicateType.Le));
+            DifferenceBoundedState inState = new DifferenceBoundedState(state);
+            state.updateState(xs[3], inState, xs[1], xs[2], BinaryOperator.SUBTRACTION);
+            assertAll(() -> assertEquals(Constraint.TOP(), state.getConstraint(xs[3], ZERO)),
+                      () -> assertEquals(new Constraint(-7, PredicateType.Le),
+                                         state.getConstraint(ZERO, xs[3])));
+        }
     }
 
     @Test
-    void testTransferTwoVariableMultiplicationWithProjection() {
-        DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
-        DifferenceBoundedState inState = new DifferenceBoundedState(state);
-        inState.add(xs[0], xs[1], new Constraint(3, PredicateType.Le));
-        inState.add(xs[1], new Constraint(4, PredicateType.Eq));
-        inState.add(xs[2], new Constraint(3, PredicateType.Eq));
-        state.updateState(xs[3], inState, xs[1], xs[2], BinaryOperator.MULTIPLICATION);
-        assertEquals(new Constraint(12, PredicateType.Eq),
-                     state.getConstraint(xs[3]));
+    void testTransferTwoVariableMultiplicationInIntervals() {
+        {
+            DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
+            DifferenceBoundedState inState = new DifferenceBoundedState(state);
+            inState.add(xs[0], xs[1], new Constraint(3, PredicateType.Le));
+            inState.add(xs[1], new Constraint(4, PredicateType.Eq));
+            inState.add(xs[2], new Constraint(3, PredicateType.Eq));
+            state.updateState(xs[3], inState, xs[1], xs[2], BinaryOperator.MULTIPLICATION);
+            assertEquals(new Constraint(12, PredicateType.Eq),
+                         state.getConstraint(xs[3]));
+        }
+
+        {
+            DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
+            state.add(xs[1], xs[0], new Constraint(-3, PredicateType.Le));
+            state.add(ZERO, xs[1], new Constraint(-4, PredicateType.Eq));
+            state.add(ZERO, xs[2], new Constraint(-3, PredicateType.Le));
+            DifferenceBoundedState inState = new DifferenceBoundedState(state);
+            state.updateState(xs[3], inState, xs[1], xs[2], BinaryOperator.MULTIPLICATION);
+            assertEquals(new Constraint(-12, PredicateType.Le),
+                         state.getConstraint(ZERO, xs[3]));
+        }
+
+        {
+            DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
+            state.add(xs[1], ZERO, new Constraint(4));
+            state.add(ZERO, xs[2], new Constraint(-3, PredicateType.Le));
+            DifferenceBoundedState inState = new DifferenceBoundedState(state);
+            state.updateState(xs[3], inState, xs[1], xs[2], BinaryOperator.MULTIPLICATION);
+            assertAll(() -> assertEquals(Constraint.TOP(), state.getConstraint(xs[3], ZERO)),
+                      () -> assertEquals(Constraint.TOP(), state.getConstraint(ZERO, xs[3])));
+        }
+
+        {
+            DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
+            state.add(ZERO, xs[1], new Constraint(-4));
+            state.add(xs[2], ZERO, new Constraint(3, PredicateType.Le));
+            DifferenceBoundedState inState = new DifferenceBoundedState(state);
+            state.updateState(xs[3], inState, xs[1], xs[2], BinaryOperator.MULTIPLICATION);
+            assertAll(() -> assertEquals(Constraint.TOP(), state.getConstraint(xs[3], ZERO)),
+                      () -> assertEquals(Constraint.TOP(), state.getConstraint(ZERO, xs[3])));
+        }
     }
 
     @Test
-    void testTransferTwoVariableDivisionWithProjection() {
-        DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
-        DifferenceBoundedState inState = new DifferenceBoundedState(state);
-        inState.add(xs[0], xs[1], new Constraint(3, PredicateType.Le));
-        inState.add(xs[1], new Constraint(4, PredicateType.Eq));
-        inState.add(xs[2], new Constraint(3, PredicateType.Eq));
-        state.updateState(xs[3], inState, xs[1], xs[2], BinaryOperator.DIVISION);
-        assertEquals(new Constraint(1, PredicateType.Eq),
-                     state.getConstraint(xs[3]));
+    void testTransferTwoVariableDivisionInIntervals() {
+        {
+            DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
+            DifferenceBoundedState inState = new DifferenceBoundedState(state);
+            inState.add(xs[0], xs[1], new Constraint(3, PredicateType.Le));
+            inState.add(xs[1], new Constraint(4, PredicateType.Eq));
+            inState.add(xs[2], new Constraint(3, PredicateType.Eq));
+            state.updateState(xs[3], inState, xs[1], xs[2], BinaryOperator.DIVISION);
+            assertEquals(new Constraint(1, PredicateType.Eq),
+                         state.getConstraint(xs[3]));
+        }
+
+        {
+            DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
+            state.add(xs[1], xs[0], new Constraint(3, PredicateType.Le));
+            state.add(ZERO, xs[1], new Constraint(-4));
+            state.add(ZERO, xs[2], new Constraint(-3, PredicateType.Le));
+            DifferenceBoundedState inState = new DifferenceBoundedState(state);
+            state.updateState(xs[3], inState, xs[1], xs[2], BinaryOperator.DIVISION);
+            assertEquals(new Constraint(-1, PredicateType.Le),
+                         state.getConstraint(ZERO, xs[3]));
+        }
+
+                {
+            DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
+            state.add(xs[1], ZERO, new Constraint(4));
+            state.add(ZERO, xs[2], new Constraint(-3, PredicateType.Le));
+            DifferenceBoundedState inState = new DifferenceBoundedState(state);
+            state.updateState(xs[3], inState, xs[1], xs[2], BinaryOperator.DIVISION);
+            assertAll(() -> assertEquals(Constraint.TOP(), state.getConstraint(xs[3], ZERO)),
+                      () -> assertEquals(Constraint.TOP(), state.getConstraint(ZERO, xs[3])));
+        }
+
+        {
+            DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
+            state.add(ZERO, xs[1], new Constraint(-4));
+            state.add(xs[2], ZERO, new Constraint(3, PredicateType.Le));
+            DifferenceBoundedState inState = new DifferenceBoundedState(state);
+            state.updateState(xs[3], inState, xs[1], xs[2], BinaryOperator.DIVISION);
+            assertAll(() -> assertEquals(Constraint.TOP(), state.getConstraint(xs[3], ZERO)),
+                      () -> assertEquals(Constraint.TOP(), state.getConstraint(ZERO, xs[3])));
+        }
     }
 
     @Test
