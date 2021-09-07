@@ -526,7 +526,7 @@ public class DifferenceBoundedState implements State {
             c = new Constraint(value, PredicateType.Eq);
         } else if (v instanceof Local) {
             Local l = (Local) v;
-            c = inState.eval(l, Variable.ZERO);
+            c = inState.eval(l, Variable.ZERO).copy();
         } else {
             c = Constraint.TOP();
         }
