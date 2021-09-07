@@ -1,5 +1,6 @@
 package abstractinterp.scalar.state;
 
+import java.util.Optional;
 import soot.jimple.IntConstant;
 
 public class Constraint implements Comparable<Constraint> {
@@ -329,5 +330,26 @@ public class Constraint implements Comparable<Constraint> {
             break;
         }
         return c;
+    }
+
+    public static PredicateType superiorPredicate(Constraint left,
+                                                  Constraint right) {
+        return Constraint.superiorPredicate(Optional.ofNullable(left),
+                                            Optional.ofNullable(right));
+    }
+
+    public static PredicateType superiorPredicate(Optional<Constraint> left,
+                                                  Optional<Constraint> right) {
+        PredicateType type;
+        if (left.isPresent() && right.isPresent()) {
+            type = PredicateType.superior(left.get().predicate(), right.get().predicate());
+        } else if (left.isPresent() && right.isEmpty()) {
+            type = left.get().predicate();
+        } else if (left.isEmpty() && right.isPresent()) {
+            type = right.get().predicate();
+        } else {
+            type = PredicateType.Eq;
+        }
+        return type;
     }
 }

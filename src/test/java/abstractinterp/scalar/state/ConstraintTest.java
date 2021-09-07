@@ -1,5 +1,6 @@
 package abstractinterp.scalar.state;
 
+import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -94,5 +95,30 @@ public class ConstraintTest {
                   () -> assertEquals(new Constraint(0, PredicateType.Le),
                                      Constraint.max(new Constraint(0),
                                               new Constraint(0, PredicateType.Le))));
+    }
+
+    @Test
+    void testGetPredicateType() {
+        assertAll(() -> assertEquals(PredicateType.Eq,
+                                     Constraint.superiorPredicate(Optional.empty(),
+                                                                  Optional.empty())),
+                  () -> assertEquals(PredicateType.Eq,
+                                     Constraint.superiorPredicate(new Constraint(0), null)),
+                  () -> assertEquals(PredicateType.Eq,
+                                     Constraint.superiorPredicate(null, new Constraint(0))),
+                  () -> assertEquals(PredicateType.Eq,
+                                     Constraint.superiorPredicate(new Constraint(1), new Constraint(0))),
+                  () -> assertEquals(PredicateType.Le,
+                                     Constraint.superiorPredicate(new Constraint(0, PredicateType.Le),
+                                                                  null)),
+                  () -> assertEquals(PredicateType.Le,
+                                     Constraint.superiorPredicate(null,
+                                                                  new Constraint(0, PredicateType.Le))),
+                  () -> assertEquals(PredicateType.Le,
+                                     Constraint.superiorPredicate(new Constraint(0, PredicateType.Le),
+                                                                  new Constraint(0))),
+                  () -> assertEquals(PredicateType.Le,
+                                     Constraint.superiorPredicate(new Constraint(0),
+                                                                  new Constraint(0, PredicateType.Le))));
     }
 }
