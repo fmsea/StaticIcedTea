@@ -691,7 +691,7 @@ public class DifferenceBoundedState implements State {
         } else if (left instanceof IntConstant && right instanceof Local) {
             feasible = this.updateCond(inState, (IntConstant) left, (Local) right, type);
         } else {
-            LOGGER.error("missing handler for x-condition: {} {} {}", left, type, right);
+            LOGGER.warn("missing handler for x-condition: {} {} {}", left, type, right);
             feasible = true;
         }
         return feasible;
