@@ -94,7 +94,7 @@ public class ConstraintTest {
                                                     new Constraint(0))),
                   () -> assertEquals(new Constraint(0, PredicateType.Le),
                                      Constraint.max(new Constraint(0),
-                                              new Constraint(0, PredicateType.Le))));
+                                                    new Constraint(0, PredicateType.Le))));
     }
 
     @Test
@@ -120,5 +120,12 @@ public class ConstraintTest {
                   () -> assertEquals(PredicateType.Le,
                                      Constraint.superiorPredicate(new Constraint(0),
                                                                   new Constraint(0, PredicateType.Le))));
+    }
+
+    @Test
+    void testCompareTo() {
+        assertAll(() -> assertEquals(-1, (new Constraint(0)).compareTo(new Constraint(1, PredicateType.Le))),
+                  () -> assertEquals(+0, (new Constraint(0, PredicateType.Le)).compareTo(new Constraint(0, PredicateType.Le))),
+                  () -> assertEquals(+1, (new Constraint(1, PredicateType.Le)).compareTo(new Constraint(0))));
     }
 }

@@ -233,25 +233,20 @@ public class Constraint implements Comparable<Constraint> {
      * @return minimum constraint
      */
     public static Constraint min(Constraint a, Constraint b) {
-        Constraint t = TOP();
-        Constraint c;
-        PredicateType predicate;
-        if (a.equals(b)) {
-            c = a.copy();
-        } else if (t.equals(a)) {
-            c = b.copy();
-        } else if (t.equals(b)) {
-            c = a.copy();
-        } else if (a.isBottom()) {
-            c = b.copy();
-        } else if (b.isBottom()) {
-            c = a.copy();
-        } else if ((predicate = PredicateType.minimum(a.predicate, b.predicate)) == PredicateType.Invalid) {
-            c = BOT();
+        Constraint r;
+        int order = a.compareTo(b);
+        if (BOT().equals(a)) {
+            r = b.copy();
+        } else if (BOT().equals(b)) {
+            r = a.copy();
+        } else if (order == 0 || order == -1) {
+            r = a.copy();
+        } else if (order == 1) {
+            r = b.copy();
         } else {
-            c = new Constraint(Math.min(a.bound, b.bound), predicate);
+            r = BOT();
         }
-        return c;
+        return r;
     }
 
     public static Constraint max(Constraint a, Constraint b) {
@@ -280,12 +275,13 @@ public class Constraint implements Comparable<Constraint> {
             order = -1;
         } else if (c.equals(BOT())) {
             order = 1;
-        } else if (predicateOrder < 0) {
-            order = -1;
-        } else if (predicateOrder == 0) {
+        } else if (Integer.compare(this.bound, c.bound) == 0 && predicateOrder < 2) {
+            // bounds are equal, defer to relation
+            order = predicateOrder;
+        } else if (predicateOrder < 2) {
+            // defer to bounds since they are not equal
+            // order should be -1 or +1
             order = Integer.compare(this.bound, c.bound);
-        } else if (predicateOrder == 1) {
-            order =  1;
         } else {
             order = 2;
         }
