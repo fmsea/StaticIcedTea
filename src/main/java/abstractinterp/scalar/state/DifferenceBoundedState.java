@@ -724,7 +724,7 @@ public class DifferenceBoundedState implements State {
             return false;
         }
         this.intersection(inState);
-        return this.isFeasible();
+        return this.incrementalClosure(left, this) && this.incrementalClosure(ZERO, this);
     }
 
     public boolean updateCond(DifferenceBoundedState inState,
@@ -754,7 +754,7 @@ public class DifferenceBoundedState implements State {
             return false;
         }
         this.intersection(inState);
-        return this.isFeasible();
+        return this.incrementalClosure(right, this) && this.incrementalClosure(ZERO, this);
     }
 
     public boolean updateCond(DifferenceBoundedState inState,
@@ -784,6 +784,6 @@ public class DifferenceBoundedState implements State {
             return false;
         }
         this.intersection(inState);
-        return this.isFeasible();
+        return this.incrementalClosure(left, this) && this.incrementalClosure(right, this);
     }
 }
