@@ -15,7 +15,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,7 +68,7 @@ public class IntervalNumericalZ3Test {
 
     @Test
     void testConstantValuePropagation() {
-        Assertions.assertTrue(Files.exists(this.z3TestFile));
+        assertTrue(Files.exists(this.z3TestFile));
         Body body = JimpleProvider.constantJimpleMethod("z3_constant_test");
         String oracle = Stream.of(new String[] {
                 "1 l1 = 6:<z3_constant_testSootClass: int z3_constant_test()>",
@@ -77,12 +80,12 @@ public class IntervalNumericalZ3Test {
                 "sat",
                 "sat",
             }).collect(Collectors.joining("\n"));
-        Assertions.assertTrue(runAnalysis(body, oracle, expected));
+        assertTrue(runAnalysis(body, oracle, expected));
     }
 
     @Test
     void testConstantArithmaticPropagation() {
-        Assertions.assertTrue(Files.exists(this.z3TestFile));
+        assertTrue(Files.exists(this.z3TestFile));
         Body body = JimpleProvider.binaryArithmaticMethod("z3ConstantMath");
         String oracle = Stream.of(new String[] {
                 "1 l0 = 3:<z3ConstantMathSootClass: void z3ConstantMath()>",
@@ -118,12 +121,12 @@ public class IntervalNumericalZ3Test {
                 "sat",
                 "sat",
             }).collect(Collectors.joining("\n"));
-        Assertions.assertTrue(runAnalysis(body, oracle, expected));
+        assertTrue(runAnalysis(body, oracle, expected));
     }
 
     @Test
     void testIfStatementPropagation() {
-        Assertions.assertTrue(Files.exists(this.z3TestFile));
+        assertTrue(Files.exists(this.z3TestFile));
         Body body = JimpleProvider.simpleIfStatement("z3_simpleIf");
         String oracle = Stream.of(new String[] {
                 "1 l0 = 4:<z3_simpleIfSootClass: void z3_simpleIf()>",
@@ -153,7 +156,7 @@ public class IntervalNumericalZ3Test {
                 "sat",
                 "sat",
             }).collect(Collectors.joining("\n"));
-        Assertions.assertTrue(runAnalysis(body, oracle, expected));
+        assertTrue(runAnalysis(body, oracle, expected));
     }
 
     @Test
@@ -197,7 +200,7 @@ public class IntervalNumericalZ3Test {
                 "sat",
                 "sat",
             }).collect(Collectors.joining("\n"));
-        Assertions.assertTrue(runAnalysis(body, oracle, expected));
+        assertTrue(runAnalysis(body, oracle, expected));
     }
 
     private boolean runAnalysis(Body body, String oracle, String expectedZ3Output) {
@@ -217,7 +220,7 @@ public class IntervalNumericalZ3Test {
                                                                      StandardCharsets.UTF_8))
                     .lines()
                     .collect(Collectors.joining("\n"));
-            Assertions.assertEquals(expectedZ3Output, output);
+            assertEquals(expectedZ3Output, output);
             return true;
         } catch (IOException ex) {
             ex.printStackTrace(System.err);

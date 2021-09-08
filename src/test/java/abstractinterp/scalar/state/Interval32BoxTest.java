@@ -5,7 +5,10 @@ import java.util.Optional;
 import soot.IntType;
 import soot.Local;
 import soot.jimple.Jimple;
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -25,14 +28,14 @@ public class Interval32BoxTest {
     void testInterval32BoxClone() {
         Interval32Box top = Interval32Box.TOP();
         Interval32Box newTop = new Interval32Box(top);
-        Assertions.assertTrue(newTop.isTop());
+        assertTrue(newTop.isTop());
     }
 
     @Test
     void testInterval32BoxCloneWhenNull() {
         Interval32Box bot = Interval32Box.BOT();
         Interval32Box newBot = new Interval32Box(bot);
-        Assertions.assertTrue(newBot.isBottom());
+        assertTrue(newBot.isBottom());
     }
 
     @Test
@@ -40,11 +43,11 @@ public class Interval32BoxTest {
         Interval32Box top = Interval32Box.TOP();
         Interval32Box bot = Interval32Box.BOT();
         Interval32Box max = Interval32Box.MAX();
-        Assertions.assertTrue(bot.isBottom());
-        Assertions.assertFalse(top.isBottom());
-        Assertions.assertFalse(max.isBottom());
         Interval32Box box = new Interval32Box(1, 0);
-        Assertions.assertTrue(box.isBottom());
+        assertAll(() -> assertTrue(bot.isBottom()),
+                  () -> assertFalse(top.isBottom()),
+                  () -> assertFalse(max.isBottom()),
+                  () -> assertTrue(box.isBottom()));
     }
 
     @Test
@@ -52,13 +55,18 @@ public class Interval32BoxTest {
         Interval32Box top = Interval32Box.TOP();
         Interval32Box bot = Interval32Box.BOT();
         Interval32Box max = Interval32Box.MAX();
-        Assertions.assertTrue(top.isTop());
-        Assertions.assertFalse(bot.isTop());
-        Assertions.assertFalse(max.isTop());
-        Interval32Box box = new Interval32Box(null, 5);
-        Assertions.assertFalse(box.isTop());
-        box = new Interval32Box(-5, null);
-        Assertions.assertFalse(box.isTop());
+        assertAll(() -> assertTrue(top.isTop()),
+                  () -> assertFalse(bot.isTop()),
+                  () -> assertFalse(max.isTop()));
+        {
+            Interval32Box box = new Interval32Box(null, 5);
+            assertFalse(box.isTop());
+        }
+
+        {
+            Interval32Box box = new Interval32Box(-5, null);
+            assertFalse(box.isTop());
+        }
     }
 
     @Test
@@ -66,11 +74,11 @@ public class Interval32BoxTest {
         Interval32Box top = Interval32Box.TOP();
         Interval32Box bot = Interval32Box.BOT();
         Interval32Box max = Interval32Box.MAX();
-        Assertions.assertFalse(bot.isLowerBounded());
-        Assertions.assertFalse(top.isLowerBounded());
-        Assertions.assertTrue(max.isLowerBounded());
         Interval32Box box = new Interval32Box(null, 1);
-        Assertions.assertFalse(box.isLowerBounded());
+        assertAll(() -> assertFalse(bot.isLowerBounded()),
+                  () -> assertFalse(top.isLowerBounded()),
+                  () -> assertTrue(max.isLowerBounded()),
+                  () -> assertFalse(box.isLowerBounded()));
     }
 
     @Test
@@ -78,11 +86,11 @@ public class Interval32BoxTest {
         Interval32Box top = Interval32Box.TOP();
         Interval32Box bot = Interval32Box.BOT();
         Interval32Box max = Interval32Box.MAX();
-        Assertions.assertFalse(bot.isUpperBounded());
-        Assertions.assertFalse(top.isUpperBounded());
-        Assertions.assertTrue(max.isUpperBounded());
         Interval32Box box = new Interval32Box(1, null);
-        Assertions.assertFalse(box.isUpperBounded());
+        assertAll(() -> assertFalse(bot.isUpperBounded()),
+                  () -> assertFalse(top.isUpperBounded()),
+                  () -> assertTrue(max.isUpperBounded()),
+                  () -> assertFalse(box.isUpperBounded()));
     }
 
     @Test
@@ -90,13 +98,21 @@ public class Interval32BoxTest {
         Interval32Box top = Interval32Box.TOP();
         Interval32Box bot = Interval32Box.BOT();
         Interval32Box max = Interval32Box.MAX();
-        Assertions.assertFalse(bot.isBounded());
-        Assertions.assertFalse(top.isBounded());
-        Assertions.assertTrue(max.isBounded());
-        Interval32Box box = new Interval32Box(1, null);
-        Assertions.assertFalse(box.isBounded());
-        box = new Interval32Box(0, 1);
-        Assertions.assertTrue(box.isBounded());
+        assertAll(() -> assertFalse(bot.isBounded()),
+                  () -> assertFalse(top.isBounded()),
+                  () -> assertTrue(max.isBounded()));
+        {
+            Interval32Box box = new Interval32Box(1, null);
+            assertFalse(box.isBounded());
+        }
+        {
+            Interval32Box box = new Interval32Box(null, 1);
+            assertFalse(box.isBounded());
+        }
+        {
+            Interval32Box box = new Interval32Box(0, 1);
+            assertTrue(box.isBounded());
+        }
     }
 
     @Test
@@ -104,26 +120,26 @@ public class Interval32BoxTest {
         Interval32Box bot = Interval32Box.BOT();
         Interval32Box top = Interval32Box.TOP();
         Interval32Box max = Interval32Box.MAX();
-        Assertions.assertFalse(bot.isValid());
-        Assertions.assertTrue(top.isValid());
-        Assertions.assertTrue(max.isValid());
         Interval32Box box = new Interval32Box(0, 1);
-        Assertions.assertTrue(box.isValid());
+        assertAll(() -> assertFalse(bot.isValid()),
+                  () -> assertTrue(top.isValid()),
+                  () -> assertTrue(max.isValid()),
+                  () -> assertTrue(box.isValid()));
     }
 
     @Test
     void testBottomDoesNotContainPoints() {
-        Assertions.assertFalse(Interval32Box.BOT().containsIntegerPoint());
+        assertFalse(Interval32Box.BOT().containsIntegerPoint());
     }
 
     @Test
     void testTopContainsIntegerPoints() {
-        Assertions.assertTrue(Interval32Box.TOP().containsIntegerPoint());
+        assertTrue(Interval32Box.TOP().containsIntegerPoint());
     }
 
     @Test
     void testMaxContainsIntegerPoints() {
-        Assertions.assertTrue(Interval32Box.MAX().containsIntegerPoint());
+        assertTrue(Interval32Box.MAX().containsIntegerPoint());
     }
 
     @Test
@@ -133,29 +149,29 @@ public class Interval32BoxTest {
         Interval32Box top = Interval32Box.TOP();
         Interval32Box max = Interval32Box.MAX();
         bot.upperBoundAssign(ano_bot);
-        Assertions.assertTrue(bot.isBottom());
+        assertTrue(bot.isBottom());
         ano_bot.upperBoundAssign(top);
-        Assertions.assertFalse(ano_bot.isUpperBounded());
-        Assertions.assertFalse(ano_bot.isLowerBounded());
-        Assertions.assertTrue(ano_bot.isTop());
+        assertFalse(ano_bot.isUpperBounded());
+        assertFalse(ano_bot.isLowerBounded());
+        assertTrue(ano_bot.isTop());
         bot.upperBoundAssign(max);
-        Assertions.assertFalse(bot.isUpperBounded());
-        Assertions.assertFalse(bot.isLowerBounded());
-        Assertions.assertTrue(bot.isTop());
+        assertFalse(bot.isUpperBounded());
+        assertFalse(bot.isLowerBounded());
+        assertTrue(bot.isTop());
         top.upperBoundAssign(Interval32Box.BOT());
-        Assertions.assertEquals(Interval32Box.TOP(), top);
+        assertEquals(Interval32Box.TOP(), top);
         Interval32Box x = new Interval32Box(0, 1);
         Interval32Box y = new Interval32Box(1, 2);
         x.upperBoundAssign(y);
-        Assertions.assertEquals(0, x.lowerBound().get());
-        Assertions.assertEquals(2, x.upperBound().get());
+        assertEquals(0, x.lowerBound().get());
+        assertEquals(2, x.upperBound().get());
         x = new Interval32Box(0, 1);
         y = new Interval32Box(-1, 2);
         x.upperBoundAssign(y);
-        Assertions.assertEquals(-1, x.lowerBound().get());
-        Assertions.assertEquals(2, x.upperBound().get());
+        assertEquals(-1, x.lowerBound().get());
+        assertEquals(2, x.upperBound().get());
         y.upperBoundAssign(top);
-        Assertions.assertEquals(Interval32Box.TOP(), y);
+        assertEquals(Interval32Box.TOP(), y);
     }
 
     @Test
@@ -165,28 +181,28 @@ public class Interval32BoxTest {
         Interval32Box a = new Interval32Box(null, 0);
         Interval32Box b = new Interval32Box(0, null);
         bot.wideningAssign(bot);
-        Assertions.assertTrue(bot.isBottom());
+        assertTrue(bot.isBottom());
         bot.wideningAssign(top);
-        Assertions.assertTrue(bot.isTop());
+        assertTrue(bot.isTop());
         top.wideningAssign(a);
-        Assertions.assertTrue(top.isTop());
+        assertTrue(top.isTop());
         a.wideningAssign(b);
-        Assertions.assertFalse(a.isLowerBounded());
-        Assertions.assertFalse(a.isUpperBounded());
+        assertFalse(a.isLowerBounded());
+        assertFalse(a.isUpperBounded());
         bot = Interval32Box.BOT();
         a = new Interval32Box(1, 10);
         bot.wideningAssign(a);
-        Assertions.assertFalse(bot.isBottom());
-        Assertions.assertFalse(bot.isLowerBounded());
-        Assertions.assertFalse(bot.isUpperBounded());
+        assertFalse(bot.isBottom());
+        assertFalse(bot.isLowerBounded());
+        assertFalse(bot.isUpperBounded());
         b = new Interval32Box(1, 11);
         a.wideningAssign(b);
-        Assertions.assertEquals(1, a.lowerBound().get());
-        Assertions.assertEquals(Integer.MAX_VALUE, a.upperBound().get());
+        assertEquals(1, a.lowerBound().get());
+        assertEquals(Integer.MAX_VALUE, a.upperBound().get());
         b = new Interval32Box(0, 12);
         a.wideningAssign(b);
-        Assertions.assertEquals(Integer.MIN_VALUE, a.lowerBound().get());
-        Assertions.assertEquals(Integer.MAX_VALUE, a.upperBound().get());
+        assertEquals(Integer.MIN_VALUE, a.lowerBound().get());
+        assertEquals(Integer.MAX_VALUE, a.upperBound().get());
     }
 
     @Test
@@ -195,71 +211,71 @@ public class Interval32BoxTest {
         Interval32Box top = Interval32Box.TOP();
         Interval32Box max = Interval32Box.MAX();
         bot.negate();
-        Assertions.assertTrue(bot.isBottom());
+        assertTrue(bot.isBottom());
         top.negate();
-        Assertions.assertTrue(top.isTop());
+        assertTrue(top.isTop());
         max.negate();
-        Assertions.assertTrue(max.isBottom());
-        Assertions.assertEquals(-1 * Integer.MAX_VALUE, max.lowerBound().get());
-        Assertions.assertEquals(-1 * Integer.MIN_VALUE, max.upperBound().get());
+        assertTrue(max.isBottom());
+        assertEquals(-1 * Integer.MAX_VALUE, max.lowerBound().get());
+        assertEquals(-1 * Integer.MIN_VALUE, max.upperBound().get());
         Interval32Box box = new Interval32Box(0, 1);
         box.negate();
-        Assertions.assertEquals(-1, box.lowerBound().get());
-        Assertions.assertEquals(0, box.upperBound().get());
+        assertEquals(-1, box.lowerBound().get());
+        assertEquals(0, box.upperBound().get());
         box = new Interval32Box(-5, 1);
         box.negate();
-        Assertions.assertEquals(-1, box.lowerBound().get());
-        Assertions.assertEquals(5, box.upperBound().get());
+        assertEquals(-1, box.lowerBound().get());
+        assertEquals(5, box.upperBound().get());
     }
 
     @Test
     void testIntersectionPosition() {
         Interval32Box x = new Interval32Box(0, 2);
         Interval32Box y = null;
-        Assertions.assertEquals(-1, x.intersectionPosition(y));
+        assertEquals(-1, x.intersectionPosition(y));
         y = new Interval32Box(3, 4);
-        Assertions.assertEquals(0, x.intersectionPosition(y));
-        Assertions.assertEquals(4, y.intersectionPosition(x));
+        assertEquals(0, x.intersectionPosition(y));
+        assertEquals(4, y.intersectionPosition(x));
         y = new Interval32Box(1, 3);
-        Assertions.assertEquals(1, x.intersectionPosition(y));
-        Assertions.assertEquals(3, y.intersectionPosition(x));
+        assertEquals(1, x.intersectionPosition(y));
+        assertEquals(3, y.intersectionPosition(x));
         y = new Interval32Box(1, 1);
-        Assertions.assertEquals(2, x.intersectionPosition(y));
-        Assertions.assertEquals(5, y.intersectionPosition(x));
+        assertEquals(2, x.intersectionPosition(y));
+        assertEquals(5, y.intersectionPosition(x));
         y = new Interval32Box(-1, 1);
-        Assertions.assertEquals(3, x.intersectionPosition(y));
-        Assertions.assertEquals(1, y.intersectionPosition(x));
+        assertEquals(3, x.intersectionPosition(y));
+        assertEquals(1, y.intersectionPosition(x));
         y = new Interval32Box(-2, -1);
-        Assertions.assertEquals(4, x.intersectionPosition(y));
-        Assertions.assertEquals(0, y.intersectionPosition(x));
+        assertEquals(4, x.intersectionPosition(y));
+        assertEquals(0, y.intersectionPosition(x));
         y = new Interval32Box(-1, 3);
-        Assertions.assertEquals(5, x.intersectionPosition(y));
-        Assertions.assertEquals(2, y.intersectionPosition(x));
+        assertEquals(5, x.intersectionPosition(y));
+        assertEquals(2, y.intersectionPosition(x));
     }
 
     @Test
     void testIntersectionPositionWhenUnbounded() {
         Interval32Box x = new Interval32Box(null, 19);
         Interval32Box y = new Interval32Box(20);
-        Assertions.assertEquals(0, x.intersectionPosition(y));
-        Assertions.assertEquals(4, y.intersectionPosition(x));
+        assertEquals(0, x.intersectionPosition(y));
+        assertEquals(4, y.intersectionPosition(x));
         y = new Interval32Box(20, null);
-        Assertions.assertEquals(0, x.intersectionPosition(y));
-        Assertions.assertEquals(4, y.intersectionPosition(x));
+        assertEquals(0, x.intersectionPosition(y));
+        assertEquals(4, y.intersectionPosition(x));
         x = new Interval32Box(1, null);
         y = new Interval32Box(null, 2);
-        Assertions.assertEquals(3, x.intersectionPosition(y));
-        Assertions.assertEquals(1, y.intersectionPosition(x));
+        assertEquals(3, x.intersectionPosition(y));
+        assertEquals(1, y.intersectionPosition(x));
         x = new Interval32Box(2, null);
-        Assertions.assertEquals(3, x.intersectionPosition(y));
-        Assertions.assertEquals(1, y.intersectionPosition(x));
+        assertEquals(3, x.intersectionPosition(y));
+        assertEquals(1, y.intersectionPosition(x));
         x = Interval32Box.TOP();
         y = new Interval32Box(2);
-        Assertions.assertEquals(2, x.intersectionPosition(y));
-        Assertions.assertEquals(5, y.intersectionPosition(x));
+        assertEquals(2, x.intersectionPosition(y));
+        assertEquals(5, y.intersectionPosition(x));
         x = new Interval32Box(null, 3);
-        Assertions.assertEquals(2, x.intersectionPosition(y));
-        Assertions.assertEquals(5, y.intersectionPosition(x));
+        assertEquals(2, x.intersectionPosition(y));
+        assertEquals(5, y.intersectionPosition(x));
     }
 
     @Test
@@ -267,19 +283,19 @@ public class Interval32BoxTest {
         Interval32Box bot = Interval32Box.BOT();
         Interval32Box top = Interval32Box.TOP();
         Interval32Box max = Interval32Box.MAX();
-        Assertions.assertEquals("⟘", bot.toString());
-        Assertions.assertEquals("⟙", top.toString());
-        Assertions.assertEquals("[-2147483648, 2147483647]", max.toString());
+        assertEquals("⟘", bot.toString());
+        assertEquals("⟙", top.toString());
+        assertEquals("[-2147483648, 2147483647]", max.toString());
         Interval32Box box = new Interval32Box(-4, 16);
-        Assertions.assertEquals("[-4, 16]", box.toString());
+        assertEquals("[-4, 16]", box.toString());
         box = new Interval32Box(1, 1);
-        Assertions.assertEquals("1", box.toString());
+        assertEquals("1", box.toString());
         box = new Interval32Box(null, 1);
-        Assertions.assertEquals("(-∞, 1]", box.toString());
+        assertEquals("(-∞, 1]", box.toString());
         box = new Interval32Box(1, null);
-        Assertions.assertEquals("[1, ∞)", box.toString());
+        assertEquals("[1, ∞)", box.toString());
         box = new Interval32Box(Optional.empty(), Optional.empty());
-        Assertions.assertEquals("⟙", box.toString());
+        assertEquals("⟙", box.toString());
     }
 
     @Test
@@ -287,50 +303,50 @@ public class Interval32BoxTest {
         Interval32Box bot = Interval32Box.BOT();
         Interval32Box top = Interval32Box.TOP();
         Interval32Box max = Interval32Box.MAX();
-        Assertions.assertFalse(bot.isSingleton());
-        Assertions.assertFalse(top.isSingleton());
-        Assertions.assertFalse(max.isSingleton());
+        assertFalse(bot.isSingleton());
+        assertFalse(top.isSingleton());
+        assertFalse(max.isSingleton());
         Interval32Box box = new Interval32Box(null, 3);
-        Assertions.assertFalse(box.isSingleton());
+        assertFalse(box.isSingleton());
         box = new Interval32Box(3, null);
-        Assertions.assertFalse(box.isSingleton());
+        assertFalse(box.isSingleton());
         box = new Interval32Box(0, 3);
-        Assertions.assertFalse(box.isSingleton());
+        assertFalse(box.isSingleton());
         box = new Interval32Box(0, 0);
-        Assertions.assertTrue(box.isSingleton());
+        assertTrue(box.isSingleton());
     }
 
     @Test
     void testEquals() {
         Interval32Box bot = Interval32Box.BOT();
-        Assertions.assertFalse(bot.equals(null));
-        Assertions.assertTrue(bot.equals(Interval32Box.BOT()));
+        assertFalse(bot.equals(null));
+        assertTrue(bot.equals(Interval32Box.BOT()));
         Interval32Box top = Interval32Box.TOP();
-        Assertions.assertTrue(top.equals(Interval32Box.TOP()));
-        Assertions.assertFalse(top.equals(bot));
+        assertTrue(top.equals(Interval32Box.TOP()));
+        assertFalse(top.equals(bot));
         Interval32Box max = Interval32Box.MAX();
-        Assertions.assertTrue(max.equals(Interval32Box.MAX()));
-        Assertions.assertFalse(max.equals(top));
-        Assertions.assertFalse(max.equals(bot));
+        assertTrue(max.equals(Interval32Box.MAX()));
+        assertFalse(max.equals(top));
+        assertFalse(max.equals(bot));
     }
 
     @Test
     void testToSMTFormula() {
         Local l = Jimple.v().newLocal("l0", IntType.v());
         Interval32Box bot = Interval32Box.BOT();
-        Assertions.assertEquals("(and (>= l0 0) (< l0 0))", bot.toSMT(l, this.solver));
+        assertEquals("(and (>= l0 0) (< l0 0))", bot.toSMT(l, this.solver));
         Interval32Box top = Interval32Box.TOP();
-        Assertions.assertEquals("(or (>= l0 0) (< l0 0))", top.toSMT(l, this.solver));
+        assertEquals("(or (>= l0 0) (< l0 0))", top.toSMT(l, this.solver));
         Interval32Box max = Interval32Box.MAX();
-        Assertions.assertEquals("(and (>= l0 (- 2147483648)) (<= l0 2147483647))",
-                                max.toSMT(l, this.solver));
+        assertEquals("(and (>= l0 (- 2147483648)) (<= l0 2147483647))",
+                     max.toSMT(l, this.solver));
         Interval32Box box = new Interval32Box(5);
-        Assertions.assertEquals("(= l0 5)", box.toSMT(l, this.solver));
+        assertEquals("(= l0 5)", box.toSMT(l, this.solver));
         box = new Interval32Box(-5, 5);
-        Assertions.assertEquals("(and (>= l0 (- 5)) (<= l0 5))",
-                                box.toSMT(l, this.solver));
+        assertEquals("(and (>= l0 (- 5)) (<= l0 5))",
+                     box.toSMT(l, this.solver));
         box = new Interval32Box(null, 5);
-        Assertions.assertEquals("(<= l0 5)", box.toSMT(l, this.solver));
+        assertEquals("(<= l0 5)", box.toSMT(l, this.solver));
     }
 
     @Test
@@ -340,17 +356,17 @@ public class Interval32BoxTest {
         Interval32Box top = Interval32Box.TOP();
         Interval32Box max = Interval32Box.MAX();
         Interval32Box box = new Interval32Box(null, 5);
-        Assertions.assertEquals("l0 >= 0 & l0 < 0", bot.toGrimpExpr(l).toString());
-        Assertions.assertEquals("l0 >= 0 | l0 < 0", top.toGrimpExpr(l).toString());
-        Assertions.assertEquals(String.format("l0 >= %d & l0 <= %d",
-                                              Integer.MIN_VALUE,
-                                              Integer.MAX_VALUE),
-                                max.toGrimpExpr(l).toString());
-        Assertions.assertEquals("l0 <= 5", box.toGrimpExpr(l).toString());
+        assertEquals("l0 >= 0 & l0 < 0", bot.toGrimpExpr(l).toString());
+        assertEquals("l0 >= 0 | l0 < 0", top.toGrimpExpr(l).toString());
+        assertEquals(String.format("l0 >= %d & l0 <= %d",
+                                   Integer.MIN_VALUE,
+                                   Integer.MAX_VALUE),
+                     max.toGrimpExpr(l).toString());
+        assertEquals("l0 <= 5", box.toGrimpExpr(l).toString());
         box = new Interval32Box(-5, null);
-        Assertions.assertEquals("l0 >= -5", box.toGrimpExpr(l).toString());
+        assertEquals("l0 >= -5", box.toGrimpExpr(l).toString());
         box = new Interval32Box(-5, 5);
-        Assertions.assertEquals("l0 >= -5 & l0 <= 5", box.toGrimpExpr(l).toString());
+        assertEquals("l0 >= -5 & l0 <= 5", box.toGrimpExpr(l).toString());
     }
 
     @Test
@@ -358,12 +374,11 @@ public class Interval32BoxTest {
         // position 0
         Interval32Box x = new Interval32Box(-1, 0);
         Interval32Box y = new Interval32Box(1, 2);
-        Assertions.assertEquals(0, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Eq);
-        Assertions.assertEquals(2, actual.size());
-        for (Interval32Box b : actual) {
-            Assertions.assertTrue(b.isBottom());
-        }
+        assertAll(() -> assertEquals(0, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertTrue(actual.get(0).isBottom()),
+                  () -> assertTrue(actual.get(1).isBottom()));
     }
 
     @Test
@@ -371,12 +386,11 @@ public class Interval32BoxTest {
         // position 1
         Interval32Box x = new Interval32Box(-1, 1);
         Interval32Box y = new Interval32Box(0, 2);
-        Assertions.assertEquals(1, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Eq);
-        Assertions.assertEquals(2, actual.size());
-        for (Interval32Box b : actual) {
-            Assertions.assertEquals(new Interval32Box(0, 1), b);
-        }
+        assertAll(() -> assertEquals(1, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(0, 1), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(0, 1), actual.get(1)));
     }
 
     @Test
@@ -384,12 +398,11 @@ public class Interval32BoxTest {
         // position 2
         Interval32Box x = new Interval32Box(-2, 2);
         Interval32Box y = new Interval32Box(-1, 1);
-        Assertions.assertEquals(2, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Eq);
-        Assertions.assertEquals(2, actual.size());
-        for (Interval32Box b : actual) {
-            Assertions.assertEquals(new Interval32Box(-1, 1), b);
-        }
+        assertAll(() -> assertEquals(2, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(-1, 1), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(-1, 1), actual.get(1)));
     }
 
     @Test
@@ -397,12 +410,11 @@ public class Interval32BoxTest {
         // position 3
         Interval32Box x = new Interval32Box(0, 2);
         Interval32Box y = new Interval32Box(-1, 1);
-        Assertions.assertEquals(3, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Eq);
-        Assertions.assertEquals(2, actual.size());
-        for (Interval32Box b : actual) {
-            Assertions.assertEquals(new Interval32Box(0, 1), b);
-        }
+        assertAll(() -> assertEquals(3, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(0, 1), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(0, 1), actual.get(1)));
     }
 
     @Test
@@ -410,12 +422,11 @@ public class Interval32BoxTest {
         // position 4
         Interval32Box x = new Interval32Box(1, 2);
         Interval32Box y = new Interval32Box(-1, 0);
-        Assertions.assertEquals(4, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Eq);
-        Assertions.assertEquals(2, actual.size());
-        for (Interval32Box b: actual) {
-            Assertions.assertTrue(b.isBottom());
-        }
+        assertAll(() -> assertEquals(4, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertTrue(actual.get(0).isBottom()),
+                  () -> assertTrue(actual.get(1).isBottom()));
     }
 
     @Test
@@ -423,24 +434,21 @@ public class Interval32BoxTest {
         // position 5
         Interval32Box x = new Interval32Box(-1, 1);
         Interval32Box y = new Interval32Box(-2, 2);
-        Assertions.assertEquals(5, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Eq);
-        Assertions.assertEquals(2, actual.size());
-        for (Interval32Box b : actual) {
-            Assertions.assertEquals(new Interval32Box(-1, 1), b);
-        }
+        assertAll(() -> assertEquals(5, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(-1, 1), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(-1, 1), actual.get(1)));
     }
 
     @Test
     void testTransferConditionNeWhenEqual() {
         Interval32Box x = new Interval32Box(0, 1);
         Interval32Box y = new Interval32Box(0, 1);
-
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Ne);
-        Assertions.assertEquals(2, actual.size());
-        for (Interval32Box b : actual) {
-            Assertions.assertTrue(b.isBottom());
-        }
+        assertAll(() -> assertEquals(2, actual.size()),
+                  () -> assertTrue(actual.get(0).isBottom()),
+                  () -> assertTrue(actual.get(0).isBottom()));
     }
 
     @Test
@@ -448,9 +456,9 @@ public class Interval32BoxTest {
         Interval32Box x = new Interval32Box(0, 1);
         Interval32Box y = new Interval32Box(-1, 1);
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Ne);
-        Assertions.assertEquals(2, actual.size());
-        Assertions.assertEquals(new Interval32Box(0, 1), actual.get(0));
-        Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(1));
+        assertAll(() -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(0, 1), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(-1, 1), actual.get(1)));
     }
 
     @Test
@@ -458,11 +466,11 @@ public class Interval32BoxTest {
         // position 0
         Interval32Box x = new Interval32Box(-1, 0);
         Interval32Box y = new Interval32Box(1, 2);
-        Assertions.assertEquals(0, x.intersectionPosition(y));
+        assertEquals(0, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Le);
-        Assertions.assertEquals(2, actual.size());
-        Assertions.assertEquals(new Interval32Box(-1, 0), actual.get(0));
-        Assertions.assertEquals(new Interval32Box(1, 2), actual.get(1));
+        assertAll(() -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(-1, 0), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(1, 2), actual.get(1)));
     }
 
     @Test
@@ -470,11 +478,11 @@ public class Interval32BoxTest {
         // position 1
         Interval32Box x = new Interval32Box(-1, 1);
         Interval32Box y = new Interval32Box(0, 2);
-        Assertions.assertEquals(1, x.intersectionPosition(y));
+        assertEquals(1, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Le);
-        Assertions.assertEquals(2, actual.size());
-        Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(0));
-        Assertions.assertEquals(new Interval32Box(0, 2), actual.get(1));
+        assertAll(() -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(-1, 1), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(0, 2), actual.get(1)));
     }
 
     @Test
@@ -482,11 +490,11 @@ public class Interval32BoxTest {
         // position 2
         Interval32Box x = new Interval32Box(-2, 2);
         Interval32Box y = new Interval32Box(-1, 1);
-        Assertions.assertEquals(2, x.intersectionPosition(y));
+        assertEquals(2, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Le);
-        Assertions.assertEquals(2, actual.size());
-        Assertions.assertEquals(new Interval32Box(-2, 1), actual.get(0));
-        Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(1));
+        assertAll(() -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(-2, 1), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(-1, 1), actual.get(1)));
     }
 
     @Test
@@ -494,12 +502,11 @@ public class Interval32BoxTest {
         // position 3
         Interval32Box x = new Interval32Box(0, 2);
         Interval32Box y = new Interval32Box(-1, 1);
-        Assertions.assertEquals(3, x.intersectionPosition(y));
+        assertEquals(3, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Le);
-        Assertions.assertEquals(2, actual.size());
-        for (Interval32Box b : actual) {
-            Assertions.assertEquals(new Interval32Box(0, 1), b);
-        }
+        assertAll(() -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(0, 1), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(0, 1), actual.get(1)));
     }
 
     @Test
@@ -507,12 +514,11 @@ public class Interval32BoxTest {
         // position 4
         Interval32Box x = new Interval32Box(1, 2);
         Interval32Box y = new Interval32Box(-1, 0);
-        Assertions.assertEquals(4, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Le);
-        Assertions.assertEquals(2, actual.size());
-        for (Interval32Box b: actual) {
-            Assertions.assertTrue(b.isBottom());
-        }
+        assertAll(() -> assertEquals(4, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertTrue(actual.get(0).isBottom()),
+                  () -> assertTrue(actual.get(1).isBottom()));
     }
 
     @Test
@@ -520,24 +526,23 @@ public class Interval32BoxTest {
         // position 5
         Interval32Box x = new Interval32Box(-1, 1);
         Interval32Box y = new Interval32Box(-2, 2);
-        Assertions.assertEquals(5, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Le);
-        Assertions.assertEquals(2, actual.size());
-        Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(0));
-        Assertions.assertEquals(new Interval32Box(-1, 2), actual.get(1));
+        assertAll(() -> assertEquals(5, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(-1, 1), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(-1, 2), actual.get(1)));
     }
 
     @Test
     void testTransferConditionLtPosition0() {
-        List<Interval32Box> actual;
         // position 0
         Interval32Box x = new Interval32Box(-1, 0);
         Interval32Box y = new Interval32Box(1, 2);
-        Assertions.assertEquals(0, x.intersectionPosition(y));
-        actual = Interval32Box.transferCondition(x, y, PredicateType.Lt);
-        Assertions.assertEquals(2, actual.size());
-        Assertions.assertEquals(new Interval32Box(-1, 0), actual.get(0));
-        Assertions.assertEquals(new Interval32Box(1, 2), actual.get(1));
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Lt);
+        assertAll(() -> assertEquals(0, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(-1, 0), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(1, 2), actual.get(1)));
     }
 
     @Test
@@ -545,11 +550,11 @@ public class Interval32BoxTest {
         // position 1
         Interval32Box x = new Interval32Box(-1, 1);
         Interval32Box y = new Interval32Box(0, 2);
-        Assertions.assertEquals(1, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Lt);
-        Assertions.assertEquals(2, actual.size());
-        Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(0));
-        Assertions.assertEquals(new Interval32Box(0, 2), actual.get(1));
+        assertAll(() -> assertEquals(1, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(-1, 1), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(0, 2), actual.get(1)));
     }
 
     @Test
@@ -557,12 +562,11 @@ public class Interval32BoxTest {
         // position 2
         Interval32Box x = new Interval32Box(-2, 2);
         Interval32Box y = new Interval32Box(-2, 2);
-        Assertions.assertEquals(2, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Lt);
-        Assertions.assertEquals(2, actual.size());
-        for (Interval32Box b : actual) {
-            Assertions.assertTrue(b.isBottom());
-        }
+        assertAll(() -> assertEquals(2, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertTrue(actual.get(0).isBottom()),
+                  () -> assertTrue(actual.get(1).isBottom()));
     }
 
     @Test
@@ -570,11 +574,11 @@ public class Interval32BoxTest {
         // position 2
         Interval32Box x = new Interval32Box(-2, 2);
         Interval32Box y = new Interval32Box(-1, 1);
-        Assertions.assertEquals(2, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Lt);
-        Assertions.assertEquals(2, actual.size());
-        Assertions.assertEquals(new Interval32Box(-2, 0), actual.get(0));
-        Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(1));
+        assertAll(() -> assertEquals(2, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(-2, 0), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(-1, 1), actual.get(1)));
     }
 
     @Test
@@ -582,11 +586,11 @@ public class Interval32BoxTest {
         // position 2
         Interval32Box x = new Interval32Box(-2, 2);
         Interval32Box y = new Interval32Box(-2, 1);
-        Assertions.assertEquals(2, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Lt);
-        Assertions.assertEquals(2, actual.size());
-        Assertions.assertEquals(new Interval32Box(-2, 0), actual.get(0));
-        Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(1));
+        assertAll(() -> assertEquals(2, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(-2, 0), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(-1, 1), actual.get(1)));
     }
 
     @Test
@@ -594,11 +598,11 @@ public class Interval32BoxTest {
         // position 3
         Interval32Box x = new Interval32Box(0, 2);
         Interval32Box y = new Interval32Box(-1, 1);
-        Assertions.assertEquals(3, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Lt);
-        Assertions.assertEquals(2, actual.size());
-        Assertions.assertEquals(new Interval32Box(0), actual.get(0));
-        Assertions.assertEquals(new Interval32Box(1), actual.get(1));
+        assertAll(() -> assertEquals(3, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(0), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(1), actual.get(1)));
 
     }
 
@@ -607,12 +611,11 @@ public class Interval32BoxTest {
         // position 4
         Interval32Box x = new Interval32Box(1, 2);
         Interval32Box y = new Interval32Box(-1, 0);
-        Assertions.assertEquals(4, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Lt);
-        Assertions.assertEquals(2, actual.size());
-        for (Interval32Box b: actual) {
-            Assertions.assertTrue(b.isBottom());
-        }
+        assertAll(() -> assertEquals(4, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertTrue(actual.get(0).isBottom()),
+                  () -> assertTrue(actual.get(1).isBottom()));
     }
 
     @Test
@@ -620,25 +623,23 @@ public class Interval32BoxTest {
         // position 5
         Interval32Box x = new Interval32Box(-1, 1);
         Interval32Box y = new Interval32Box(-2, 2);
-        Assertions.assertEquals(5, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Lt);
-        Assertions.assertEquals(2, actual.size());
-        Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(0));
-        Assertions.assertEquals(new Interval32Box(0, 2), actual.get(1));
+        assertAll(() -> assertEquals(5, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(-1, 1), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(0, 2), actual.get(1)));
     }
 
     @Test
     void testTransferConditionGePosition0() {
-        List<Interval32Box> actual;
         // position 0
         Interval32Box x = new Interval32Box(-1, 0);
         Interval32Box y = new Interval32Box(1, 2);
-        Assertions.assertEquals(0, x.intersectionPosition(y));
-        actual = Interval32Box.transferCondition(x, y, PredicateType.Ge);
-        Assertions.assertEquals(2, actual.size());
-        for (Interval32Box b : actual) {
-            Assertions.assertTrue(b.isBottom());
-        }
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Ge);
+        assertAll(() -> assertEquals(0, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertTrue(actual.get(0).isBottom()),
+                  () -> assertTrue(actual.get(1).isBottom()));
     }
 
     @Test
@@ -646,12 +647,11 @@ public class Interval32BoxTest {
         // position 1
         Interval32Box x = new Interval32Box(-1, 1);
         Interval32Box y = new Interval32Box(0, 2);
-        Assertions.assertEquals(1, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Ge);
-        Assertions.assertEquals(2, actual.size());
-        for (Interval32Box b : actual) {
-            Assertions.assertEquals(new Interval32Box(0, 1), b);
-        }
+        assertAll(() -> assertEquals(1, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(0, 1), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(0, 1), actual.get(1)));
     }
 
     @Test
@@ -659,11 +659,11 @@ public class Interval32BoxTest {
         // position 2
         Interval32Box x = new Interval32Box(-2, 2);
         Interval32Box y = new Interval32Box(-1, 1);
-        Assertions.assertEquals(2, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Ge);
-        Assertions.assertEquals(2, actual.size());
-        Assertions.assertEquals(new Interval32Box(-1, 2), actual.get(0));
-        Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(1));
+        assertAll(() -> assertEquals(2, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(-1, 2), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(-1, 1), actual.get(1)));
     }
 
     @Test
@@ -671,11 +671,11 @@ public class Interval32BoxTest {
         // position 3
         Interval32Box x = new Interval32Box(0, 2);
         Interval32Box y = new Interval32Box(-1, 1);
-        Assertions.assertEquals(3, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Ge);
-        Assertions.assertEquals(2, actual.size());
-        Assertions.assertEquals(new Interval32Box(0, 2), actual.get(0));
-        Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(1));
+        assertAll(() -> assertEquals(3, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(0, 2), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(-1, 1), actual.get(1)));
 
     }
 
@@ -684,11 +684,11 @@ public class Interval32BoxTest {
         // position 4
         Interval32Box x = new Interval32Box(1, 2);
         Interval32Box y = new Interval32Box(-1, 0);
-        Assertions.assertEquals(4, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Ge);
-        Assertions.assertEquals(2, actual.size());
-        Assertions.assertEquals(new Interval32Box(1, 2), actual.get(0));
-        Assertions.assertEquals(new Interval32Box(-1, 0), actual.get(1));
+        assertAll(() -> assertEquals(4, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(1, 2), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(-1, 0), actual.get(1)));
     }
 
     @Test
@@ -696,26 +696,23 @@ public class Interval32BoxTest {
         // position 5
         Interval32Box x = new Interval32Box(-1, 1);
         Interval32Box y = new Interval32Box(-2, 2);
-        Assertions.assertEquals(5, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Ge);
-        Assertions.assertEquals(2, actual.size());
-        for (Interval32Box b : actual) {
-            Assertions.assertEquals(new Interval32Box(-1, 1), b);
-        }
+        assertAll(() -> assertEquals(5, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(-1, 1), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(-1, 1), actual.get(1)));
     }
 
     @Test
     void testTransferConditionGtPosition0() {
-        List<Interval32Box> actual;
         // position 0
         Interval32Box x = new Interval32Box(-1, 0);
         Interval32Box y = new Interval32Box(1, 2);
-        Assertions.assertEquals(0, x.intersectionPosition(y));
-        actual = Interval32Box.transferCondition(x, y, PredicateType.Gt);
-        Assertions.assertEquals(2, actual.size());
-        for (Interval32Box b : actual) {
-            Assertions.assertTrue(b.isBottom());
-        }
+        List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Gt);
+        assertAll(() -> assertEquals(0, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertTrue(actual.get(0).isBottom()),
+                  () -> assertTrue(actual.get(1).isBottom()));
     }
 
     @Test
@@ -723,11 +720,11 @@ public class Interval32BoxTest {
         // position 1
         Interval32Box x = new Interval32Box(-1, 1);
         Interval32Box y = new Interval32Box(0, 2);
-        Assertions.assertEquals(1, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Gt);
-        Assertions.assertEquals(2, actual.size());
-        Assertions.assertEquals(new Interval32Box(1), actual.get(0));
-        Assertions.assertEquals(new Interval32Box(0), actual.get(1));
+        assertAll(() -> assertEquals(1, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(1), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(0), actual.get(1)));
     }
 
     @Test
@@ -735,12 +732,11 @@ public class Interval32BoxTest {
         // position 2
         Interval32Box x = new Interval32Box(-1, 1);
         Interval32Box y = new Interval32Box(-1, 1);
-        Assertions.assertEquals(2, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Gt);
-        Assertions.assertEquals(2, actual.size());
-        for (Interval32Box b : actual) {
-            Assertions.assertTrue(b.isBottom());
-        }
+        assertAll(() -> assertEquals(2, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertTrue(actual.get(0).isBottom()),
+                  () -> assertTrue(actual.get(1).isBottom()));
     }
 
     @Test
@@ -748,11 +744,11 @@ public class Interval32BoxTest {
         // position 2
         Interval32Box x = new Interval32Box(-2, 2);
         Interval32Box y = new Interval32Box(-2, 1);
-        Assertions.assertEquals(2, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Gt);
-        Assertions.assertEquals(2, actual.size());
-        Assertions.assertEquals(new Interval32Box(-1, 2), actual.get(0));
-        Assertions.assertEquals(new Interval32Box(-2, 1), actual.get(1));
+        assertAll(() -> assertEquals(2, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(-1, 2), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(-2, 1), actual.get(1)));
     }
 
     @Test
@@ -760,11 +756,11 @@ public class Interval32BoxTest {
         // position 3
         Interval32Box x = new Interval32Box(0, 2);
         Interval32Box y = new Interval32Box(-1, 1);
-        Assertions.assertEquals(3, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Gt);
-        Assertions.assertEquals(2, actual.size());
-        Assertions.assertEquals(new Interval32Box(0, 2), actual.get(0));
-        Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(1));
+        assertAll(() -> assertEquals(3, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(0, 2), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(-1, 1), actual.get(1)));
 
     }
 
@@ -773,11 +769,11 @@ public class Interval32BoxTest {
         // position 4
         Interval32Box x = new Interval32Box(1, 2);
         Interval32Box y = new Interval32Box(-1, 0);
-        Assertions.assertEquals(4, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Gt);
-        Assertions.assertEquals(2, actual.size());
-        Assertions.assertEquals(new Interval32Box(1, 2), actual.get(0));
-        Assertions.assertEquals(new Interval32Box(-1, 0), actual.get(1));
+        assertAll(() -> assertEquals(4, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(1, 2), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(-1, 0), actual.get(1)));
     }
 
     @Test
@@ -785,11 +781,11 @@ public class Interval32BoxTest {
         // position 5
         Interval32Box x = new Interval32Box(-1, 1);
         Interval32Box y = new Interval32Box(-2, 2);
-        Assertions.assertEquals(5, x.intersectionPosition(y));
         List<Interval32Box> actual = Interval32Box.transferCondition(x, y, PredicateType.Gt);
-        Assertions.assertEquals(2, actual.size());
-        Assertions.assertEquals(new Interval32Box(-1, 1), actual.get(0));
-        Assertions.assertEquals(new Interval32Box(0), actual.get(1));
+        assertAll(() -> assertEquals(5, x.intersectionPosition(y)),
+                  () -> assertEquals(2, actual.size()),
+                  () -> assertEquals(new Interval32Box(-1, 1), actual.get(0)),
+                  () -> assertEquals(new Interval32Box(0), actual.get(1)));
     }
 
     @Test
@@ -797,46 +793,46 @@ public class Interval32BoxTest {
         {
             Interval32Box x = new Interval32Box(null, 0);
             Interval32Box y = new Interval32Box(0, null);
-            Assertions.assertAll(() -> Assertions.assertEquals(Interval32Box.TOP(),
-                                                               Interval32Box.add(x, y)),
-                                 () -> Assertions.assertEquals(Interval32Box.TOP(),
-                                                               Interval32Box.add(y, x)));
+            assertAll(() -> assertEquals(Interval32Box.TOP(),
+                                         Interval32Box.add(x, y)),
+                      () -> assertEquals(Interval32Box.TOP(),
+                                         Interval32Box.add(y, x)));
         }
 
         {
             Interval32Box x = new Interval32Box(null, 0);
             Interval32Box y = new Interval32Box(0, 1);
-            Assertions.assertAll(() -> Assertions.assertEquals(new Interval32Box(null, 1),
-                                                               Interval32Box.add(x, y)),
-                                 () -> Assertions.assertEquals(new Interval32Box(null, 1),
-                                                               Interval32Box.add(y, x)));
+            assertAll(() -> assertEquals(new Interval32Box(null, 1),
+                                         Interval32Box.add(x, y)),
+                      () -> assertEquals(new Interval32Box(null, 1),
+                                         Interval32Box.add(y, x)));
         }
 
         {
             Interval32Box x = new Interval32Box(0, null);
             Interval32Box y = new Interval32Box(0, 1);
-            Assertions.assertAll(() -> Assertions.assertEquals(new Interval32Box(0, null),
-                                                               Interval32Box.add(x, y)),
-                                 () -> Assertions.assertEquals(new Interval32Box(0, null),
-                                                               Interval32Box.add(y, x)));
+            assertAll(() -> assertEquals(new Interval32Box(0, null),
+                                         Interval32Box.add(x, y)),
+                      () -> assertEquals(new Interval32Box(0, null),
+                                         Interval32Box.add(y, x)));
         }
 
         {
             Interval32Box x = new Interval32Box(null, 0);
             Interval32Box y = new Interval32Box(null, 1);
-            Assertions.assertAll(() -> Assertions.assertEquals(new Interval32Box(null, 1),
-                                                               Interval32Box.add(x, y)),
-                                 () -> Assertions.assertEquals(new Interval32Box(null, 1),
-                                                               Interval32Box.add(y, x)));
+            assertAll(() -> assertEquals(new Interval32Box(null, 1),
+                                         Interval32Box.add(x, y)),
+                      () -> assertEquals(new Interval32Box(null, 1),
+                                         Interval32Box.add(y, x)));
         }
 
         {
             Interval32Box x = new Interval32Box(0, null);
             Interval32Box y = new Interval32Box(1, null);
-            Assertions.assertAll(() -> Assertions.assertEquals(new Interval32Box(1, null),
-                                                               Interval32Box.add(x, y)),
-                                 () -> Assertions.assertEquals(new Interval32Box(1, null),
-                                                               Interval32Box.add(y, x)));
+            assertAll(() -> assertEquals(new Interval32Box(1, null),
+                                         Interval32Box.add(x, y)),
+                      () -> assertEquals(new Interval32Box(1, null),
+                                         Interval32Box.add(y, x)));
         }
     }
 
@@ -845,46 +841,46 @@ public class Interval32BoxTest {
         {
             Interval32Box x = new Interval32Box(null, 0);
             Interval32Box y = new Interval32Box(0, null);
-            Assertions.assertAll(() -> Assertions.assertEquals(Interval32Box.TOP(),
-                                                               Interval32Box.subtract(x, y)),
-                                 () -> Assertions.assertEquals(Interval32Box.TOP(),
-                                                               Interval32Box.subtract(y, x)));
+            assertAll(() -> assertEquals(Interval32Box.TOP(),
+                                         Interval32Box.subtract(x, y)),
+                      () -> assertEquals(Interval32Box.TOP(),
+                                         Interval32Box.subtract(y, x)));
         }
 
         {
             Interval32Box x = new Interval32Box(null, 0);
             Interval32Box y = new Interval32Box(0, 1);
-            Assertions.assertAll(() -> Assertions.assertEquals(new Interval32Box(null, 0),
-                                                               Interval32Box.subtract(x, y)),
-                                 () -> Assertions.assertEquals(new Interval32Box(0, null),
-                                                               Interval32Box.subtract(y, x)));
+            assertAll(() -> assertEquals(new Interval32Box(null, 0),
+                                         Interval32Box.subtract(x, y)),
+                      () -> assertEquals(new Interval32Box(0, null),
+                                         Interval32Box.subtract(y, x)));
         }
 
         {
             Interval32Box x = new Interval32Box(0, null);
             Interval32Box y = new Interval32Box(0, 1);
-            Assertions.assertAll(() -> Assertions.assertEquals(new Interval32Box(-1, null),
-                                                               Interval32Box.subtract(x, y)),
-                                 () -> Assertions.assertEquals(new Interval32Box(null, 1),
-                                                               Interval32Box.subtract(y, x)));
+            assertAll(() -> assertEquals(new Interval32Box(-1, null),
+                                         Interval32Box.subtract(x, y)),
+                      () -> assertEquals(new Interval32Box(null, 1),
+                                         Interval32Box.subtract(y, x)));
         }
 
         {
             Interval32Box x = new Interval32Box(null, 0);
             Interval32Box y = new Interval32Box(null, 1);
-            Assertions.assertAll(() -> Assertions.assertEquals(new Interval32Box(null, 1),
-                                                               Interval32Box.subtract(x, y)),
-                                 () -> Assertions.assertEquals(new Interval32Box(null, 1),
-                                                               Interval32Box.subtract(y, x)));
+            assertAll(() -> assertEquals(new Interval32Box(null, 1),
+                                         Interval32Box.subtract(x, y)),
+                      () -> assertEquals(new Interval32Box(null, 1),
+                                         Interval32Box.subtract(y, x)));
         }
 
         {
             Interval32Box x = new Interval32Box(0, null);
             Interval32Box y = new Interval32Box(1, null);
-            Assertions.assertAll(() -> Assertions.assertEquals(new Interval32Box(1, null),
-                                                               Interval32Box.subtract(x, y)),
-                                 () -> Assertions.assertEquals(new Interval32Box(1, null),
-                                                               Interval32Box.subtract(y, x)));
+            assertAll(() -> assertEquals(new Interval32Box(1, null),
+                                         Interval32Box.subtract(x, y)),
+                      () -> assertEquals(new Interval32Box(1, null),
+                                         Interval32Box.subtract(y, x)));
         }
     }
 
@@ -893,28 +889,28 @@ public class Interval32BoxTest {
         {
             Interval32Box x = new Interval32Box(null, 0);
             Interval32Box y = new Interval32Box(0, null);
-            Assertions.assertAll(() -> Assertions.assertEquals(Interval32Box.TOP(),
-                                                               Interval32Box.multiply(x, y)),
-                                 () -> Assertions.assertEquals(Interval32Box.TOP(),
-                                                               Interval32Box.multiply(y, x)));
+            assertAll(() -> assertEquals(Interval32Box.TOP(),
+                                         Interval32Box.multiply(x, y)),
+                      () -> assertEquals(Interval32Box.TOP(),
+                                         Interval32Box.multiply(y, x)));
         }
 
         {
             Interval32Box x = new Interval32Box(null, 1);
             Interval32Box y = new Interval32Box(0, 1);
-            Assertions.assertAll(() -> Assertions.assertEquals(Interval32Box.TOP(),
-                                                               Interval32Box.multiply(x, y)),
-                                 () -> Assertions.assertEquals(Interval32Box.TOP(),
-                                                               Interval32Box.multiply(y, x)));
+            assertAll(() -> assertEquals(Interval32Box.TOP(),
+                                         Interval32Box.multiply(x, y)),
+                      () -> assertEquals(Interval32Box.TOP(),
+                                         Interval32Box.multiply(y, x)));
         }
 
         {
             Interval32Box x = new Interval32Box(1, null);
             Interval32Box y = new Interval32Box(0, 1);
-            Assertions.assertAll(() -> Assertions.assertEquals(Interval32Box.TOP(),
-                                                               Interval32Box.multiply(x, y)),
-                                 () -> Assertions.assertEquals(Interval32Box.TOP(),
-                                                               Interval32Box.multiply(y, x)));
+            assertAll(() -> assertEquals(Interval32Box.TOP(),
+                                         Interval32Box.multiply(x, y)),
+                      () -> assertEquals(Interval32Box.TOP(),
+                                         Interval32Box.multiply(y, x)));
         }
     }
 
@@ -923,64 +919,64 @@ public class Interval32BoxTest {
         {
             Interval32Box x = new Interval32Box(null, 1);
             Interval32Box y = new Interval32Box(1, null);
-            Assertions.assertAll(() -> Assertions.assertEquals(Interval32Box.TOP(),
-                                                               Interval32Box.divide(x, y)),
-                                 () -> Assertions.assertEquals(Interval32Box.TOP(),
-                                                               Interval32Box.divide(y, x)));
+            assertAll(() -> assertEquals(Interval32Box.TOP(),
+                                         Interval32Box.divide(x, y)),
+                      () -> assertEquals(Interval32Box.TOP(),
+                                         Interval32Box.divide(y, x)));
         }
 
         {
             Interval32Box x = new Interval32Box(null, 1);
             Interval32Box y = new Interval32Box(1, 2);
-            Assertions.assertAll(() -> Assertions.assertEquals(Interval32Box.TOP(),
-                                                               Interval32Box.divide(x, y)),
-                                 () -> Assertions.assertEquals(Interval32Box.TOP(),
-                                                               Interval32Box.divide(y, x)));
+            assertAll(() -> assertEquals(Interval32Box.TOP(),
+                                         Interval32Box.divide(x, y)),
+                      () -> assertEquals(Interval32Box.TOP(),
+                                         Interval32Box.divide(y, x)));
         }
 
         {
             Interval32Box x = new Interval32Box(1, null);
             Interval32Box y = new Interval32Box(1, 2);
-            Assertions.assertAll(() -> Assertions.assertEquals(Interval32Box.TOP(),
-                                                               Interval32Box.divide(x, y)),
-                                 () -> Assertions.assertEquals(Interval32Box.TOP(),
-                                                               Interval32Box.divide(y, x)));
+            assertAll(() -> assertEquals(Interval32Box.TOP(),
+                                         Interval32Box.divide(x, y)),
+                      () -> assertEquals(Interval32Box.TOP(),
+                                         Interval32Box.divide(y, x)));
         }
 
         {
             Interval32Box x = new Interval32Box(0, 2);
             Interval32Box y = new Interval32Box(1, 2);
-            Assertions.assertAll(() -> Assertions.assertEquals(new Interval32Box(0, 2),
-                                                               Interval32Box.divide(x, y)),
-                                 () -> Assertions.assertEquals(new Interval32Box(1, null),
-                                                               Interval32Box.divide(y, x)));
+            assertAll(() -> assertEquals(new Interval32Box(0, 2),
+                                         Interval32Box.divide(x, y)),
+                      () -> assertEquals(new Interval32Box(1, null),
+                                         Interval32Box.divide(y, x)));
         }
 
         {
             Interval32Box x = new Interval32Box(2, 0);
             Interval32Box y = new Interval32Box(1, 2);
-            Assertions.assertAll(() -> Assertions.assertEquals(new Interval32Box(0, 2),
-                                                               Interval32Box.divide(x, y)),
-                                 () -> Assertions.assertEquals(new Interval32Box(null, 2),
-                                                               Interval32Box.divide(y, x)));
+            assertAll(() -> assertEquals(new Interval32Box(0, 2),
+                                         Interval32Box.divide(x, y)),
+                      () -> assertEquals(new Interval32Box(null, 2),
+                                         Interval32Box.divide(y, x)));
         }
 
         {
             Interval32Box x = new Interval32Box(1, 2);
             Interval32Box y = new Interval32Box(-1, 2);
-            Assertions.assertAll(() -> Assertions.assertEquals(Interval32Box.TOP(),
-                                                               Interval32Box.divide(x, y)),
-                                 () -> Assertions.assertEquals(new Interval32Box(-1, 2),
-                                                               Interval32Box.divide(y, x)));
+            assertAll(() -> assertEquals(Interval32Box.TOP(),
+                                         Interval32Box.divide(x, y)),
+                      () -> assertEquals(new Interval32Box(-1, 2),
+                                         Interval32Box.divide(y, x)));
         }
 
         {
             Interval32Box x = new Interval32Box(Integer.MAX_VALUE);
             Interval32Box y = Interval32Box.MAX();
-            Assertions.assertAll(() -> Assertions.assertEquals(Interval32Box.TOP(),
-                                                               Interval32Box.divide(x, y)),
-                                 () -> Assertions.assertEquals(new Interval32Box(-1, 1),
-                                                               Interval32Box.divide(y, x)));
+            assertAll(() -> assertEquals(Interval32Box.TOP(),
+                                         Interval32Box.divide(x, y)),
+                      () -> assertEquals(new Interval32Box(-1, 1),
+                                         Interval32Box.divide(y, x)));
         }
     }
 }

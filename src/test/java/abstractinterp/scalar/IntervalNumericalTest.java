@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import java.util.stream.IntStream;
 
 import soot.Scene;
@@ -11,7 +12,7 @@ import soot.Body;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -49,9 +50,9 @@ public class IntervalNumericalTest {
         String[] expected = new String[] {
             "2 l1 = 6:<constant_testSootClass: int constant_test(int)>",
             "l1->(= l1 6)"};
-        Assertions.assertEquals(expected.length, actual.length);
+        assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
-            Assertions.assertEquals(expected[i], actual[i]);
+            assertEquals(expected[i], actual[i]);
         }
     }
 
@@ -89,9 +90,9 @@ public class IntervalNumericalTest {
                 "5 l0 = l3 / l2:<moreConstantMathSootClass: void moreConstantMath()>",
                 "l0->(= l0 (- 1))"
         };
-        Assertions.assertEquals(expected.length, actual.length);
+        assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
-            Assertions.assertEquals(expected[i], actual[i]);
+            assertEquals(expected[i], actual[i]);
         }
     }
 
@@ -129,9 +130,9 @@ public class IntervalNumericalTest {
             "6 l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
             "l3->(= l3 6)"
         };
-        Assertions.assertEquals(expected.length, actual.length);
+        assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
-            Assertions.assertEquals(expected[i], actual[i]);
+            assertEquals(expected[i], actual[i]);
         }
     }
 
@@ -173,9 +174,9 @@ public class IntervalNumericalTest {
             "6 l3 = l0 + l1:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
             "l3->(or (>= l3 0) (< l3 0))"
         };
-        Assertions.assertEquals(expected.length, actual.length);
+        assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
-            Assertions.assertEquals(expected[i], actual[i]);
+            assertEquals(expected[i], actual[i]);
         }
     }
 
@@ -232,9 +233,9 @@ public class IntervalNumericalTest {
             "9 i5 = $i0 - 18:<test.Example1M: int example_5(int)>",
             "i5->(= i5 (- 6))",
         };
-        Assertions.assertEquals(expected.length, actual.length);
+        assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
-            Assertions.assertEquals(expected[i], actual[i]);
+            assertEquals(expected[i], actual[i]);
         }
     }
 
@@ -264,9 +265,9 @@ public class IntervalNumericalTest {
             "9 l3 = l3 + 1:<test.Nonsense: void decode()>",
             "l3->(<= l3 21)",
         };
-        Assertions.assertEquals(expected.length, actual.length);
+        assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
-            Assertions.assertEquals(expected[i], actual[i]);
+            assertEquals(expected[i], actual[i]);
         }
     }
 
@@ -286,9 +287,9 @@ public class IntervalNumericalTest {
             "3 l2 = l1 + 1:<test.neqBranch: void neq()>",
             "l2->(or (>= l2 0) (< l2 0))",
         };
-        Assertions.assertEquals(expected.length, actual.length);
+        assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
-            Assertions.assertEquals(expected[i], actual[i]);
+            assertEquals(expected[i], actual[i]);
         }
     }
 
@@ -312,9 +313,9 @@ public class IntervalNumericalTest {
             "$i26->(= $i26 (- 30))",
         };
 
-        Assertions.assertEquals(expected.length, actual.length);
+        assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
-            Assertions.assertEquals(expected[i], actual[i]);
+            assertEquals(expected[i], actual[i]);
         }
     }
 
@@ -338,9 +339,9 @@ public class IntervalNumericalTest {
             "w0->(or (>= w0 0) (< w0 0))",
         };
 
-        Assertions.assertEquals(expected.length, actual.length);
+        assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
-            Assertions.assertEquals(expected[i], actual[i]);
+            assertEquals(expected[i], actual[i]);
         }
     }
 
@@ -369,29 +370,13 @@ public class IntervalNumericalTest {
     }
 
     private void assertReportOutputEquals(String[] expected, String[] actual) {
-        Assertions.assertEquals(expected.length, actual.length);
-        for (int i = 0; i < actual.length; i++) {
-            Assertions.assertEquals(
-                    expected[i].substring(0, expected[i].lastIndexOf("->")),
-                    actual[i].substring(0, actual[i].lastIndexOf("->")));
-            Assertions.assertTrue(areLocalsEqual(expected[i], actual[i]));
-        }
-    }
-
-    private boolean areLocalsEqual(String expected, String result) {
-        Map<String, String> expectedLocals = parseLocals(expected);
-        Map<String, String> resultLocals = parseLocals(result);
-        if (expectedLocals.keySet().size() != resultLocals.keySet().size()) {
-            return false;
-        }
-        for (Map.Entry<String, String> l : expectedLocals.entrySet()) {
-            if (!resultLocals.containsKey(l.getKey())) {
-                return false;
-            } else if (!resultLocals.get(l.getKey()).equals(l.getValue())) {
-                return false;
-            }
-        }
-        return true;
+        assertEquals(expected.length, actual.length);
+        assertAll(Stream.concat(IntStream.range(0, expected.length)
+                                .mapToObj(i -> () -> assertEquals(expected[i].substring(0, expected[i].lastIndexOf("->")),
+                                                                  actual[i].substring(0, actual[i].lastIndexOf("->")))),
+                                IntStream.range(0, expected.length)
+                                .mapToObj(i -> () -> assertEquals(parseLocals(expected[i]),
+                                                                  parseLocals(actual[i])))));
     }
 
     private Map<String, String> parseLocals(String statement) {

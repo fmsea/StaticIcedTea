@@ -6,7 +6,9 @@ import soot.grimp.Grimp;
 import soot.jimple.Jimple;
 import soot.jimple.IntConstant;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import solver.SolverWrapper;
@@ -29,14 +31,14 @@ public class Interval32BoxZ3Test {
         Interval32Box bot = Interval32Box.BOT();
         Interval32Box top = Interval32Box.TOP();
         Interval32Box max_box = Interval32Box.MAX();
-        Assertions.assertTrue(solver.equals(g.newAndExpr(g.newGeExpr(l, zero),
-                                                         g.newLtExpr(l, zero)),
-                                            bot.toGrimpExpr(l)));
-        Assertions.assertTrue(solver.equals(g.newOrExpr(g.newGeExpr(l, zero),
-                                                        g.newLtExpr(l, zero)),
-                                            top.toGrimpExpr(l)));
-        Assertions.assertTrue(solver.equals(g.newAndExpr(g.newGeExpr(l, min),
-                                                         g.newLeExpr(l, max)),
-                                            max_box.toGrimpExpr(l)));
+        assertAll(() -> assertTrue(solver.equals(g.newAndExpr(g.newGeExpr(l, zero),
+                                                              g.newLtExpr(l, zero)),
+                                                 bot.toGrimpExpr(l))),
+                  () -> assertTrue(solver.equals(g.newOrExpr(g.newGeExpr(l, zero),
+                                                             g.newLtExpr(l, zero)),
+                                                 top.toGrimpExpr(l))),
+                  () -> assertTrue(solver.equals(g.newAndExpr(g.newGeExpr(l, min),
+                                                              g.newLeExpr(l, max)),
+                                                 max_box.toGrimpExpr(l))));
     }
 }

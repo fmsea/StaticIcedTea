@@ -4,6 +4,10 @@ import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
 import net.jqwik.api.constraints.IntRange;
 import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import soot.jimple.IntConstant;
 
 public class ConstraintProperties {
@@ -11,28 +15,28 @@ public class ConstraintProperties {
     @Property
     void constantAdditionTransfer(@ForAll @IntRange(min=-536870911, max=536870911) int x,
                                   @ForAll @IntRange(min=-536870911, max=536870911) int y) {
-        Assertions.assertEquals(new Constraint(x + y, PredicateType.Eq),
-                                Constraint.transferBinary(IntConstant.v(x),
-                                                          IntConstant.v(y),
-                                                          BinaryOperator.ADDITION));
+        assertEquals(new Constraint(x + y, PredicateType.Eq),
+                     Constraint.transferBinary(IntConstant.v(x),
+                                               IntConstant.v(y),
+                                               BinaryOperator.ADDITION));
     }
 
     @Property
     void constantSubtractionTransfer(@ForAll @IntRange(min=-536870911, max=536870911) int x,
                                      @ForAll @IntRange(min=-536870911, max=536870911) int y) {
-        Assertions.assertEquals(new Constraint(x - y, PredicateType.Eq),
-                                Constraint.transferBinary(IntConstant.v(x),
-                                                          IntConstant.v(y),
-                                                          BinaryOperator.SUBTRACTION));
+        assertEquals(new Constraint(x - y, PredicateType.Eq),
+                     Constraint.transferBinary(IntConstant.v(x),
+                                               IntConstant.v(y),
+                                               BinaryOperator.SUBTRACTION));
     }
 
     @Property
     void constraintMultiplicationTransfer(@ForAll @IntRange(min=-32768, max=32768) int x,
                                           @ForAll @IntRange(min=-32768, max=32768) int y) {
-        Assertions.assertEquals(new Constraint(x * y, PredicateType.Eq),
-                                Constraint.transferBinary(IntConstant.v(x),
-                                                          IntConstant.v(y),
-                                                          BinaryOperator.MULTIPLICATION));
+        assertEquals(new Constraint(x * y, PredicateType.Eq),
+                     Constraint.transferBinary(IntConstant.v(x),
+                                               IntConstant.v(y),
+                                               BinaryOperator.MULTIPLICATION));
     }
 
     @Property
@@ -42,214 +46,214 @@ public class ConstraintProperties {
                                                       IntConstant.v(y),
                                                       BinaryOperator.DIVISION);
         if (y == 0) {
-            Assertions.assertEquals(Constraint.BOT(), actual);
+            assertEquals(Constraint.BOT(), actual);
         } else {
-            Assertions.assertEquals(new Constraint(x / y, PredicateType.Eq),
-                                    actual);
+            assertEquals(new Constraint(x / y, PredicateType.Eq),
+                         actual);
         }
     }
 
     @Property
     void constraintTransfer(@ForAll @IntRange(min=-536870911, max=536870911) int x,
                             @ForAll @IntRange(min=-536870911, max=536870911) int y) {
-        Assertions.assertEquals(Constraint.TOP(),
-                                Constraint.transferBinary(IntConstant.v(x),
-                                                          IntConstant.v(y),
-                                                          BinaryOperator.MODULUS));
-        Assertions.assertEquals(Constraint.TOP(),
-                                Constraint.transferBinary(IntConstant.v(x),
-                                                          IntConstant.v(y),
-                                                          BinaryOperator.INVALID));
+        assertAll(() -> assertEquals(Constraint.TOP(),
+                                     Constraint.transferBinary(IntConstant.v(x),
+                                                               IntConstant.v(y),
+                                                               BinaryOperator.MODULUS)),
+                  () -> assertEquals(Constraint.TOP(),
+                                     Constraint.transferBinary(IntConstant.v(x),
+                                                               IntConstant.v(y),
+                                                               BinaryOperator.INVALID)));
     }
 
     @Property
     void constraintAddition(@ForAll @IntRange(min=-536870911, max=536870911) int x,
                             @ForAll @IntRange(min=-536870911, max=536870911) int y) {
-        Assertions.assertEquals(new Constraint(x + y),
-                                Constraint.add(new Constraint(x),
-                                               new Constraint(y)));
-        Assertions.assertEquals(new Constraint(x + y, PredicateType.Le),
-                                Constraint.add(new Constraint(x, PredicateType.Le),
-                                               new Constraint(y, PredicateType.Lt)));
-        Assertions.assertEquals(new Constraint(x + y, PredicateType.Le),
-                                Constraint.add(new Constraint(x, PredicateType.Lt),
-                                               new Constraint(y, PredicateType.Le)));
-        Assertions.assertEquals(new Constraint(x + y, PredicateType.Le),
-                                Constraint.add(new Constraint(x),
-                                               new Constraint(y, PredicateType.Le)));
-        Assertions.assertEquals(new Constraint(x + y, PredicateType.Le),
-                                Constraint.add(new Constraint(x, PredicateType.Le),
-                                               new Constraint(y)));
-        Assertions.assertEquals(new Constraint(x + y, PredicateType.Ge),
-                                Constraint.add(new Constraint(x, PredicateType.Ge),
-                                               new Constraint(y, PredicateType.Gt)));
-        Assertions.assertEquals(new Constraint(x + y, PredicateType.Ge),
-                                Constraint.add(new Constraint(x, PredicateType.Gt),
-                                               new Constraint(y, PredicateType.Ge)));
-        Assertions.assertEquals(new Constraint(x + y, PredicateType.Ge),
-                                Constraint.add(new Constraint(x),
-                                               new Constraint(y, PredicateType.Ge)));
-        Assertions.assertEquals(new Constraint(x + y, PredicateType.Ge),
-                                Constraint.add(new Constraint(x, PredicateType.Ge),
-                                               new Constraint(y)));
+        assertAll(() -> assertEquals(new Constraint(x + y),
+                                     Constraint.add(new Constraint(x),
+                                                    new Constraint(y))),
+                  () -> assertEquals(new Constraint(x + y, PredicateType.Le),
+                                     Constraint.add(new Constraint(x, PredicateType.Le),
+                                                    new Constraint(y, PredicateType.Lt))),
+                  () -> assertEquals(new Constraint(x + y, PredicateType.Le),
+                                     Constraint.add(new Constraint(x, PredicateType.Lt),
+                                                    new Constraint(y, PredicateType.Le))),
+                  () -> assertEquals(new Constraint(x + y, PredicateType.Le),
+                                     Constraint.add(new Constraint(x),
+                                                    new Constraint(y, PredicateType.Le))),
+                  () -> assertEquals(new Constraint(x + y, PredicateType.Le),
+                                     Constraint.add(new Constraint(x, PredicateType.Le),
+                                                    new Constraint(y))),
+                  () -> assertEquals(new Constraint(x + y, PredicateType.Ge),
+                                     Constraint.add(new Constraint(x, PredicateType.Ge),
+                                                    new Constraint(y, PredicateType.Gt))),
+                  () -> assertEquals(new Constraint(x + y, PredicateType.Ge),
+                                     Constraint.add(new Constraint(x, PredicateType.Gt),
+                                                    new Constraint(y, PredicateType.Ge))),
+                  () -> assertEquals(new Constraint(x + y, PredicateType.Ge),
+                                     Constraint.add(new Constraint(x),
+                                                    new Constraint(y, PredicateType.Ge))),
+                  () -> assertEquals(new Constraint(x + y, PredicateType.Ge),
+                                     Constraint.add(new Constraint(x, PredicateType.Ge),
+                                                    new Constraint(y))));
     }
 
     @Property
     void constraintSubtraction(@ForAll @IntRange(min=-536870911, max=536870911) int x,
                                @ForAll @IntRange(min=-536870911, max=536870911) int y) {
-        Assertions.assertEquals(new Constraint(x - y),
-                                Constraint.subtract(new Constraint(x),
-                                                    new Constraint(y)));
-        Assertions.assertEquals(new Constraint(x - y, PredicateType.Le),
-                                Constraint.subtract(new Constraint(x, PredicateType.Le),
-                                                    new Constraint(y, PredicateType.Lt)));
-        Assertions.assertEquals(new Constraint(x - y, PredicateType.Le),
-                                Constraint.subtract(new Constraint(x, PredicateType.Lt),
-                                                    new Constraint(y, PredicateType.Le)));
-        Assertions.assertEquals(new Constraint(x - y, PredicateType.Le),
-                                Constraint.subtract(new Constraint(x),
-                                                    new Constraint(y, PredicateType.Le)));
-        Assertions.assertEquals(new Constraint(x - y, PredicateType.Le),
-                                Constraint.subtract(new Constraint(x, PredicateType.Le),
-                                                    new Constraint(y)));
-        Assertions.assertEquals(new Constraint(x - y, PredicateType.Ge),
-                                Constraint.subtract(new Constraint(x, PredicateType.Ge),
-                                                    new Constraint(y, PredicateType.Gt)));
-        Assertions.assertEquals(new Constraint(x - y, PredicateType.Ge),
-                                Constraint.subtract(new Constraint(x, PredicateType.Gt),
-                                                    new Constraint(y, PredicateType.Ge)));
-        Assertions.assertEquals(new Constraint(x - y, PredicateType.Ge),
-                                Constraint.subtract(new Constraint(x),
-                                                    new Constraint(y, PredicateType.Ge)));
-        Assertions.assertEquals(new Constraint(x - y, PredicateType.Ge),
-                                Constraint.subtract(new Constraint(x, PredicateType.Ge),
-                                               new Constraint(y)));
+        assertAll(() -> assertEquals(new Constraint(x - y),
+                                     Constraint.subtract(new Constraint(x),
+                                                         new Constraint(y))),
+                  () -> assertEquals(new Constraint(x - y, PredicateType.Le),
+                                     Constraint.subtract(new Constraint(x, PredicateType.Le),
+                                                         new Constraint(y, PredicateType.Lt))),
+                  () -> assertEquals(new Constraint(x - y, PredicateType.Le),
+                                     Constraint.subtract(new Constraint(x, PredicateType.Lt),
+                                                         new Constraint(y, PredicateType.Le))),
+                  () -> assertEquals(new Constraint(x - y, PredicateType.Le),
+                                     Constraint.subtract(new Constraint(x),
+                                                         new Constraint(y, PredicateType.Le))),
+                  () -> assertEquals(new Constraint(x - y, PredicateType.Le),
+                                     Constraint.subtract(new Constraint(x, PredicateType.Le),
+                                                         new Constraint(y))),
+                  () -> assertEquals(new Constraint(x - y, PredicateType.Ge),
+                                     Constraint.subtract(new Constraint(x, PredicateType.Ge),
+                                                         new Constraint(y, PredicateType.Gt))),
+                  () -> assertEquals(new Constraint(x - y, PredicateType.Ge),
+                                     Constraint.subtract(new Constraint(x, PredicateType.Gt),
+                                                         new Constraint(y, PredicateType.Ge))),
+                  () -> assertEquals(new Constraint(x - y, PredicateType.Ge),
+                                     Constraint.subtract(new Constraint(x),
+                                                         new Constraint(y, PredicateType.Ge))),
+                  () -> assertEquals(new Constraint(x - y, PredicateType.Ge),
+                                     Constraint.subtract(new Constraint(x, PredicateType.Ge),
+                                                         new Constraint(y))));
     }
 
     @Property
     void constraintMultiplication(@ForAll @IntRange(min=-32768, max=32768) int x,
                                   @ForAll @IntRange(min=-32768, max=32768) int y) {
-        Assertions.assertEquals(new Constraint(x * y),
-                                Constraint.multiply(new Constraint(x),
-                                                    new Constraint(y)));
-        Assertions.assertEquals(new Constraint(x * y, PredicateType.Le),
-                                Constraint.multiply(new Constraint(x, PredicateType.Le),
-                                                    new Constraint(y, PredicateType.Lt)));
-        Assertions.assertEquals(new Constraint(x * y, PredicateType.Le),
-                                Constraint.multiply(new Constraint(x, PredicateType.Lt),
-                                                    new Constraint(y, PredicateType.Le)));
-        Assertions.assertEquals(new Constraint(x * y, PredicateType.Le),
-                                Constraint.multiply(new Constraint(x),
-                                                    new Constraint(y, PredicateType.Le)));
-        Assertions.assertEquals(new Constraint(x * y, PredicateType.Le),
-                                Constraint.multiply(new Constraint(x, PredicateType.Le),
-                                                    new Constraint(y)));
-        Assertions.assertEquals(new Constraint(x * y, PredicateType.Ge),
-                                Constraint.multiply(new Constraint(x, PredicateType.Ge),
-                                                    new Constraint(y, PredicateType.Gt)));
-        Assertions.assertEquals(new Constraint(x * y, PredicateType.Ge),
-                                Constraint.multiply(new Constraint(x, PredicateType.Gt),
-                                                    new Constraint(y, PredicateType.Ge)));
-        Assertions.assertEquals(new Constraint(x * y, PredicateType.Ge),
-                                Constraint.multiply(new Constraint(x),
-                                                    new Constraint(y, PredicateType.Ge)));
-        Assertions.assertEquals(new Constraint(x * y, PredicateType.Ge),
-                                Constraint.multiply(new Constraint(x, PredicateType.Ge),
-                                               new Constraint(y)));
+        assertAll(() -> assertEquals(new Constraint(x * y),
+                                     Constraint.multiply(new Constraint(x),
+                                                         new Constraint(y))),
+                  () -> assertEquals(new Constraint(x * y, PredicateType.Le),
+                                     Constraint.multiply(new Constraint(x, PredicateType.Le),
+                                                         new Constraint(y, PredicateType.Lt))),
+                  () -> assertEquals(new Constraint(x * y, PredicateType.Le),
+                                     Constraint.multiply(new Constraint(x, PredicateType.Lt),
+                                                         new Constraint(y, PredicateType.Le))),
+                  () -> assertEquals(new Constraint(x * y, PredicateType.Le),
+                                     Constraint.multiply(new Constraint(x),
+                                                         new Constraint(y, PredicateType.Le))),
+                  () -> assertEquals(new Constraint(x * y, PredicateType.Le),
+                                     Constraint.multiply(new Constraint(x, PredicateType.Le),
+                                                         new Constraint(y))),
+                  () -> assertEquals(new Constraint(x * y, PredicateType.Ge),
+                                     Constraint.multiply(new Constraint(x, PredicateType.Ge),
+                                                         new Constraint(y, PredicateType.Gt))),
+                  () -> assertEquals(new Constraint(x * y, PredicateType.Ge),
+                                     Constraint.multiply(new Constraint(x, PredicateType.Gt),
+                                                         new Constraint(y, PredicateType.Ge))),
+                  () -> assertEquals(new Constraint(x * y, PredicateType.Ge),
+                                     Constraint.multiply(new Constraint(x),
+                                                         new Constraint(y, PredicateType.Ge))),
+                  () -> assertEquals(new Constraint(x * y, PredicateType.Ge),
+                                     Constraint.multiply(new Constraint(x, PredicateType.Ge),
+                                                         new Constraint(y))));
     }
 
     @Property
     void constraintDivision(@ForAll @IntRange(min=-536870911, max=536870911) int x,
                             @ForAll @IntRange(min=-536870911, max=536870911) int y) {
         if (y == 0) {
-            Assertions.assertEquals(Constraint.BOT(),
-                                    Constraint.divide(new Constraint(x),
-                                                      new Constraint(y)));
-            Assertions.assertEquals(Constraint.BOT(),
-                                    Constraint.divide(new Constraint(x, PredicateType.Le),
-                                                      new Constraint(y, PredicateType.Lt)));
-            Assertions.assertEquals(Constraint.BOT(),
-                                    Constraint.divide(new Constraint(x, PredicateType.Lt),
-                                                      new Constraint(y, PredicateType.Le)));
-            Assertions.assertEquals(Constraint.BOT(),
-                                    Constraint.divide(new Constraint(x),
-                                                      new Constraint(y, PredicateType.Le)));
-            Assertions.assertEquals(Constraint.BOT(),
-                                    Constraint.divide(new Constraint(x, PredicateType.Le),
-                                                      new Constraint(y)));
-            Assertions.assertEquals(Constraint.BOT(),
-                                    Constraint.divide(new Constraint(x, PredicateType.Ge),
-                                                      new Constraint(y, PredicateType.Gt)));
-            Assertions.assertEquals(Constraint.BOT(),
-                                    Constraint.divide(new Constraint(x, PredicateType.Gt),
-                                                      new Constraint(y, PredicateType.Ge)));
-            Assertions.assertEquals(Constraint.BOT(),
-                                    Constraint.divide(new Constraint(x),
-                                                      new Constraint(y, PredicateType.Ge)));
-            Assertions.assertEquals(Constraint.BOT(),
-                                    Constraint.divide(new Constraint(x, PredicateType.Ge),
-                                                      new Constraint(y)));
+            assertAll(() -> assertEquals(Constraint.BOT(),
+                                         Constraint.divide(new Constraint(x),
+                                                           new Constraint(y))),
+                      () -> assertEquals(Constraint.BOT(),
+                                         Constraint.divide(new Constraint(x, PredicateType.Le),
+                                                           new Constraint(y, PredicateType.Lt))),
+                      () -> assertEquals(Constraint.BOT(),
+                                         Constraint.divide(new Constraint(x, PredicateType.Lt),
+                                                           new Constraint(y, PredicateType.Le))),
+                      () -> assertEquals(Constraint.BOT(),
+                                         Constraint.divide(new Constraint(x),
+                                                           new Constraint(y, PredicateType.Le))),
+                      () -> assertEquals(Constraint.BOT(),
+                                         Constraint.divide(new Constraint(x, PredicateType.Le),
+                                                           new Constraint(y))),
+                      () -> assertEquals(Constraint.BOT(),
+                                         Constraint.divide(new Constraint(x, PredicateType.Ge),
+                                                           new Constraint(y, PredicateType.Gt))),
+                      () -> assertEquals(Constraint.BOT(),
+                                         Constraint.divide(new Constraint(x, PredicateType.Gt),
+                                                           new Constraint(y, PredicateType.Ge))),
+                      () -> assertEquals(Constraint.BOT(),
+                                         Constraint.divide(new Constraint(x),
+                                                           new Constraint(y, PredicateType.Ge))),
+                      () -> assertEquals(Constraint.BOT(),
+                                         Constraint.divide(new Constraint(x, PredicateType.Ge),
+                                                           new Constraint(y))));
         } else {
-            Assertions.assertEquals(new Constraint(x / y),
-                                    Constraint.divide(new Constraint(x),
-                                                      new Constraint(y)));
-            Assertions.assertEquals(new Constraint(x / y, PredicateType.Le),
-                                    Constraint.divide(new Constraint(x, PredicateType.Le),
-                                                      new Constraint(y, PredicateType.Lt)));
-            Assertions.assertEquals(new Constraint(x / y, PredicateType.Le),
-                                    Constraint.divide(new Constraint(x, PredicateType.Lt),
-                                                      new Constraint(y, PredicateType.Le)));
-            Assertions.assertEquals(new Constraint(x / y, PredicateType.Le),
-                                    Constraint.divide(new Constraint(x),
-                                                      new Constraint(y, PredicateType.Le)));
-            Assertions.assertEquals(new Constraint(x / y, PredicateType.Le),
-                                    Constraint.divide(new Constraint(x, PredicateType.Le),
-                                                      new Constraint(y)));
-            Assertions.assertEquals(new Constraint(x / y, PredicateType.Ge),
-                                    Constraint.divide(new Constraint(x, PredicateType.Ge),
-                                                      new Constraint(y, PredicateType.Gt)));
-            Assertions.assertEquals(new Constraint(x / y, PredicateType.Ge),
-                                    Constraint.divide(new Constraint(x, PredicateType.Gt),
-                                                      new Constraint(y, PredicateType.Ge)));
-            Assertions.assertEquals(new Constraint(x / y, PredicateType.Ge),
-                                    Constraint.divide(new Constraint(x),
-                                                      new Constraint(y, PredicateType.Ge)));
-            Assertions.assertEquals(new Constraint(x / y, PredicateType.Ge),
-                                    Constraint.divide(new Constraint(x, PredicateType.Ge),
-                                                      new Constraint(y)));
+            assertAll(() -> assertEquals(new Constraint(x / y),
+                                         Constraint.divide(new Constraint(x),
+                                                           new Constraint(y))),
+                      () -> assertEquals(new Constraint(x / y, PredicateType.Le),
+                                         Constraint.divide(new Constraint(x, PredicateType.Le),
+                                                           new Constraint(y, PredicateType.Lt))),
+                      () -> assertEquals(new Constraint(x / y, PredicateType.Le),
+                                         Constraint.divide(new Constraint(x, PredicateType.Lt),
+                                                           new Constraint(y, PredicateType.Le))),
+                      () -> assertEquals(new Constraint(x / y, PredicateType.Le),
+                                         Constraint.divide(new Constraint(x),
+                                                           new Constraint(y, PredicateType.Le))),
+                      () -> assertEquals(new Constraint(x / y, PredicateType.Le),
+                                         Constraint.divide(new Constraint(x, PredicateType.Le),
+                                                           new Constraint(y))),
+                      () -> assertEquals(new Constraint(x / y, PredicateType.Ge),
+                                         Constraint.divide(new Constraint(x, PredicateType.Ge),
+                                                           new Constraint(y, PredicateType.Gt))),
+                      () -> assertEquals(new Constraint(x / y, PredicateType.Ge),
+                                         Constraint.divide(new Constraint(x, PredicateType.Gt),
+                                                           new Constraint(y, PredicateType.Ge))),
+                      () -> assertEquals(new Constraint(x / y, PredicateType.Ge),
+                                         Constraint.divide(new Constraint(x),
+                                                           new Constraint(y, PredicateType.Ge))),
+                      () -> assertEquals(new Constraint(x / y, PredicateType.Ge),
+                                         Constraint.divide(new Constraint(x, PredicateType.Ge),
+                                                           new Constraint(y))));
         }
     }
 
     @Property
     void bottomStaysBottom(@ForAll Constraint c) {
         Constraint bot = Constraint.BOT();
-        Assertions.assertEquals(Constraint.BOT(),
-                                c.add(bot));
-        Assertions.assertEquals(Constraint.BOT(),
-                                bot.add(c));
-        Assertions.assertEquals(Constraint.BOT(),
-                                c.subtract(bot));
-        Assertions.assertEquals(Constraint.BOT(),
-                                bot.subtract(c));
-        Assertions.assertEquals(Constraint.BOT(),
-                                c.multiply(bot));
-        Assertions.assertEquals(Constraint.BOT(),
-                                bot.multiply(c));
-        Assertions.assertEquals(Constraint.BOT(),
-                                c.divide(bot));
-        Assertions.assertEquals(Constraint.BOT(),
-                                bot.divide(c));
-        Assertions.assertEquals(Constraint.BOT(),
-                                c.modulus(bot));
-        Assertions.assertEquals(Constraint.BOT(),
-                                bot.modulus(c));
+        assertAll(() -> assertEquals(Constraint.BOT(),
+                                     c.add(bot)),
+                  () -> assertEquals(Constraint.BOT(),
+                                     bot.add(c)),
+                  () -> assertEquals(Constraint.BOT(),
+                                     c.subtract(bot)),
+                  () -> assertEquals(Constraint.BOT(),
+                                     bot.subtract(c)),
+                  () -> assertEquals(Constraint.BOT(),
+                                     c.multiply(bot)),
+                  () -> assertEquals(Constraint.BOT(),
+                                     bot.multiply(c)),
+                  () -> assertEquals(Constraint.BOT(),
+                                     c.divide(bot)),
+                  () -> assertEquals(Constraint.BOT(),
+                                     bot.divide(c)),
+                  () -> assertEquals(Constraint.BOT(),
+                                     c.modulus(bot)),
+                  () -> assertEquals(Constraint.BOT(),
+                                     bot.modulus(c)));
     }
 
     @Property
     void constraintNegation(@ForAll Constraint c) {
-        Assertions.assertEquals(new Constraint(c.bound() * -1,
-                                               c.predicate().negate()),
-                                c.negate());
+        assertEquals(new Constraint(c.bound() * -1,
+                                    c.predicate().negate()),
+                     c.negate());
     }
 
     @Property
@@ -260,28 +264,28 @@ public class ConstraintProperties {
 
     @Property
     void compareToBottom(@ForAll Constraint c) {
-        Assertions.assertEquals(-1, Constraint.BOT().compareTo(c));
-        Assertions.assertEquals(+1, c.compareTo(Constraint.BOT()));
+        assertAll(() -> assertEquals(-1, Constraint.BOT().compareTo(c)),
+                  () -> assertEquals(+1, c.compareTo(Constraint.BOT())));
     }
 
     @Property
     void constraintMinWhenTop(@ForAll Constraint c) {
-        Assertions.assertEquals(c, Constraint.min(Constraint.TOP(), c));
-        Assertions.assertEquals(c, Constraint.min(c, Constraint.TOP()));
+        assertAll(() -> assertEquals(c, Constraint.min(Constraint.TOP(), c)),
+                  () -> assertEquals(c, Constraint.min(c, Constraint.TOP())));
     }
 
     @Property
     void constraintMinWhenBot(@ForAll Constraint c) {
-        Assertions.assertEquals(c, Constraint.min(Constraint.BOT(), c));
-        Assertions.assertEquals(c, Constraint.min(c, Constraint.BOT()));
+        assertAll(() -> assertEquals(c, Constraint.min(Constraint.BOT(), c)),
+                  () -> assertEquals(c, Constraint.min(c, Constraint.BOT())));
     }
 
     @Property
     void constraintMinimum(@ForAll @IntRange(min=-523288, max=523288) int a,
                            @ForAll @IntRange(min=-523288, max=523288) int b) {
-        Assertions.assertEquals(new Constraint(Math.min(a, b)),
-                                Constraint.min(new Constraint(a),
-                                               new Constraint(b)));
+        assertEquals(new Constraint(Math.min(a, b)),
+                     Constraint.min(new Constraint(a),
+                                    new Constraint(b)));
     }
 
     @Property
@@ -289,27 +293,27 @@ public class ConstraintProperties {
                                                @ForAll @IntRange(min=-523288, max=523288) int b) {
         Constraint c = Constraint.min(new Constraint(a, PredicateType.Le),
                                       new Constraint(b, PredicateType.Gt));
-        Assertions.assertTrue(c.isBottom());
+        assertTrue(c.isBottom());
     }
 
     @Property
     void constraintMaxIsTop(@ForAll Constraint c) {
-        Assertions.assertEquals(Constraint.TOP(), Constraint.max(c, Constraint.TOP()));
-        Assertions.assertEquals(Constraint.TOP(), Constraint.max(Constraint.TOP(), c));
+        assertEquals(Constraint.TOP(), Constraint.max(c, Constraint.TOP()));
+        assertEquals(Constraint.TOP(), Constraint.max(Constraint.TOP(), c));
     }
 
     @Property
     void constraintMaxWhenBottom(@ForAll Constraint c) {
-        Assertions.assertEquals(c, Constraint.max(c, Constraint.BOT()));
-        Assertions.assertEquals(c, Constraint.max(Constraint.BOT(), c));
+        assertAll(() -> assertEquals(c, Constraint.max(c, Constraint.BOT())),
+                  () -> assertEquals(c, Constraint.max(Constraint.BOT(), c)));
     }
 
     @Property
     void constraintMaximum(@ForAll @IntRange(min=-523288, max=523288) int a,
                            @ForAll @IntRange(min=-523288, max=523288) int b) {
-        Assertions.assertEquals(new Constraint(Math.max(a, b)),
-                                Constraint.max(new Constraint(a),
-                                               new Constraint(b)));
+        assertEquals(new Constraint(Math.max(a, b)),
+                     Constraint.max(new Constraint(a),
+                                    new Constraint(b)));
     }
 
     @Property
@@ -317,6 +321,6 @@ public class ConstraintProperties {
                                               @ForAll @IntRange(min=-523288, max=523288) int b) {
         Constraint c = Constraint.max(new Constraint(a, PredicateType.Le),
                                       new Constraint(b, PredicateType.Gt));
-        Assertions.assertEquals(Constraint.BOT(), c);
+        assertEquals(Constraint.BOT(), c);
     }
 }

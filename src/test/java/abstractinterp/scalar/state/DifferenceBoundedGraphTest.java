@@ -325,24 +325,46 @@ public class DifferenceBoundedGraphTest {
 
     @Test
     void testEquals() {
-        DifferenceBoundedGraph graph = new DifferenceBoundedGraph(locals);
-        assertFalse(graph.equals(null));
-        assertFalse(graph.equals(new Object()));
-        assertTrue(graph.equals(graph));
-        assertTrue(graph.equals(new DifferenceBoundedGraph(graph)));
-        graph.add(xs[0], xs[1], new Constraint(3));
-        graph.add(xs[1], xs[2], new Constraint(3, PredicateType.Le));
-        graph.add(xs[2], xs[3], new Constraint(6, PredicateType.Le));
-        graph.add(xs[2], xs[0], new Constraint(3));
-        DifferenceBoundedGraph g2 = new DifferenceBoundedGraph(graph);
-        assertTrue(graph.equals(g2));
-        assertTrue(g2.equals(graph));
-        g2.add(xs[0], xs[1], new Constraint(2));
-        assertFalse(graph.equals(g2));
-        assertFalse(g2.equals(graph));
-        g2.add(xs[1], xs[0], new Constraint(-2));
-        assertFalse(graph.equals(g2));
-        assertFalse(g2.equals(graph));
+        {
+            DifferenceBoundedGraph graph = new DifferenceBoundedGraph(locals);
+            assertAll(() -> assertFalse(graph.equals(null)),
+                      () -> assertFalse(graph.equals(new Object())),
+                      () -> assertTrue(graph.equals(graph)),
+                      () -> assertTrue(graph.equals(new DifferenceBoundedGraph(graph))));
+        }
+        {
+            DifferenceBoundedGraph graph = new DifferenceBoundedGraph(locals);
+            graph.add(xs[0], xs[1], new Constraint(3));
+            graph.add(xs[1], xs[2], new Constraint(3, PredicateType.Le));
+            graph.add(xs[2], xs[3], new Constraint(6, PredicateType.Le));
+            graph.add(xs[2], xs[0], new Constraint(3));
+            DifferenceBoundedGraph g2 = new DifferenceBoundedGraph(graph);
+            assertTrue(graph.equals(g2));
+            assertTrue(g2.equals(graph));
+        }
+        {
+            DifferenceBoundedGraph graph = new DifferenceBoundedGraph(locals);
+            graph.add(xs[0], xs[1], new Constraint(3));
+            graph.add(xs[1], xs[2], new Constraint(3, PredicateType.Le));
+            graph.add(xs[2], xs[3], new Constraint(6, PredicateType.Le));
+            graph.add(xs[2], xs[0], new Constraint(3));
+            DifferenceBoundedGraph g2 = new DifferenceBoundedGraph(graph);
+            g2.add(xs[0], xs[1], new Constraint(2));
+            assertAll(() -> assertFalse(graph.equals(g2)),
+                      () -> assertFalse(g2.equals(graph)));
+        }
+        {
+            DifferenceBoundedGraph graph = new DifferenceBoundedGraph(locals);
+            graph.add(xs[0], xs[1], new Constraint(3));
+            graph.add(xs[1], xs[2], new Constraint(3, PredicateType.Le));
+            graph.add(xs[2], xs[3], new Constraint(6, PredicateType.Le));
+            graph.add(xs[2], xs[0], new Constraint(3));
+            DifferenceBoundedGraph g2 = new DifferenceBoundedGraph(graph);
+            g2.add(xs[0], xs[1], new Constraint(2));
+            g2.add(xs[1], xs[0], new Constraint(-2));
+            assertAll(() -> assertFalse(graph.equals(g2)),
+                      () -> assertFalse(g2.equals(graph)));
+        }
     }
 
     @Test
@@ -355,11 +377,11 @@ public class DifferenceBoundedGraphTest {
         test.add(xs[0], xs[1], new Constraint(3));
         test.add(xs[1], xs[2], new Constraint(4, PredicateType.Le));
         test.add(xs[2], xs[3], Constraint.TOP());
-        assertTrue(graph.equals(test));
-        assertTrue(test.equals(graph));
-        assertTrue(graph.computeClosure());
-        assertTrue(test.computeClosure());
-        assertTrue(graph.equals(test));
-        assertTrue(test.equals(graph));
+        assertAll(() -> assertTrue(graph.equals(test)),
+                  () -> assertTrue(test.equals(graph)),
+                  () -> assertTrue(graph.computeClosure()),
+                  () -> assertTrue(test.computeClosure()),
+                  () -> assertTrue(graph.equals(test)),
+                  () -> assertTrue(test.equals(graph)));
     }
 }

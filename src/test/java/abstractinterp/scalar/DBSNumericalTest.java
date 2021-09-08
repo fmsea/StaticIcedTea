@@ -6,7 +6,8 @@ import soot.Body;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -34,10 +35,9 @@ public class DBSNumericalTest {
             "2 l1 = 6:<constant_testSootClass: int constant_test(int)>",
             "l1->(= l1 6)",
         };
-        Assertions.assertEquals(expected.length, actual.length);
-        for (int i = 0; i < expected.length; i++) {
-            Assertions.assertEquals(expected[i], actual[i]);
-        }
+        assertEquals(expected.length, actual.length);
+        assertAll(IntStream.range(0, expected.length)
+                  .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
     }
 
     @Test
@@ -59,10 +59,9 @@ public class DBSNumericalTest {
             "5 l0 = l3 / l2:<moreConstantMathSootClass: void moreConstantMath()>",
             "l0->(and (= l0 (- 1)) (= l1 (+ 6 l0)))"
         };
-        Assertions.assertEquals(expected.length, actual.length);
-        for (int i = 0; i < expected.length; i++) {
-            Assertions.assertEquals(expected[i], actual[i]);
-        }
+        assertEquals(expected.length, actual.length);
+        assertAll(IntStream.range(0, expected.length)
+                  .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
     }
 
     @Test
@@ -85,10 +84,9 @@ public class DBSNumericalTest {
             "6 l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
             "l3->(= l3 6)",
         };
-        Assertions.assertEquals(expected.length, actual.length);
-        for (int i = 0; i < expected.length; i++) {
-            Assertions.assertEquals(expected[i], actual[i]);
-        }
+        assertEquals(expected.length, actual.length);
+        assertAll(IntStream.range(0, expected.length)
+                  .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
     }
 
     @Test
@@ -111,10 +109,9 @@ public class DBSNumericalTest {
             "6 l3 = l0 + l1:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
             "l3->(or (<= l3 0) (> l3 0))",
         };
-        Assertions.assertEquals(expected.length, actual.length);
-        for (int i = 0; i < expected.length; i++) {
-            Assertions.assertEquals(expected[i], actual[i]);
-        }
+        assertEquals(expected.length, actual.length);
+        assertAll(IntStream.range(0, expected.length)
+                  .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
     }
 
     @Test
@@ -141,10 +138,9 @@ public class DBSNumericalTest {
             "9 i5 = $i0 - 18:<test.Example1M: int example_5(int)>",
             "i5->(and (= i5 (+ (- 18) $i0)) (= i5 (- 6)))",
         };
-        Assertions.assertEquals(expected.length, actual.length);
-        for (int i = 0; i < expected.length; i++) {
-            Assertions.assertEquals(expected[i], actual[i]);
-        }
+        assertEquals(expected.length, actual.length);
+        assertAll(IntStream.range(0, expected.length)
+                  .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
     }
 
     @Test
@@ -175,10 +171,9 @@ public class DBSNumericalTest {
             "9 l3 = l3 + 1:<test.Nonsense: void decode()>",
             "l3->(<= l3 21)",
         };
-        Assertions.assertEquals(expected.length, actual.length);
-        for (int i = 0; i < expected.length; i++) {
-            Assertions.assertEquals(expected[i], actual[i]);
-        }
+        assertEquals(expected.length, actual.length);
+        assertAll(IntStream.range(0, expected.length)
+                  .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
     }
 
     @Test
@@ -197,10 +192,9 @@ public class DBSNumericalTest {
             "3 l2 = l1 + 1:<test.neqBranch: void neq()>",
             "l2->(= l2 (+ 1 l1))",
         };
-        Assertions.assertEquals(expected.length, actual.length);
-        for (int i = 0; i < expected.length; i++) {
-            Assertions.assertEquals(expected[i], actual[i]);
-        }
+        assertEquals(expected.length, actual.length);
+        assertAll(IntStream.range(0, expected.length)
+                  .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
     }
 
     @Test
@@ -223,10 +217,9 @@ public class DBSNumericalTest {
             "$i26->(= $i26 (- 30))",
         };
 
-        Assertions.assertEquals(expected.length, actual.length);
-        for (int i = 0; i < expected.length; i++) {
-            Assertions.assertEquals(expected[i], actual[i]);
-        }
+        assertEquals(expected.length, actual.length);
+        assertAll(IntStream.range(0, expected.length)
+                  .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
     }
 
     @Test
@@ -249,10 +242,9 @@ public class DBSNumericalTest {
             "w0->(= w0 0)",
         };
 
-        Assertions.assertEquals(expected.length, actual.length);
-        for (int i = 0; i < expected.length; i++) {
-            Assertions.assertEquals(expected[i], actual[i]);
-        }
+        assertEquals(expected.length, actual.length);
+        assertAll(IntStream.range(0, expected.length)
+                  .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
     }
 
     @Test

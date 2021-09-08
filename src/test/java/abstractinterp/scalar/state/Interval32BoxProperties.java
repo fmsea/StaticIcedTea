@@ -197,9 +197,7 @@ public class Interval32BoxProperties {
         result = Interval32Box.transferCondition(x, y, PredicateType.Ne);
         assertEquals(2, result.size());
         if (x.equals(y)) {
-            for (Interval32Box b : result) {
-                assertTrue(b.isBottom());
-            }
+            assertAll(result.stream().map(b -> () -> assertTrue(b.isBottom())));
         } else {
             assertAll(() -> assertEquals(x, result.get(0)),
                       () -> assertEquals(y, result.get(1)));
@@ -214,9 +212,7 @@ public class Interval32BoxProperties {
         result = Interval32Box.transferCondition(x, y, PredicateType.Le);
         assertEquals(2, result.size());
         if (position == (byte) 4) {
-            for (Interval32Box b : result) {
-                assertTrue(b.isBottom());
-            }
+            assertAll(result.stream().map(b -> () -> assertTrue(b.isBottom())));
         } else if (position == (byte) 0 || position == (byte) 1) {
             assertAll(() -> assertEquals(x, result.get(0)),
                       () -> assertEquals(y, result.get(1)));
@@ -226,9 +222,7 @@ public class Interval32BoxProperties {
                       () -> assertEquals(y, result.get(1)));
         } else if (position == (byte) 3) {
             Interval32Box expected = new Interval32Box(x.lowerBound(), y.upperBound());
-            for (Interval32Box b : result) {
-                assertEquals(expected, b);
-            }
+            assertAll(result.stream().map(b -> () -> assertEquals(expected, b)));
         } else if (position == (byte) 5) {
             Interval32Box y_expected = new Interval32Box(x.lowerBound(), y.upperBound());
             assertAll(() -> assertEquals(x, result.get(0)),
@@ -244,9 +238,7 @@ public class Interval32BoxProperties {
         result = Interval32Box.transferCondition(x, y, PredicateType.Lt);
         assertEquals(2, result.size());
         if (x.equals(y) || position == (byte) 4) {
-            for (Interval32Box b : result) {
-                assertTrue(b.isBottom());
-            }
+            assertAll(result.stream().map(b -> () -> assertTrue(b.isBottom())));
         } else if (position == (byte) 0 || position == (byte) 1) {
             assertAll(() -> assertEquals(x, result.get(0)),
                       () -> assertEquals(y, result.get(1)));
@@ -284,24 +276,22 @@ public class Interval32BoxProperties {
         result = Interval32Box.transferCondition(x, y, PredicateType.Ge);
         assertEquals(2, result.size());
         if (position == (byte) 0) {
-            for (Interval32Box b : result) {
-                assertTrue(b.isBottom());
-            }
+            assertAll(result.stream().map(b -> () -> assertTrue(b.isBottom())));
         } else if (position == (byte) 3 || position == (byte) 4) {
             assertAll(() -> assertEquals(x, result.get(0)),
                       () -> assertEquals(y, result.get(1)));
         } else if (position == (byte) 1) {
-            for (Interval32Box b : result) {
-                assertEquals(new Interval32Box(y.lowerBound(), x.upperBound()), b);
-            }
+            assertAll(result.stream().map(b -> () -> assertEquals(new Interval32Box(y.lowerBound(),
+                                                                                    x.upperBound()),
+                                                                  b)));
         } else if (position == (byte) 2) {
             assertAll(() -> assertEquals(new Interval32Box(y.lowerBound(), x.upperBound()),
                                          result.get(0)),
                       () -> assertEquals(y, result.get(1)));
         } else if (position == (byte) 5) {
-            for (Interval32Box b : result) {
-                assertEquals(new Interval32Box(x.lowerBound(), x.upperBound()), b);
-            }
+            assertAll(result.stream().map(b -> () -> assertEquals(new Interval32Box(x.lowerBound(),
+                                                                                    x.upperBound()),
+                                                                  b)));
         }
     }
 
@@ -313,9 +303,7 @@ public class Interval32BoxProperties {
         result = Interval32Box.transferCondition(x, y, PredicateType.Gt);
         assertEquals(2, result.size());
         if (x.equals(y) || position == (byte) 0) {
-            for (Interval32Box b : result) {
-                assertTrue(b.isBottom());
-            }
+            assertAll(result.stream().map(b -> () -> assertTrue(b.isBottom())));
         } else if (position == (byte) 3 || position == (byte) 4) {
             assertAll(() -> assertEquals(x, result.get(0)),
                       () -> assertEquals(y, result.get(1)));

@@ -83,7 +83,8 @@ public class IntervalBoxStateProperties {
             assertEquals(Optional.empty(), z.upperBound());
         } else {
             try {
-                assertEquals(Math.subtractExact(x.upperBound().get(), y.lowerBound().get()),
+                assertEquals(Math.subtractExact(x.upperBound().get(),
+                                                y.lowerBound().get()),
                              z.upperBound().get());
             } catch (ArithmeticException ex) {
                 assertTrue(z.upperBound().isEmpty());
@@ -96,14 +97,22 @@ public class IntervalBoxStateProperties {
                                      @ForAll Interval32Box y) {
         Interval32Box z = IntervalBoxState.transferBinary(x, y, BinaryOperator.MULTIPLICATION);
         try {
-            Optional<Integer> low = Optional.of(minimum(Math.multiplyExact(x.lowerBoundOrElse(), y.lowerBoundOrElse()),
-                                                        Math.multiplyExact(x.lowerBoundOrElse(), y.upperBoundOrElse()),
-                                                        Math.multiplyExact(x.upperBoundOrElse(), y.lowerBoundOrElse()),
-                                                        Math.multiplyExact(x.upperBoundOrElse(), y.upperBoundOrElse())));
-            Optional<Integer> high = Optional.of(maximum(Math.multiplyExact(x.lowerBoundOrElse(), y.lowerBoundOrElse()),
-                                                         Math.multiplyExact(x.lowerBoundOrElse(), y.upperBoundOrElse()),
-                                                         Math.multiplyExact(x.upperBoundOrElse(), y.lowerBoundOrElse()),
-                                                         Math.multiplyExact(x.upperBoundOrElse(), y.upperBoundOrElse())));
+            Optional<Integer> low = Optional.of(minimum(Math.multiplyExact(x.lowerBoundOrElse(),
+                                                                           y.lowerBoundOrElse()),
+                                                        Math.multiplyExact(x.lowerBoundOrElse(),
+                                                                           y.upperBoundOrElse()),
+                                                        Math.multiplyExact(x.upperBoundOrElse(),
+                                                                           y.lowerBoundOrElse()),
+                                                        Math.multiplyExact(x.upperBoundOrElse(),
+                                                                           y.upperBoundOrElse())));
+            Optional<Integer> high = Optional.of(maximum(Math.multiplyExact(x.lowerBoundOrElse(),
+                                                                            y.lowerBoundOrElse()),
+                                                         Math.multiplyExact(x.lowerBoundOrElse(),
+                                                                            y.upperBoundOrElse()),
+                                                         Math.multiplyExact(x.upperBoundOrElse(),
+                                                                            y.lowerBoundOrElse()),
+                                                         Math.multiplyExact(x.upperBoundOrElse(),
+                                                                            y.upperBoundOrElse())));
             assertAll(() -> assertEquals(low, z.lowerBound()),
                       () -> assertEquals(high, z.upperBound()));
         } catch (ArithmeticException ex) {
