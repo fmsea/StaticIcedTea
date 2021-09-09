@@ -156,15 +156,15 @@ public class IntegerAnalysis<S extends State> {
         int stmtCount = 0;
         for (Unit u : this.g.getBody().getUnits()) {
             stmtCount++;
-            if (outputStmt.contains(u)) {
+            if (outputStmt.contains(u) && changedVariables.get(u).size() > 0) {
                 S state = analysis.getFallFlowAfter(u);
+                sb.append(stmtCount);
+                sb.append(" ");
+                sb.append(u);
+                sb.append(":");
+                sb.append(methodSignature);
+                sb.append('\n');
                 if (state.isFeasible()) {
-                    sb.append(stmtCount);
-                    sb.append(" ");
-                    sb.append(u);
-                    sb.append(":");
-                    sb.append(methodSignature);
-                    sb.append('\n');
                     for (Local l : locals) {
                         if (changedVariables.get(u).contains(l)) {
                             sb.append(l.toString());
@@ -173,17 +173,17 @@ public class IntegerAnalysis<S extends State> {
                             sb.append('\n');
                         }
                     }
-                    List<S> branches = analysis.getBranchFlowAfter(u);
-                    if (!branches.isEmpty()) {
-                        for (S branch : branches) {
-                            if (branch.isFeasible()) {
-                                for (Local l : locals) {
-                                    if (changedVariables.get(u).contains(l)) {
-                                        sb.append(l.toString());
-                                        sb.append("f->");
-                                        sb.append(branch.toSMT(l, this.solver));
-                                        sb.append('\n');
-                                    }
+                }
+                List<S> branches = analysis.getBranchFlowAfter(u);
+                if (!branches.isEmpty()) {
+                    for (S branch : branches) {
+                        if (branch.isFeasible()) {
+                            for (Local l : locals) {
+                                if (changedVariables.get(u).contains(l)) {
+                                    sb.append(l.toString());
+                                    sb.append("f->");
+                                    sb.append(branch.toSMT(l, this.solver));
+                                    sb.append('\n');
                                 }
                             }
                         }

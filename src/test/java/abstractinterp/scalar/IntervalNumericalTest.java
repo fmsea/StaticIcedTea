@@ -127,6 +127,9 @@ public class IntervalNumericalTest {
             "l1->(= l1 0)",
             "3 l2 = 0:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
             "l2->(= l2 0)",
+            "4 if l0 >= 3 goto l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
+            "l0f->(= l0 4)",
+            "5 l3 = l1 / l2:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
             "6 l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
             "l3->(= l3 6)"
         };
@@ -226,6 +229,9 @@ public class IntervalNumericalTest {
             "b2->(= b2 1)",
             "3 b3 = 3:<test.Example1M: int example_5(int)>",
             "b3->(= b3 3)",
+            "4 if b3 != 0 goto i4 = b3 + b2:<test.Example1M: int example_5(int)>",
+            "b3f->(= b3 3)",
+            "5 i4 = b3 - b2:<test.Example1M: int example_5(int)>",
             "7 i4 = b3 + b2:<test.Example1M: int example_5(int)>",
             "i4->(= i4 4)",
             "8 $i0 = b3 * i4:<test.Example1M: int example_5(int)>",
@@ -363,6 +369,7 @@ public class IntervalNumericalTest {
             "u0->(= u0 120)",
             "5 r0 = neg 1:<test.transverse: int zero()>",
             "r0->(= r0 (- 1))",
+            "7 r0 = 1:<test.transverse: int zero()>",
         };
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
