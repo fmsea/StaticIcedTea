@@ -77,6 +77,13 @@ public class DifferenceBoundedState implements State {
         this.dbs.add(l, r, constraint);
     }
 
+    public void addWithNarrowing(Local l, Local r, Constraint c) {
+        Constraint constraint = this.dbs.getValue(l, r)
+            .map(k -> Constraint.narrow(c, k))
+            .orElse(c);
+        this.add(l, r, constraint);
+    }
+
     /** Get the constraint connecting <i>l</i> through <i>ZERO</i>
      *
      * If no edge directly connects the two locals, we return TOP.
@@ -703,19 +710,19 @@ public class DifferenceBoundedState implements State {
                            PredicateType type) {
         switch (type) {
         case Le:
-            this.add(left, ZERO, new Constraint(right.value, PredicateType.Le));
+            this.addWithNarrowing(left, ZERO, new Constraint(right.value, PredicateType.Le));
             break;
         case Lt:
-            this.add(left, ZERO, new Constraint(right.value - 1, PredicateType.Le));
+            this.addWithNarrowing(left, ZERO, new Constraint(right.value - 1, PredicateType.Le));
             break;
         case Eq:
-            this.add(left, ZERO, new Constraint(right.value));
+            this.addWithNarrowing(left, ZERO, new Constraint(right.value));
             break;
         case Ge:
-            this.add(ZERO, left, new Constraint(right.value * -1, PredicateType.Le));
+            this.addWithNarrowing(ZERO, left, new Constraint(right.value * -1, PredicateType.Le));
             break;
         case Gt:
-            this.add(ZERO, left, new Constraint((right.value * - 1) - 1, PredicateType.Le));
+            this.addWithNarrowing(ZERO, left, new Constraint((right.value * - 1) - 1, PredicateType.Le));
             break;
         case Ne:
             break;
@@ -723,7 +730,6 @@ public class DifferenceBoundedState implements State {
             this.makeInfeasible();
             return false;
         }
-        this.intersection(inState);
         return this.incrementalClosure(left, this) && this.incrementalClosure(ZERO, this);
     }
 
@@ -733,19 +739,19 @@ public class DifferenceBoundedState implements State {
                            PredicateType type) {
         switch (type) {
         case Le:
-            this.add(ZERO, right, new Constraint(left.value * - 1, PredicateType.Le));
+            this.addWithNarrowing(ZERO, right, new Constraint(left.value * - 1, PredicateType.Le));
             break;
         case Lt:
-            this.add(ZERO, right, new Constraint((left.value * - 1) - 1, PredicateType.Le));
+            this.addWithNarrowing(ZERO, right, new Constraint((left.value * - 1) - 1, PredicateType.Le));
             break;
         case Eq:
-            this.add(right, ZERO, new Constraint(left.value));
+            this.addWithNarrowing(right, ZERO, new Constraint(left.value));
             break;
         case Ge:
-            this.add(right, ZERO, new Constraint(left.value, PredicateType.Le));
+            this.addWithNarrowing(right, ZERO, new Constraint(left.value, PredicateType.Le));
             break;
         case Gt:
-            this.add(right, ZERO, new Constraint(left.value + 1, PredicateType.Le));
+            this.addWithNarrowing(right, ZERO, new Constraint(left.value + 1, PredicateType.Le));
             break;
         case Ne:
             break;
@@ -753,7 +759,6 @@ public class DifferenceBoundedState implements State {
             this.makeInfeasible();
             return false;
         }
-        this.intersection(inState);
         return this.incrementalClosure(right, this) && this.incrementalClosure(ZERO, this);
     }
 
@@ -763,19 +768,19 @@ public class DifferenceBoundedState implements State {
                            PredicateType type) {
         switch (type) {
         case Le:
-            this.add(left, right, new Constraint(0, PredicateType.Le));
+            this.addWithNarrowing(left, right, new Constraint(0, PredicateType.Le));
             break;
         case Lt:
-            this.add(left, right, new Constraint(-1, PredicateType.Le));
+            this.addWithNarrowing(left, right, new Constraint(-1, PredicateType.Le));
             break;
         case Eq:
-            this.add(left, right, new Constraint(0));
+            this.addWithNarrowing(left, right, new Constraint(0));
             break;
         case Ge:
-            this.add(right, left, new Constraint(0, PredicateType.Le));
+            this.addWithNarrowing(right, left, new Constraint(0, PredicateType.Le));
             break;
         case Gt:
-            this.add(right, left, new Constraint(-1, PredicateType.Le));
+            this.addWithNarrowing(right, left, new Constraint(-1, PredicateType.Le));
             break;
         case Ne:
             break;
@@ -783,7 +788,6 @@ public class DifferenceBoundedState implements State {
             this.makeInfeasible();
             return false;
         }
-        this.intersection(inState);
         return this.incrementalClosure(left, this) && this.incrementalClosure(right, this);
     }
 }

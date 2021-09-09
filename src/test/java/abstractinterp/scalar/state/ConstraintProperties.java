@@ -323,4 +323,16 @@ public class ConstraintProperties {
                                       new Constraint(b, PredicateType.Gt));
         assertEquals(Constraint.BOT(), c);
     }
+
+    @Property
+    void constraintNarrowWithBottomIsBottom(@ForAll Constraint c) {
+        assertAll(() -> assertTrue(Constraint.narrow(Constraint.BOT(), c).isBottom()),
+                  () -> assertTrue(Constraint.narrow(c, Constraint.BOT()).isBottom()));
+    }
+
+    @Property
+    void constraintNarrowWithTopIsC(@ForAll Constraint c) {
+        assertAll(() -> assertEquals(c, Constraint.narrow(Constraint.TOP(), c)),
+                  () -> assertEquals(c, Constraint.narrow(c, Constraint.TOP())));
+    }
 }

@@ -262,6 +262,25 @@ public class Constraint implements Comparable<Constraint> {
         return r;
     }
 
+    public static Constraint narrow(Constraint a, Constraint b) {
+        Constraint r;
+        if (a.isBottom() || b.isBottom()) {
+            r = BOT();
+        } else if (a.isTop()) {
+            r = b.copy();
+        } else if (b.isTop()) {
+            r = a.copy();
+        } else if (a.predicate == b.predicate && a.predicate != PredicateType.Eq) {
+            r = new Constraint(Integer.min(a.bound, b.bound), a.predicate);
+        } else if (PredicateType.compare(a.predicate, b.predicate) < 2 &&
+                   a.bound == b.bound) {
+            r = new Constraint(a.bound, PredicateType.inferior(a.predicate, b.predicate));
+        } else {
+            r = Constraint.BOT();
+        }
+        return r;
+    }
+
     public int compareTo(Constraint c) {
         int predicateOrder = PredicateType.compare(this.predicate, c.predicate);
         int order;

@@ -1113,4 +1113,48 @@ public class DifferenceBoundedStateTest {
                   () -> assertEquals(new Constraint(3), state.getConstraint(xs[3], xs[1])),
                   () -> assertEquals(new Constraint(6), state.getConstraint(xs[3], xs[2])));
     }
+
+    @Test
+    void testAddWithNarrowing() {
+        {
+            DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
+            state.addWithNarrowing(xs[0], xs[1], new Constraint(2));
+            assertEquals(new Constraint(2), state.getConstraint(xs[0], xs[1]));
+        }
+
+        {
+            DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
+            state.add(xs[0], xs[1], new Constraint(2));
+            state.addWithNarrowing(xs[0], xs[1], new Constraint(2, PredicateType.Le));
+            assertEquals(new Constraint(2), state.getConstraint(xs[0], xs[1]));
+        }
+
+        {
+            DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
+            state.add(xs[0], xs[1], new Constraint(2, PredicateType.Le));
+            state.addWithNarrowing(xs[0], xs[1], new Constraint(2));
+            assertEquals(new Constraint(2), state.getConstraint(xs[0], xs[1]));
+        }
+
+        {
+            DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
+            state.add(xs[0], xs[1], new Constraint(3));
+            state.addWithNarrowing(xs[0], xs[1], new Constraint(2));
+            assertEquals(Constraint.BOT(), state.getConstraint(xs[0], xs[1]));
+        }
+
+        {
+            DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
+            state.add(xs[0], xs[1], new Constraint(2));
+            state.addWithNarrowing(xs[0], xs[1], new Constraint(1, PredicateType.Le));
+            assertEquals(Constraint.BOT(), state.getConstraint(xs[0], xs[1]));
+        }
+
+        {
+            DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
+            state.add(xs[0], xs[1], new Constraint(1, PredicateType.Le));
+            state.addWithNarrowing(xs[0], xs[1], new Constraint(2));
+            assertEquals(Constraint.BOT(), state.getConstraint(xs[0], xs[1]));
+        }
+    }
 }

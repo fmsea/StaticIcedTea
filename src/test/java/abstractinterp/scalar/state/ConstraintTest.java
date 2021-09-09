@@ -128,4 +128,41 @@ public class ConstraintTest {
                   () -> assertEquals(+0, (new Constraint(0, PredicateType.Le)).compareTo(new Constraint(0, PredicateType.Le))),
                   () -> assertEquals(+1, (new Constraint(1, PredicateType.Le)).compareTo(new Constraint(0))));
     }
+
+    @Test
+    void testNarrow() {
+        assertAll(() -> assertEquals(Constraint.BOT(),
+                                     Constraint.narrow(new Constraint(0),
+                                                       Constraint.BOT())),
+                  () -> assertEquals(Constraint.BOT(),
+                                     Constraint.narrow(Constraint.BOT(),
+                                                       new Constraint(0))),
+                  () -> assertEquals(new Constraint(0),
+                                     Constraint.narrow(Constraint.TOP(),
+                                                       new Constraint(0))),
+                  () -> assertEquals(new Constraint(0),
+                                     Constraint.narrow(new Constraint(0),
+                                                       Constraint.TOP())),
+                  () -> assertEquals(new Constraint(0),
+                                     Constraint.narrow(new Constraint(0, PredicateType.Eq),
+                                                       new Constraint(0, PredicateType.Le))),
+                  () -> assertEquals(new Constraint(0),
+                                     Constraint.narrow(new Constraint(0, PredicateType.Le),
+                                                       new Constraint(0, PredicateType.Eq))),
+                  () -> assertEquals(new Constraint(0, PredicateType.Le),
+                                     Constraint.narrow(new Constraint(0, PredicateType.Le),
+                                                       new Constraint(1, PredicateType.Le))),
+                  () -> assertEquals(new Constraint(0, PredicateType.Le),
+                                     Constraint.narrow(new Constraint(1, PredicateType.Le),
+                                                       new Constraint(0, PredicateType.Le))),
+                  () -> assertEquals(Constraint.BOT(),
+                                     Constraint.narrow(new Constraint(0, PredicateType.Eq),
+                                                       new Constraint(1, PredicateType.Eq))),
+                  () -> assertEquals(Constraint.BOT(),
+                                     Constraint.narrow(new Constraint(1, PredicateType.Eq),
+                                                       new Constraint(0, PredicateType.Le))),
+                  () -> assertEquals(Constraint.BOT(),
+                                     Constraint.narrow(new Constraint(0, PredicateType.Le),
+                                                       new Constraint(1, PredicateType.Eq))));
+    }
 }
