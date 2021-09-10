@@ -1060,6 +1060,19 @@ public class DifferenceBoundedStateTest {
     }
 
     @Test
+    void testIncrementalClosureUpdatesInferredEdges() {
+        DifferenceBoundedState inState = new DifferenceBoundedState(locals, true);
+        inState.add(xs[0], xs[1], new Constraint(3));
+        inState.add(xs[1], xs[2], new Constraint(2));
+        inState.add(xs[0], xs[2], new Constraint(5));
+
+        DifferenceBoundedState state = new DifferenceBoundedState(inState);
+        state.updateState(xs[0], inState, xs[1], IntConstant.v(2), BinaryOperator.ADDITION);
+        assertAll(() -> assertEquals(new Constraint(2), state.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(new Constraint(4), state.getConstraint(xs[0], xs[2])));
+    }
+
+    @Test
     void testIsFeasibleWhenBottom() {
         DifferenceBoundedState state = new DifferenceBoundedState(locals, true);
         state.add(xs[0], xs[1], new Constraint(0));
