@@ -1,0 +1,15 @@
+3 i2 = 0:<miniExample2: int example(int)>
+i2->(= i2 0)
+4 i3 = 0:<miniExample2: int example(int)>
+i3->(= i3 0)
+5 if i3 >= i0 goto return i2:<miniExample2: int example(int)>
+i0->(<= i3 (+ (- 1) i0))
+i3->(<= i3 (+ (- 1) i0))
+i0f->(<= i0 (+ 0 i3))
+i3f->(<= i0 (+ 0 i3))
+6 $i1 = i0 * i3:<miniExample2: int example(int)>
+$i1->(or (<= $i1 0) (> $i1 0))
+7 i2 = i2 + $i1:<miniExample2: int example(int)>
+i2->(or (<= i2 0) (> i2 0))
+8 i3 = i3 + 1:<miniExample2: int example(int)>
+i3->(<= i3 (+ 0 i0))

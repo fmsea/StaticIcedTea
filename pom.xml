@@ -204,6 +204,12 @@
     <scope>test</scope>
   </dependency>
   <dependency>
+    <groupId>org.junit.jupiter</groupId>
+    <artifactId>junit-jupiter-params</artifactId>
+    <version>5.7.1</version>
+    <scope>test</scope>
+  </dependency>
+  <dependency>
     <groupId>net.jqwik</groupId>
     <artifactId>jqwik</artifactId>
     <version>1.5.1</version>
