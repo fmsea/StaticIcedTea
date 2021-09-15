@@ -326,4 +326,36 @@ public class Interval32BoxProperties {
                                          result.get(1)));
         }
     }
+
+    @Property
+    void testIntervalAdditionWithBottom(@ForAll Interval32Box c) {
+        assertAll(() -> assertEquals(Interval32Box.BOT(),
+                                     Interval32Box.add(c, Interval32Box.BOT())),
+                  () -> assertEquals(Interval32Box.BOT(),
+                                     Interval32Box.add(Interval32Box.BOT(), c)));
+    }
+
+    @Property
+    void testIntervalSubtractionWithBottom(@ForAll Interval32Box c) {
+        assertAll(() -> assertEquals(Interval32Box.BOT(),
+                                     Interval32Box.subtract(c, Interval32Box.BOT())),
+                  () -> assertEquals(Interval32Box.BOT(),
+                                     Interval32Box.subtract(Interval32Box.BOT(), c)));
+    }
+
+    @Property
+    void testIntervalMultiplicationWithBottom(@ForAll Interval32Box c) {
+        assertAll(() -> assertEquals(Interval32Box.BOT(),
+                                     Interval32Box.multiply(c, Interval32Box.BOT())),
+                  () -> assertEquals(Interval32Box.BOT(),
+                                     Interval32Box.multiply(Interval32Box.BOT(), c)));
+    }
+
+    @Property
+    void testIntervalDivisionWithBottom(@ForAll Interval32Box c) {
+        assertAll(() -> assertEquals(Interval32Box.BOT(),
+                                     Interval32Box.divide(c, Interval32Box.BOT())),
+                  () -> assertEquals(Interval32Box.BOT(),
+                                     Interval32Box.divide(Interval32Box.BOT(), c)));
+    }
 }

@@ -953,9 +953,9 @@ public class Interval32BoxTest {
         }
 
         {
-            Interval32Box x = new Interval32Box(2, 0);
+            Interval32Box x = new Interval32Box(-2, 0);
             Interval32Box y = new Interval32Box(1, 2);
-            assertAll(() -> assertEquals(new Interval32Box(0, 2),
+            assertAll(() -> assertEquals(new Interval32Box(-2, 0),
                                          Interval32Box.divide(x, y)),
                       () -> assertEquals(new Interval32Box(null, 2),
                                          Interval32Box.divide(y, x)));
