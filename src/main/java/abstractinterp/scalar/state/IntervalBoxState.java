@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 import soot.Local;
 import soot.Value;
 import soot.jimple.IntConstant;
@@ -234,7 +235,21 @@ public class IntervalBoxState implements State {
 
     @Override
     public String toString() {
-        return state.toString();
+        List<Local> locals = this.state.keySet()
+            .stream()
+            .sorted((a, b) -> (a.toString().compareTo(b.toString())))
+            .collect(Collectors.toList());
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        for (Local local : locals) {
+            sb.append(local);
+            sb.append("=");
+            sb.append(this.state.get(local).toString());
+            sb.append(", ");
+        }
+        sb.delete(sb.length() - 2, sb.length());
+        sb.append("}");
+        return sb.toString();
     }
 
     public String toSMT(SolverWrapper solver) {
