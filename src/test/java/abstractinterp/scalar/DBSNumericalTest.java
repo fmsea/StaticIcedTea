@@ -268,4 +268,76 @@ public class DBSNumericalTest {
         assertAll(IntStream.range(0, expected.length)
                              .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
     }
+
+    @Test
+    void testFibonacci() {
+        Body body = JimpleProvider.fibonacci();
+        IntegerAnalysis<DifferenceBoundedState> analysis =
+            new IntegerAnalysis<>(body, 2, new DifferenceBoundedStateFactory());
+        analysis.runAnalysis();
+        String[] actual = analysis.generateSMTReport().split("\n");
+        String[] expected = new String[] {
+            "2 i2 = 0:<test.Fibonacci: int fibonacci(int)>",
+            "i2->(= i2 0)",
+            "3 i3 = 1:<test.Fibonacci: int fibonacci(int)>",
+            "i3->(= i3 1)",
+            "4 i4 = 2:<test.Fibonacci: int fibonacci(int)>",
+            "i4->(= i4 2)",
+            "5 if i4 >= i0 goto return i3:<test.Fibonacci: int fibonacci(int)>",
+            "i0->(<= i4 (+ (- 1) i0))",
+            "i4->(<= i4 (+ (- 1) i0))",
+            "i0f->(<= i0 (+ 0 i4))",
+            "i4f->(<= i0 (+ 0 i4))",
+            "6 i1 = i2 + i3:<test.Fibonacci: int fibonacci(int)>",
+            "i1->(or (<= i1 0) (> i1 0))",
+            "7 i2 = i3:<test.Fibonacci: int fibonacci(int)>",
+            "i2->(= i2 (+ 0 i3))",
+            "8 i3 = i1:<test.Fibonacci: int fibonacci(int)>",
+            "i3->(= i3 (+ 0 i1))",
+            "9 i4 = i4 + 1:<test.Fibonacci: int fibonacci(int)>",
+            "i4->(<= i4 (+ 0 i0))",
+        };
+        assertEquals(expected.length, actual.length);
+        assertAll(IntStream.range(0, expected.length)
+                  .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
+    }
+
+    @Test
+    void testTribonacci() {
+        Body body = JimpleProvider.tribonacci();
+        IntegerAnalysis<DifferenceBoundedState> analysis =
+            new IntegerAnalysis<>(body, 2, new DifferenceBoundedStateFactory());
+        analysis.runAnalysis();
+        String[] actual = analysis.generateSMTReport().split("\n");
+        String[] expected = new String[] {
+            "2 i3 = 0:<test.Tribonacci: int tribonacci(int)>",
+            "i3->(= i3 0)",
+            "3 i4 = 1:<test.Tribonacci: int tribonacci(int)>",
+            "i4->(= i4 1)",
+            "4 i5 = 1:<test.Tribonacci: int tribonacci(int)>",
+            "i5->(= i5 1)",
+            "5 i6 = 3:<test.Tribonacci: int tribonacci(int)>",
+            "i6->(= i6 3)",
+            "6 if i6 >= i0 goto return i5:<test.Tribonacci: int tribonacci(int)>",
+            "i0->(<= i6 (+ (- 1) i0))",
+            "i6->(<= i6 (+ (- 1) i0))",
+            "i0f->(<= i0 (+ 0 i6))",
+            "i6f->(<= i0 (+ 0 i6))",
+            "7 $i1 = i5 + i4:<test.Tribonacci: int tribonacci(int)>",
+            "$i1->(or (<= $i1 0) (> $i1 0))",
+            "8 i2 = $i1 + i3:<test.Tribonacci: int tribonacci(int)>",
+            "i2->(or (<= i2 0) (> i2 0))",
+            "9 i3 = i4:<test.Tribonacci: int tribonacci(int)>",
+            "i3->(= i3 (+ 0 i4))",
+            "10 i4 = i5:<test.Tribonacci: int tribonacci(int)>",
+            "i4->(= i4 (+ 0 i5))",
+            "11 i5 = i2:<test.Tribonacci: int tribonacci(int)>",
+            "i5->(= i5 (+ 0 i2))",
+            "12 i6 = i6 + 1:<test.Tribonacci: int tribonacci(int)>",
+            "i6->(<= i6 (+ 0 i0))",
+        };
+        assertEquals(expected.length, actual.length);
+        assertAll(IntStream.range(0, expected.length)
+                  .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
+    }
 }

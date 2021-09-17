@@ -351,4 +351,86 @@ public class JimpleProvider implements ArbitraryProvider {
 
         return body;
     }
+
+    public static Body fibonacci() {
+        SootClass testClass = new SootClass("test.Fibonacci", Modifier.PUBLIC);
+        testClass.setSuperclass(Scene.v().getSootClass("java.lang.Object"));
+        SootMethod method = new SootMethod("fibonacci",
+                                           Arrays.asList(new Type[] {IntType.v()}),
+                                           IntType.v());
+        testClass.addMethod(method);
+        Scene.v().addClass(testClass);
+        JimpleBody body = Jimple.v().newBody(method);
+        method.setActiveBody(body);
+        Chain<Unit> units = body.getUnits();
+
+        Local i0 = Jimple.v().newLocal("i0", IntType.v());
+        Local i1 = Jimple.v().newLocal("i1", IntType.v());
+        Local i2 = Jimple.v().newLocal("i2", IntType.v());
+        Local i3 = Jimple.v().newLocal("i3", IntType.v());
+        Local i4 = Jimple.v().newLocal("i4", IntType.v());
+
+        Stream.of(i0, i1, i2, i3, i4) .forEach(l -> body.getLocals().add(l));
+
+        Unit exit = Jimple.v().newReturnStmt(i3);
+        Unit loopGuard = Jimple.v().newIfStmt(Jimple.v().newGeExpr(i4, i0), exit);
+        units.add(Jimple.v().newIdentityStmt(i0,
+                                             Jimple.v().newParameterRef(IntType.v(), 0)));
+        units.add(Jimple.v().newAssignStmt(i2, IntConstant.v(0)));
+        units.add(Jimple.v().newAssignStmt(i3, IntConstant.v(1)));
+        units.add(Jimple.v().newAssignStmt(i4, IntConstant.v(2)));
+        units.add(loopGuard);
+        units.add(Jimple.v().newAssignStmt(i1, Jimple.v().newAddExpr(i2, i3)));
+        units.add(Jimple.v().newAssignStmt(i2, i3));
+        units.add(Jimple.v().newAssignStmt(i3, i1));
+        units.add(Jimple.v().newAssignStmt(i4, Jimple.v().newAddExpr(i4, IntConstant.v(1))));
+        units.add(Jimple.v().newGotoStmt(loopGuard));
+        units.add(exit);
+
+        return body;
+    }
+
+    public static Body tribonacci() {
+        SootClass testClass = new SootClass("test.Tribonacci", Modifier.PUBLIC);
+        testClass.setSuperclass(Scene.v().getSootClass("java.lang.Object"));
+        SootMethod method = new SootMethod("tribonacci",
+                                           Arrays.asList(new Type[] {IntType.v()}),
+                                           IntType.v());
+        testClass.addMethod(method);
+        Scene.v().addClass(testClass);
+        JimpleBody body = Jimple.v().newBody(method);
+        method.setActiveBody(body);
+        Chain<Unit> units = body.getUnits();
+
+        Local i0 = Jimple.v().newLocal("i0", IntType.v());
+        Local i2 = Jimple.v().newLocal("i2", IntType.v());
+        Local i3 = Jimple.v().newLocal("i3", IntType.v());
+        Local i4 = Jimple.v().newLocal("i4", IntType.v());
+        Local i5 = Jimple.v().newLocal("i5", IntType.v());
+        Local i6 = Jimple.v().newLocal("i6", IntType.v());
+        Local ti1 = Jimple.v().newLocal("$i1", IntType.v());
+
+        Stream.of(i0, i2, i3, i4, i5, i6, ti1)
+            .forEach(l -> body.getLocals().add(l));
+
+        Unit exit = Jimple.v().newReturnStmt(i5);
+        Unit loopGuard = Jimple.v().newIfStmt(Jimple.v().newGeExpr(i6, i0), exit);
+        units.add(Jimple.v().newIdentityStmt(i0,
+                                             Jimple.v().newParameterRef(IntType.v(), 0)));
+        units.add(Jimple.v().newAssignStmt(i3, IntConstant.v(0)));
+        units.add(Jimple.v().newAssignStmt(i4, IntConstant.v(1)));
+        units.add(Jimple.v().newAssignStmt(i5, IntConstant.v(1)));
+        units.add(Jimple.v().newAssignStmt(i6, IntConstant.v(3)));
+        units.add(loopGuard);
+        units.add(Jimple.v().newAssignStmt(ti1, Jimple.v().newAddExpr(i5, i4)));
+        units.add(Jimple.v().newAssignStmt(i2, Jimple.v().newAddExpr(ti1, i3)));
+        units.add(Jimple.v().newAssignStmt(i3, i4));
+        units.add(Jimple.v().newAssignStmt(i4, i5));
+        units.add(Jimple.v().newAssignStmt(i5, i2));
+        units.add(Jimple.v().newAssignStmt(i6, Jimple.v().newAddExpr(i6, IntConstant.v(1))));
+        units.add(Jimple.v().newGotoStmt(loopGuard));
+        units.add(exit);
+
+        return body;
+    }
 }
