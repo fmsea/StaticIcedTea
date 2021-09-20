@@ -60,6 +60,7 @@ public class ForwardBranchedFlowNumerical<S extends State>
     protected void widen(S beforeFlow, S prevBeforeFlow) {
         LOGGER.trace("widening {} with {}", beforeFlow, prevBeforeFlow);
         beforeFlow.widenWith(prevBeforeFlow);
+        LOGGER.trace("widening result: {}", beforeFlow);
     }
 
     @Override
