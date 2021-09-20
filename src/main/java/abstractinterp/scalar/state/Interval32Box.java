@@ -192,6 +192,23 @@ public class Interval32Box {
         }
     }
 
+    public boolean isSubset(Interval32Box box) {
+        boolean subset = false;
+        if (this.equals(box) || this.isBottom() || box.isTop()) {
+            subset = true;
+        } else if (box.isBottom()) {
+            subset = false;
+        } else {
+            subset = ((this.lowerBound
+                       .map(tl -> box.lowerBound.map(bl -> tl >= bl).orElse(true))
+                       .orElse(this.lowerBound.isEmpty() && box.lowerBound.isEmpty())) &&
+                      (this.upperBound
+                       .map(tu -> box.upperBound.map(bu -> tu <= bu).orElse(true))
+                       .orElse(this.upperBound.isEmpty() && box.upperBound.isEmpty())));
+        }
+        return subset;
+    }
+
     public byte intersectionPosition(Interval32Box box) {
         byte position = -1;
         if (box == null ||

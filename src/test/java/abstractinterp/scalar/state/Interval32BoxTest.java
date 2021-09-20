@@ -302,6 +302,63 @@ public class Interval32BoxTest {
     }
 
     @Test
+    void testIsSubset() {
+        {
+            Interval32Box a = new Interval32Box(0, 1);
+            assertTrue(a.isSubset(a));
+        }
+
+        {
+            Interval32Box a = new Interval32Box(0, 1);
+            Interval32Box top = Interval32Box.TOP();
+            assertAll(() -> assertTrue(a.isSubset(top)),
+                      () -> assertFalse(top.isSubset(a)));
+        }
+
+        {
+            Interval32Box a = new Interval32Box(0, 1);
+            Interval32Box b = new Interval32Box(0, 2);
+            assertAll(() -> assertTrue(a.isSubset(b)),
+                      () -> assertFalse(b.isSubset(a)));
+        }
+
+        {
+            Interval32Box a = new Interval32Box(0, 1);
+            Interval32Box b = new Interval32Box(-1, 1);
+            assertAll(() -> assertTrue(a.isSubset(b)),
+                      () -> assertFalse(b.isSubset(a)));
+        }
+
+        {
+            Interval32Box a = new Interval32Box(0, 1);
+            Interval32Box b = new Interval32Box(null, 1);
+            assertAll(() -> assertTrue(a.isSubset(b)),
+                      () -> assertFalse(b.isSubset(a)));
+        }
+
+        {
+            Interval32Box a = new Interval32Box(0, 1);
+            Interval32Box b = new Interval32Box(0, null);
+            assertAll(() -> assertTrue(a.isSubset(b)),
+                      () -> assertFalse(b.isSubset(a)));
+        }
+
+        {
+            Interval32Box a = new Interval32Box(null, 1);
+            Interval32Box b = new Interval32Box(null, 2);
+            assertAll(() -> assertTrue(a.isSubset(b)),
+                      () -> assertFalse(b.isSubset(a)));
+        }
+
+        {
+            Interval32Box a = new Interval32Box(0, null);
+            Interval32Box b = new Interval32Box(-1, null);
+            assertAll(() -> assertTrue(a.isSubset(b)),
+                      () -> assertFalse(b.isSubset(a)));
+        }
+    }
+
+    @Test
     void testNegate() {
         Interval32Box bot = Interval32Box.BOT();
         Interval32Box top = Interval32Box.TOP();

@@ -2,9 +2,11 @@ package abstractinterp.scalar.state;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import soot.Local;
@@ -119,6 +121,26 @@ public class IntervalBoxState implements State {
         for(Local l : state.keySet()){
             getValue(l).wideningAssign(prevBeforeFlow.getValue(l));
         }
+    }
+
+    public boolean isSubset(State inState) {
+        if (inState instanceof IntervalBoxState) {
+            return this.isSubset((IntervalBoxState) inState);
+        } else {
+            throw new RuntimeException("invalid type for subset checks");
+        }
+    }
+
+    public boolean isSubset(IntervalBoxState inState) {
+        Set<Local> keys = new HashSet<>();
+        keys.addAll(this.state.keySet());
+        keys.addAll(inState.state.keySet());
+        boolean subset = keys.stream().map(k -> {
+                Optional<Interval32Box> oa = Optional.ofNullable(this.state.get(k));
+                Optional<Interval32Box> ob = Optional.ofNullable(inState.state.get(k));
+                return oa.map(a -> ob.map(b -> a.isSubset(b)).orElse(false)).orElse(false);
+            }).reduce((a, b) -> a && b).orElse(false);
+        return subset;
     }
 
     /**

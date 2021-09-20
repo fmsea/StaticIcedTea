@@ -92,6 +92,24 @@ public class Interval32BoxProperties {
     }
 
     @Property
+    void everythingSubsetsTop(@ForAll Interval32Box box) {
+        Interval32Box top = Interval32Box.TOP();
+        assertTrue(box.isSubset(top));
+    }
+
+    @Property
+    void bottomIsAlwaysSubset(@ForAll Interval32Box box) {
+        Interval32Box bot = Interval32Box.BOT();
+        assertTrue(bot.isSubset(box));
+    }
+
+    @Property
+    void noIntervalSubsetsBottom(@ForAll Interval32Box box) {
+        Interval32Box bot = Interval32Box.BOT();
+        assertFalse(box.isSubset(bot));
+    }
+
+    @Property
     void negateInterval(@ForAll int x, @ForAll int y) {
         Interval32Box box = new Interval32Box(x, y);
         box.negate();

@@ -172,6 +172,18 @@ public class DifferenceBoundedState implements State {
         this.dbs.intersection(inState.dbs);
     }
 
+    public boolean isSubset(State inState) {
+        if (inState instanceof DifferenceBoundedState) {
+            return this.isSubset((DifferenceBoundedState) inState);
+        } else {
+            throw new RuntimeException("invalid types for subset checks");
+        }
+    }
+
+    public boolean isSubset(DifferenceBoundedState inState) {
+        return false;
+    }
+
     public static State initialFlow(Set<Local> locals, boolean top) {
         return new DifferenceBoundedState(locals, top);
     }

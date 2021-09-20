@@ -13,6 +13,7 @@ public interface State {
     // public B getValue(Local local);
     public void mergeWith(State inState);
     public void widenWith(State prevBeforeFlow);
+    public boolean isSubset(State inState);
     public void updateState(Local var, State inState, Value left, Value right, BinaryOperator operator);
     public void updateState(Local var, State inState, Value v);
     public String toSMT(SolverWrapper solver);
