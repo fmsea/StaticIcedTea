@@ -1,0 +1,2 @@
+2 l1 = 6:<constant_testSootClass: int constant_test(int)>
+l1->(and (>= l1 6) (<= l1 6))

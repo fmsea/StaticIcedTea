@@ -1,0 +1,23 @@
+1 l0 = 5:<z3_simple_loopSootClass: void z3_simple_loop()>
+l0
+sat
+sat
+2 l1 = 0:<z3_simple_loopSootClass: void z3_simple_loop()>
+l1
+sat
+unsat
+3 if l1 >= 5 goto l3 = l0 + l1:<z3_simple_loopSootClass: void z3_simple_loop()>
+l1
+sat
+unsat
+l1f
+sat
+unsat
+4 l1 = l1 + 1:<z3_simple_loopSootClass: void z3_simple_loop()>
+l1
+sat
+unsat
+6 l3 = l0 + l1:<z3_simple_loopSootClass: void z3_simple_loop()>
+l3
+sat
+unsat

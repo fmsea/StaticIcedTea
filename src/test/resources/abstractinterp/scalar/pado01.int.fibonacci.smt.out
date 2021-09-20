@@ -1,0 +1,41 @@
+2 i2 = 0:<test.Fibonacci: int fibonacci(int)>
+i2
+sat
+sat
+3 i3 = 1:<test.Fibonacci: int fibonacci(int)>
+i3
+sat
+unsat
+4 i4 = 2:<test.Fibonacci: int fibonacci(int)>
+i4
+sat
+unsat
+5 if i4 >= i0 goto return i3:<test.Fibonacci: int fibonacci(int)>
+i0
+sat
+unsat
+i0f
+sat
+unsat
+i4
+sat
+unsat
+i4f
+sat
+unsat
+6 i1 = i2 + i3:<test.Fibonacci: int fibonacci(int)>
+i1
+sat
+sat
+7 i2 = i3:<test.Fibonacci: int fibonacci(int)>
+i2
+sat
+unsat
+8 i3 = i1:<test.Fibonacci: int fibonacci(int)>
+i3
+sat
+unsat
+9 i4 = i4 + 1:<test.Fibonacci: int fibonacci(int)>
+i4
+sat
+unsat
