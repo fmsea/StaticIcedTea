@@ -90,9 +90,9 @@ public class IntegerAnalysis<S extends State> {
         }
 
         // Entry points
-        // for (Unit head : g.getHeads()) {
-        //     unitToBeforeFlow.put(head, analysis.entryInitialFlow());
-        // }
+        for (Unit head : g.getHeads()) {
+            unitToBeforeFlow.put(head, analysis.entryInitialFlow());
+        }
         // traps are treated as entry points
         if (analysis.treatTrapHandlersAsEntries()) {
             for (Trap trap : ((UnitGraph) g).getBody().getTraps()) {

@@ -27,15 +27,13 @@ public class IntervalBoxState implements State {
 
         state = new HashMap<Local, Interval32Box>();
         if (top) {
-            // maximum integer intervals
             for (Local l : keys) {
-                Interval32Box rb = Interval32Box.MAX();
+                Interval32Box rb = Interval32Box.TOP();
                 state.put(l, rb);
             }
         } else {
-            // by default create the empty intervals
             for (Local l : keys) {
-                Interval32Box rb = Interval32Box.TOP();
+                Interval32Box rb = Interval32Box.BOT();
                 state.put(l, rb);
             }
         }
