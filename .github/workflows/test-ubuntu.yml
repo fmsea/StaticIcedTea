@@ -1,5 +1,5 @@
 ---
-name: Run tests on Ubuntu
+name: Run Project Test Suite
 
 on:
   push:
