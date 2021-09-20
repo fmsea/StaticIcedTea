@@ -53,23 +53,42 @@ public class Interval32BoxProperties {
     }
 
     @Property
+    void upperBoundAssignWithBottom(@ForAll Interval32Box c) {
+        Interval32Box bot = Interval32Box.BOT();
+        assertAll(() -> assertFalse((Interval32Box.upperBoundAssign(bot, c)).isBottom()),
+                  () -> assertFalse((Interval32Box.upperBoundAssign(c, bot)).isBottom()));
+    }
+
+    @Property
     void widenAssign(@ForAll Interval32Box x,
                      @ForAll Interval32Box y) {
-        int x1 = x.lowerBoundOrElse();
-        int y1 = x.upperBoundOrElse();
-        int x2 = y.lowerBoundOrElse();
-        int y2 = y.upperBoundOrElse();
-        x.wideningAssign(y);
-        if (x2 < x1) {
-            assertEquals(Integer.MIN_VALUE, x.lowerBound().get());
+        int xl = x.lowerBoundOrElse();
+        int xu = x.upperBoundOrElse();
+        int yl = y.lowerBoundOrElse();
+        int yu = y.upperBoundOrElse();
+        Interval32Box z = Interval32Box.wideningAssign(x, y);
+        if (xl < yl) {
+            assertFalse(z.isLowerBounded());
         } else {
-            assertEquals(x1, x.lowerBound().get());
+            assertAll(() -> assertTrue(z.isLowerBounded()),
+                      () -> assertEquals(xl, z.lowerBoundOrElse()));
         }
-        if (y1 < y2) {
-            assertEquals(Integer.MAX_VALUE, x.upperBound().get());
+        if (xu > yu) {
+            assertFalse(z.isUpperBounded());
         } else {
-            assertEquals(y1, x.upperBound().get());
+            assertAll(() -> assertTrue(z.isUpperBounded()),
+                      () -> assertEquals(xu, z.upperBoundOrElse()));
         }
+    }
+
+    @Property
+    void widenWithBottomStaysBottom(@ForAll Interval32Box box) {
+        Interval32Box a = new Interval32Box(box);
+        Interval32Box bot = Interval32Box.BOT();
+        a.wideningAssign(bot);
+        bot.wideningAssign(box);
+        assertAll(() -> assertFalse(a.isBottom()),
+                  () -> assertTrue(bot.isBottom()));
     }
 
     @Property

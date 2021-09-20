@@ -176,12 +176,12 @@ public class IntervalNumericalZ3Test {
                 "2 l1 = 0:<z3_simple_loopSootClass: void z3_simple_loop()>",
                 "l1->(= l1 0)",
                 "3 if l1 >= 5 goto l3 = l0 + l1:<z3_simple_loopSootClass: void z3_simple_loop()>",
-                "l1->(<= l1 4)",
+                "l1->(and (>= l1 0) (<= l1 4))",
                 "l1f->(>= l1 5)",
                 "4 l1 = l1 + 1:<z3_simple_loopSootClass: void z3_simple_loop()>",
-                "l1->(<= l1 5)",
+                "l1->(and (>= l1 1) (<= l1 5))",
                 "6 l3 = l0 + l1:<z3_simple_loopSootClass: void z3_simple_loop()>",
-                "l3->(or (>= l3 0) (< l3 0))",
+                "l3->(>= l3 10)",
             }).collect(Collectors.joining("\n"));
         String expected = Stream.of(new String[] {
                 "1 l0 = 5:<z3_simple_loopSootClass: void z3_simple_loop()>",

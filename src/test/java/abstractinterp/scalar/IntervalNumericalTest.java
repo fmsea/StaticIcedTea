@@ -37,7 +37,7 @@ public class IntervalNumericalTest {
         String[] actual = analysis.generateReport().split("\n");
         assertReportOutputEquals(new String[] {
                 "l1 = 6 class soot.jimple.internal.JAssignStmt f->{l1=6}",
-                "return l1 class soot.jimple.internal.JReturnStmt f->{l1=⟙}"},
+                "return l1 class soot.jimple.internal.JReturnStmt f->{l1=⟘}"},
             actual);
     }
 
@@ -68,7 +68,7 @@ public class IntervalNumericalTest {
                 "l2 = l1 - l0 class soot.jimple.internal.JAssignStmt f->{l0=3, l1=9, l2=6, l3=⟙}",
                 "l3 = l2 * -1 class soot.jimple.internal.JAssignStmt f->{l0=3, l1=9, l2=6, l3=-6}",
                 "l0 = l3 / l2 class soot.jimple.internal.JAssignStmt f->{l0=-1, l1=9, l2=6, l3=-6}",
-                "return class soot.jimple.internal.JReturnVoidStmt f->{l0=⟙, l1=⟙, l2=⟙, l3=⟙}"},
+                "return class soot.jimple.internal.JReturnVoidStmt f->{l0=⟘, l1=⟘, l2=⟘, l3=⟘}"},
             actual);
     }
 
@@ -110,7 +110,7 @@ public class IntervalNumericalTest {
                 "if l0 >= 3 goto l3 = 6 b->[{l0=4, l1=0, l2=0, l3=⟙}]",
                 "l3 = l1 / l2 class soot.jimple.internal.JAssignStmt f->{l0=⟘, l1=0, l2=0, l3=⟙}",
                 "l3 = 6 class soot.jimple.internal.JAssignStmt f->{l0=4, l1=0, l2=0, l3=6}",
-                "return class soot.jimple.internal.JReturnVoidStmt f->{l3=⟙, l1=⟙, l2=⟙, l0=⟙}"},
+                "return class soot.jimple.internal.JReturnVoidStmt f->{l0=⟘, l1=⟘, l2=⟘, l3=⟘}"},
             actual);
     }
 
@@ -148,13 +148,13 @@ public class IntervalNumericalTest {
         assertReportOutputEquals(new String[] {
                 "l0 = 5 class soot.jimple.internal.JAssignStmt f->{l0=5, l2=⟙, l1=⟙, l3=⟙}",
                 "l1 = 0 class soot.jimple.internal.JAssignStmt f->{l0=5, l2=⟙, l1=0, l3=⟙}",
-                "if l1 >= 5 goto l3 = l0 + l1 class soot.jimple.internal.JIfStmt f->{l0=⟙, l2=⟙, l1=(-∞, 4], l3=⟙}",
-                "if l1 >= 5 goto l3 = l0 + l1 b->[{l0=⟙, l2=⟙, l1=[5, ∞), l3=⟙}]",
-                "l1 = l1 + 1 class soot.jimple.internal.JAssignStmt f->{l0=⟙, l2=⟙, l1=(-∞, 4], l3=⟙}",
-                "goto [?= (branch)] class soot.jimple.internal.JGotoStmt f->{l0=⟙, l2=⟙, l1=⟙, l3=⟙}",
-                "goto [?= (branch)] b->[{l0=⟙, l2=⟙, l1=(-∞, 5], l3=⟙}]",
-                "l3 = l0 + l1 class soot.jimple.internal.JAssignStmt f->{l0=⟙, l2=⟙, l1=[5, ∞), l3=⟙}",
-                "return class soot.jimple.internal.JReturnVoidStmt f->{l0=⟙, l2=⟙, l1=⟙, l3=⟙}"},
+                "if l1 >= 5 goto l3 = l0 + l1 class soot.jimple.internal.JIfStmt f->{l0=5, l2=⟙, l1=[0, 4], l3=⟙}",
+                "if l1 >= 5 goto l3 = l0 + l1 b->[{l0=5, l2=⟙, l1=[5, ∞), l3=⟙}]",
+                "l1 = l1 + 1 class soot.jimple.internal.JAssignStmt f->{l0=5, l2=⟙, l1=[1, 5], l3=⟙}",
+                "goto [?= (branch)] class soot.jimple.internal.JGotoStmt f->{l0=⟘, l2=⟘, l1=⟘, l3=⟘}",
+                "goto [?= (branch)] b->[{l0=5, l2=⟙, l1=[1, 5], l3=⟙}]",
+                "l3 = l0 + l1 class soot.jimple.internal.JAssignStmt f->{l0=5, l2=⟙, l1=[5, ∞), l3=[10, ∞)}",
+                "return class soot.jimple.internal.JReturnVoidStmt f->{l0=⟘, l2=⟘, l1=⟘, l3=⟘}"},
             actual);
     }
 
@@ -170,12 +170,12 @@ public class IntervalNumericalTest {
             "2 l1 = 0:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
             "l1->(= l1 0)",
             "3 if l1 >= 5 goto l3 = l0 + l1:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
-            "l1->(<= l1 4)",
+            "l1->(and (>= l1 0) (<= l1 4))",
             "l1f->(>= l1 5)",
             "4 l1 = l1 + 1:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
-            "l1->(<= l1 5)",
+            "l1->(and (>= l1 1) (<= l1 5))",
             "6 l3 = l0 + l1:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
-            "l3->(or (>= l3 0) (< l3 0))"
+            "l3->(>= l3 10)",
         };
         assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
@@ -203,7 +203,7 @@ public class IntervalNumericalTest {
             "i4 = b3 - b2 class soot.jimple.internal.JAssignStmt f->" +
             "{b3=⟘, i1=⟙, b2=1, $i0=⟙, i4=⟘, i5=⟙}",
             "goto [?= $i0 = b3 * i4] class soot.jimple.internal.JGotoStmt f->" +
-            "{b3=⟙, i1=⟙, b2=⟙, $i0=⟙, i4=⟙, i5=⟙}",
+            "{b3=⟘, i1=⟘, b2=⟘, $i0=⟘, i4=⟘, i5=⟘}",
             "goto [?= $i0 = b3 * i4] b->" +
             "[{b3=⟘, i1=⟙, b2=1, $i0=⟙, i4=⟘, i5=⟙}]",
             "i4 = b3 + b2 class soot.jimple.internal.JAssignStmt f->" +
@@ -213,7 +213,7 @@ public class IntervalNumericalTest {
             "i5 = $i0 - 18 class soot.jimple.internal.JAssignStmt f->" +
             "{b3=3, i1=⟙, b2=1, $i0=12, i4=4, i5=-6}",
             "return i5 class soot.jimple.internal.JReturnStmt f->" +
-            "{b3=⟙, i1=⟙, b2=⟙, $i0=⟙, i4=⟙, i5=⟙}"
+            "{b3=⟘, i1=⟘, b2=⟘, $i0=⟘, i4=⟘, i5=⟘}"
         };
         assertReportOutputEquals(expected, actual);
     }
@@ -264,12 +264,10 @@ public class IntervalNumericalTest {
             "5 l4 = l3 % 2:<test.Nonsense: void decode()>",
             "l4->(or (>= l4 0) (< l4 0))",
             "6 if l1 == 0 goto l3 = l3 + 1:<test.Nonsense: void decode()>",
-            "l1->(or (>= l1 0) (< l1 0))",
-            "l1f->(= l1 0)",
+            "l1->(= l1 4)",
             "7 l3 = l0 - 2:<test.Nonsense: void decode()>",
-            "l3->(or (>= l3 0) (< l3 0))",
+            "l3->(= l3 1)",
             "9 l3 = l3 + 1:<test.Nonsense: void decode()>",
-            "l3->(<= l3 21)",
         };
         assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
@@ -291,7 +289,7 @@ public class IntervalNumericalTest {
             "l0->(= l0 0)",
             "l0f->(or (>= l0 0) (< l0 0))",
             "3 l2 = l1 + 1:<test.neqBranch: void neq()>",
-            "l2->(or (>= l2 0) (< l2 0))",
+            "l2->(= l2 5)",
         };
         assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {

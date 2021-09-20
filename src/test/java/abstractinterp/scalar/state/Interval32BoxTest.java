@@ -144,65 +144,161 @@ public class Interval32BoxTest {
 
     @Test
     void testUpperBoundAssign() {
-        Interval32Box bot = Interval32Box.BOT();
-        Interval32Box ano_bot = Interval32Box.BOT();
-        Interval32Box top = Interval32Box.TOP();
-        Interval32Box max = Interval32Box.MAX();
-        bot.upperBoundAssign(ano_bot);
-        assertTrue(bot.isBottom());
-        ano_bot.upperBoundAssign(top);
-        assertFalse(ano_bot.isUpperBounded());
-        assertFalse(ano_bot.isLowerBounded());
-        assertTrue(ano_bot.isTop());
-        bot.upperBoundAssign(max);
-        assertFalse(bot.isUpperBounded());
-        assertFalse(bot.isLowerBounded());
-        assertTrue(bot.isTop());
-        top.upperBoundAssign(Interval32Box.BOT());
-        assertEquals(Interval32Box.TOP(), top);
-        Interval32Box x = new Interval32Box(0, 1);
-        Interval32Box y = new Interval32Box(1, 2);
-        x.upperBoundAssign(y);
-        assertEquals(0, x.lowerBound().get());
-        assertEquals(2, x.upperBound().get());
-        x = new Interval32Box(0, 1);
-        y = new Interval32Box(-1, 2);
-        x.upperBoundAssign(y);
-        assertEquals(-1, x.lowerBound().get());
-        assertEquals(2, x.upperBound().get());
-        y.upperBoundAssign(top);
-        assertEquals(Interval32Box.TOP(), y);
+        {
+            Interval32Box bot = Interval32Box.BOT();
+            bot.upperBoundAssign(Interval32Box.BOT());
+            assertTrue(bot.isBottom());
+        }
+
+        {
+            Interval32Box bot = Interval32Box.BOT();
+            Interval32Box top = Interval32Box.TOP();
+            Interval32Box r1 = Interval32Box.upperBoundAssign(bot, top);
+            Interval32Box r2 = Interval32Box.upperBoundAssign(top, bot);
+            assertAll(() -> assertFalse(r1.isBottom()),
+                      () -> assertTrue(r1.isTop()),
+                      () -> assertFalse(r2.isBottom()),
+                      () -> assertTrue(r2.isTop()));
+        }
+
+        {
+            Interval32Box x = new Interval32Box(0, 1);
+            Interval32Box y = new Interval32Box(1, 2);
+            Interval32Box r1 = Interval32Box.upperBoundAssign(x, y);
+            Interval32Box r2 = Interval32Box.upperBoundAssign(y, x);
+            assertAll(() -> assertEquals(0, r1.lowerBoundOrElse()),
+                      () -> assertEquals(2, r1.upperBoundOrElse()),
+                      () -> assertEquals(0, r2.lowerBoundOrElse()),
+                      () -> assertEquals(2, r2.upperBoundOrElse()));
+        }
+
+        {
+            Interval32Box x = new Interval32Box(0, 1);
+            Interval32Box y = new Interval32Box(-1, 0);
+            Interval32Box r1 = Interval32Box.upperBoundAssign(x, y);
+            Interval32Box r2 = Interval32Box.upperBoundAssign(y, x);
+            assertAll(() -> assertEquals(-1, r1.lowerBoundOrElse()),
+                      () -> assertEquals(+1, r1.upperBoundOrElse()),
+                      () -> assertEquals(-1, r2.lowerBoundOrElse()),
+                      () -> assertEquals(+1, r2.upperBoundOrElse()));
+        }
+
+        {
+            Interval32Box x = new Interval32Box(0, 1);
+            Interval32Box y = new Interval32Box(-1, 2);
+            Interval32Box z = new Interval32Box(-1, 2);
+            Interval32Box r1 = Interval32Box.upperBoundAssign(x, y);
+            Interval32Box r2 = Interval32Box.upperBoundAssign(y, x);
+            assertAll(() -> assertEquals(z, r1),
+                      () -> assertEquals(z, r2));
+        }
+
+        {
+            Interval32Box x = new Interval32Box(0, null);
+            Interval32Box y = new Interval32Box(1, 5);
+            Interval32Box e = new Interval32Box(0, null);
+            Interval32Box r1 = Interval32Box.upperBoundAssign(x, y);
+            Interval32Box r2 = Interval32Box.upperBoundAssign(y, x);
+            assertAll(() -> assertEquals(e, r1),
+                      () -> assertEquals(e, r2));
+        }
+
+        {
+            Interval32Box x = new Interval32Box(null, 0);
+            Interval32Box y = new Interval32Box(-5, -1);
+            Interval32Box e = new Interval32Box(null, 0);
+            Interval32Box r1 = Interval32Box.upperBoundAssign(x, y);
+            Interval32Box r2 = Interval32Box.upperBoundAssign(y, x);
+            assertAll(() -> assertEquals(e, r1),
+                      () -> assertEquals(e, r2));
+        }
     }
 
     @Test
     void testWideningAssign() {
-        Interval32Box bot = Interval32Box.BOT();
-        Interval32Box top = Interval32Box.TOP();
-        Interval32Box a = new Interval32Box(null, 0);
-        Interval32Box b = new Interval32Box(0, null);
-        bot.wideningAssign(bot);
-        assertTrue(bot.isBottom());
-        bot.wideningAssign(top);
-        assertTrue(bot.isTop());
-        top.wideningAssign(a);
-        assertTrue(top.isTop());
-        a.wideningAssign(b);
-        assertFalse(a.isLowerBounded());
-        assertFalse(a.isUpperBounded());
-        bot = Interval32Box.BOT();
-        a = new Interval32Box(1, 10);
-        bot.wideningAssign(a);
-        assertFalse(bot.isBottom());
-        assertFalse(bot.isLowerBounded());
-        assertFalse(bot.isUpperBounded());
-        b = new Interval32Box(1, 11);
-        a.wideningAssign(b);
-        assertEquals(1, a.lowerBound().get());
-        assertEquals(Integer.MAX_VALUE, a.upperBound().get());
-        b = new Interval32Box(0, 12);
-        a.wideningAssign(b);
-        assertEquals(Integer.MIN_VALUE, a.lowerBound().get());
-        assertEquals(Integer.MAX_VALUE, a.upperBound().get());
+        {
+            Interval32Box bot = Interval32Box.BOT();
+            bot.wideningAssign(bot);
+            Interval32Box c = Interval32Box.wideningAssign(bot, bot);
+            assertTrue(c.isBottom());
+        }
+        {
+            Interval32Box bot = Interval32Box.BOT();
+            Interval32Box top = Interval32Box.TOP();
+            Interval32Box c = Interval32Box.wideningAssign(bot, top);
+            assertAll(() -> assertTrue(c.isBottom()),
+                      () -> assertFalse(c.isTop()));
+        }
+
+        {
+            Interval32Box top = Interval32Box.TOP();
+            Interval32Box a = new Interval32Box(null, 0);
+            Interval32Box b = new Interval32Box(0, null);
+            assertAll(() -> assertTrue((Interval32Box.wideningAssign(a, top)).isTop()),
+                      () -> assertTrue((Interval32Box.wideningAssign(top, a)).isTop()),
+                      () -> assertTrue((Interval32Box.wideningAssign(b, top)).isTop()),
+                      () -> assertTrue((Interval32Box.wideningAssign(top, b)).isTop()));
+        }
+
+        {
+            Interval32Box a = new Interval32Box(1, 10);
+            Interval32Box b = new Interval32Box(2, 9);
+            Interval32Box c = Interval32Box.wideningAssign(a, b);
+            assertAll(() -> assertTrue(c.isTop()),
+                      () -> assertFalse(c.isLowerBounded()),
+                      () -> assertFalse(c.isUpperBounded()));
+        }
+
+        {
+            Interval32Box a = new Interval32Box(2, 9);
+            Interval32Box b = new Interval32Box(1, 10);
+            Interval32Box c = Interval32Box.wideningAssign(a, b);
+            assertAll(() -> assertFalse(c.isTop()),
+                      () -> assertTrue(c.isLowerBounded()),
+                      () -> assertTrue(c.isUpperBounded()),
+                      () -> assertEquals(2, c.lowerBoundOrElse()),
+                      () -> assertEquals(9, c.upperBoundOrElse()));
+        }
+
+        {
+            Interval32Box a = new Interval32Box(1, 5);
+            Interval32Box b = new Interval32Box(0, null);
+            Interval32Box c = Interval32Box.wideningAssign(a, b);
+            assertAll(() -> assertFalse(c.isTop()),
+                      () -> assertTrue(c.isLowerBounded()),
+                      () -> assertFalse(c.isUpperBounded()),
+                      () -> assertEquals(1, c.lowerBoundOrElse()));
+        }
+
+        {
+            Interval32Box a = new Interval32Box(1, null);
+            Interval32Box b = new Interval32Box(0, 5);
+            Interval32Box c = Interval32Box.wideningAssign(a, b);
+            assertAll(() -> assertFalse(c.isTop()),
+                      () -> assertTrue(c.isLowerBounded()),
+                      () -> assertFalse(c.isUpperBounded()),
+                      () -> assertEquals(1, c.lowerBoundOrElse()));
+        }
+
+        {
+            Interval32Box a = new Interval32Box(-1, 0);
+            Interval32Box b = new Interval32Box(null, 0);
+            Interval32Box c = Interval32Box.wideningAssign(a, b);
+            assertAll(() -> assertFalse(c.isTop()),
+                      () -> assertFalse(c.isLowerBounded()),
+                      () -> assertTrue(c.isUpperBounded()),
+                      () -> assertEquals(0, c.upperBoundOrElse()));
+        }
+
+        {
+            Interval32Box a = new Interval32Box(null, 0);
+            Interval32Box b = new Interval32Box(-1, 0);
+            Interval32Box c = Interval32Box.wideningAssign(a, b);
+            assertAll(() -> assertFalse(c.isTop()),
+                      () -> assertFalse(c.isLowerBounded()),
+                      () -> assertTrue(c.isUpperBounded()),
+                      () -> assertEquals(0, c.upperBoundOrElse()));
+        }
     }
 
     @Test
@@ -370,6 +466,43 @@ public class Interval32BoxTest {
     }
 
     @Test
+    void testTransferConditionEqWithTOP() {
+        {
+            Interval32Box t1 = Interval32Box.TOP();
+            Interval32Box t2 = Interval32Box.TOP();
+            List<Interval32Box> rs = Interval32Box.transferCondition(t1, t2, PredicateType.Eq);
+            assertAll(() -> assertEquals(2, t1.intersectionPosition(t2)),
+                      () -> assertEquals(2, rs.size()),
+                      () -> assertTrue(rs.get(0).isTop()),
+                      () -> assertTrue(rs.get(1).isTop()));
+        }
+
+        {
+            Interval32Box top = Interval32Box.TOP();
+            Interval32Box x = new Interval32Box(0, 1);
+            List<Interval32Box> rs = Interval32Box.transferCondition(top, x, PredicateType.Eq);
+            assertAll(() -> assertEquals(2, top.intersectionPosition(x)),
+                      () -> assertEquals(2, rs.size()),
+                      () -> assertFalse(rs.get(0).isTop()),
+                      () -> assertFalse(rs.get(1).isTop()),
+                      () -> assertEquals(x, rs.get(0)),
+                      () -> assertEquals(x, rs.get(1)));
+        }
+
+        {
+            Interval32Box top = Interval32Box.TOP();
+            Interval32Box x = new Interval32Box(0, 1);
+            List<Interval32Box> rs = Interval32Box.transferCondition(x, top, PredicateType.Eq);
+            assertAll(() -> assertEquals(5, x.intersectionPosition(top)),
+                      () -> assertEquals(2, rs.size()),
+                      () -> assertFalse(rs.get(0).isTop()),
+                      () -> assertFalse(rs.get(1).isTop()),
+                      () -> assertEquals(x, rs.get(0)),
+                      () -> assertEquals(x, rs.get(1)));
+        }
+    }
+
+    @Test
     void testTransferConditionEqPosition0() {
         // position 0
         Interval32Box x = new Interval32Box(-1, 0);
@@ -462,6 +595,80 @@ public class Interval32BoxTest {
     }
 
     @Test
+    void testTransferConditionNeWhenTop() {
+        {
+            Interval32Box t1 = Interval32Box.TOP();
+            Interval32Box t2 = Interval32Box.TOP();
+            List<Interval32Box> rs = Interval32Box.transferCondition(t1, t2, PredicateType.Ne);
+            assertAll(() -> assertEquals(2, t1.intersectionPosition(t2)),
+                      () -> assertEquals(2, rs.size()),
+                      () -> assertTrue(rs.get(0).isBottom()),
+                      () -> assertTrue(rs.get(1).isBottom()));
+        }
+
+        {
+            Interval32Box top = Interval32Box.TOP();
+            Interval32Box x = new Interval32Box(0, 1);
+            List<Interval32Box> rs = Interval32Box.transferCondition(top, x, PredicateType.Ne);
+            assertAll(() -> assertEquals(2, top.intersectionPosition(x)),
+                      () -> assertEquals(2, rs.size()),
+                      () -> assertTrue(rs.get(0).isTop()),
+                      () -> assertFalse(rs.get(1).isTop()),
+                      () -> assertEquals(top, rs.get(0)),
+                      () -> assertEquals(x, rs.get(1)));
+        }
+
+        {
+            Interval32Box top = Interval32Box.TOP();
+            Interval32Box x = new Interval32Box(0, 1);
+            List<Interval32Box> rs = Interval32Box.transferCondition(x, top, PredicateType.Ne);
+            assertAll(() -> assertEquals(5, x.intersectionPosition(top)),
+                      () -> assertEquals(2, rs.size()),
+                      () -> assertFalse(rs.get(0).isTop()),
+                      () -> assertTrue(rs.get(1).isTop()),
+                      () -> assertEquals(x, rs.get(0)),
+                      () -> assertEquals(top, rs.get(1)));
+        }
+    }
+
+    @Test
+    void testTransferConditionLeWithTOP() {
+        {
+            Interval32Box t1 = Interval32Box.TOP();
+            Interval32Box t2 = Interval32Box.TOP();
+            List<Interval32Box> rs = Interval32Box.transferCondition(t1, t2, PredicateType.Le);
+            assertAll(() -> assertEquals(2, t1.intersectionPosition(t2)),
+                      () -> assertEquals(2, rs.size()),
+                      () -> assertTrue(rs.get(0).isTop()),
+                      () -> assertTrue(rs.get(1).isTop()));
+        }
+
+        {
+            Interval32Box top = Interval32Box.TOP();
+            Interval32Box x = new Interval32Box(0, 1);
+            List<Interval32Box> rs = Interval32Box.transferCondition(top, x, PredicateType.Le);
+            assertAll(() -> assertEquals(2, top.intersectionPosition(x)),
+                      () -> assertEquals(2, rs.size()),
+                      () -> assertFalse(rs.get(0).isTop()),
+                      () -> assertFalse(rs.get(1).isTop()),
+                      () -> assertEquals(new Interval32Box(null, 1), rs.get(0)),
+                      () -> assertEquals(x, rs.get(1)));
+        }
+
+        {
+            Interval32Box top = Interval32Box.TOP();
+            Interval32Box x = new Interval32Box(0, 1);
+            List<Interval32Box> rs = Interval32Box.transferCondition(x, top, PredicateType.Le);
+            assertAll(() -> assertEquals(5, x.intersectionPosition(top)),
+                      () -> assertEquals(2, rs.size()),
+                      () -> assertFalse(rs.get(0).isTop()),
+                      () -> assertFalse(rs.get(1).isTop()),
+                      () -> assertEquals(x, rs.get(0)),
+                      () -> assertEquals(new Interval32Box(null, 1), rs.get(1)));
+        }
+    }
+
+    @Test
     void testTransferConditionLePosition0() {
         // position 0
         Interval32Box x = new Interval32Box(-1, 0);
@@ -531,6 +738,45 @@ public class Interval32BoxTest {
                   () -> assertEquals(2, actual.size()),
                   () -> assertEquals(new Interval32Box(-1, 1), actual.get(0)),
                   () -> assertEquals(new Interval32Box(-1, 2), actual.get(1)));
+    }
+
+    @Test
+    void testTransferConditionLtWhenTOP() {
+        {
+            Interval32Box t1 = Interval32Box.TOP();
+            Interval32Box t2 = Interval32Box.TOP();
+            List<Interval32Box> rs = Interval32Box.transferCondition(t1, t2, PredicateType.Lt);
+            assertAll(() -> assertEquals(2, t1.intersectionPosition(t2)),
+                      () -> assertEquals(2, rs.size()),
+                      () -> assertFalse(rs.get(0).isBottom()),
+                      () -> assertFalse(rs.get(1).isBottom()),
+                      () -> assertTrue(rs.get(0).isTop()),
+                      () -> assertTrue(rs.get(1).isTop()));
+        }
+
+        {
+            Interval32Box top = Interval32Box.TOP();
+            Interval32Box x = new Interval32Box(0, 1);
+            List<Interval32Box> rs = Interval32Box.transferCondition(top, x, PredicateType.Lt);
+            assertAll(() -> assertEquals(2, top.intersectionPosition(x)),
+                      () -> assertEquals(2, rs.size()),
+                      () -> assertFalse(rs.get(0).isTop()),
+                      () -> assertFalse(rs.get(1).isTop()),
+                      () -> assertEquals(new Interval32Box(null, 0), rs.get(0)),
+                      () -> assertEquals(x, rs.get(1)));
+        }
+
+        {
+            Interval32Box top = Interval32Box.TOP();
+            Interval32Box x = new Interval32Box(0, 1);
+            List<Interval32Box> rs = Interval32Box.transferCondition(x, top, PredicateType.Lt);
+            assertAll(() -> assertEquals(5, x.intersectionPosition(top)),
+                      () -> assertEquals(2, rs.size()),
+                      () -> assertFalse(rs.get(0).isTop()),
+                      () -> assertFalse(rs.get(1).isTop()),
+                      () -> assertEquals(x, rs.get(0)),
+                      () -> assertEquals(new Interval32Box(1, null), rs.get(1)));
+        }
     }
 
     @Test
@@ -631,6 +877,43 @@ public class Interval32BoxTest {
     }
 
     @Test
+    void testTransferConditionGeWhenTop() {
+        {
+            Interval32Box t1 = Interval32Box.TOP();
+            Interval32Box t2 = Interval32Box.TOP();
+            List<Interval32Box> rs = Interval32Box.transferCondition(t1, t2, PredicateType.Ge);
+            assertAll(() -> assertEquals(2, t1.intersectionPosition(t2)),
+                      () -> assertEquals(2, rs.size()),
+                      () -> assertTrue(rs.get(0).isTop()),
+                      () -> assertTrue(rs.get(1).isTop()));
+        }
+
+        {
+            Interval32Box top = Interval32Box.TOP();
+            Interval32Box x = new Interval32Box(0, 1);
+            List<Interval32Box> rs = Interval32Box.transferCondition(top, x, PredicateType.Ge);
+            assertAll(() -> assertEquals(2, top.intersectionPosition(x)),
+                      () -> assertEquals(2, rs.size()),
+                      () -> assertFalse(rs.get(0).isTop()),
+                      () -> assertFalse(rs.get(1).isTop()),
+                      () -> assertEquals(new Interval32Box(0, null), rs.get(0)),
+                      () -> assertEquals(new Interval32Box(0, 1), rs.get(1)));
+        }
+
+        {
+            Interval32Box top = Interval32Box.TOP();
+            Interval32Box x = new Interval32Box(0, 1);
+            List<Interval32Box> rs = Interval32Box.transferCondition(x, top, PredicateType.Ge);
+            assertAll(() -> assertEquals(5, x.intersectionPosition(top)),
+                      () -> assertEquals(2, rs.size()),
+                      () -> assertFalse(rs.get(0).isTop()),
+                      () -> assertFalse(rs.get(1).isTop()),
+                      () -> assertEquals(new Interval32Box(0, 1), rs.get(0)),
+                      () -> assertEquals(new Interval32Box(0, 1), rs.get(1)));
+        }
+    }
+
+    @Test
     void testTransferConditionGePosition0() {
         // position 0
         Interval32Box x = new Interval32Box(-1, 0);
@@ -701,6 +984,45 @@ public class Interval32BoxTest {
                   () -> assertEquals(2, actual.size()),
                   () -> assertEquals(new Interval32Box(-1, 1), actual.get(0)),
                   () -> assertEquals(new Interval32Box(-1, 1), actual.get(1)));
+    }
+
+    @Test
+    void testTransferConditionGtWhenTop() {
+        {
+            Interval32Box t1 = Interval32Box.TOP();
+            Interval32Box t2 = Interval32Box.TOP();
+            List<Interval32Box> rs = Interval32Box.transferCondition(t1, t2, PredicateType.Gt);
+            assertAll(() -> assertEquals(2, t1.intersectionPosition(t2)),
+                      () -> assertEquals(2, rs.size()),
+                      () -> assertFalse(rs.get(0).isBottom()),
+                      () -> assertFalse(rs.get(1).isBottom()),
+                      () -> assertTrue(rs.get(0).isTop()),
+                      () -> assertTrue(rs.get(1).isTop()));
+        }
+
+        {
+            Interval32Box top = Interval32Box.TOP();
+            Interval32Box x = new Interval32Box(0, 1);
+            List<Interval32Box> rs = Interval32Box.transferCondition(top, x, PredicateType.Gt);
+            assertAll(() -> assertEquals(2, top.intersectionPosition(x)),
+                      () -> assertEquals(2, rs.size()),
+                      () -> assertFalse(rs.get(0).isTop()),
+                      () -> assertFalse(rs.get(1).isTop()),
+                      () -> assertEquals(new Interval32Box(1, null), rs.get(0)),
+                      () -> assertEquals(new Interval32Box(0, 1), rs.get(1)));
+        }
+
+        {
+            Interval32Box top = Interval32Box.TOP();
+            Interval32Box x = new Interval32Box(0, 1);
+            List<Interval32Box> rs = Interval32Box.transferCondition(x, top, PredicateType.Gt);
+            assertAll(() -> assertEquals(5, x.intersectionPosition(top)),
+                      () -> assertEquals(2, rs.size()),
+                      () -> assertFalse(rs.get(0).isTop()),
+                      () -> assertTrue(rs.get(1).isBottom()),
+                      () -> assertEquals(new Interval32Box(0, 1), rs.get(0)),
+                      () -> assertEquals(Interval32Box.BOT(), rs.get(1)));
+        }
     }
 
     @Test

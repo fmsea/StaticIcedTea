@@ -147,9 +147,9 @@ public class IntervalBoxStateTest {
             path1.update(l1, new Interval32Box(3, 5));
             locals.forEach(l -> path2.update(l, Interval32Box.BOT()));
             path1.mergeWith(path2);
-            assertAll(() -> assertEquals(Interval32Box.TOP(),
+            assertAll(() -> assertEquals(new Interval32Box(1, 3),
                                          path1.getValue(l0)),
-                      () -> assertEquals(Interval32Box.TOP(),
+                      () -> assertEquals(new Interval32Box(3, 5),
                                          path1.getValue(l1)));
         }
 
@@ -160,9 +160,9 @@ public class IntervalBoxStateTest {
             path1.update(l1, new Interval32Box(3, 5));
             locals.forEach(l -> path2.update(l, Interval32Box.BOT()));
             path2.mergeWith(path1);
-            assertAll(() -> assertEquals(Interval32Box.TOP(),
+            assertAll(() -> assertEquals(new Interval32Box(1, 3),
                                          path2.getValue(l0)),
-                      () -> assertEquals(Interval32Box.TOP(),
+                      () -> assertEquals(new Interval32Box(3, 5),
                                          path2.getValue(l1)));
         }
     }
@@ -182,7 +182,7 @@ public class IntervalBoxStateTest {
             path2.update(l0, Interval32Box.BOT());
             path2.update(l1, Interval32Box.TOP());
             path1.mergeWith(path2);
-            assertAll(() -> assertEquals(Interval32Box.TOP(),
+            assertAll(() -> assertEquals(new Interval32Box(3),
                                          path1.getValue(l0)),
                       () -> assertEquals(Interval32Box.TOP(),
                                          path1.getValue(l1)));
@@ -195,7 +195,7 @@ public class IntervalBoxStateTest {
             path2.update(l0, Interval32Box.BOT());
             path2.update(l1, Interval32Box.TOP());
             path2.mergeWith(path1);
-            assertAll(() -> assertEquals(Interval32Box.TOP(),
+            assertAll(() -> assertEquals(new Interval32Box(3),
                                          path2.getValue(l0)),
                       () -> assertEquals(Interval32Box.TOP(),
                                          path2.getValue(l1)));

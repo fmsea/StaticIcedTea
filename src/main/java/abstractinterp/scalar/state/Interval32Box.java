@@ -127,7 +127,7 @@ public class Interval32Box {
     private void minAssign(Interval32Box box) {
         if (!this.isLowerBounded() || !box.isLowerBounded()) {
             this.lowerBound = Optional.empty();
-        } else if (box.isLowerBounded() && this.lowerBound.get() > box.lowerBound.get()) {
+        } else if (this.lowerBound.map(lo -> lo > box.lowerBound.get()).orElse(false)) {
             this.lowerBound = box.lowerBound;
         }
     }
@@ -135,37 +135,61 @@ public class Interval32Box {
     private void maxAssign(Interval32Box box) {
         if (!this.isUpperBounded() || !box.isUpperBounded()) {
             this.upperBound = Optional.empty();
-        } else if (box.isUpperBounded() && this.upperBound.get() < box.upperBound.get()) {
+        } else if (this.upperBound.map(up -> up < box.upperBound.get()).orElse(false)) {
             this.upperBound = box.upperBound;
         }
     }
 
     private void minWidenAssign(Interval32Box box) {
-        if (!this.isLowerBounded() || !box.isLowerBounded()) {
+        boolean shouldWiden = (!this.isLowerBounded() ||
+                               !box.isLowerBounded() ||
+                               this.lowerBound.flatMap(tl -> box.lowerBound.map(ol -> tl < ol)).orElse(false));
+        if (shouldWiden) {
             this.lowerBound = Optional.empty();
-        } else if (box.lowerBound.get() < this.lowerBound.get()) {
-            this.lowerBound = Optional.of(Integer.MIN_VALUE);
         }
     }
 
     private void maxWidenAssign(Interval32Box box) {
-        if (!this.isUpperBounded() || !box.isUpperBounded()) {
+        boolean shouldWiden = (!this.isUpperBounded() ||
+                               !box.isUpperBounded() ||
+                               this.upperBound.flatMap(tu -> box.upperBound.map(ou -> tu > ou)).orElse(false));
+        if (shouldWiden) {
             this.upperBound = Optional.empty();
-        } else if (box.upperBound.get() > this.upperBound.get()) {
-            this.upperBound = Optional.of(Integer.MAX_VALUE);
         }
     }
 
+    public static Interval32Box upperBoundAssign(Interval32Box a, Interval32Box b) {
+        Interval32Box c = new Interval32Box(a);
+        c.upperBoundAssign(b);
+        return c;
+    }
+
     public void upperBoundAssign(Interval32Box box) {
-        this.minAssign(box);
-        this.maxAssign(box);
-        this.bottom = this.bottom && box.bottom;
+        if (this.isBottom()) {
+            this.lowerBound = box.lowerBound;
+            this.upperBound = box.upperBound;
+            this.bottom = box.bottom;
+        } else if (box.isBottom()) {
+            // skip
+        } else {
+            this.minAssign(box);
+            this.maxAssign(box);
+        }
+        this.checkAndSetBottom();
+    }
+
+    public static Interval32Box wideningAssign(Interval32Box a, Interval32Box b) {
+        Interval32Box c = new Interval32Box(a);
+        c.wideningAssign(b);
+        return c;
     }
 
     public void wideningAssign(Interval32Box box) {
-        minWidenAssign(box);
-        maxWidenAssign(box);
-        this.bottom = this.bottom && box.bottom;
+        if (!(this.isBottom() || box.isBottom())) {
+            minWidenAssign(box);
+            maxWidenAssign(box);
+            this.checkAndSetBottom();
+        }
     }
 
     public byte intersectionPosition(Interval32Box box) {
@@ -500,7 +524,7 @@ public class Interval32Box {
             ret.add(new Interval32Box(rhs));
             break;
         case 2:
-            if (lhs.equals(rhs)) {
+            if (lhs.equals(rhs) && !(lhs.isTop() && rhs.isTop())) {
                 ret.add(BOT());
                 ret.add(BOT());
             } else {
@@ -579,7 +603,7 @@ public class Interval32Box {
                                       lhs.upperBound.map(u -> Integer.valueOf(u - 1))));
             break;
         case 2:
-            if (lhs.equals(rhs)) {
+            if (lhs.equals(rhs) && !(lhs.isTop() && rhs.isTop())) {
                 ret.add(BOT());
                 ret.add(BOT());
             } else {
