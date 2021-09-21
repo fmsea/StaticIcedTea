@@ -395,4 +395,9 @@ public class Interval32BoxProperties {
                   () -> assertEquals(Interval32Box.BOT(),
                                      Interval32Box.divide(Interval32Box.BOT(), c)));
     }
+
+    @Property
+    void intervalEquality(@ForAll Interval32Box box) {
+        assertTrue(box.equals(box));
+    }
 }

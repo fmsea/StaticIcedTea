@@ -683,27 +683,21 @@ public class Interval32Box {
     }
 
     public boolean equals(Interval32Box box) {
-        boolean ret;
-        if (box == null) {
-            ret = false;
-        } else if (this.bottom != box.bottom) {
-            ret = false;
-        } else if (!(this.isBounded() || box.isBounded())) {
-            ret = true;
-        } else if (!(this.isLowerBounded() ||
-                     box.isLowerBounded() ||
-                     this.isUpperBounded() ||
-                     box.isUpperBounded())) {
-            ret = true;
-        } else if (this.isLowerBounded() &&
-                   this.lowerBound.equals(box.lowerBound) &&
-                   this.isUpperBounded() &&
-                   this.upperBound.equals(box.upperBound)) {
-            ret = true;
-        } else {
-            ret = false;
-        }
-        return ret;
+        return (box != null &&
+                ((this.isBottom() && box.isBottom()) ||
+                 (this.bottom == box.bottom &&
+                  this.lowerBound.equals(box.lowerBound) &&
+                  this.upperBound.equals(box.upperBound))));
+    }
+
+    @Override
+    public int hashCode() {
+        int prime = 31;
+        int result = 1;
+        result = prime * result + this.lowerBound.hashCode();
+        result = prime * result + this.upperBound.hashCode();
+        result = prime * result + (this.bottom ? 0 : 1);
+        return result;
     }
 
     @Override
