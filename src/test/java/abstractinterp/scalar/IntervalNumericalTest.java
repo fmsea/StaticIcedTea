@@ -2,8 +2,6 @@ package abstractinterp.scalar;
 
 import java.util.Map;
 import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.stream.IntStream;
 
@@ -146,15 +144,15 @@ public class IntervalNumericalTest {
         analysis.runAnalysis();
         String[] actual = analysis.generateReport().split("\n");
         assertReportOutputEquals(new String[] {
-                "l0 = 5 class soot.jimple.internal.JAssignStmt f->{l0=5, l2=⟙, l1=⟙, l3=⟙}",
-                "l1 = 0 class soot.jimple.internal.JAssignStmt f->{l0=5, l2=⟙, l1=0, l3=⟙}",
-                "if l1 >= 5 goto l3 = l0 + l1 class soot.jimple.internal.JIfStmt f->{l0=5, l2=⟙, l1=[0, 4], l3=⟙}",
-                "if l1 >= 5 goto l3 = l0 + l1 b->[{l0=5, l2=⟙, l1=[5, ∞), l3=⟙}]",
-                "l1 = l1 + 1 class soot.jimple.internal.JAssignStmt f->{l0=5, l2=⟙, l1=[1, 5], l3=⟙}",
-                "goto [?= (branch)] class soot.jimple.internal.JGotoStmt f->{l0=⟘, l2=⟘, l1=⟘, l3=⟘}",
-                "goto [?= (branch)] b->[{l0=5, l2=⟙, l1=[1, 5], l3=⟙}]",
-                "l3 = l0 + l1 class soot.jimple.internal.JAssignStmt f->{l0=5, l2=⟙, l1=[5, ∞), l3=[10, ∞)}",
-                "return class soot.jimple.internal.JReturnVoidStmt f->{l0=⟘, l2=⟘, l1=⟘, l3=⟘}"},
+                "l0 = 5 class soot.jimple.internal.JAssignStmt f->{l0=5, l1=⟙, l2=⟙, l3=⟙}",
+                "l1 = 0 class soot.jimple.internal.JAssignStmt f->{l0=5, l1=0, l2=⟙, l3=⟙}",
+                "if l1 >= 5 goto l3 = l0 + l1 class soot.jimple.internal.JIfStmt f->{l0=5, l1=[0, 4], l2=⟙, l3=⟙}",
+                "if l1 >= 5 goto l3 = l0 + l1 b->[{l0=5, l1=[5, ∞), l2=⟙, l3=⟙}]",
+                "l1 = l1 + 1 class soot.jimple.internal.JAssignStmt f->{l0=5, l1=[1, 5], l2=⟙, l3=⟙}",
+                "goto [?= (branch)] class soot.jimple.internal.JGotoStmt f->{l0=⟘, l1=⟘, l2=⟘, l3=⟘}",
+                "goto [?= (branch)] b->[{l0=5, l1=[1, 5], l2=⟙, l3=⟙}]",
+                "l3 = l0 + l1 class soot.jimple.internal.JAssignStmt f->{l0=5, l1=[5, ∞), l2=⟙, l3=[10, ∞)}",
+                "return class soot.jimple.internal.JReturnVoidStmt f->{l0=⟘, l1=⟘, l2=⟘, l3=⟘}"},
             actual);
     }
 
@@ -191,29 +189,29 @@ public class IntervalNumericalTest {
         String[] actual = analysis.generateReport().split("\n");
         String[] expected = new String[] {
             "i1 := @parameter0: int class soot.jimple.internal.JIdentityStmt f->" +
-            "{b3=⟙, i1=⟙, b2=⟙, $i0=⟙, i4=⟙, i5=⟙}",
+            "{$i0=⟙, b2=⟙, b3=⟙, i1=⟙, i4=⟙, i5=⟙}",
             "b2 = 1 class soot.jimple.internal.JAssignStmt f->" +
-            "{b3=⟙, i1=⟙, b2=1, $i0=⟙, i4=⟙, i5=⟙}",
+            "{$i0=⟙, b2=1, b3=⟙, i1=⟙, i4=⟙, i5=⟙}",
             "b3 = 3 class soot.jimple.internal.JAssignStmt f->" +
-            "{b3=3, i1=⟙, b2=1, $i0=⟙, i4=⟙, i5=⟙}",
+            "{$i0=⟙, b2=1, b3=3, i1=⟙, i4=⟙, i5=⟙}",
             "if b3 != 0 goto i4 = b3 + b2 class soot.jimple.internal.JIfStmt f->" +
-            "{b3=⟘, i1=⟙, b2=1, $i0=⟙, i4=⟙, i5=⟙}",
+            "{$i0=⟙, b2=1, b3=⟘, i1=⟙, i4=⟙, i5=⟙}",
             "if b3 != 0 goto i4 = b3 + b2 b->" +
-            "[{b3=3, i1=⟙, b2=1, $i0=⟙, i4=⟙, i5=⟙}]",
+            "[{$i0=⟙, b2=1, b3=3, i1=⟙, i4=⟙, i5=⟙}]",
             "i4 = b3 - b2 class soot.jimple.internal.JAssignStmt f->" +
-            "{b3=⟘, i1=⟙, b2=1, $i0=⟙, i4=⟘, i5=⟙}",
+            "{$i0=⟙, b2=1, b3=⟘, i1=⟙, i4=⟘, i5=⟙}",
             "goto [?= $i0 = b3 * i4] class soot.jimple.internal.JGotoStmt f->" +
-            "{b3=⟘, i1=⟘, b2=⟘, $i0=⟘, i4=⟘, i5=⟘}",
+            "{$i0=⟘, b2=⟘, b3=⟘, i1=⟘, i4=⟘, i5=⟘}",
             "goto [?= $i0 = b3 * i4] b->" +
-            "[{b3=⟘, i1=⟙, b2=1, $i0=⟙, i4=⟘, i5=⟙}]",
+            "[{$i0=⟙, b2=1, b3=⟘, i1=⟙, i4=⟘, i5=⟙}]",
             "i4 = b3 + b2 class soot.jimple.internal.JAssignStmt f->" +
-            "{b3=3, i1=⟙, b2=1, $i0=⟙, i4=4, i5=⟙}",
+            "{$i0=⟙, b2=1, b3=3, i1=⟙, i4=4, i5=⟙}",
             "$i0 = b3 * i4 class soot.jimple.internal.JAssignStmt f->" +
-            "{b3=3, i1=⟙, b2=1, $i0=12, i4=4, i5=⟙}",
+            "{$i0=12, b2=1, b3=3, i1=⟙, i4=4, i5=⟙}",
             "i5 = $i0 - 18 class soot.jimple.internal.JAssignStmt f->" +
-            "{b3=3, i1=⟙, b2=1, $i0=12, i4=4, i5=-6}",
+            "{$i0=12, b2=1, b3=3, i1=⟙, i4=4, i5=-6}",
             "return i5 class soot.jimple.internal.JReturnStmt f->" +
-            "{b3=⟘, i1=⟘, b2=⟘, $i0=⟘, i4=⟘, i5=⟘}"
+            "{$i0=⟘, b2=⟘, b3=⟘, i1=⟘, i4=⟘, i5=⟘}"
         };
         assertReportOutputEquals(expected, actual);
     }
@@ -448,22 +446,8 @@ public class IntervalNumericalTest {
 
     private void assertReportOutputEquals(String[] expected, String[] actual) {
         assertEquals(expected.length, actual.length);
-        assertAll(Stream.concat(IntStream.range(0, expected.length)
-                                .mapToObj(i -> () -> assertEquals(expected[i].substring(0, expected[i].lastIndexOf("->")),
-                                                                  actual[i].substring(0, actual[i].lastIndexOf("->")))),
-                                IntStream.range(0, expected.length)
-                                .mapToObj(i -> () -> assertEquals(parseLocals(expected[i]),
-                                                                  parseLocals(actual[i])))));
-    }
+        assertAll(IntStream.range(0, expected.length)
+                  .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
 
-    private Map<String, String> parseLocals(String statement) {
-        Pattern pattern = Pattern.compile("([a-z0-9]{2})=(\\[-*\\d+, -*\\d+\\]|\\d+|⟙|⟘)");
-        Map<String, String> locals = new HashMap<>();
-        String values = statement.substring(statement.indexOf('{') + 1, statement.indexOf('}'));
-        Matcher r = pattern.matcher(values);
-        while (r.find()) {
-            locals.put(r.group(1), r.group(2));
-        }
-        return locals;
     }
 }
