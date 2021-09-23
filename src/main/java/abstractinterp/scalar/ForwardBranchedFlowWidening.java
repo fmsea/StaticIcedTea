@@ -43,7 +43,7 @@ public abstract class ForwardBranchedFlowWidening<N extends Unit, A extends Stat
         this.wideningNodes = wideningNodes;
         itersCount = new HashMap<N,Integer>();
         for (N n : wideningNodes) {
-            itersCount.put(n, iters);
+            itersCount.put(n, iters + 1);
         }
     }
 
