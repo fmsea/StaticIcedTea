@@ -40,7 +40,7 @@ public class IntervalBoxStateProperties {
     @Property
     void transferBinaryAddition(@ForAll Interval32Box x,
                                 @ForAll Interval32Box y) {
-        Interval32Box z = IntervalBoxState.transferBinary(x, y, BinaryOperator.ADDITION);
+        Interval32Box z = IntervalBoxState.transferBinary(x, y, BinaryOperatorType.ADDITION);
         if (x.lowerBound().isEmpty() || y.lowerBound().isEmpty()) {
             assertEquals(Optional.empty(), z.lowerBound());
         } else {
@@ -67,7 +67,7 @@ public class IntervalBoxStateProperties {
     @Property
     void transferBinarySubtraction(@ForAll Interval32Box x,
                                    @ForAll Interval32Box y) {
-        Interval32Box z = IntervalBoxState.transferBinary(x, y, BinaryOperator.SUBTRACTION);
+        Interval32Box z = IntervalBoxState.transferBinary(x, y, BinaryOperatorType.SUBTRACTION);
         if (x.lowerBound().isEmpty() || y.upperBound().isEmpty()) {
             assertEquals(Optional.empty(), z.lowerBound());
         } else {
@@ -95,7 +95,7 @@ public class IntervalBoxStateProperties {
     @Property
     void transferBinaryMultiplcation(@ForAll Interval32Box x,
                                      @ForAll Interval32Box y) {
-        Interval32Box z = IntervalBoxState.transferBinary(x, y, BinaryOperator.MULTIPLICATION);
+        Interval32Box z = IntervalBoxState.transferBinary(x, y, BinaryOperatorType.MULTIPLICATION);
         try {
             Optional<Integer> low = Optional.of(minimum(Math.multiplyExact(x.lowerBoundOrElse(),
                                                                            y.lowerBoundOrElse()),
@@ -125,7 +125,7 @@ public class IntervalBoxStateProperties {
     @Property
     void transferBinaryDivision(@ForAll Interval32Box x,
                                 @ForAll Interval32Box y) {
-        Interval32Box z = IntervalBoxState.transferBinary(x, y, BinaryOperator.DIVISION);
+        Interval32Box z = IntervalBoxState.transferBinary(x, y, BinaryOperatorType.DIVISION);
         BiFunction<Integer, Integer, Integer> div = (a, b) -> {
             if (a == Integer.MIN_VALUE && b == -1) {
                 return Integer.MAX_VALUE;

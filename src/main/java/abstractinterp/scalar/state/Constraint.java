@@ -321,7 +321,7 @@ public class Constraint implements Comparable<Constraint> {
 
     public static Constraint transferBinary(IntConstant x,
                                             IntConstant y,
-                                            BinaryOperator op) {
+                                            BinaryOperatorType op) {
         Constraint a = new Constraint(x.value, PredicateType.Eq);
         Constraint b = new Constraint(y.value, PredicateType.Eq);
         Constraint c;

@@ -27,7 +27,7 @@ import soot.toolkits.graph.DirectedGraph;
 
 import abstractinterp.scalar.state.State;
 import abstractinterp.scalar.state.factory.StateFactory;
-import abstractinterp.scalar.state.BinaryOperator;
+import abstractinterp.scalar.state.BinaryOperatorType;
 import abstractinterp.scalar.state.PredicateType;
 
 public class ForwardBranchedFlowNumerical<S extends State>
@@ -102,7 +102,7 @@ public class ForwardBranchedFlowNumerical<S extends State>
                 Local lVar = (Local) lhs;
                 Value rhs = stmt.getRightOp();
                 if (rhs instanceof BinopExpr) {
-                    BinaryOperator op = BinaryOperator.fromJimple((BinopExpr) rhs);
+                    BinaryOperatorType op = BinaryOperatorType.fromJimple((BinopExpr) rhs);
                     Value left = ((BinopExpr) rhs).getOp1();
                     Value right = ((BinopExpr) rhs).getOp2();
 

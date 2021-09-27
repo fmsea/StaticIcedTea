@@ -153,7 +153,7 @@ public class IntervalBoxState implements State {
      *             multiplication, 3 - division
      * @return
      */
-    public static Interval32Box transferBinary(Interval32Box lhs, Interval32Box rhs, BinaryOperator operator) {
+    public static Interval32Box transferBinary(Interval32Box lhs, Interval32Box rhs, BinaryOperatorType operator) {
         Interval32Box ret;
         // find low of lhs
         if (lhs.isBottom() || rhs.isBottom()) {
@@ -205,7 +205,7 @@ public class IntervalBoxState implements State {
         return ret;
     }
 
-    public void updateState(Local lVar, State inState, Value left, Value right, BinaryOperator operator) {
+    public void updateState(Local lVar, State inState, Value left, Value right, BinaryOperatorType operator) {
         if (inState instanceof IntervalBoxState) {
             updateState(lVar, (IntervalBoxState) inState, left, right, operator);
         } else {
@@ -217,7 +217,7 @@ public class IntervalBoxState implements State {
                             IntervalBoxState inState,
                             Value left,
                             Value right,
-                            BinaryOperator operator) {
+                            BinaryOperatorType operator) {
         Interval32Box leftBox = eval(inState, left);
         Interval32Box rightBox = eval(inState, right);
         state.put(lVar, transferBinary(leftBox, rightBox, operator));

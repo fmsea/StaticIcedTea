@@ -14,7 +14,7 @@ import soot.jimple.UshrExpr;
 import soot.jimple.XorExpr;
 import org.slf4j.LoggerFactory;
 
-public enum BinaryOperator {
+public enum BinaryOperatorType {
     ADDITION,
     SUBTRACTION,
     MULTIPLICATION,
@@ -28,8 +28,8 @@ public enum BinaryOperator {
     XOR,
     INVALID;
 
-    public static BinaryOperator fromJimple(BinopExpr expr) {
-        BinaryOperator op;
+    public static BinaryOperatorType fromJimple(BinopExpr expr) {
+        BinaryOperatorType op;
         if (expr instanceof AddExpr) {
             op = ADDITION;
         } else if (expr instanceof SubExpr) {
@@ -53,7 +53,7 @@ public enum BinaryOperator {
         } else if (expr instanceof XorExpr) {
             op = XOR;
         } else {
-            LoggerFactory.getLogger(BinaryOperator.class)
+            LoggerFactory.getLogger(BinaryOperatorType.class)
                 .error("No conversion for binary operation: {}", expr);
             op = INVALID;
         }

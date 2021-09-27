@@ -234,7 +234,7 @@ public class DifferenceBoundedState implements State {
                             State inState,
                             Value left,
                             Value right,
-                            BinaryOperator operator) {
+                            BinaryOperatorType operator) {
         if (inState instanceof DifferenceBoundedState) {
             updateState(lVar, (DifferenceBoundedState) inState, left, right, operator);
         } else {
@@ -252,7 +252,7 @@ public class DifferenceBoundedState implements State {
                             DifferenceBoundedState inState,
                             Value left,
                             Value right,
-                            BinaryOperator type) {
+                            BinaryOperatorType type) {
         LOGGER.debug("{} = {} ({}) {}", lVar, left, type, right);
         LOGGER.trace("inState: {}", inState);
         if (left instanceof Local && right instanceof IntConstant) {
@@ -279,7 +279,7 @@ public class DifferenceBoundedState implements State {
                             DifferenceBoundedState inState,
                             IntConstant left,
                             IntConstant right,
-                            BinaryOperator op) {
+                            BinaryOperatorType op) {
         Constraint c = Constraint.transferBinary(left, right, op);
         this.add(lVar, ZERO, c);
     }
@@ -300,7 +300,7 @@ public class DifferenceBoundedState implements State {
                             DifferenceBoundedState inState,
                             Local left,
                             IntConstant right,
-                            BinaryOperator op) {
+                            BinaryOperatorType op) {
         Optional<Constraint> leftConstraint;
         Constraint rightConstraint = this.eval(right);
         switch (op) {
@@ -368,7 +368,7 @@ public class DifferenceBoundedState implements State {
                             DifferenceBoundedState inState,
                             IntConstant left,
                             Local right,
-                            BinaryOperator op) {
+                            BinaryOperatorType op) {
         Constraint leftConstraint = this.eval(left);
         Optional<Constraint> rightConstraint;
         switch (op) {
@@ -431,7 +431,7 @@ public class DifferenceBoundedState implements State {
                             DifferenceBoundedState inState,
                             Local left,
                             Local right,
-                            BinaryOperator op) {
+                            BinaryOperatorType op) {
         Consumer<BiFunction<Interval32Box, Interval32Box, Interval32Box>> computeInterval = (binop) -> {
             Optional<Constraint> leftLower = inState.getValue(ZERO, left);
             Optional<Constraint> leftUpper = inState.getValue(left, ZERO);

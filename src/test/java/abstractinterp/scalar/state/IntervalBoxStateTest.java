@@ -33,11 +33,11 @@ public class IntervalBoxStateTest {
         Interval32Box x = new Interval32Box(null, 1);
         Interval32Box y = new Interval32Box(1, null);
         {
-            Interval32Box z = IntervalBoxState.transferBinary(x, y, BinaryOperator.INVALID);
+            Interval32Box z = IntervalBoxState.transferBinary(x, y, BinaryOperatorType.INVALID);
             assertEquals(Interval32Box.TOP(), z);
         }
         {
-            Interval32Box z = IntervalBoxState.transferBinary(y, x, BinaryOperator.INVALID);
+            Interval32Box z = IntervalBoxState.transferBinary(y, x, BinaryOperatorType.INVALID);
             assertEquals(Interval32Box.TOP(), z);
         }
     }
@@ -65,9 +65,9 @@ public class IntervalBoxStateTest {
     void transferBinaryReturnBottomWhenBottomValue() {
         Interval32Box x = new Interval32Box(null, 1);
         Interval32Box y = Interval32Box.BOT();
-        Interval32Box z = IntervalBoxState.transferBinary(x, y, BinaryOperator.INVALID);
+        Interval32Box z = IntervalBoxState.transferBinary(x, y, BinaryOperatorType.INVALID);
         assertEquals(Interval32Box.BOT(), z);
-        z = IntervalBoxState.transferBinary(y, x, BinaryOperator.INVALID);
+        z = IntervalBoxState.transferBinary(y, x, BinaryOperatorType.INVALID);
         assertEquals(Interval32Box.BOT(), z);
     }
 
@@ -75,10 +75,10 @@ public class IntervalBoxStateTest {
     void transferBinaryDivisionDivideByZero() {
         Interval32Box x = new Interval32Box(-4, 3);
         Interval32Box y = new Interval32Box(0, 0);
-        Interval32Box z = IntervalBoxState.transferBinary(x, y, BinaryOperator.DIVISION);
+        Interval32Box z = IntervalBoxState.transferBinary(x, y, BinaryOperatorType.DIVISION);
         assertTrue(z.isTop());
         x = new Interval32Box(y);
-        z = IntervalBoxState.transferBinary(x, y, BinaryOperator.DIVISION);
+        z = IntervalBoxState.transferBinary(x, y, BinaryOperatorType.DIVISION);
         assertTrue(z.isTop());
     }
 

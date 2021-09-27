@@ -18,7 +18,7 @@ public class ConstraintProperties {
         assertEquals(new Constraint(x + y, PredicateType.Eq),
                      Constraint.transferBinary(IntConstant.v(x),
                                                IntConstant.v(y),
-                                               BinaryOperator.ADDITION));
+                                               BinaryOperatorType.ADDITION));
     }
 
     @Property
@@ -27,7 +27,7 @@ public class ConstraintProperties {
         assertEquals(new Constraint(x - y, PredicateType.Eq),
                      Constraint.transferBinary(IntConstant.v(x),
                                                IntConstant.v(y),
-                                               BinaryOperator.SUBTRACTION));
+                                               BinaryOperatorType.SUBTRACTION));
     }
 
     @Property
@@ -36,7 +36,7 @@ public class ConstraintProperties {
         assertEquals(new Constraint(x * y, PredicateType.Eq),
                      Constraint.transferBinary(IntConstant.v(x),
                                                IntConstant.v(y),
-                                               BinaryOperator.MULTIPLICATION));
+                                               BinaryOperatorType.MULTIPLICATION));
     }
 
     @Property
@@ -44,7 +44,7 @@ public class ConstraintProperties {
                                     @ForAll @IntRange(min=-536870911, max=536870911) int y) {
         Constraint actual = Constraint.transferBinary(IntConstant.v(x),
                                                       IntConstant.v(y),
-                                                      BinaryOperator.DIVISION);
+                                                      BinaryOperatorType.DIVISION);
         if (y == 0) {
             assertEquals(Constraint.BOT(), actual);
         } else {
@@ -59,11 +59,11 @@ public class ConstraintProperties {
         assertAll(() -> assertEquals(Constraint.TOP(),
                                      Constraint.transferBinary(IntConstant.v(x),
                                                                IntConstant.v(y),
-                                                               BinaryOperator.MODULUS)),
+                                                               BinaryOperatorType.MODULUS)),
                   () -> assertEquals(Constraint.TOP(),
                                      Constraint.transferBinary(IntConstant.v(x),
                                                                IntConstant.v(y),
-                                                               BinaryOperator.INVALID)));
+                                                               BinaryOperatorType.INVALID)));
     }
 
     @Property
