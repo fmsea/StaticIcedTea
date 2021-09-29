@@ -1,0 +1,11 @@
+1 x0 = 60:<test.transverse: int zero()>
+x0->(= x0 60)
+2 y0 = neg x0:<test.transverse: int zero()>
+y0->(= y0 (- 60))
+3 u0 = x0 - y0:<test.transverse: int zero()>
+u0->(= u0 120)
+4 if u0 > 120 goto r0 = 1:<test.transverse: int zero()>
+u0->(= u0 120)
+5 r0 = neg 1:<test.transverse: int zero()>
+r0->(= r0 (- 1))
+7 r0 = 1:<test.transverse: int zero()>

@@ -18,7 +18,7 @@ import abstractinterp.scalar.state.IntervalBoxState;
 import abstractinterp.scalar.state.factory.IntervalBoxStateFactory;
 import abstractinterp.scalar.state.providers.JimpleProvider;
 
-public class IntervalNumericalTest {
+public class IntervalNumericalTest extends AbstractNumericalTest {
 
     @BeforeAll
     static void sootSuiteInitialize() {
@@ -33,10 +33,8 @@ public class IntervalNumericalTest {
         IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateReport().split("\n");
-        assertReportOutputEquals(new String[] {
-                "l1 = 6 class soot.jimple.internal.JAssignStmt f->{l1=6}",
-                "return l1 class soot.jimple.internal.JReturnStmt f->{l1=⟘}"},
-            actual);
+        String[] expected = readResourcesFile("int.constantValuePropagation.out").split("\n");
+        assertReportOutputEquals(expected, actual);
     }
 
     @Test
@@ -45,9 +43,7 @@ public class IntervalNumericalTest {
         IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
-        String[] expected = new String[] {
-            "2 l1 = 6:<constant_testSootClass: int constant_test(int)>",
-            "l1->(= l1 6)"};
+        String[] expected = readResourcesFile("int.constantValuePropagation.smt.out").split("\n");
         assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
             assertEquals(expected[i], actual[i]);
@@ -60,14 +56,8 @@ public class IntervalNumericalTest {
         IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateReport().split("\n");
-        assertReportOutputEquals(new String[] {
-                "l0 = 3 class soot.jimple.internal.JAssignStmt f->{l0=3, l1=⟙, l2=⟙, l3=⟙}",
-                "l1 = l0 + 6 class soot.jimple.internal.JAssignStmt f->{l0=3, l1=9, l2=⟙, l3=⟙}",
-                "l2 = l1 - l0 class soot.jimple.internal.JAssignStmt f->{l0=3, l1=9, l2=6, l3=⟙}",
-                "l3 = l2 * -1 class soot.jimple.internal.JAssignStmt f->{l0=3, l1=9, l2=6, l3=-6}",
-                "l0 = l3 / l2 class soot.jimple.internal.JAssignStmt f->{l0=-1, l1=9, l2=6, l3=-6}",
-                "return class soot.jimple.internal.JReturnVoidStmt f->{l0=⟘, l1=⟘, l2=⟘, l3=⟘}"},
-            actual);
+        String[] expected = readResourcesFile("int.constantMathPropagation.out").split("\n");
+        assertReportOutputEquals(expected, actual);
     }
 
     @Test
@@ -76,18 +66,7 @@ public class IntervalNumericalTest {
         IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
-        String[] expected = new String[] {
-                "1 l0 = 3:<moreConstantMathSootClass: void moreConstantMath()>",
-                "l0->(= l0 3)",
-                "2 l1 = l0 + 6:<moreConstantMathSootClass: void moreConstantMath()>",
-                "l1->(= l1 9)",
-                "3 l2 = l1 - l0:<moreConstantMathSootClass: void moreConstantMath()>",
-                "l2->(= l2 6)",
-                "4 l3 = l2 * -1:<moreConstantMathSootClass: void moreConstantMath()>",
-                "l3->(= l3 (- 6))",
-                "5 l0 = l3 / l2:<moreConstantMathSootClass: void moreConstantMath()>",
-                "l0->(= l0 (- 1))"
-        };
+        String[] expected = readResourcesFile("int.constantMathPropagation.smt.out").split("\n");
         assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
             assertEquals(expected[i], actual[i]);
@@ -100,16 +79,8 @@ public class IntervalNumericalTest {
         IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateReport().split("\n");
-        assertReportOutputEquals(new String[] {
-                "l0 = 4 class soot.jimple.internal.JAssignStmt f->{l0=4, l1=⟙, l2=⟙, l3=⟙}",
-                "l1 = 0 class soot.jimple.internal.JAssignStmt f->{l0=4, l1=0, l2=⟙, l3=⟙}",
-                "l2 = 0 class soot.jimple.internal.JAssignStmt f->{l0=4, l1=0, l2=0, l3=⟙}",
-                "if l0 >= 3 goto l3 = 6 class soot.jimple.internal.JIfStmt f->{l0=⟘, l1=0, l2=0, l3=⟙}",
-                "if l0 >= 3 goto l3 = 6 b->[{l0=4, l1=0, l2=0, l3=⟙}]",
-                "l3 = l1 / l2 class soot.jimple.internal.JAssignStmt f->{l0=⟘, l1=0, l2=0, l3=⟙}",
-                "l3 = 6 class soot.jimple.internal.JAssignStmt f->{l0=4, l1=0, l2=0, l3=6}",
-                "return class soot.jimple.internal.JReturnVoidStmt f->{l0=⟘, l1=⟘, l2=⟘, l3=⟘}"},
-            actual);
+        String[] expected = readResourcesFile("int.branching.out").split("\n");
+        assertReportOutputEquals(expected, actual);
     }
 
     @Test
@@ -118,19 +89,7 @@ public class IntervalNumericalTest {
         IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
-        String[] expected = new String[] {
-            "1 l0 = 4:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
-            "l0->(= l0 4)",
-            "2 l1 = 0:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
-            "l1->(= l1 0)",
-            "3 l2 = 0:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
-            "l2->(= l2 0)",
-            "4 if l0 >= 3 goto l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
-            "l0f->(= l0 4)",
-            "5 l3 = l1 / l2:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
-            "6 l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
-            "l3->(= l3 6)"
-        };
+        String[] expected = readResourcesFile("int.branching.smt.out").split("\n");
         assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
             assertEquals(expected[i], actual[i]);
@@ -143,17 +102,8 @@ public class IntervalNumericalTest {
         IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateReport().split("\n");
-        assertReportOutputEquals(new String[] {
-                "l0 = 5 class soot.jimple.internal.JAssignStmt f->{l0=5, l1=⟙, l2=⟙, l3=⟙}",
-                "l1 = 0 class soot.jimple.internal.JAssignStmt f->{l0=5, l1=0, l2=⟙, l3=⟙}",
-                "if l1 >= 5 goto l3 = l0 + l1 class soot.jimple.internal.JIfStmt f->{l0=5, l1=[0, 4], l2=⟙, l3=⟙}",
-                "if l1 >= 5 goto l3 = l0 + l1 b->[{l0=5, l1=[5, ∞), l2=⟙, l3=⟙}]",
-                "l1 = l1 + 1 class soot.jimple.internal.JAssignStmt f->{l0=5, l1=[1, 5], l2=⟙, l3=⟙}",
-                "goto [?= (branch)] class soot.jimple.internal.JGotoStmt f->{l0=⟘, l1=⟘, l2=⟘, l3=⟘}",
-                "goto [?= (branch)] b->[{l0=5, l1=[1, 5], l2=⟙, l3=⟙}]",
-                "l3 = l0 + l1 class soot.jimple.internal.JAssignStmt f->{l0=5, l1=[5, ∞), l2=⟙, l3=[10, ∞)}",
-                "return class soot.jimple.internal.JReturnVoidStmt f->{l0=⟘, l1=⟘, l2=⟘, l3=⟘}"},
-            actual);
+        String[] expected = readResourcesFile("int.looping.out").split("\n");
+        assertReportOutputEquals(expected, actual);
     }
 
     @Test
@@ -162,19 +112,7 @@ public class IntervalNumericalTest {
         IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
-        String[] expected = new String[] {
-            "1 l0 = 5:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
-            "l0->(= l0 5)",
-            "2 l1 = 0:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
-            "l1->(= l1 0)",
-            "3 if l1 >= 5 goto l3 = l0 + l1:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
-            "l1->(and (>= l1 0) (<= l1 4))",
-            "l1f->(>= l1 5)",
-            "4 l1 = l1 + 1:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
-            "l1->(and (>= l1 1) (<= l1 5))",
-            "6 l3 = l0 + l1:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
-            "l3->(>= l3 10)",
-        };
+        String[] expected = readResourcesFile("int.looping.smt.out").split("\n");
         assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
             assertEquals(expected[i], actual[i]);
@@ -187,32 +125,7 @@ public class IntervalNumericalTest {
         IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateReport().split("\n");
-        String[] expected = new String[] {
-            "i1 := @parameter0: int class soot.jimple.internal.JIdentityStmt f->" +
-            "{$i0=⟙, b2=⟙, b3=⟙, i1=⟙, i4=⟙, i5=⟙}",
-            "b2 = 1 class soot.jimple.internal.JAssignStmt f->" +
-            "{$i0=⟙, b2=1, b3=⟙, i1=⟙, i4=⟙, i5=⟙}",
-            "b3 = 3 class soot.jimple.internal.JAssignStmt f->" +
-            "{$i0=⟙, b2=1, b3=3, i1=⟙, i4=⟙, i5=⟙}",
-            "if b3 != 0 goto i4 = b3 + b2 class soot.jimple.internal.JIfStmt f->" +
-            "{$i0=⟙, b2=1, b3=⟘, i1=⟙, i4=⟙, i5=⟙}",
-            "if b3 != 0 goto i4 = b3 + b2 b->" +
-            "[{$i0=⟙, b2=1, b3=3, i1=⟙, i4=⟙, i5=⟙}]",
-            "i4 = b3 - b2 class soot.jimple.internal.JAssignStmt f->" +
-            "{$i0=⟙, b2=1, b3=⟘, i1=⟙, i4=⟘, i5=⟙}",
-            "goto [?= $i0 = b3 * i4] class soot.jimple.internal.JGotoStmt f->" +
-            "{$i0=⟘, b2=⟘, b3=⟘, i1=⟘, i4=⟘, i5=⟘}",
-            "goto [?= $i0 = b3 * i4] b->" +
-            "[{$i0=⟙, b2=1, b3=⟘, i1=⟙, i4=⟘, i5=⟙}]",
-            "i4 = b3 + b2 class soot.jimple.internal.JAssignStmt f->" +
-            "{$i0=⟙, b2=1, b3=3, i1=⟙, i4=4, i5=⟙}",
-            "$i0 = b3 * i4 class soot.jimple.internal.JAssignStmt f->" +
-            "{$i0=12, b2=1, b3=3, i1=⟙, i4=4, i5=⟙}",
-            "i5 = $i0 - 18 class soot.jimple.internal.JAssignStmt f->" +
-            "{$i0=12, b2=1, b3=3, i1=⟙, i4=4, i5=-6}",
-            "return i5 class soot.jimple.internal.JReturnStmt f->" +
-            "{$i0=⟘, b2=⟘, b3=⟘, i1=⟘, i4=⟘, i5=⟘}"
-        };
+        String[] expected = readResourcesFile("int.example5.out").split("\n");
         assertReportOutputEquals(expected, actual);
     }
 
@@ -222,21 +135,7 @@ public class IntervalNumericalTest {
         IntegerAnalysis<IntervalBoxState> analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
-        String[] expected = new String[] {
-            "2 b2 = 1:<test.Example1M: int example_5(int)>",
-            "b2->(= b2 1)",
-            "3 b3 = 3:<test.Example1M: int example_5(int)>",
-            "b3->(= b3 3)",
-            "4 if b3 != 0 goto i4 = b3 + b2:<test.Example1M: int example_5(int)>",
-            "b3f->(= b3 3)",
-            "5 i4 = b3 - b2:<test.Example1M: int example_5(int)>",
-            "7 i4 = b3 + b2:<test.Example1M: int example_5(int)>",
-            "i4->(= i4 4)",
-            "8 $i0 = b3 * i4:<test.Example1M: int example_5(int)>",
-            "$i0->(= $i0 12)",
-            "9 i5 = $i0 - 18:<test.Example1M: int example_5(int)>",
-            "i5->(= i5 (- 6))",
-        };
+        String[] expected = readResourcesFile("int.example5.smt.out").split("\n");
         assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
             assertEquals(expected[i], actual[i]);
@@ -249,24 +148,7 @@ public class IntervalNumericalTest {
         IntegerAnalysis<IntervalBoxState> analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
-        String[] expected = new String[] {
-            "1 l0 = 3:<test.Nonsense: void decode()>",
-            "l0->(= l0 3)",
-            "2 l1 = 4:<test.Nonsense: void decode()>",
-            "l1->(= l1 4)",
-            "3 l2 = 1:<test.Nonsense: void decode()>",
-            "l2->(= l2 1)",
-            "4 if l3 > 20 goto return:<test.Nonsense: void decode()>",
-            "l3->(<= l3 20)",
-            "l3f->(>= l3 21)",
-            "5 l4 = l3 % 2:<test.Nonsense: void decode()>",
-            "l4->(or (>= l4 0) (< l4 0))",
-            "6 if l1 == 0 goto l3 = l3 + 1:<test.Nonsense: void decode()>",
-            "l1->(= l1 4)",
-            "7 l3 = l0 - 2:<test.Nonsense: void decode()>",
-            "l3->(= l3 1)",
-            "9 l3 = l3 + 1:<test.Nonsense: void decode()>",
-        };
+        String[] expected = readResourcesFile("int.nonsenseExample.smt.out").split("\n");
         assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
             assertEquals(expected[i], actual[i]);
@@ -280,15 +162,7 @@ public class IntervalNumericalTest {
             new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
-        String[] expected = new String[] {
-            "1 l1 = 4:<test.neqBranch: void neq()>",
-            "l1->(= l1 4)",
-            "2 if l0 != 0 goto return:<test.neqBranch: void neq()>",
-            "l0->(= l0 0)",
-            "l0f->(or (>= l0 0) (< l0 0))",
-            "3 l2 = l1 + 1:<test.neqBranch: void neq()>",
-            "l2->(= l2 5)",
-        };
+        String[] expected = readResourcesFile("int.neqLoop.smt.out").split("\n");
         assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
             assertEquals(expected[i], actual[i]);
@@ -302,18 +176,7 @@ public class IntervalNumericalTest {
             new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
-        String[] expected = new String[] {
-            "1 b0 = 0:<test.ballonFactory: void getArrow()>",
-            "b0->(= b0 0)",
-            "2 b1 = 50:<test.ballonFactory: void getArrow()>",
-            "b1->(= b1 50)",
-            "3 b2 = 60:<test.ballonFactory: void getArrow()>",
-            "b2->(= b2 60)",
-            "4 $b25 = neg b2:<test.ballonFactory: void getArrow()>",
-            "$b25->(= $b25 (- 60))",
-            "5 $i26 = $b25 / 2:<test.ballonFactory: void getArrow()>",
-            "$i26->(= $i26 (- 30))",
-        };
+        String[] expected = readResourcesFile("int.getArrowSubset.smt.out").split("\n");
 
         assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
@@ -328,18 +191,7 @@ public class IntervalNumericalTest {
             new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
-        String[] expected = new String[] {
-            "1 u0 = x0:<test.ints: int compareIntervals()>",
-            "u0->(or (>= u0 0) (< u0 0))",
-            "2 if x0 < 20 goto (branch):<test.ints: int compareIntervals()>",
-            "x0->(>= x0 20)",
-            "x0f->(<= x0 19)",
-            "4 if x0 >= 0 goto w0 = x0 + u0:<test.ints: int compareIntervals()>",
-            "x0->(<= x0 (- 1))",
-            "x0f->(and (>= x0 0) (<= x0 19))",
-            "6 w0 = x0 + u0:<test.ints: int compareIntervals()>",
-            "w0->(or (>= w0 0) (< w0 0))",
-        };
+        String[] expected = readResourcesFile("int.intervalComparison.smt.out").split("\n");
 
         assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
@@ -354,19 +206,7 @@ public class IntervalNumericalTest {
             new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
-        String[] expected = new String[] {
-            "1 x0 = 60:<test.transverse: int zero()>",
-            "x0->(= x0 60)",
-            "2 y0 = neg x0:<test.transverse: int zero()>",
-            "y0->(= y0 (- 60))",
-            "3 u0 = x0 - y0:<test.transverse: int zero()>",
-            "u0->(= u0 120)",
-            "4 if u0 > 120 goto r0 = 1:<test.transverse: int zero()>",
-            "u0->(= u0 120)",
-            "5 r0 = neg 1:<test.transverse: int zero()>",
-            "r0->(= r0 (- 1))",
-            "7 r0 = 1:<test.transverse: int zero()>",
-        };
+        String[] expected = readResourcesFile("int.transverseZero.smt.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                              .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
@@ -379,27 +219,7 @@ public class IntervalNumericalTest {
             new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
-        String[] expected = new String[] {
-            "2 i2 = 0:<test.Fibonacci: int fibonacci(int)>",
-            "i2->(= i2 0)",
-            "3 i3 = 1:<test.Fibonacci: int fibonacci(int)>",
-            "i3->(= i3 1)",
-            "4 i4 = 2:<test.Fibonacci: int fibonacci(int)>",
-            "i4->(= i4 2)",
-            "5 if i4 >= i0 goto return i3:<test.Fibonacci: int fibonacci(int)>",
-            "i0->(>= i0 3)",
-            "i4->(>= i4 2)",
-            "i0f->(>= i0 2)",
-            "i4f->(>= i4 2)",
-            "6 i1 = i2 + i3:<test.Fibonacci: int fibonacci(int)>",
-            "i1->(>= i1 1)",
-            "7 i2 = i3:<test.Fibonacci: int fibonacci(int)>",
-            "i2->(>= i2 1)",
-            "8 i3 = i1:<test.Fibonacci: int fibonacci(int)>",
-            "i3->(>= i3 1)",
-            "9 i4 = i4 + 1:<test.Fibonacci: int fibonacci(int)>",
-            "i4->(>= i4 3)",
-        };
+        String[] expected = readResourcesFile("int.fibonacci.smt.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
@@ -412,33 +232,7 @@ public class IntervalNumericalTest {
             new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
-        String[] expected = new String[] {
-            "2 i3 = 0:<test.Tribonacci: int tribonacci(int)>",
-            "i3->(= i3 0)",
-            "3 i4 = 1:<test.Tribonacci: int tribonacci(int)>",
-            "i4->(= i4 1)",
-            "4 i5 = 1:<test.Tribonacci: int tribonacci(int)>",
-            "i5->(= i5 1)",
-            "5 i6 = 3:<test.Tribonacci: int tribonacci(int)>",
-            "i6->(= i6 3)",
-            "6 if i6 >= i0 goto return i5:<test.Tribonacci: int tribonacci(int)>",
-            "i0->(>= i0 4)",
-            "i6->(>= i6 3)",
-            "i0f->(>= i0 3)",
-            "i6f->(>= i6 3)",
-            "7 $i1 = i5 + i4:<test.Tribonacci: int tribonacci(int)>",
-            "$i1->(>= $i1 2)",
-            "8 i2 = $i1 + i3:<test.Tribonacci: int tribonacci(int)>",
-            "i2->(>= i2 2)",
-            "9 i3 = i4:<test.Tribonacci: int tribonacci(int)>",
-            "i3->(>= i3 1)",
-            "10 i4 = i5:<test.Tribonacci: int tribonacci(int)>",
-            "i4->(>= i4 1)",
-            "11 i5 = i2:<test.Tribonacci: int tribonacci(int)>",
-            "i5->(>= i5 2)",
-            "12 i6 = i6 + 1:<test.Tribonacci: int tribonacci(int)>",
-            "i6->(>= i6 4)",
-        };
+        String[] expected = readResourcesFile("int.tribonacci.smt.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));

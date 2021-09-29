@@ -15,7 +15,7 @@ import abstractinterp.scalar.state.DifferenceBoundedState;
 import abstractinterp.scalar.state.factory.DifferenceBoundedStateFactory;
 import abstractinterp.scalar.state.providers.JimpleProvider;
 
-public class DBSNumericalTest {
+public class DBSNumericalTest extends AbstractNumericalTest {
 
     @BeforeAll
     static void sootSuiteInitialize() {
@@ -31,10 +31,7 @@ public class DBSNumericalTest {
             new IntegerAnalysis<>(body, 2, new DifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
-        String[] expected = new String[] {
-            "2 l1 = 6:<constant_testSootClass: int constant_test(int)>",
-            "l1->(= l1 6)",
-        };
+        String[] expected = readResourcesFile("dbs.constantValuePropagation.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
@@ -47,18 +44,7 @@ public class DBSNumericalTest {
             new IntegerAnalysis<>(body, 2, new DifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
-        String[] expected = new String[]{
-            "1 l0 = 3:<moreConstantMathSootClass: void moreConstantMath()>",
-            "l0->(= l0 3)",
-            "2 l1 = l0 + 6:<moreConstantMathSootClass: void moreConstantMath()>",
-            "l1->(and (= l1 9) (= l1 (+ 6 l0)))",
-            "3 l2 = l1 - l0:<moreConstantMathSootClass: void moreConstantMath()>",
-            "l2->(= l2 6)",
-            "4 l3 = l2 * -1:<moreConstantMathSootClass: void moreConstantMath()>",
-            "l3->(= l3 (- 6))",
-            "5 l0 = l3 / l2:<moreConstantMathSootClass: void moreConstantMath()>",
-            "l0->(and (= l0 (- 1)) (= l1 (+ 6 l0)))"
-        };
+        String[] expected = readResourcesFile("dbs.constantMathPropagation.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
@@ -71,19 +57,7 @@ public class DBSNumericalTest {
             new IntegerAnalysis<>(body, 2, new DifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
-        String[] expected = new String[] {
-            "1 l0 = 4:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
-            "l0->(= l0 4)",
-            "2 l1 = 0:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
-            "l1->(= l1 0)",
-            "3 l2 = 0:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
-            "l2->(= l2 0)",
-            "4 if l0 >= 3 goto l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
-            "l0f->(and (= l0 4) (>= l0 3))",
-            "5 l3 = l1 / l2:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
-            "6 l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>",
-            "l3->(= l3 6)",
-        };
+        String[] expected = readResourcesFile("dbs.branching.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
@@ -96,19 +70,7 @@ public class DBSNumericalTest {
             new IntegerAnalysis<>(body, 2, new DifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
-        String[] expected = new String[] {
-            "1 l0 = 5:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
-            "l0->(= l0 5)",
-            "2 l1 = 0:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
-            "l1->(= l1 0)",
-            "3 if l1 >= 5 goto l3 = l0 + l1:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
-            "l1->(<= l1 4)",
-            "l1f->(and (<= l1 5) (>= l1 5))",
-            "4 l1 = l1 + 1:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
-            "l1->(<= l1 5)",
-            "6 l3 = l0 + l1:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>",
-            "l3->(or (<= l3 0) (> l3 0))",
-        };
+        String[] expected = readResourcesFile("dbs.looping.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
@@ -121,21 +83,7 @@ public class DBSNumericalTest {
             new IntegerAnalysis<>(body, 2, new DifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
-        String[] expected = new String[] {
-            "2 b2 = 1:<test.Example1M: int example_5(int)>",
-            "b2->(= b2 1)",
-            "3 b3 = 3:<test.Example1M: int example_5(int)>",
-            "b3->(= b3 3)",
-            "4 if b3 != 0 goto i4 = b3 + b2:<test.Example1M: int example_5(int)>",
-            "b3f->(= b3 3)",
-            "5 i4 = b3 - b2:<test.Example1M: int example_5(int)>",
-            "7 i4 = b3 + b2:<test.Example1M: int example_5(int)>",
-            "i4->(= i4 4)",
-            "8 $i0 = b3 * i4:<test.Example1M: int example_5(int)>",
-            "$i0->(= $i0 12)",
-            "9 i5 = $i0 - 18:<test.Example1M: int example_5(int)>",
-            "i5->(and (= i5 (- 6)) (= i5 (+ (- 18) $i0)))",
-        };
+        String[] expected = readResourcesFile("dbs.example5.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
@@ -148,26 +96,7 @@ public class DBSNumericalTest {
             new IntegerAnalysis<>(body, 2, new DifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
-        String[] expected = new String[] {
-            "1 l0 = 3:<test.Nonsense: void decode()>",
-            "l0->(= l0 3)",
-            "2 l1 = 4:<test.Nonsense: void decode()>",
-            "l1->(= l1 4)",
-            "3 l2 = 1:<test.Nonsense: void decode()>",
-            "l2->(= l2 1)",
-            "4 if l3 > 20 goto return:<test.Nonsense: void decode()>",
-            "l3->(<= l3 20)",
-            "l3f->(>= l3 21)",
-            "5 l4 = l3 % 2:<test.Nonsense: void decode()>",
-            "l4->(or (<= l4 0) (> l4 0))",
-            "6 if l1 == 0 goto l3 = l3 + 1:<test.Nonsense: void decode()>",
-            "l1->(or (<= l1 0) (> l1 0))",
-            "l1f->(= l1 0)",
-            "7 l3 = l0 - 2:<test.Nonsense: void decode()>",
-            "l3->(= l3 (+ (- 2) l0))",
-            "9 l3 = l3 + 1:<test.Nonsense: void decode()>",
-            "l3->(<= l3 21)",
-        };
+        String[] expected = readResourcesFile("dbs.nonsenseExample.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
@@ -180,15 +109,7 @@ public class DBSNumericalTest {
             new IntegerAnalysis<>(body, 2, new DifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
-        String[] expected = new String[] {
-            "1 l1 = 4:<test.neqBranch: void neq()>",
-            "l1->(= l1 4)",
-            "2 if l0 != 0 goto return:<test.neqBranch: void neq()>",
-            "l0->(= l0 0)",
-            "l0f->(or (<= l0 0) (> l0 0))",
-            "3 l2 = l1 + 1:<test.neqBranch: void neq()>",
-            "l2->(= l2 (+ 1 l1))",
-        };
+        String[] expected = readResourcesFile("dbs.neqLoop.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
@@ -201,18 +122,7 @@ public class DBSNumericalTest {
             new IntegerAnalysis<>(body, 2, new DifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
-        String[] expected = new String[] {
-            "1 b0 = 0:<test.ballonFactory: void getArrow()>",
-            "b0->(= b0 0)",
-            "2 b1 = 50:<test.ballonFactory: void getArrow()>",
-            "b1->(= b1 50)",
-            "3 b2 = 60:<test.ballonFactory: void getArrow()>",
-            "b2->(= b2 60)",
-            "4 $b25 = neg b2:<test.ballonFactory: void getArrow()>",
-            "$b25->(= $b25 (- 60))",
-            "5 $i26 = $b25 / 2:<test.ballonFactory: void getArrow()>",
-            "$i26->(= $i26 (- 30))",
-        };
+        String[] expected = readResourcesFile("dbs.getArrowSubset.out").split("\n");
 
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
@@ -226,18 +136,7 @@ public class DBSNumericalTest {
             new IntegerAnalysis<>(body, 2, new DifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
-        String[] expected = new String[] {
-            "1 u0 = x0:<test.ints: int compareIntervals()>",
-            "u0->(= u0 (+ 0 x0))",
-            "2 if x0 < 20 goto (branch):<test.ints: int compareIntervals()>",
-            "x0->(and (>= x0 20) (= u0 (+ 0 x0)))",
-            "x0f->(and (<= x0 19) (= u0 (+ 0 x0)))",
-            "4 if x0 >= 0 goto w0 = x0 + u0:<test.ints: int compareIntervals()>",
-            "x0->(and (<= x0 (- 1)) (= u0 (+ 0 x0)))",
-            "x0f->(and (<= x0 19) (>= x0 0) (= u0 (+ 0 x0)))",
-            "6 w0 = x0 + u0:<test.ints: int compareIntervals()>",
-            "w0->(= w0 0)",
-        };
+        String[] expected = readResourcesFile("dbs.intervalComparison.out").split("\n");
 
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
@@ -251,19 +150,7 @@ public class DBSNumericalTest {
             new IntegerAnalysis<>(body, 2, new DifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
-        String[] expected = new String[] {
-            "1 x0 = 60:<test.transverse: int zero()>",
-            "x0->(= x0 60)",
-            "2 y0 = neg x0:<test.transverse: int zero()>",
-            "y0->(= y0 (- 60))",
-            "3 u0 = x0 - y0:<test.transverse: int zero()>",
-            "u0->(= u0 120)",
-            "4 if u0 > 120 goto r0 = 1:<test.transverse: int zero()>",
-            "u0->(= u0 120)",
-            "5 r0 = neg 1:<test.transverse: int zero()>",
-            "r0->(= r0 (- 1))",
-            "7 r0 = 1:<test.transverse: int zero()>",
-        };
+        String[] expected = readResourcesFile("dbs.transverseZero.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                              .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
@@ -276,27 +163,7 @@ public class DBSNumericalTest {
             new IntegerAnalysis<>(body, 2, new DifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
-        String[] expected = new String[] {
-            "2 i2 = 0:<test.Fibonacci: int fibonacci(int)>",
-            "i2->(= i2 0)",
-            "3 i3 = 1:<test.Fibonacci: int fibonacci(int)>",
-            "i3->(= i3 1)",
-            "4 i4 = 2:<test.Fibonacci: int fibonacci(int)>",
-            "i4->(= i4 2)",
-            "5 if i4 >= i0 goto return i3:<test.Fibonacci: int fibonacci(int)>",
-            "i0->(<= i4 (+ (- 1) i0))",
-            "i4->(<= i4 (+ (- 1) i0))",
-            "i0f->(<= i0 (+ 0 i4))",
-            "i4f->(<= i0 (+ 0 i4))",
-            "6 i1 = i2 + i3:<test.Fibonacci: int fibonacci(int)>",
-            "i1->(or (<= i1 0) (> i1 0))",
-            "7 i2 = i3:<test.Fibonacci: int fibonacci(int)>",
-            "i2->(= i2 (+ 0 i3))",
-            "8 i3 = i1:<test.Fibonacci: int fibonacci(int)>",
-            "i3->(= i3 (+ 0 i1))",
-            "9 i4 = i4 + 1:<test.Fibonacci: int fibonacci(int)>",
-            "i4->(<= i4 (+ 0 i0))",
-        };
+        String[] expected = readResourcesFile("dbs.fibonacci.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
@@ -309,33 +176,7 @@ public class DBSNumericalTest {
             new IntegerAnalysis<>(body, 2, new DifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReport().split("\n");
-        String[] expected = new String[] {
-            "2 i3 = 0:<test.Tribonacci: int tribonacci(int)>",
-            "i3->(= i3 0)",
-            "3 i4 = 1:<test.Tribonacci: int tribonacci(int)>",
-            "i4->(= i4 1)",
-            "4 i5 = 1:<test.Tribonacci: int tribonacci(int)>",
-            "i5->(= i5 1)",
-            "5 i6 = 3:<test.Tribonacci: int tribonacci(int)>",
-            "i6->(= i6 3)",
-            "6 if i6 >= i0 goto return i5:<test.Tribonacci: int tribonacci(int)>",
-            "i0->(<= i6 (+ (- 1) i0))",
-            "i6->(<= i6 (+ (- 1) i0))",
-            "i0f->(<= i0 (+ 0 i6))",
-            "i6f->(<= i0 (+ 0 i6))",
-            "7 $i1 = i5 + i4:<test.Tribonacci: int tribonacci(int)>",
-            "$i1->(or (<= $i1 0) (> $i1 0))",
-            "8 i2 = $i1 + i3:<test.Tribonacci: int tribonacci(int)>",
-            "i2->(or (<= i2 0) (> i2 0))",
-            "9 i3 = i4:<test.Tribonacci: int tribonacci(int)>",
-            "i3->(= i3 (+ 0 i4))",
-            "10 i4 = i5:<test.Tribonacci: int tribonacci(int)>",
-            "i4->(= i4 (+ 0 i5))",
-            "11 i5 = i2:<test.Tribonacci: int tribonacci(int)>",
-            "i5->(= i5 (+ 0 i2))",
-            "12 i6 = i6 + 1:<test.Tribonacci: int tribonacci(int)>",
-            "i6->(<= i6 (+ 0 i0))",
-        };
+        String[] expected = readResourcesFile("dbs.tribonacci.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));

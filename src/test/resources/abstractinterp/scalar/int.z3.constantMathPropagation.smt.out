@@ -1,0 +1,20 @@
+1 l0 = 3:<z3ConstantMathSootClass: void z3ConstantMath()>
+l0
+sat
+sat
+2 l1 = l0 + 6:<z3ConstantMathSootClass: void z3ConstantMath()>
+l1
+sat
+sat
+3 l2 = l1 - l0:<z3ConstantMathSootClass: void z3ConstantMath()>
+l2
+sat
+sat
+4 l3 = l2 * -1:<z3ConstantMathSootClass: void z3ConstantMath()>
+l3
+sat
+sat
+5 l0 = l3 / l2:<z3ConstantMathSootClass: void z3ConstantMath()>
+l0
+sat
+sat

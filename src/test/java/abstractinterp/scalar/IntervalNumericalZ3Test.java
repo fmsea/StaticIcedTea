@@ -33,7 +33,7 @@ import processing.Smt2Format;
 import solver.SolverWrapper;
 import solver.SolverWrapperZ3;
 
-public class IntervalNumericalZ3Test {
+public class IntervalNumericalZ3Test extends AbstractNumericalTest {
 
     private SolverWrapper solver;
     private Path z3TestFile;
@@ -70,16 +70,8 @@ public class IntervalNumericalZ3Test {
     void testConstantValuePropagation() {
         assertTrue(Files.exists(this.z3TestFile));
         Body body = JimpleProvider.constantJimpleMethod("z3_constant_test");
-        String oracle = Stream.of(new String[] {
-                "1 l1 = 6:<z3_constant_testSootClass: int z3_constant_test()>",
-                "l1->(= l1 6)",
-            }).collect(Collectors.joining("\n"));
-        String expected = Stream.of(new String[] {
-                "1 l1 = 6:<z3_constant_testSootClass: int z3_constant_test()>",
-                "l1",
-                "sat",
-                "sat",
-            }).collect(Collectors.joining("\n"));
+        String oracle = readResourcesFile("int.z3.constantValuePropagation.out");
+        String expected = readResourcesFile("int.z3.constantValuePropagation.smt.out");
         assertTrue(runAnalysis(body, oracle, expected));
     }
 
@@ -87,40 +79,8 @@ public class IntervalNumericalZ3Test {
     void testConstantArithmaticPropagation() {
         assertTrue(Files.exists(this.z3TestFile));
         Body body = JimpleProvider.binaryArithmaticMethod("z3ConstantMath");
-        String oracle = Stream.of(new String[] {
-                "1 l0 = 3:<z3ConstantMathSootClass: void z3ConstantMath()>",
-                "l0->(= l0 3)",
-                "2 l1 = l0 + 6:<z3ConstantMathSootClass: void z3ConstantMath()>",
-                "l1->(= l1 9)",
-                "3 l2 = l1 - l0:<z3ConstantMathSootClass: void z3ConstantMath()>",
-                "l2->(= l2 6)",
-                "4 l3 = l2 * -1:<z3ConstantMathSootClass: void z3ConstantMath()>",
-                "l3->(= l3 (- 6))",
-                "5 l0 = l3 / l2:<z3ConstantMathSootClass: void z3ConstantMath()>",
-                "l0->(= l0 (- 1))",
-            }).collect(Collectors.joining("\n"));
-        String expected = Stream.of(new String[] {
-                "1 l0 = 3:<z3ConstantMathSootClass: void z3ConstantMath()>",
-                "l0",
-                "sat",
-                "sat",
-                "2 l1 = l0 + 6:<z3ConstantMathSootClass: void z3ConstantMath()>",
-                "l1",
-                "sat",
-                "sat",
-                "3 l2 = l1 - l0:<z3ConstantMathSootClass: void z3ConstantMath()>",
-                "l2",
-                "sat",
-                "sat",
-                "4 l3 = l2 * -1:<z3ConstantMathSootClass: void z3ConstantMath()>",
-                "l3",
-                "sat",
-                "sat",
-                "5 l0 = l3 / l2:<z3ConstantMathSootClass: void z3ConstantMath()>",
-                "l0",
-                "sat",
-                "sat",
-            }).collect(Collectors.joining("\n"));
+        String oracle = readResourcesFile("int.z3.constantMathPropagation.out");
+        String expected = readResourcesFile("int.z3.constantMathPropagation.smt.out");
         assertTrue(runAnalysis(body, oracle, expected));
     }
 
@@ -128,86 +88,16 @@ public class IntervalNumericalZ3Test {
     void testIfStatementPropagation() {
         assertTrue(Files.exists(this.z3TestFile));
         Body body = JimpleProvider.simpleIfStatement("z3_simpleIf");
-        String oracle = Stream.of(new String[] {
-                "1 l0 = 4:<z3_simpleIfSootClass: void z3_simpleIf()>",
-                "l0->(= l0 4)",
-                "2 l1 = 0:<z3_simpleIfSootClass: void z3_simpleIf()>",
-                "l1->(= l1 0)",
-                "3 l2 = 0:<z3_simpleIfSootClass: void z3_simpleIf()>",
-                "l2->(= l2 0)",
-                "4 if l0 >= 3 goto l3 = 6:<z3_simpleIfSootClass: void z3_simpleIf()>",
-                "l0f->(= l0 4)",
-                "5 l3 = l1 / l2:<z3_simpleIfSootClass: void z3_simpleIf()>",
-                "6 l3 = 6:<z3_simpleIfSootClass: void z3_simpleIf()>",
-                "l3->(= l3 6)",
-            }).collect(Collectors.joining("\n"));
-        String expected = Stream.of(new String[] {
-                "1 l0 = 4:<z3_simpleIfSootClass: void z3_simpleIf()>",
-                "l0",
-                "sat",
-                "sat",
-                "2 l1 = 0:<z3_simpleIfSootClass: void z3_simpleIf()>",
-                "l1",
-                "sat",
-                "sat",
-                "3 l2 = 0:<z3_simpleIfSootClass: void z3_simpleIf()>",
-                "l2",
-                "sat",
-                "sat",
-                "4 if l0 >= 3 goto l3 = 6:<z3_simpleIfSootClass: void z3_simpleIf()>",
-                "l0f",
-                "sat",
-                "sat",
-                "5 l3 = l1 / l2:<z3_simpleIfSootClass: void z3_simpleIf()>",
-                "6 l3 = 6:<z3_simpleIfSootClass: void z3_simpleIf()>",
-                "l3",
-                "sat",
-                "sat",
-            }).collect(Collectors.joining("\n"));
+        String oracle = readResourcesFile("int.z3.branching.out");
+        String expected = readResourcesFile("int.z3.branching.smt.out");
         assertTrue(runAnalysis(body, oracle, expected));
     }
 
     @Test
     void testWhileStatementPropagation() {
         Body body = JimpleProvider.simpleLoopStatement("z3_simple_loop");
-        String oracle = Stream.of(new String[] {
-                "1 l0 = 5:<z3_simple_loopSootClass: void z3_simple_loop()>",
-                "l0->(= l0 5)",
-                "2 l1 = 0:<z3_simple_loopSootClass: void z3_simple_loop()>",
-                "l1->(= l1 0)",
-                "3 if l1 >= 5 goto l3 = l0 + l1:<z3_simple_loopSootClass: void z3_simple_loop()>",
-                "l1->(and (>= l1 0) (<= l1 4))",
-                "l1f->(>= l1 5)",
-                "4 l1 = l1 + 1:<z3_simple_loopSootClass: void z3_simple_loop()>",
-                "l1->(and (>= l1 1) (<= l1 5))",
-                "6 l3 = l0 + l1:<z3_simple_loopSootClass: void z3_simple_loop()>",
-                "l3->(>= l3 10)",
-            }).collect(Collectors.joining("\n"));
-        String expected = Stream.of(new String[] {
-                "1 l0 = 5:<z3_simple_loopSootClass: void z3_simple_loop()>",
-                "l0",
-                "sat",
-                "sat",
-                "2 l1 = 0:<z3_simple_loopSootClass: void z3_simple_loop()>",
-                "l1",
-                "sat",
-                "sat",
-                "3 if l1 >= 5 goto l3 = l0 + l1:<z3_simple_loopSootClass: void z3_simple_loop()>",
-                "l1",
-                "sat",
-                "sat",
-                "l1f",
-                "sat",
-                "sat",
-                "4 l1 = l1 + 1:<z3_simple_loopSootClass: void z3_simple_loop()>",
-                "l1",
-                "sat",
-                "sat",
-                "6 l3 = l0 + l1:<z3_simple_loopSootClass: void z3_simple_loop()>",
-                "l3",
-                "sat",
-                "sat",
-            }).collect(Collectors.joining("\n"));
+        String oracle = readResourcesFile("int.z3.looping.out");
+        String expected = readResourcesFile("int.z3.looping.smt.out");
         assertTrue(runAnalysis(body, oracle, expected));
     }
 

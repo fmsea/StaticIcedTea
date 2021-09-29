@@ -1,0 +1,10 @@
+1 b0 = 0:<test.ballonFactory: void getArrow()>
+b0->(= b0 0)
+2 b1 = 50:<test.ballonFactory: void getArrow()>
+b1->(= b1 50)
+3 b2 = 60:<test.ballonFactory: void getArrow()>
+b2->(= b2 60)
+4 $b25 = neg b2:<test.ballonFactory: void getArrow()>
+$b25->(= $b25 (- 60))
+5 $i26 = $b25 / 2:<test.ballonFactory: void getArrow()>
+$i26->(= $i26 (- 30))

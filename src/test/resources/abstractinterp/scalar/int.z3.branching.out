@@ -1,0 +1,11 @@
+1 l0 = 4:<z3_simpleIfSootClass: void z3_simpleIf()>
+l0->(= l0 4)
+2 l1 = 0:<z3_simpleIfSootClass: void z3_simpleIf()>
+l1->(= l1 0)
+3 l2 = 0:<z3_simpleIfSootClass: void z3_simpleIf()>
+l2->(= l2 0)
+4 if l0 >= 3 goto l3 = 6:<z3_simpleIfSootClass: void z3_simpleIf()>
+l0f->(= l0 4)
+5 l3 = l1 / l2:<z3_simpleIfSootClass: void z3_simpleIf()>
+6 l3 = 6:<z3_simpleIfSootClass: void z3_simpleIf()>
+l3->(= l3 6)
