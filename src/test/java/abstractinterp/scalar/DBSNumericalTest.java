@@ -134,7 +134,7 @@ public class DBSNumericalTest {
             "8 $i0 = b3 * i4:<test.Example1M: int example_5(int)>",
             "$i0->(= $i0 12)",
             "9 i5 = $i0 - 18:<test.Example1M: int example_5(int)>",
-            "i5->(and (= i5 (+ (- 18) $i0)) (= i5 (- 6)))",
+            "i5->(and (= i5 (- 6)) (= i5 (+ (- 18) $i0)))",
         };
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
