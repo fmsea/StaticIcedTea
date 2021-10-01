@@ -400,4 +400,12 @@ public class Interval32BoxProperties {
     void intervalEquality(@ForAll Interval32Box box) {
         assertTrue(box.equals(box));
     }
+
+    @Property
+    void translationMappingDoesNotAlterOriginal(@ForAll Interval32Box box) {
+        Interval32Box orig = new Interval32Box(box);
+        box.lowerBound().map(b -> b * -1);
+        box.upperBound().map(b -> b * -1);
+        assertAll(() -> assertEquals(orig, box));
+    }
 }
