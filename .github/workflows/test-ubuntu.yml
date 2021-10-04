@@ -35,6 +35,6 @@ jobs:
           -Dpackaging=jar \
           -DgeneratePom=true
       - name: Build Project
-        run: mvn --batch-mode verify -Dtest=!DBSIntervalComparativeTest
+        run: mvn --batch-mode verify -Dtest=!*ComparativeTest
         env:
           LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:/usr/lib/x86_64-linux-gnu/jni/
