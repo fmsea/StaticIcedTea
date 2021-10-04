@@ -13,6 +13,8 @@ import soot.Local;
 import soot.Value;
 import soot.jimple.IntConstant;
 import soot.jimple.internal.JNegExpr;
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultDirectedGraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -288,6 +290,17 @@ public class IntervalBoxState implements State {
         Interval32Box interval = this.state.get(l);
         sb.append(solver.smt2(interval.toGrimpExpr(l)));
         return sb.toString();
+    }
+
+    public Graph<Local, DBSConstraint> toGraph() {
+        Graph<Local, DBSConstraint> graph = new DefaultDirectedGraph<>(DBSConstraint.class);
+        graph.addVertex(Variable.ZERO);
+        this.state.forEach((l, i) -> {
+                graph.addVertex(l);
+                graph.addEdge(l, Variable.ZERO, DBSConstraint.from(i.upperBound(), i.isBottom()));
+                graph.addEdge(Variable.ZERO, l, DBSConstraint.from(i.lowerBound().map(b -> b * -1), i.isBottom()));
+            });
+        return graph;
     }
 
     @Override

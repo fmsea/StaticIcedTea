@@ -11,6 +11,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import soot.Local;
@@ -576,8 +577,8 @@ public class DifferenceBoundedState implements State {
         return sb.toString();
     }
 
-    public void toDOT(String name) {
-        this.dbs.toDot(name);
+    public Graph<Local, DBSConstraint> toGraph() {
+        throw new UnsupportedOperationException("I'm not doing this one yet");
     }
 
     public String toSMT(Local l, SolverWrapper solver) {

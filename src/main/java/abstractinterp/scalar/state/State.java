@@ -2,6 +2,7 @@ package abstractinterp.scalar.state;
 
 import soot.Local;
 import soot.Value;
+import org.jgrapht.Graph;
 
 import solver.SolverWrapper;
 
@@ -18,6 +19,7 @@ public interface State {
     public void updateState(Local var, State inState, Value v);
     public String toSMT(SolverWrapper solver);
     public String toSMT(Local l, SolverWrapper solver);
+    public Graph<Local, DBSConstraint> toGraph();
     public void updateTop(Local local);
     public boolean updateCond(State inState, Value left, Value right, PredicateType type);
     public void forget(Local local);
