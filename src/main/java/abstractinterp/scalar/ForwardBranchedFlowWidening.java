@@ -21,6 +21,9 @@ import abstractinterp.scalar.state.State;
 public abstract class ForwardBranchedFlowWidening<N extends Unit, A extends State>
     extends ForwardBranchedFlowBasic<N, A> {
 
+    // This number should be negative.
+    protected final int MAX_WIDENING_ITERATIONS = -10;
+
     Set<N> wideningNodes;
     /**
      * Count of merging performed by a widening node
@@ -65,12 +68,12 @@ public abstract class ForwardBranchedFlowWidening<N extends Unit, A extends Stat
             if (!prevBeforeFlow.equals(beforeFlow)) {
                 //check the count
                 int mergeCounts = itersCount.get(node);
-                if (mergeCounts == 0) {
+                if (mergeCounts < MAX_WIDENING_ITERATIONS) {
+                    throw new RuntimeException(String.format("Widening did not work [iterations=%d, node=%s]",
+                                                             mergeCounts * -1,
+                                                             node));
+                } else if (mergeCounts <= 0) {
                     widen(beforeFlow, prevBeforeFlow);
-                } else if (mergeCounts <= -10) {
-                    throw new RuntimeException("Widening is not working for " + node);
-                } else if (mergeCounts < 0) {
-                    LOGGER.error("Widening is not working for {}", node);
                 }
                 mergeCounts--;
                 itersCount.put(node, mergeCounts);
