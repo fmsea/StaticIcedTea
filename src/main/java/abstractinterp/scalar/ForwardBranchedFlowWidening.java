@@ -67,17 +67,6 @@ public abstract class ForwardBranchedFlowWidening<N extends Unit, A extends Stat
                 int mergeCounts = itersCount.get(node);
                 if (mergeCounts == 0) {
                     widen(beforeFlow, prevBeforeFlow);
-                } else if (mergeCounts == -1) {
-                    // prevBeforeFlow is the widened flow
-                    // check that the newly merged flow is a subset of the widened flow
-                    // if so, "merge" them together via widening
-                    // if not, print error
-                    if (beforeFlow.isSubset(prevBeforeFlow)) {
-                        widen(beforeFlow, prevBeforeFlow);
-                    } else {
-                        LOGGER.error("Widening breaks ascending chain!");
-                        LOGGER.debug("{} ⊈ {}", beforeFlow, prevBeforeFlow);
-                    }
                 } else if (mergeCounts <= -10) {
                     throw new RuntimeException("Widening is not working for " + node);
                 } else if (mergeCounts < 0) {
