@@ -5,15 +5,20 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 import java.util.stream.Stream;
 import soot.Local;
 import soot.grimp.Grimp;
 import soot.jimple.IntConstant;
 import soot.jimple.BinopExpr;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import solver.SolverWrapper;
 
 public class Interval32Box {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Interval32Box.class);
 
     private boolean bottom = false;
     private Optional<Integer> lowerBound = Optional.empty();
@@ -207,54 +212,6 @@ public class Interval32Box {
                        .orElse(this.upperBound.isEmpty() && box.upperBound.isEmpty())));
         }
         return subset;
-    }
-
-    public byte intersectionPosition(Interval32Box box) {
-        byte position = -1;
-        if (box == null ||
-            this.bottom ||
-            box.bottom) {
-            position = -1;
-        } else if (this.isTop()) {
-            position = 2;
-        } else if (box.isTop()) {
-            position = 5;
-        } else if (this.isUpperBounded() &&
-                   box.isLowerBounded() &&
-                   this.upperBound.get().compareTo(box.lowerBound.get()) < 0) {
-            // [x1,x2] ... [y1,y2]
-            position = 0;
-        } else if (this.isUpperBounded() &&
-                   box.isLowerBounded() &&
-                   (!this.isLowerBounded() || this.lowerBound.get().compareTo(box.lowerBound.get()) < 0) &&
-                   box.lowerBound.get().compareTo(this.upperBound.get()) <= 0 &&
-                   (!box.isUpperBounded() || this.upperBound.get().compareTo(box.upperBound.get()) < 0)) {
-            // [x1, y1, x2, y2]
-            position = 1;
-        } else if (box.isBounded() &&
-                   (!this.isLowerBounded() || this.lowerBound.get().compareTo(box.lowerBound.get()) <= 0) &&
-                   (!this.isUpperBounded() || box.upperBound.get().compareTo(this.upperBound.get()) <= 0)) {
-            // [x1,y1,y2,x2]
-            position = 2;
-        } else if (this.isLowerBounded() &&
-                   box.isUpperBounded() &&
-                   (!box.isLowerBounded() || box.lowerBound.get().compareTo(this.lowerBound.get()) < 0) &&
-                   this.lowerBound.get().compareTo(box.upperBound.get()) <= 0 &&
-                   (!this.isUpperBounded() || box.upperBound.get().compareTo(this.upperBound.get()) < 0)) {
-            // [y1,x1,y2,x2]
-            position = 3;
-        } else if (this.isLowerBounded() &&
-                   box.isUpperBounded() &&
-                   box.upperBound.get().compareTo(this.lowerBound.get()) < 0) {
-            // [y1,y2] .. [x1,x2]
-            position = 4;
-        } else if (this.isBounded() &&
-                   (!box.isLowerBounded() || box.lowerBound.get().compareTo(this.lowerBound.get()) <= 0) &&
-                   (!box.isUpperBounded() || this.upperBound.get().compareTo(box.upperBound.get()) <= 0)) {
-            // [y1,x1,x2,y2]
-            position = 5;
-        }
-        return position;
     }
 
     public static Interval32Box add(Interval32Box x, Interval32Box y) {
@@ -456,33 +413,20 @@ public class Interval32Box {
 
     private static List<Interval32Box> transferConditionEq(Interval32Box lhs,
                                                            Interval32Box rhs) {
+        // lhs = [a, b]
+        // rhs = [c, d]
         List<Interval32Box> ret = new ArrayList<>(2);
-        byte position = lhs.intersectionPosition(rhs);
-        switch (position) {
-        case 0:
-            ret.add(BOT());
-            ret.add(BOT());
-            break;
-        case 1: // common elements [rhs.l, lhs.u]
-            ret.add(new Interval32Box(rhs.lowerBound, lhs.upperBound));
-            ret.add(new Interval32Box(rhs.lowerBound, lhs.upperBound));
-            break;
-        case 2: // inner rhs interval
-            ret.add(new Interval32Box(rhs));
-            ret.add(new Interval32Box(rhs));
-            break;
-        case 3: // common elements [lhs.l, rhs.u]
-            ret.add(new Interval32Box(lhs.lowerBound, rhs.upperBound));
-            ret.add(new Interval32Box(lhs.lowerBound, rhs.upperBound));
-            break;
-        case 4:
-            ret.add(BOT());
-            ret.add(BOT());
-            break;
-        case 5: // inner lhs interval
-            ret.add(new Interval32Box(lhs));
-            ret.add(new Interval32Box(lhs));
-            break;
+        if (lhs.lowerBound.flatMap(ll -> rhs.upperBound.map(ru -> ll > ru)).orElse(false) ||
+            rhs.lowerBound.flatMap(rl -> lhs.upperBound.map(lu -> rl > lu)).orElse(false)) {
+            ret.add(Interval32Box.BOT());
+            ret.add(Interval32Box.BOT());
+        } else {
+            ret.add(new Interval32Box(negate(minimum(negate(lhs.lowerBound),
+                                                     negate(rhs.lowerBound))),
+                                      minimum(lhs.upperBound, rhs.upperBound)));
+            ret.add(new Interval32Box(negate(minimum(negate(lhs.lowerBound),
+                                                     negate(rhs.lowerBound))),
+                                      minimum(lhs.upperBound, rhs.upperBound)));
         }
         return ret;
     }
@@ -491,7 +435,7 @@ public class Interval32Box {
                                                            Interval32Box rhs) {
         List<Interval32Box> ret = new ArrayList<>(2);
         // check if all values are equal, otherwise, leave
-        if (lhs.equals(rhs)) {
+        if (lhs.isSingleton() && rhs.isSingleton() && lhs.equals(rhs)) {
             ret.add(BOT());
             ret.add(BOT());
         } else {
@@ -502,159 +446,97 @@ public class Interval32Box {
     }
 
     private static List<Interval32Box> transferConditionLe(Interval32Box lhs,
-                                            Interval32Box rhs) {
+                                                           Interval32Box rhs) {
+        // lhs = [a, b]
+        // rhs = [c, d]
         List<Interval32Box> ret = new ArrayList<>(2);
-        byte position = lhs.intersectionPosition(rhs);
-        switch (position) {
-        case 0: // lhs <= rhs
-        case 1:
+        if (lhs.lowerBound.flatMap(a -> rhs.upperBound.map(d -> a > d)).orElse(false)) {
+            ret.add(Interval32Box.BOT());
+            ret.add(Interval32Box.BOT());
+        } else if (lhs.upperBound.flatMap(b -> rhs.lowerBound.map(c -> b <= c)).orElse(false)) {
             ret.add(new Interval32Box(lhs));
             ret.add(new Interval32Box(rhs));
-            break;
-        case 2:
-            ret.add(new Interval32Box(lhs.lowerBound, rhs.upperBound));
-            ret.add(new Interval32Box(rhs));
-            break;
-        case 3:
-            ret.add(new Interval32Box(lhs.lowerBound, rhs.upperBound));
-            ret.add(new Interval32Box(lhs.lowerBound, rhs.upperBound));
-            break;
-        case 4:
-            ret.add(BOT());
-            ret.add(BOT());
-            break;
-        case 5:
-            ret.add(new Interval32Box(lhs));
-            ret.add(new Interval32Box(lhs.lowerBound, rhs.upperBound));
+        } else {
+            ret.add(new Interval32Box(negate(minimum(negate(lhs.lowerBound),
+                                                     sub(sub(rhs.upperBound, lhs.lowerBound),
+                                                         rhs.lowerBound))),
+                                      minimum(lhs.upperBound, rhs.upperBound)));
+            ret.add(new Interval32Box(negate(minimum(negate(rhs.lowerBound),
+                                                     negate(lhs.lowerBound))),
+                                      minimum(rhs.upperBound,
+                                              add(sub(rhs.upperBound, lhs.lowerBound),
+                                                  lhs.upperBound))));
         }
         return ret;
     }
 
     private static List<Interval32Box> transferConditionLt(Interval32Box lhs,
-                                            Interval32Box rhs) {
+                                                           Interval32Box rhs) {
+        // lhs = [a, b]
+        // rhs = [c, d]
+        Optional<Integer> a = lhs.lowerBound;
+        Optional<Integer> b = lhs.upperBound;
+        Optional<Integer> c = rhs.lowerBound;
+        Optional<Integer> d = rhs.upperBound;
         List<Interval32Box> ret = new ArrayList<>(2);
-        byte position = lhs.intersectionPosition(rhs);
-        switch (position) {
-        case 0:
-        case 1:
+        if (a.flatMap(A -> d.map(D -> A >= D)).orElse(false)) {
+            ret.add(Interval32Box.BOT());
+            ret.add(Interval32Box.BOT());
+        } else if (b.flatMap(B -> c.map(C -> B <= C - 1)).orElse(false)) {
             ret.add(new Interval32Box(lhs));
             ret.add(new Interval32Box(rhs));
-            break;
-        case 2:
-            if (lhs.equals(rhs) && !(lhs.isTop() && rhs.isTop())) {
-                ret.add(BOT());
-                ret.add(BOT());
-            } else {
-                ret.add(new Interval32Box(lhs.lowerBound,
-                                          rhs.upperBound.map(u -> Integer.valueOf(u - 1))));
-                if (lhs.isLowerBounded() && lhs.lowerBound.equals(rhs.lowerBound)) {
-                    ret.add(new Interval32Box(rhs.lowerBound.map(l -> Integer.valueOf(l + 1)),
-                                              rhs.upperBound));
-                } else {
-                    ret.add(new Interval32Box(rhs));
-                }
-            }
-            break;
-        case 3:
-            ret.add(new Interval32Box(lhs.lowerBound,
-                                      rhs.upperBound.map(u -> Integer.valueOf(u - 1))));
-            ret.add(new Interval32Box(lhs.lowerBound.map(l -> Integer.valueOf(l + 1)),
-                                      rhs.upperBound));
-            break;
-        case 4:
-            ret.add(BOT());
-            ret.add(BOT());
-            break;
-        case 5:
-            ret.add(new Interval32Box(lhs));
-            ret.add(new Interval32Box(lhs.lowerBound.map(l -> Integer.valueOf(l + 1)),
-                                      rhs.upperBound));
-            break;
+        } else {
+            ret.add(new Interval32Box(a, minimum(b, sub(d, Optional.of(1)))));
+            ret.add(new Interval32Box(negate(minimum(negate(c), add(negate(a), Optional.of(-1)))),
+                                      minimum(d, add(d, add(negate(a), b)))));
         }
         return ret;
     }
 
     private static List<Interval32Box> transferConditionGe(Interval32Box lhs,
                                                            Interval32Box rhs) {
+        // lhs = [a, b]
+        // rhs = [c, d]
         List<Interval32Box> ret = new ArrayList<>(2);
-        byte position = lhs.intersectionPosition(rhs);
-        switch (position) {
-        case 0:
-            ret.add(BOT());
-            ret.add(BOT());
-            break;
-        case 1:
-            ret.add(new Interval32Box(rhs.lowerBound, lhs.upperBound));
-            ret.add(new Interval32Box(rhs.lowerBound, lhs.upperBound));
-            break;
-        case 2:
-            ret.add(new Interval32Box(rhs.lowerBound, lhs.upperBound));
-            ret.add(new Interval32Box(rhs));
-            break;
-        case 3:
-        case 4:
+        if (rhs.lowerBound.flatMap(c -> lhs.upperBound.map(b -> c > b)).orElse(false)) {
+            ret.add(Interval32Box.BOT());
+            ret.add(Interval32Box.BOT());
+        } else if (rhs.upperBound.flatMap(d -> lhs.lowerBound.map(a -> d <= a)).orElse(false)) {
             ret.add(new Interval32Box(lhs));
             ret.add(new Interval32Box(rhs));
-            break;
-        case 5:
-            ret.add(new Interval32Box(lhs));
-            ret.add(new Interval32Box(lhs));
-            break;
+        } else {
+            ret.add(new Interval32Box(negate(minimum(negate(lhs.lowerBound),
+                                                     negate(rhs.lowerBound))),
+                                      minimum(lhs.upperBound,
+                                              add(rhs.upperBound, sub(lhs.upperBound, rhs.lowerBound)))));
+            ret.add(new Interval32Box(negate(minimum(negate(rhs.lowerBound),
+                                                     add(lhs.upperBound,
+                                                         add(negate(rhs.lowerBound),
+                                                             negate(lhs.lowerBound))))),
+                                      minimum(rhs.upperBound, lhs.upperBound)));
         }
         return ret;
     }
 
     private static List<Interval32Box> transferConditionGt(Interval32Box lhs,
                                                            Interval32Box rhs) {
+        // lhs = [a, b]
+        // rhs = [c, d]
+        Optional<Integer> a = lhs.lowerBound;
+        Optional<Integer> b = lhs.upperBound;
+        Optional<Integer> c = rhs.lowerBound;
+        Optional<Integer> d = rhs.upperBound;
         List<Interval32Box> ret = new ArrayList<>(2);
-        byte position = lhs.intersectionPosition(rhs);
-        switch (position) {
-        case 0:
-            ret.add(BOT());
-            ret.add(BOT());
-            break;
-        case 1:
-            ret.add(new Interval32Box(rhs.lowerBound.map(l -> Integer.valueOf(l + 1)),
-                                      lhs.upperBound));
-            ret.add(new Interval32Box(rhs.lowerBound,
-                                      lhs.upperBound.map(u -> Integer.valueOf(u - 1))));
-            break;
-        case 2:
-            if (lhs.equals(rhs) && !(lhs.isTop() && rhs.isTop())) {
-                ret.add(BOT());
-                ret.add(BOT());
-            } else {
-                ret.add(new Interval32Box(rhs.lowerBound.map(l -> Integer.valueOf(l + 1)),
-                                          lhs.upperBound));
-                ret.add(new Interval32Box(rhs));
-            }
-            break;
-        case 3:
-        case 4:
+        if (c.flatMap(C -> b.map(B -> C >= B)).orElse(false)) {
+            ret.add(Interval32Box.BOT());
+            ret.add(Interval32Box.BOT());
+        } else if (a.flatMap(A -> d.map(D -> A > D)).orElse(false)) {
             ret.add(new Interval32Box(lhs));
             ret.add(new Interval32Box(rhs));
-            break;
-        case 5:
-            ret.add(new Interval32Box(lhs));
-            ret.add(new Interval32Box(lhs.lowerBound.map(l -> Integer.valueOf(l + 1)),
-                                      lhs.upperBound.map(u -> Integer.valueOf(u - 1))));
-            break;
-        }
-        return ret;
-    }
-
-    public boolean intersects(Interval32Box box) {
-        boolean ret;
-        byte position = this.intersectionPosition(box);
-        if (position == -1 || position == 0 || position == 4) {
-            ret = false;
-        } else if (position == 1 ||
-                   position == 2 ||
-                   position == 3 ||
-                   position == 5) {
-            ret = true;
         } else {
-            ret = false;
+            ret.add(new Interval32Box(negate(minimum(negate(a), sub(negate(c), Optional.of(1)))), b));
+        ret.add(new Interval32Box(negate(minimum(negate(c), add(negate(a), sub(b, c)))),
+                                  minimum(d, sub(b, Optional.of(1)))));
         }
         return ret;
     }
@@ -745,5 +627,59 @@ public class Interval32Box {
                                      Grimp.v().newLeExpr(local, IntConstant.v(Integer.MAX_VALUE)));
         }
         return r;
+    }
+
+    private static Optional<Integer> minimum(Optional<Integer> A, Optional<Integer> B) {
+        return A.map(a -> B.map(b -> a <= b ? Optional.of(a) : Optional.of(b)).orElse(A)).orElse(B);
+    }
+
+    private static Optional<Integer> maximum(Optional<Integer> A, Optional<Integer> B) {
+        return A.map(a -> B.map(b -> a <= b ? Optional.of(b) : Optional.of(a)).orElse(A)).orElse(B);
+    }
+
+    private static Optional<Integer> add(Optional<Integer> A, Optional<Integer> B) {
+        return A.flatMap(a -> B.flatMap(b -> {
+                    Optional<Integer> r;
+                    try {
+                        r = Optional.of(Math.addExact(a, b));
+                    } catch (ArithmeticException ex) {
+                        r = Optional.empty();
+                    }
+                    return r;
+                }));
+    }
+
+    private static Optional<Integer> sub(Optional<Integer> A, Optional<Integer> B) {
+        return A.flatMap(a -> B.flatMap(b -> {
+                    Optional<Integer> r;
+                    try {
+                        r = Optional.of(Math.subtractExact(a, b));
+                    } catch (ArithmeticException ex) {
+                        r = Optional.empty();
+                    }
+                    return r;
+                }));
+    }
+
+    private static Optional<Integer> mul(Optional<Integer> A, Optional<Integer> B) {
+        return A.flatMap(a -> B.flatMap(b -> {
+                    Optional<Integer> r;
+                    try {
+                        r = Optional.of(Math.multiplyExact(a, b));
+                    } catch (ArithmeticException ex) {
+                        r = Optional.empty();
+                    }
+                    return r;
+                }));
+    }
+
+    private static Optional<Integer> negate(Optional<Integer> A) {
+        return mul(A, Optional.of(-1));
+    }
+
+    private static int compare(Optional<Integer> A, Optional<Integer> B) {
+        int order = -2;
+        order = A.map(a -> B.map(b -> Integer.compare(a, b)).orElse(-1)).orElse(+1);
+        return order;
     }
 }

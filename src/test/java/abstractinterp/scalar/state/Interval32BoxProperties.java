@@ -118,28 +118,6 @@ public class Interval32BoxProperties {
     }
 
     @Property
-    void bottomIntersectsWithNothing(@ForAll Interval32Box box) {
-        Interval32Box bot = Interval32Box.BOT();
-        assertAll(() -> assertFalse(bot.intersects(box)),
-                  () -> assertFalse(box.intersects(bot)));
-    }
-
-    @Property
-    void topAlwaysIntersects(@ForAll Interval32Box box) {
-        Interval32Box top = Interval32Box.TOP();
-        Interval32Box max = Interval32Box.MAX();
-        assertAll(() -> assertTrue(top.intersects(box)),
-                  () -> assertTrue(max.intersects(box)),
-                  () -> assertTrue(box.intersects(top)),
-                  () -> assertTrue(box.intersects(max)));
-    }
-
-    @Property
-    boolean selfIntersectsWithSelf(@ForAll Interval32Box box) {
-        return box.intersects(box);
-    }
-
-    @Property
     boolean intervalsCanBeSingletons(@ForAll int x) {
         Interval32Box box = new Interval32Box(x, x);
         return box.isSingleton();
@@ -194,173 +172,113 @@ public class Interval32BoxProperties {
     }
 
     @Property
-    void testTransferConditionEq(@ForAll Interval32Box x,
-                                 @ForAll Interval32Box y) {
-        List<Interval32Box> result;
-        byte position = x.intersectionPosition(y);
-        result = Interval32Box.transferCondition(x, y, PredicateType.Eq);
-        assertEquals(2, result.size());
-        if (position == (byte) 0 || position == (byte) 4) {
-            for (Interval32Box b : result) {
-                assertTrue(b.isBottom());
-            }
-        } else if (position == (byte) 1) {
-            for (Interval32Box b : result) {
-                Interval32Box expected = new Interval32Box(y.lowerBound(), x.upperBound());
-                assertEquals(expected, b);
-            }
-        } else if (position == (byte) 2) {
-            for (Interval32Box b : result) {
-                Interval32Box expected = new Interval32Box(y);
-                assertEquals(expected, b);
-            }
-        } else if (position == (byte) 3) {
-            for (Interval32Box b : result) {
-                Interval32Box expected = new Interval32Box(x.lowerBound(), y.upperBound());
-                assertEquals(expected, b);
-            }
-        } else if (position == (byte) 5) {
-            for (Interval32Box b : result) {
-                Interval32Box expected = new Interval32Box(x);
-                assertEquals(expected, b);
-            }
-        }
-    }
-
-    @Property
-    void testTransferConditionNe(@ForAll Interval32Box x,
-                                 @ForAll Interval32Box y) {
-        List<Interval32Box> result;
-        result = Interval32Box.transferCondition(x, y, PredicateType.Ne);
-        assertEquals(2, result.size());
-        if (x.equals(y)) {
-            assertAll(result.stream().map(b -> () -> assertTrue(b.isBottom())));
+    boolean testTransferConditionEq(@ForAll Interval32Box x,
+                                    @ForAll Interval32Box y) {
+        List<Interval32Box> result = Interval32Box.transferCondition(x, y, PredicateType.Eq);
+        if ((x.lowerBound().flatMap(xl -> y.upperBound().map(yu -> xl > yu)).orElse(false)) ||
+            (y.lowerBound().flatMap(yl -> x.upperBound().map(xu -> yl > xu)).orElse(false))) {
+            return result.stream().map(r -> r.isBottom()).reduce((r1, r2) -> r1 && r2).get();
         } else {
-            assertAll(() -> assertEquals(x, result.get(0)),
-                      () -> assertEquals(y, result.get(1)));
+            return result.stream().map(r -> r.isValid()).reduce((r1, r2) -> r1 && r2).get();
         }
     }
 
     @Property
-    void testTransferConditionLe(@ForAll Interval32Box x,
-                                 @ForAll Interval32Box y) {
-        List<Interval32Box> result;
-        byte position = x.intersectionPosition(y);
-        result = Interval32Box.transferCondition(x, y, PredicateType.Le);
-        assertEquals(2, result.size());
-        if (position == (byte) 4) {
-            assertAll(result.stream().map(b -> () -> assertTrue(b.isBottom())));
-        } else if (position == (byte) 0 || position == (byte) 1) {
-            assertAll(() -> assertEquals(x, result.get(0)),
-                      () -> assertEquals(y, result.get(1)));
-        } else if (position == (byte) 2) {
-            Interval32Box x_expected = new Interval32Box(x.lowerBound(), y.upperBound());
-            assertAll(() -> assertEquals(x_expected, result.get(0)),
-                      () -> assertEquals(y, result.get(1)));
-        } else if (position == (byte) 3) {
-            Interval32Box expected = new Interval32Box(x.lowerBound(), y.upperBound());
-            assertAll(result.stream().map(b -> () -> assertEquals(expected, b)));
-        } else if (position == (byte) 5) {
-            Interval32Box y_expected = new Interval32Box(x.lowerBound(), y.upperBound());
-            assertAll(() -> assertEquals(x, result.get(0)),
-                      () -> assertEquals(y_expected, result.get(1)));
+    boolean testTransferConditionNe(@ForAll Interval32Box x,
+                                    @ForAll Interval32Box y) {
+        List<Interval32Box> result = Interval32Box.transferCondition(x, y, PredicateType.Ne);
+        if (x.isSingleton() && y.isSingleton() && x.equals(y)) {
+            return result.stream().map(r -> r.isBottom()).reduce((r1, r2) -> r1 && r2).get();
+        } else {
+            return result.stream().map(r -> r.isValid()).reduce((r1, r2) -> r1 && r2).get();
         }
     }
 
     @Property
-    void testTransferConditionLt(@ForAll Interval32Box x,
-                                 @ForAll Interval32Box y) {
-        List<Interval32Box> result;
-        byte position = x.intersectionPosition(y);
-        result = Interval32Box.transferCondition(x, y, PredicateType.Lt);
-        assertEquals(2, result.size());
-        if (x.equals(y) || position == (byte) 4) {
-            assertAll(result.stream().map(b -> () -> assertTrue(b.isBottom())));
-        } else if (position == (byte) 0 || position == (byte) 1) {
-            assertAll(() -> assertEquals(x, result.get(0)),
-                      () -> assertEquals(y, result.get(1)));
-        } else if (position == (byte) 2) {
-            Interval32Box x_expected = new Interval32Box(x.lowerBound().map(l -> Integer.valueOf(l)),
-                                                         y.upperBound().map(u -> Integer.valueOf(u - 1)));
-            assertEquals(x_expected, result.get(0));
-            if (x.lowerBound().equals(y.lowerBound())) {
-                assertEquals(new Interval32Box(y.lowerBound().map(l -> Integer.valueOf(l + 1)),
-                                               y.upperBound().map(u -> Integer.valueOf(u))),
-                             result.get(1));
-            } else {
-                assertEquals(y, result.get(1));
-            }
-        } else if (position == (byte) 3) {
-            assertAll(() -> assertEquals(new Interval32Box(x.lowerBound().map(l -> Integer.valueOf(l)),
-                                                           y.upperBound().map(u -> Integer.valueOf(u - 1))),
-                                         result.get(0)),
-                      () -> assertEquals(new Interval32Box(x.lowerBound().map(l -> Integer.valueOf(l + 1)),
-                                                           y.upperBound().map(u -> Integer.valueOf(u))),
-                                         result.get(1)));
-        } else if (position == (byte) 5) {
-            assertAll(() -> assertEquals(x, result.get(0)),
-                      () -> assertEquals(new Interval32Box(x.lowerBound().map(l -> Integer.valueOf(l + 1)),
-                                                           y.upperBound().map(u -> Integer.valueOf(u))),
-                                         result.get(1)));
+    boolean testTransferConditionLt(@ForAll Interval32Box x,
+                                    @ForAll Interval32Box y) {
+        List<Interval32Box> result = Interval32Box.transferCondition(x, y, PredicateType.Lt);
+        if (x.lowerBound().flatMap(a -> y.upperBound().map(d -> a >= d)).orElse(false)) {
+            return result.stream().map(r -> r.isBottom()).reduce((r1, r2) -> r1 && r2).get();
+        } else {
+            return result.stream().map(r -> r.isValid()).reduce((r1, r2) -> r1 && r2).get();
         }
     }
 
     @Property
-    void testTransferConditionGe(@ForAll Interval32Box x,
-                                 @ForAll Interval32Box y) {
-        List<Interval32Box> result;
-        byte position = x.intersectionPosition(y);
-        result = Interval32Box.transferCondition(x, y, PredicateType.Ge);
-        assertEquals(2, result.size());
-        if (position == (byte) 0) {
-            assertAll(result.stream().map(b -> () -> assertTrue(b.isBottom())));
-        } else if (position == (byte) 3 || position == (byte) 4) {
-            assertAll(() -> assertEquals(x, result.get(0)),
-                      () -> assertEquals(y, result.get(1)));
-        } else if (position == (byte) 1) {
-            assertAll(result.stream().map(b -> () -> assertEquals(new Interval32Box(y.lowerBound(),
-                                                                                    x.upperBound()),
-                                                                  b)));
-        } else if (position == (byte) 2) {
-            assertAll(() -> assertEquals(new Interval32Box(y.lowerBound(), x.upperBound()),
-                                         result.get(0)),
-                      () -> assertEquals(y, result.get(1)));
-        } else if (position == (byte) 5) {
-            assertAll(result.stream().map(b -> () -> assertEquals(new Interval32Box(x.lowerBound(),
-                                                                                    x.upperBound()),
-                                                                  b)));
+    boolean testTransferConditionLTChanges(@ForAll Interval32Box x,
+                                           @ForAll Interval32Box y) {
+        List<Interval32Box> result = Interval32Box.transferCondition(x, y, PredicateType.Lt);
+        if (x.upperBound().flatMap(b -> y.lowerBound().map(c -> b < c)).orElse(false)) {
+            return result.get(0).equals(x) && result.get(1).equals(y);
+        } else {
+            return true;
         }
     }
 
     @Property
-    void testTransferConditionGt(@ForAll Interval32Box x,
-                                 @ForAll Interval32Box y) {
-        List<Interval32Box> result;
-        byte position = x.intersectionPosition(y);
-        result = Interval32Box.transferCondition(x, y, PredicateType.Gt);
-        assertEquals(2, result.size());
-        if (x.equals(y) || position == (byte) 0) {
-            assertAll(result.stream().map(b -> () -> assertTrue(b.isBottom())));
-        } else if (position == (byte) 3 || position == (byte) 4) {
-            assertAll(() -> assertEquals(x, result.get(0)),
-                      () -> assertEquals(y, result.get(1)));
-        } else if (position == (byte) 1) {
-            assertAll(() -> assertEquals(new Interval32Box(y.lowerBound().map(l -> Integer.valueOf(l + 1)),
-                                                           x.upperBound().map(u -> Integer.valueOf(u))),
-                                         result.get(0)),
-                      () -> assertEquals(new Interval32Box(y.lowerBound().map(l -> Integer.valueOf(l)),
-                                                           x.upperBound().map(u -> Integer.valueOf(u - 1))),
-                                         result.get(1)));
-        } else if (position == (byte) 2) {
-            assertAll(() -> assertEquals(new Interval32Box(y.lowerBound().map(l -> Integer.valueOf(l + 1)),
-                                                           x.upperBound().map(u -> Integer.valueOf(u))),
-                                         result.get(0)),
-                      () -> assertEquals(y, result.get(1)));
-        } else if (position == (byte) 5) {
-            assertAll(() -> assertEquals(x, result.get(0)),
-                      () -> assertEquals(new Interval32Box(x.lowerBound().map(l -> Integer.valueOf(l + 1)),
-                                                           x.upperBound().map(u -> Integer.valueOf(u - 1))),
-                                         result.get(1)));
+    boolean testTransferConditionLe(@ForAll Interval32Box x,
+                                    @ForAll Interval32Box y) {
+        List<Interval32Box> result = Interval32Box.transferCondition(x, y, PredicateType.Le);
+        if (x.lowerBound().flatMap(a -> y.upperBound().map(d -> a > d)).orElse(false)) {
+            return result.stream().map(r -> r.isBottom()).reduce((r1, r2) -> r1 && r2).get();
+        } else {
+            return result.stream().map(r -> r.isValid()).reduce((r1, r2) -> r1 && r2).get();
+        }
+    }
+
+    @Property
+    boolean testTransferConditionLTEChanges(@ForAll Interval32Box x,
+                                            @ForAll Interval32Box y) {
+        List<Interval32Box> result = Interval32Box.transferCondition(x, y, PredicateType.Le);
+        if (x.upperBound().flatMap(b -> y.lowerBound().map(c -> b <= c)).orElse(false)) {
+            return result.get(0).equals(x) && result.get(1).equals(y);
+        } else {
+            return true;
+        }
+    }
+
+    @Property
+    boolean testTransferConditionGt(@ForAll Interval32Box x,
+                                    @ForAll Interval32Box y) {
+        List<Interval32Box> result = Interval32Box.transferCondition(x, y, PredicateType.Gt);
+        if (y.lowerBound().flatMap(c -> x.upperBound().map(b -> c >= b)).orElse(false)) {
+            return result.stream().map(r -> r.isBottom()).reduce((r1, r2) -> r1 && r2).get();
+        } else {
+            return result.stream().map(r -> r.isValid()).reduce((r1, r2) -> r1 && r2).get();
+        }
+    }
+
+    @Property
+    boolean testTransferConditionGTChanges(@ForAll Interval32Box x,
+                                           @ForAll Interval32Box y) {
+        List<Interval32Box> result = Interval32Box.transferCondition(x, y, PredicateType.Gt);
+        if (x.lowerBound().flatMap(a -> y.upperBound().map(d -> a > d)).orElse(false)) {
+            return result.get(0).equals(x) && result.get(1).equals(y);
+        } else {
+            return true;
+        }
+    }
+
+    @Property
+    boolean testTransferConditionGe(@ForAll Interval32Box x,
+                                    @ForAll Interval32Box y) {
+        List<Interval32Box> result = Interval32Box.transferCondition(x, y, PredicateType.Ge);
+        if (y.lowerBound().flatMap(c -> x.upperBound().map(b -> c > b)).orElse(false)) {
+            return result.stream().map(r -> r.isBottom()).reduce((r1, r2) -> r1 && r2).get();
+        } else {
+            return result.stream().map(r -> r.isValid()).reduce((r1, r2) -> r1 && r2).get();
+        }
+    }
+
+    @Property
+    boolean testTransferConditionGTEChanges(@ForAll Interval32Box x,
+                                            @ForAll Interval32Box y) {
+        List<Interval32Box> result = Interval32Box.transferCondition(x, y, PredicateType.Ge);
+        if (y.upperBound().flatMap(d -> x.lowerBound().map(a -> d <= a)).orElse(false)) {
+            return result.get(0).equals(x) && result.get(1).equals(y);
+        } else {
+            return true;
         }
     }
 
