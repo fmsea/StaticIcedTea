@@ -116,6 +116,16 @@ public class PADO01DifferenceBoundedMatrix {
         return added;
     }
 
+    public boolean putIncremental(Local source, Local target, PADO01Constraint constraint) {
+        boolean feasible = false;
+        if (!putConstraint(source, target, constraint)) {
+            feasible = this.isFeasible();
+        } else {
+            feasible = this.incrementalClosure(source, target);
+        }
+        return feasible;
+    }
+
     public PADO01Constraint getConstraint(Local source, Local target) {
         int i = this.localToIndices.get(source);
         int j = this.localToIndices.get(target);
@@ -172,6 +182,32 @@ public class PADO01DifferenceBoundedMatrix {
                 return PADO01Constraint.compare(this.matrix[i][j],
                                                 other.matrix[i][j]) <= 0;
             });
+    }
+
+    private boolean incrementalClosure(Local source, Local target) {
+        int si = this.localToIndices.get(source);
+        int ti = this.localToIndices.get(target);
+        Set<Local> worklist = new HashSet<>();
+        // seed worklist with a few more necessary targets
+        worklist.add(target);
+        // foreach child of target (ti), put a constraint
+        // we do not skip self references to ensure we capture a negative cycle
+        for (int i = 0; i < N; i++) {
+            if (this.putConstraint(si, i, PADO01Constraint.add(this.matrix[si][ti],
+                                                               this.matrix[ti][i]))) {
+                worklist.add(this.indicesToLocals.get(i));
+            }
+        }
+
+        for (int i = 0; i < N; i++) {
+            for (Local l : worklist) {
+                int c = this.localToIndices.get(l);
+                this.putConstraint(i, c, PADO01Constraint.add(this.matrix[i][si],
+                                                              this.matrix[si][c]));
+            }
+        }
+
+        return this.isFeasible();
     }
 
     /** Compute transitive closure of matrix
