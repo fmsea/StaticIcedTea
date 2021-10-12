@@ -13,6 +13,7 @@ public class DBSMiniJavaExamplesProvider extends MiniJavaExamplesProvider {
         return Stream.of(example("miniExample1", "dbs"),
                          example("miniExample2", "dbs"),
                          example("miniExample3", "dbs"),
-                         example("miniExample4", "dbs"));
+                         example("miniExample4", "dbs"),
+                         example("miniExample5", "dbs"));
     }
 }

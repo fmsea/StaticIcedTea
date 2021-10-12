@@ -13,6 +13,7 @@ public class IntMiniJavaExamplesProvider extends MiniJavaExamplesProvider {
         return Stream.of(example("miniExample1", "int"),
                          example("miniExample2", "int"),
                          example("miniExample3", "int"),
-                         example("miniExample4", "int"));
+                         example("miniExample4", "int"),
+                         example("miniExample5", "int"));
     }
 }

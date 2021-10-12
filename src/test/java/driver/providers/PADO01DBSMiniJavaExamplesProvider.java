@@ -13,6 +13,7 @@ public class PADO01DBSMiniJavaExamplesProvider extends MiniJavaExamplesProvider 
         return Stream.of(example("miniExample1", "pado"),
                          example("miniExample2", "pado"),
                          example("miniExample3", "pado"),
-                         example("miniExample4", "pado"));
+                         example("miniExample4", "pado"),
+                         example("miniExample5", "pado"));
     }
 }
