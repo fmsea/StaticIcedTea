@@ -4,8 +4,8 @@ l0->(and (>= l0 5) (<= l0 5))
 l1->(and (>= l1 0) (<= l1 0) (<= l0 (+ l1 5)) (<= l1 (+ l0 (- 5))))
 3 if l1 >= 5 goto l3 = l0 + l1:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>
 l1->(and (>= l1 0) (<= l1 4) (<= l0 (+ l1 5)) (<= l1 (+ l0 (- 1))))
-l1f->(and (>= l1 5) (<= l1 5) (<= l0 (+ l1 0)) (<= l1 (+ l0 0)))
+l1f->(and (>= l1 5) (<= l0 (+ l1 0)))
 4 l1 = l1 + 1:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>
 l1->(and (>= l1 1) (<= l1 5) (<= l0 (+ l1 4)) (<= l1 (+ l0 0)))
 6 l3 = l0 + l1:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>
-l3->(and (>= l3 10) (<= l3 10) (<= l0 (+ l3 (- 5))) (<= l3 (+ l0 5)) (<= l1 (+ l3 (- 5))) (<= l3 (+ l1 5)))
+l3->(and (>= l3 10) (<= l0 (+ l3 (- 5))))

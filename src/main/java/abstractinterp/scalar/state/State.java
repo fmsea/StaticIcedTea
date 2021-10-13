@@ -10,10 +10,18 @@ public interface State {
     public State copy();
     public boolean isFeasible();
     public void copyTo(State dest);
-    // public void update(Local l, B b);
-    // public B getValue(Local local);
     public void mergeWith(State inState);
-    public void widenWith(State prevBeforeFlow);
+
+    /** Widen flows according to Cousot and Miné definition
+     *
+     * Widening definition
+     * m_ij ▽ n_ij = { m_ij if n_ij ≤ m_ij else +∞ }
+     * where `this` is `m` and `newFlow` is `n`.
+     *
+     * Definition can be found in §4 of mine-pado-2001.
+     * http://dx.doi.org/10.1007/3-540-44978-7_10
+     */
+    public void widenWith(State newFlow);
     public boolean isSubset(State inState);
     public void updateState(Local var, State inState, Value left, Value right, BinaryOperatorType operator);
     public void updateState(Local var, State inState, Value v);

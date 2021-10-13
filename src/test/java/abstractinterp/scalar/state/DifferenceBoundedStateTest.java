@@ -976,36 +976,38 @@ public class DifferenceBoundedStateTest {
             DifferenceBoundedState m = new DifferenceBoundedState(state1);
             DifferenceBoundedState n = new DifferenceBoundedState(state2);
 
-            m.widenWith(n);
+            DifferenceBoundedState c = DifferenceBoundedState.widen(m, n);
 
             assertAll("m ▽ n",
-                      () -> assertEquals(new Constraint(2, PredicateType.Le),
-                                         m.getConstraint(xs[0], xs[1])),
+                      () -> assertEquals(Constraint.TOP(), c.getConstraint(xs[0], xs[1])),
                       () -> assertEquals(new Constraint(3, PredicateType.Le),
-                                         m.getConstraint(xs[1], xs[2])),
-                      () -> assertEquals(Constraint.TOP(), m.getConstraint(xs[2], xs[0])),
-                      () -> assertEquals(new Constraint(4, PredicateType.Le),
-                                         m.getConstraint(xs[2], xs[3])),
-                      () -> assertEquals(Constraint.TOP(), m.getConstraint(xs[3], xs[0])),
-                      () -> assertEquals(Constraint.TOP(), m.getConstraint(xs[3], xs[1])));
+                                         c.getConstraint(xs[1], xs[2])),
+                      () -> assertEquals(new Constraint(5, PredicateType.Le),
+                                         c.getConstraint(xs[2], xs[0])),
+                      () -> assertEquals(Constraint.TOP(), c.getConstraint(xs[2], xs[3])),
+                      () -> assertEquals(new Constraint(1, PredicateType.Le),
+                                         c.getConstraint(xs[3], xs[0])),
+                      () -> assertEquals(new Constraint(5, PredicateType.Le),
+                                         c.getConstraint(xs[3], xs[1])));
         }
 
         {
             DifferenceBoundedState m = new DifferenceBoundedState(state1);
             DifferenceBoundedState n = new DifferenceBoundedState(state2);
 
-            n.widenWith(m);
+            DifferenceBoundedState c = DifferenceBoundedState.widen(n, m);
 
             assertAll("n ▽ m",
-                      () -> assertEquals(Constraint.TOP(), n.getConstraint(xs[0], xs[1])),
                       () -> assertEquals(new Constraint(3, PredicateType.Le),
-                                         n.getConstraint(xs[1], xs[2])),
+                                         c.getConstraint(xs[0], xs[1])),
+                      () -> assertEquals(new Constraint(3, PredicateType.Le),
+                                         c.getConstraint(xs[1], xs[2])),
+                      () -> assertEquals(Constraint.TOP(), c.getConstraint(xs[2], xs[0])),
+                      () -> assertEquals(new Constraint(5, PredicateType.Le),
+                                         c.getConstraint(xs[2], xs[3])),
+                      () -> assertEquals(Constraint.TOP(), c.getConstraint(xs[3], xs[0])),
                       () -> assertEquals(new Constraint(4, PredicateType.Le),
-                                         n.getConstraint(xs[2], xs[0])),
-                      () -> assertEquals(Constraint.TOP(), n.getConstraint(xs[2], xs[3])),
-                      () -> assertEquals(new Constraint(0, PredicateType.Le),
-                                         n.getConstraint(xs[3], xs[0])),
-                      () -> assertEquals(Constraint.TOP(), n.getConstraint(xs[3], xs[1])));
+                                         c.getConstraint(xs[3], xs[1])));
         }
     }
 

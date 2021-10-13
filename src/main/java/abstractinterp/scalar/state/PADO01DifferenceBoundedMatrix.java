@@ -282,11 +282,18 @@ public class PADO01DifferenceBoundedMatrix {
         return true;
     }
 
-    public void widenWith(PADO01DifferenceBoundedMatrix prev) {
+    public static PADO01DifferenceBoundedMatrix widen(PADO01DifferenceBoundedMatrix m,
+                                                      PADO01DifferenceBoundedMatrix n) {
+        PADO01DifferenceBoundedMatrix res = new PADO01DifferenceBoundedMatrix(m);
+        res.widenWith(n);
+        return res;
+    }
+
+    public void widenWith(PADO01DifferenceBoundedMatrix n) {
         iterateMatrix((i, j) -> {
                 PADO01Constraint c1 = this.matrix[i][j];
-                PADO01Constraint c2 = prev.matrix[i][j];
-                if (!(c1.isBottom() || c2.isBottom()) && c1.compareTo(c2) == 1) {
+                PADO01Constraint c2 = n.matrix[i][j];
+                if (!(c1.isBottom() || c2.isBottom()) && c2.compareTo(c1) == 1) {
                     this.matrix[i][j] = PADO01Constraint.TOP();
                 }
             });

@@ -67,13 +67,13 @@ public class Interval32BoxProperties {
         int yl = y.lowerBoundOrElse();
         int yu = y.upperBoundOrElse();
         Interval32Box z = Interval32Box.wideningAssign(x, y);
-        if (xl < yl) {
+        if (xl > yl) {
             assertFalse(z.isLowerBounded());
         } else {
             assertAll(() -> assertTrue(z.isLowerBounded()),
                       () -> assertEquals(xl, z.lowerBoundOrElse()));
         }
-        if (xu > yu) {
+        if (xu < yu) {
             assertFalse(z.isUpperBounded());
         } else {
             assertAll(() -> assertTrue(z.isUpperBounded()),
@@ -82,13 +82,13 @@ public class Interval32BoxProperties {
     }
 
     @Property
-    void widenWithBottomStaysBottom(@ForAll Interval32Box box) {
+    void widenWithBottomTakesOther(@ForAll Interval32Box box) {
         Interval32Box a = new Interval32Box(box);
         Interval32Box bot = Interval32Box.BOT();
         a.wideningAssign(bot);
         bot.wideningAssign(box);
         assertAll(() -> assertFalse(a.isBottom()),
-                  () -> assertTrue(bot.isBottom()));
+                  () -> assertFalse(bot.isBottom()));
     }
 
     @Property

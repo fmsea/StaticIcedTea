@@ -313,6 +313,8 @@ public class DifferenceBoundedGraph {
 
     public void widenWith(DifferenceBoundedGraph other) {
         // close incoming graph
+        // this is m
+        // other is n
         other.computeClosure();
         LOGGER.debug("widening this {} with {}", this.toString(), other.toString());
         LOGGER.debug("other graph is feasible: {}", other.feasible);
@@ -322,7 +324,7 @@ public class DifferenceBoundedGraph {
                 Constraint c2 = other.eval(s, t);
                 LOGGER.trace("widening ({} -> {}) {} < {}",
                              s, t, c1, c2);
-                if (!(c1.isBottom() || c2.isBottom()) && c1.compareTo(c2) == 1) {
+                if (!(c1.isBottom() || c2.isBottom()) && c2.compareTo(c1) == 1) {
                     this.add(s, t, Constraint.TOP());
                 }
             }

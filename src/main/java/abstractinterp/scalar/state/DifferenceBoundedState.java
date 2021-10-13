@@ -135,6 +135,12 @@ public class DifferenceBoundedState implements State {
         return this.dbs.isFeasible();
     }
 
+    public static DifferenceBoundedState widen(DifferenceBoundedState m,
+                                               DifferenceBoundedState n) {
+        DifferenceBoundedState res = new DifferenceBoundedState(m);
+        res.widenWith(n);
+        return res;
+    }
 
     public void widenWith(State inState) {
         if (inState instanceof DifferenceBoundedState) {

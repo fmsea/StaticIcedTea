@@ -145,19 +145,19 @@ public class Interval32Box {
         }
     }
 
-    private void minWidenAssign(Interval32Box box) {
+    private void minWidenAssign(Interval32Box n) {
         boolean shouldWiden = (!this.isLowerBounded() ||
-                               !box.isLowerBounded() ||
-                               this.lowerBound.flatMap(tl -> box.lowerBound.map(ol -> tl < ol)).orElse(false));
+                               !n.isLowerBounded() ||
+                               this.lowerBound.flatMap(ml -> n.lowerBound.map(nl -> nl < ml)).orElse(false));
         if (shouldWiden) {
             this.lowerBound = Optional.empty();
         }
     }
 
-    private void maxWidenAssign(Interval32Box box) {
+    private void maxWidenAssign(Interval32Box n) {
         boolean shouldWiden = (!this.isUpperBounded() ||
-                               !box.isUpperBounded() ||
-                               this.upperBound.flatMap(tu -> box.upperBound.map(ou -> tu > ou)).orElse(false));
+                               !n.isUpperBounded() ||
+                               this.upperBound.flatMap(mu -> n.upperBound.map(nu -> nu > mu)).orElse(false));
         if (shouldWiden) {
             this.upperBound = Optional.empty();
         }
@@ -183,16 +183,22 @@ public class Interval32Box {
         this.checkAndSetBottom();
     }
 
-    public static Interval32Box wideningAssign(Interval32Box a, Interval32Box b) {
-        Interval32Box c = new Interval32Box(a);
-        c.wideningAssign(b);
+    public static Interval32Box wideningAssign(Interval32Box m, Interval32Box n) {
+        Interval32Box c = new Interval32Box(m);
+        c.wideningAssign(n);
         return c;
     }
 
-    public void wideningAssign(Interval32Box box) {
-        if (!(this.isBottom() || box.isBottom())) {
-            minWidenAssign(box);
-            maxWidenAssign(box);
+    public void wideningAssign(Interval32Box n) {
+        // this = m
+        if (this.isBottom()) {
+            this.lowerBound = n.lowerBound;
+            this.upperBound = n.upperBound;
+            this.bottom = n.bottom;
+        } else if (!n.isBottom()) {
+            // ⊃ this ≠ ⟘ ∧ box ≠ ⟘
+            minWidenAssign(n);
+            maxWidenAssign(n);
             this.checkAndSetBottom();
         }
     }

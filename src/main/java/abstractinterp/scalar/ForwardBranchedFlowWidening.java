@@ -73,7 +73,7 @@ public abstract class ForwardBranchedFlowWidening<N extends Unit, A extends Stat
                                                              mergeCounts * -1,
                                                              node));
                 } else if (mergeCounts <= 0) {
-                    widen(beforeFlow, prevBeforeFlow);
+                    widen(prevBeforeFlow, beforeFlow);
                 }
                 mergeCounts--;
                 itersCount.put(node, mergeCounts);
@@ -87,10 +87,17 @@ public abstract class ForwardBranchedFlowWidening<N extends Unit, A extends Stat
 
     /**
      * widens beforeFlow with prevBeforeFlow and writes
-     * the results back to beforeFlow
+     * the results back to prevBeforeFlow
+     * Widening definition
+     * m_ij ▽ n_ij = { m_ij if n_ij ≤ m_ij else +∞ }
+     * where `prevBeforeFlow` is `m` and `beforeFlow` is `n`.
+     *
+     * http://dx.doi.org/10.1007/3-540-44978-7_10
+     *
      * @param beforeFlow
      * @param prevBefore
+     * @return widened flow
      */
-    protected abstract void widen(A beforeFlow, A prevBeforeFlow);
+    protected abstract void widen(A prevBeforeFlow, A beforeFlow);
 
 }

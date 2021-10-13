@@ -226,8 +226,8 @@ public class Interval32BoxTest {
             Interval32Box bot = Interval32Box.BOT();
             Interval32Box top = Interval32Box.TOP();
             Interval32Box c = Interval32Box.wideningAssign(bot, top);
-            assertAll(() -> assertTrue(c.isBottom()),
-                      () -> assertFalse(c.isTop()));
+            assertAll(() -> assertFalse(c.isBottom()),
+                      () -> assertTrue(c.isTop()));
         }
 
         {
@@ -241,49 +241,47 @@ public class Interval32BoxTest {
         }
 
         {
-            Interval32Box a = new Interval32Box(1, 10);
-            Interval32Box b = new Interval32Box(2, 9);
-            Interval32Box c = Interval32Box.wideningAssign(a, b);
+            Interval32Box m = new Interval32Box(1, 10);
+            Interval32Box n = new Interval32Box(2, 9);
+            Interval32Box c = Interval32Box.wideningAssign(m, n);
+            assertAll(() -> assertFalse(c.isTop()),
+                      () -> assertEquals(new Interval32Box(1, 10), c));
+        }
+
+        {
+            Interval32Box m = new Interval32Box(2, 9);
+            Interval32Box n = new Interval32Box(1, 10);
+            Interval32Box c = Interval32Box.wideningAssign(m, n);
             assertAll(() -> assertTrue(c.isTop()),
                       () -> assertFalse(c.isLowerBounded()),
-                      () -> assertFalse(c.isUpperBounded()));
+                      () -> assertFalse(c.isUpperBounded()),
+                      () -> assertEquals(Interval32Box.TOP(), c));
         }
 
         {
-            Interval32Box a = new Interval32Box(2, 9);
-            Interval32Box b = new Interval32Box(1, 10);
-            Interval32Box c = Interval32Box.wideningAssign(a, b);
-            assertAll(() -> assertFalse(c.isTop()),
-                      () -> assertTrue(c.isLowerBounded()),
-                      () -> assertTrue(c.isUpperBounded()),
-                      () -> assertEquals(2, c.lowerBoundOrElse()),
-                      () -> assertEquals(9, c.upperBoundOrElse()));
-        }
-
-        {
-            Interval32Box a = new Interval32Box(1, 5);
-            Interval32Box b = new Interval32Box(0, null);
-            Interval32Box c = Interval32Box.wideningAssign(a, b);
+            Interval32Box m = new Interval32Box(0, null);
+            Interval32Box n = new Interval32Box(1, 5);
+            Interval32Box c = Interval32Box.wideningAssign(m, n);
             assertAll(() -> assertFalse(c.isTop()),
                       () -> assertTrue(c.isLowerBounded()),
                       () -> assertFalse(c.isUpperBounded()),
-                      () -> assertEquals(1, c.lowerBoundOrElse()));
+                      () -> assertEquals(0, c.lowerBoundOrElse()));
         }
 
         {
-            Interval32Box a = new Interval32Box(1, null);
-            Interval32Box b = new Interval32Box(0, 5);
-            Interval32Box c = Interval32Box.wideningAssign(a, b);
+            Interval32Box m = new Interval32Box(0, 5);
+            Interval32Box n = new Interval32Box(1, null);
+            Interval32Box c = Interval32Box.wideningAssign(m, n);
             assertAll(() -> assertFalse(c.isTop()),
                       () -> assertTrue(c.isLowerBounded()),
                       () -> assertFalse(c.isUpperBounded()),
-                      () -> assertEquals(1, c.lowerBoundOrElse()));
+                      () -> assertEquals(0, c.lowerBoundOrElse()));
         }
 
         {
-            Interval32Box a = new Interval32Box(-1, 0);
-            Interval32Box b = new Interval32Box(null, 0);
-            Interval32Box c = Interval32Box.wideningAssign(a, b);
+            Interval32Box m = new Interval32Box(null, 0);
+            Interval32Box n = new Interval32Box(-1, 0);
+            Interval32Box c = Interval32Box.wideningAssign(m, n);
             assertAll(() -> assertFalse(c.isTop()),
                       () -> assertFalse(c.isLowerBounded()),
                       () -> assertTrue(c.isUpperBounded()),
@@ -291,9 +289,9 @@ public class Interval32BoxTest {
         }
 
         {
-            Interval32Box a = new Interval32Box(null, 0);
-            Interval32Box b = new Interval32Box(-1, 0);
-            Interval32Box c = Interval32Box.wideningAssign(a, b);
+            Interval32Box m = new Interval32Box(-1, 0);
+            Interval32Box n = new Interval32Box(null, 0);
+            Interval32Box c = Interval32Box.wideningAssign(m, n);
             assertAll(() -> assertFalse(c.isTop()),
                       () -> assertFalse(c.isLowerBounded()),
                       () -> assertTrue(c.isUpperBounded()),

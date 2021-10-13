@@ -553,12 +553,12 @@ public class PADO01DifferenceBoundedMatrixTest {
         {
             PADO01DifferenceBoundedMatrix m = new PADO01DifferenceBoundedMatrix(this.locals, true);
             PADO01DifferenceBoundedMatrix n = new PADO01DifferenceBoundedMatrix(this.locals, false);
-            m.widenWith(n);
+            PADO01DifferenceBoundedMatrix c = PADO01DifferenceBoundedMatrix.widen(m, n);
             checkMatrixCondition((s, t) -> {
                     if (s.equals(t)) {
-                        assertEquals(PADO01Constraint.of(0), m.getConstraint(s, t));
+                        assertEquals(PADO01Constraint.of(0), c.getConstraint(s, t));
                     } else {
-                        assertEquals(PADO01Constraint.TOP(), m.getConstraint(s, t));
+                        assertEquals(PADO01Constraint.TOP(), c.getConstraint(s, t));
                     }
                 });
         }
@@ -566,48 +566,48 @@ public class PADO01DifferenceBoundedMatrixTest {
         {
             PADO01DifferenceBoundedMatrix m = new PADO01DifferenceBoundedMatrix(this.locals, true);
             PADO01DifferenceBoundedMatrix n = new PADO01DifferenceBoundedMatrix(this.locals, true);
-            m.widenWith(n);
+            PADO01DifferenceBoundedMatrix c = PADO01DifferenceBoundedMatrix.widen(m, n);
             checkMatrixCondition((s, t) -> {
                     if (s.equals(t)) {
-                        assertEquals(PADO01Constraint.of(0), m.getConstraint(s, t));
+                        assertEquals(PADO01Constraint.of(0), c.getConstraint(s, t));
                     } else {
-                        assertEquals(PADO01Constraint.TOP(), m.getConstraint(s, t));
+                        assertEquals(PADO01Constraint.TOP(), c.getConstraint(s, t));
                     }
                 });
         }
 
         {
             PADO01DifferenceBoundedMatrix m = new PADO01DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[0], xs[1], PADO01Constraint.of(-1));
-            m.setConstraint(xs[0], xs[2], PADO01Constraint.of(-1));
+            m.setConstraint(xs[0], xs[1], PADO01Constraint.of(-2));
+            m.setConstraint(xs[0], xs[2], PADO01Constraint.of(0));
             m.setConstraint(xs[1], xs[0], PADO01Constraint.of(4));
-            m.setConstraint(xs[1], xs[2], PADO01Constraint.of(1));
+            m.setConstraint(xs[1], xs[2], PADO01Constraint.of(2));
             m.setConstraint(xs[2], xs[0], PADO01Constraint.of(3));
             PADO01DifferenceBoundedMatrix n = new PADO01DifferenceBoundedMatrix(this.locals, true);
-            n.setConstraint(xs[0], xs[1], PADO01Constraint.of(-2));
-            n.setConstraint(xs[0], xs[2], PADO01Constraint.of(0));
+            n.setConstraint(xs[0], xs[1], PADO01Constraint.of(-1));
+            n.setConstraint(xs[0], xs[2], PADO01Constraint.of(-1));
             n.setConstraint(xs[1], xs[0], PADO01Constraint.of(4));
-            n.setConstraint(xs[1], xs[2], PADO01Constraint.of(2));
+            n.setConstraint(xs[1], xs[2], PADO01Constraint.of(1));
             n.setConstraint(xs[2], xs[0], PADO01Constraint.of(3));
-            m.widenWith(n);
+            PADO01DifferenceBoundedMatrix c = PADO01DifferenceBoundedMatrix.widen(m, n);
             assertAll(() -> assertEquals(PADO01Constraint.of(0),
-                                         m.getConstraint(xs[0], xs[0])),
+                                         c.getConstraint(xs[0], xs[0])),
                       () -> assertEquals(PADO01Constraint.of(0),
-                                         m.getConstraint(xs[1], xs[1])),
+                                         c.getConstraint(xs[1], xs[1])),
                       () -> assertEquals(PADO01Constraint.of(0),
-                                         m.getConstraint(xs[2], xs[2])),
+                                         c.getConstraint(xs[2], xs[2])),
                       () -> assertEquals(PADO01Constraint.TOP(),
-                                         m.getConstraint(xs[0], xs[1])),
-                      () -> assertEquals(PADO01Constraint.of(-1),
-                                         m.getConstraint(xs[0], xs[2])),
+                                         c.getConstraint(xs[0], xs[1])),
+                      () -> assertEquals(PADO01Constraint.of(0),
+                                         c.getConstraint(xs[0], xs[2])),
                       () -> assertEquals(PADO01Constraint.of(4),
-                                         m.getConstraint(xs[1], xs[0])),
-                      () -> assertEquals(PADO01Constraint.of(1),
-                                         m.getConstraint(xs[1], xs[2])),
+                                         c.getConstraint(xs[1], xs[0])),
+                      () -> assertEquals(PADO01Constraint.of(2),
+                                         c.getConstraint(xs[1], xs[2])),
                       () -> assertEquals(PADO01Constraint.of(3),
-                                         m.getConstraint(xs[2], xs[0])),
+                                         c.getConstraint(xs[2], xs[0])),
                       () -> assertEquals(PADO01Constraint.TOP(),
-                                         m.getConstraint(xs[2], xs[1])));
+                                         c.getConstraint(xs[2], xs[1])));
         }
     }
 

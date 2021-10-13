@@ -56,11 +56,22 @@ public class ForwardBranchedFlowNumerical<S extends State>
         this.stateFactory = stateFactory;
     }
 
+    /** Widen flows
+     *
+     * Widen flows following the definition of widening per Miné's PADO 2001 paper.
+     *
+     * m_ij ▽ n_ij = { m_ij if n_ij ≤ m_ij else +∞ }
+     * where `prevBeforeFlow` is `m` and `beforeFlow` is `n`.
+     *
+     * http://dx.doi.org/10.1007/3-540-44978-7_10
+     */
     @Override
-    protected void widen(S beforeFlow, S prevBeforeFlow) {
-        LOGGER.trace("widening {} with {}", beforeFlow, prevBeforeFlow);
-        beforeFlow.widenWith(prevBeforeFlow);
-        LOGGER.trace("widening result: {}", beforeFlow);
+    protected void widen(S prevBeforeFlow, S beforeFlow) {
+        LOGGER.trace("widening {} with {}", prevBeforeFlow, beforeFlow);
+        State widenedFlow = prevBeforeFlow.copy();
+        widenedFlow.widenWith(beforeFlow);
+        LOGGER.trace("widening result: {}", widenedFlow);
+        widenedFlow.copyTo(beforeFlow);
     }
 
     @Override
