@@ -56,11 +56,14 @@ import soot.toolkits.graph.UnitGraph;
 import soot.toolkits.scalar.ForwardBranchedFlowAnalysis;
 //import abstractinterp.scalar.ForwardBranchedFlowAnalysis;
 import soot.util.Chain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import disjoint.domain.BaseElement;
 import disjoint.domain.Domain;
 import disjoint.driver.StartAnalysis;
 import solver.SolverWrapper;
+import solver.SolverFactory;
 import disjoint.state.*;
 
 /**
@@ -71,6 +74,8 @@ import disjoint.state.*;
  */
 public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 //public class ValueAnalysis extends ForwardBranchedFlowAnalysis<Unit, AbstractState> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ValueAnalysis.class);
 
 	//only write to the file states of those statements
 	protected Set<Unit> outputStmt;
@@ -225,12 +230,14 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 		//done with the analysis
 		time = end - start;
 		//reporting part
-		String timeData = b.getMethod().getDeclaringClass() + "\t" +b.getMethod().getSignature()+
-				"\t Done in "+ (end - start)+"\n";
-		System.out.println(timeData);
+		LOGGER.info("{}\t{}\t analyzed in {}ms",
+                    b.getMethod().getDeclaringClass(),
+                    b.getMethod().getSignature(),
+                    time);
 	}
 
 	public void report(){
+        StringBuilder sb = new StringBuilder();
 		Chain<Local> locals = b.getLocals();
 		//printing the result
 		Iterator<Unit> iter = b.getUnits().iterator();
@@ -242,9 +249,12 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 			stmtCount++;
 			//System.out.println("outputStmt " + outputStmt);
 			if(outputStmt.contains(u)){
-				//String that keeps that state info for the current state
-				String outputInfo = stmtCount + " " + u +":" + b.getMethod().getSignature() + "\n";
-				System.out.println(outputInfo);
+				sb.append(stmtCount);
+                sb.append(" ");
+                sb.append(u);
+                sb.append(":");
+                sb.append(b.getMethod().getSignature());
+                sb.append("\n");
 				AbstractState fall = getFallFlowAfter(u);
 				if(!fall.getStates().isEmpty() && fall.isFeasible()){
 					for(Local l : locals){
@@ -258,7 +268,10 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 									state = new GAndExpr(state, be);
 								}
 							}
-							System.out.println(l + "->" + solver.smt2((BinopExpr)state));
+                            sb.append(l);
+                            sb.append("->");
+                            sb.append(solver.smt2((BinopExpr)state));
+                            sb.append("\n");
 						}
 					}
 				}
@@ -280,7 +293,10 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 									}
 									//branched flow will be marked with "f" after the var name
 									//while fall through will have just the var name
-									System.out.println(l+"f" + "->" + solver.smt2((BinopExpr)state));
+                                    sb.append(l);
+                                    sb.append("f->");
+                                    sb.append(solver.smt2((BinopExpr)state));
+                                    sb.append("\n");
 								}
 							}
 						}
@@ -288,8 +304,9 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 					}
 				}
 			}//end outputStmt check
-			System.out.flush();
 		}
+        System.out.print(sb.toString());
+        System.out.flush();
 	}
 
 	@Override

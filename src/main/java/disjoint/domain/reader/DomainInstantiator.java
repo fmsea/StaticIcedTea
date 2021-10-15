@@ -10,8 +10,9 @@ import soot.IntType;
 import soot.grimp.internal.GAndExpr;
 import soot.jimple.BinopExpr;
 import soot.jimple.internal.JimpleLocal;
-
 import com.microsoft.z3.Z3Exception;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import disjoint.domain.BaseElement;
 import disjoint.domain.Domain;
@@ -19,6 +20,8 @@ import disjoint.domain.IntervalPredicate;
 import solver.SolverWrapperZ3;
 
 public class DomainInstantiator extends DisjointDomainBaseVisitor {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DomainInstantiator.class);
 	
 	Domain domain;
 	
@@ -28,7 +31,7 @@ public class DomainInstantiator extends DisjointDomainBaseVisitor {
 	@Override public BaseElement visitIntervals(DisjointDomainParser.IntervalsContext ctx) {
 		//whatever children return add to the domain
 		for( ParseTree child : ctx.children){
-			//System.out.println("Ctx " + ctx.getText());
+			LOGGER.debug("Ctx {}", ctx.getText());
 			Set<BaseElement> beSet = (Set<BaseElement>) visit(child);
 			Iterator<BaseElement> iter = beSet.iterator();
 			while(iter.hasNext()){
@@ -38,7 +41,7 @@ public class DomainInstantiator extends DisjointDomainBaseVisitor {
 		//domain.done(); unimplemented method that should check whether the domain is complete
 		//we do it here ...
 		checkCompleteAndDisjoint();
-		System.out.println(domain.getBaseElements().size());
+        LOGGER.info("Domain Size: {}", domain.getBaseElements().size());
 		
 		
 		return null; 
@@ -53,7 +56,7 @@ public class DomainInstantiator extends DisjointDomainBaseVisitor {
 		SolverWrapperZ3 solver = new SolverWrapperZ3();
 		boolean sat = solver.evaluateNot(complete);
 		if(sat){
-			System.out.println("Domain " + domain + " is incomplete !");
+			LOGGER.error("Domain {} is incomplete!", domain);
 			System.exit(2);
 		}
 		//check whether the domain is pairwise disjoint
@@ -123,7 +126,7 @@ public class DomainInstantiator extends DisjointDomainBaseVisitor {
 				rhsInfty = true;
 			}
 			
-			//System.out.println("lhsIcl " + lhsIncl + " rhsIncl " + rhsIncl);
+            LOGGER.debug("lhsIcl {} rhsIncl {}", lhsIncl, rhsIncl);
 			//figure out the delimiter
 			switch(ctx.del.getType()){
 				case DisjointDomainParser.COMMA:{
@@ -161,7 +164,7 @@ public class DomainInstantiator extends DisjointDomainBaseVisitor {
 					//Exclusively over the interval
 					//range should not have empty lhs/rhs
 					if(lhsInfty || rhsInfty){
-						System.out.println("Wrong format for range");
+                        LOGGER.error("Wrong format for range");
 					} else {
 						//get the integer values
 						int lhsIntVal = Integer.parseInt(lhsVal);
