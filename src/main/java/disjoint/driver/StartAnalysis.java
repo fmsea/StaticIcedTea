@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.microsoft.z3.Z3Exception;
 
-import disjoint.analysis.ValueTransfomer;
+import disjoint.analysis.ValueTransformer;
 import disjoint.domain.Domain;
 import disjoint.domain.reader.DomainReader;
 import solver.SolverWrapper;
@@ -77,7 +77,7 @@ public class StartAnalysis {
 		String[] sootArgs = {"-f", "n", className};
 		//add the analysis into the compiler
 		PackManager.v().getPack("jtp").
-		add(new Transform("jtp.disjoint", new ValueTransfomer(domain, methodId, symbolicOn)));
+		add(new Transform("jtp.disjoint", new ValueTransformer(domain, methodId, symbolicOn)));
 		//system separator
 		String pathSeparator = System.getProperty("path.separator");
 		//adding runtime to the path

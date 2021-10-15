@@ -4,7 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import disjoint.analysis.ValueTransfomer;
+import disjoint.analysis.ValueTransformer;
 import disjoint.domain.Domain;
 import disjoint.domain.reader.DomainReader;
 import soot.G;
@@ -88,7 +88,7 @@ public class StartAnalysisOld {
 		
 		String[] sootArgs = {"-f", "n", className};
 		PackManager.v().getPack("jtp").
-			add(new Transform("jtp.disjoint", new ValueTransfomer(domain, 2, symbolicOn)));
+			add(new Transform("jtp.disjoint", new ValueTransformer(domain, 2, symbolicOn)));
 		//adding runtime to the path
 		System.out.println(Scene.v().getSootClassPath() +  " " + System.getProperty("java.class.path"));
 		Scene.v().setSootClassPath(Scene.v().getSootClassPath()+":"+System.getProperty("java.class.path") 
