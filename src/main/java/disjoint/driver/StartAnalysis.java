@@ -53,7 +53,7 @@ public class StartAnalysis {
         if (args.length >= 4) {
             className = args[0];
             methodId = Integer.parseInt(args[1]);
-            domainName = args[2];
+            domainName = Paths.get(args[2]).toAbsolutePath().toString();
             symbolicOn = args[3];
         }
 
