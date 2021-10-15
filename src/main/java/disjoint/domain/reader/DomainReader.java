@@ -23,6 +23,7 @@ public class DomainReader {
 
     public DomainReader(String fileName) {
         try (Reader reader = new FileReader(fileName)) {
+            initializeDomains(reader);
         } catch (FileNotFoundException ex) {
             // TODO Auto-generated catch block
             ex.printStackTrace();
@@ -33,6 +34,10 @@ public class DomainReader {
     }
 
     public DomainReader(Reader reader) {
+        initializeDomains(reader);
+    }
+
+    private void initializeDomains(Reader reader) {
         // holds the domain descriptions read from the file
         List<String> domains = new ArrayList<String>();
         // for each line in the file create
