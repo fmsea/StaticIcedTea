@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
-import disjoint.driver.StartAnalysis;
+import driver.StartPredicateNumerical;
 import util.Configuration;
 
 @Command(name = "disjoint",
@@ -19,7 +19,7 @@ public class StartDisjointAnalysisCommand implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         Configuration.LoadArtifactsIntoSootPath();
-        StartAnalysis.main(this.arguments.toArray(new String[0]));
+        StartPredicateNumerical.main(this.arguments.toArray(new String[arguments.size()]));
         return 0;
     }
 }
