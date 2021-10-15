@@ -14,14 +14,18 @@ import solver.SolverWrapperZ3;
 import soot.PackManager;
 import soot.Scene;
 import soot.Transform;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * The driver for the analysis
  * you're welcome to come up with your own.
  * @author elenasherman
  *
  */
-
 public class StartAnalysis {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(StartAnalysis.class);
 	/**
 	 *  The class should have static fields for the files to write to
 	 *  className_sY_domainName
@@ -37,6 +41,10 @@ public class StartAnalysis {
 	 */
 	public static void main(String[] args) {
 
+        LOGGER.debug("arguments: {}", args.length);
+        for (int i = 0; i < args.length; i++) {
+            LOGGER.debug("arguments[{}]: {}", i, args[i]);
+        }
 		//Parse arguments
         String className = "test.Example1M";
         Integer methodId = 6;
@@ -50,12 +58,12 @@ public class StartAnalysis {
         }
 
 		//Print info based on the arguments
-		System.out.println("Running analysis for " + domainName + "_"+ symbolicOn);
+		LOGGER.info("Running analysis for {} _ {}", domainName, symbolicOn);
 		try {
 			//instantiate domain and analysis
 			new StartAnalysis(className, methodId, domainName, symbolicOn.equals("sY"));
 		} catch (IOException e) {
-			e.printStackTrace();
+            LOGGER.error("unable to complete analysis", e);
 		}
 	}
 
@@ -64,7 +72,7 @@ public class StartAnalysis {
 		DomainReader dr = new DomainReader(domainFile);
 		List<Domain> domain = dr.getReadDomains();
 		//show the domain encoding used in the analysis
-		System.out.println("Domain provided: \n" + " " + domain);
+		LOGGER.info("Domain provided: \n{}", domain);
 		//"-f" "n" means for soot not to output the compiled files 
 		String[] sootArgs = {"-f", "n", className};
 		//add the analysis into the compiler
@@ -91,8 +99,7 @@ public class StartAnalysis {
 			s = new SolverWrapperZ3();
 
 		} catch (Z3Exception e) {
-			e.printStackTrace();
-			System.out.println("Cannot instatiate the solver");
+            LOGGER.error("Cannot instantiate the solver", e);
 			System.exit(2);
 		}
 		//set the timeout if applicable
