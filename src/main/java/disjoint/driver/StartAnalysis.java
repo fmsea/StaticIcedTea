@@ -86,26 +86,4 @@ public class StartAnalysis {
 		//run soot with the added analysis
 		soot.Main.main(sootArgs);
 	}
-
-	/*
-	 * Instantiates solver based on the choice
-	 * of the solver 
-	 * For now just a single one that
-	 * we have based on Z3
-	 */
-	public static SolverWrapper getSolver(){
-		SolverWrapper s = null;
-		try {
-			s = new SolverWrapperZ3();
-
-		} catch (Z3Exception e) {
-            LOGGER.error("Cannot instantiate the solver", e);
-			System.exit(2);
-		}
-		//set the timeout if applicable
-		//in milliseconds
-		s.setTimeOut(10000000);
-		return s;
-	}
-
 }

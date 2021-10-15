@@ -146,7 +146,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 	public ValueAnalysis(UnitGraph graph, List<Domain> setDomains, boolean symbolicOn) {
 		super(graph);
 
-		solver = StartAnalysis.getSolver();
+		solver = SolverFactory.getSolver();
 		//initialize the type of states that will be used in the analysis
 		states = new ArrayList<State>();
 		IntervalStates iState = null;
