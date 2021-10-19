@@ -39,7 +39,8 @@ import com.microsoft.z3.Solver;
 import com.microsoft.z3.Status;
 import com.microsoft.z3.Z3Exception;
 
-public class SolverWrapperZ3 implements SolverWrapper {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is a wrapper for the actual solver used in the analysis which is Z3
@@ -48,6 +49,8 @@ public class SolverWrapperZ3 implements SolverWrapper {
  *
  */
 public class SolverWrapperZ3 implements SolverWrapper {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SolverWrapperZ3.class);
 
     private Context ctx;
     // no need to create a new IntExpr every time
@@ -77,8 +80,7 @@ public class SolverWrapperZ3 implements SolverWrapper {
             }
             z3Formula = ctx.mkForall(forall, z3Formula, 0, null, null, null, null);
         } catch (Z3Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.error("Error while checking equality", e);
         }
         boolean ret = solve(z3Formula);
         return ret;
@@ -99,11 +101,10 @@ public class SolverWrapperZ3 implements SolverWrapper {
                 ret = false;
             } else {
                 // unknown
-                System.out.println("Warning: " + result + " for " + z3Formula);
+                LOGGER.warn("{} for {}", result, z3Formula);
             }
         } catch (Z3Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.error("Error while solving", e);
         }
         return ret;
     }
@@ -176,8 +177,8 @@ public class SolverWrapperZ3 implements SolverWrapper {
                             rhsArith = ctx.mkInt(1 << number.getInt()); // this is 2^y
                             rhsExpr = ctx.mkDiv(lhsArith, rhsArith);
                         } else {
-                            System.out.println(
-                                    "Rhs in ShrExpr is not a number " + rhsArith.getClass());
+                            LOGGER.error("Rhs in ShrExpr is not a number [class={}]",
+                                         rhsArith.getClass());
                             System.exit(2);
                         }
                     } else if (rhsBinop instanceof ShlExpr) {
@@ -189,13 +190,12 @@ public class SolverWrapperZ3 implements SolverWrapper {
                             ArithExpr[] operands = new ArithExpr[] {lhsArith, rhsArith};
                             rhsExpr = ctx.mkMul(operands);
                         } else {
-                            System.out.println(
-                                    "Rhs in ShlExpr is not a number " + rhsArith.getClass());
+                            LOGGER.error("Rhs in ShlExpr is not a number [class={}]", rhsArith.getClass());
                             System.exit(2);
                         }
 
                     } else {
-                        System.out.println("Cannot process rhsBinop " + rhsBinop.getClass());
+                        LOGGER.error("Cannot process rhsBinop [class={}]", rhsBinop.getClass());
                         System.exit(2);
                     }
                 } catch (Z3Exception e) {
@@ -251,7 +251,7 @@ public class SolverWrapperZ3 implements SolverWrapper {
             }
         } else {
             // something else that we don't handle yet :(
-            System.out.println("Cannot process " + expr);
+            LOGGER.error("Cannot process {}", expr);
             System.exit(2);
         }
         return ret;
@@ -279,7 +279,7 @@ public class SolverWrapperZ3 implements SolverWrapper {
                 e.printStackTrace();
             }
         } else {
-            System.out.println("Cannot process singelton " + v + " of " + v.getClass());
+            LOGGER.error("Cannot process singleton {} of {}", v, v.getClass());
         }
         return ret;
     }
@@ -307,7 +307,7 @@ public class SolverWrapperZ3 implements SolverWrapper {
                 for (Value v : unknown) {
                     IntExpr res = (IntExpr) m.getConstInterp(sootVarToZ3Var.get(v));
                     if (res.toString().contains("mod") || res.toString().contains("div")) {
-                        System.out.println("Z3Formula  " + z3Formula);
+                        LOGGER.info("Z3Formula: {}", z3Formula);
                         return null;
                     }
                     ret.add(Long.parseLong(res.toString()));
@@ -316,10 +316,10 @@ public class SolverWrapperZ3 implements SolverWrapper {
                 ret = new ArrayList<Long>();
             } else {
                 // unknown
-                System.out.println("Warning: " + result + " for " + z3Formula);
+                LOGGER.warn("{} for {}", result, z3Formula);
             }
         } catch (Z3Exception e) {
-            e.printStackTrace();
+            LOGGER.error("evaluate solution failed", e);
         }
         return ret;
     }
