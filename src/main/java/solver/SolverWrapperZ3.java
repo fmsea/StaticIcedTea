@@ -41,13 +41,14 @@ import com.microsoft.z3.Z3Exception;
 
 public class SolverWrapperZ3 implements SolverWrapper {
 
+/**
+ * This class is a wrapper for the actual solver used in the analysis which is Z3
+ *
+ * @author elenasherman
+ *
+ */
+public class SolverWrapperZ3 implements SolverWrapper {
 
-    /**
-     * This class is a wrapper for the actual solver used in the analysis which is Z3
-     *
-     * @author elenasherman
-     *
-     */
     private Context ctx;
     // no need to create a new IntExpr every time
     private Map<Value, IntExpr> sootVarToZ3Var;
