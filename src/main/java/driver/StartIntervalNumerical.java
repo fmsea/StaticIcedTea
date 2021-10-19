@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import abstractinterp.scalar.IntegerAnalysis;
 import abstractinterp.scalar.state.IntervalBoxState;
 import abstractinterp.scalar.state.factory.IntervalBoxStateFactory;
+import util.AnalysisTimer;
 import soot.Body;
 import soot.Scene;
 import soot.SootClass;
@@ -66,7 +67,7 @@ public class StartIntervalNumerical {
         LOGGER.trace("Soot Body: {}", b);
 
         IntegerAnalysis<IntervalBoxState> analysis = new IntegerAnalysis<>(b, 2, new IntervalBoxStateFactory());
-        analysis.runAnalysis();
+        AnalysisTimer.time((s) -> analysis.runAnalysis());
 
         if (writeOutputToFile) {
             try (FileWriter writer = new FileWriter(fileName.toFile())) {

@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import abstractinterp.scalar.IntegerAnalysis;
 import abstractinterp.scalar.state.PADO01DifferenceBoundedState;
 import abstractinterp.scalar.state.factory.PADO01DifferenceBoundedStateFactory;
+import util.AnalysisTimer;
 import soot.Body;
 import soot.Scene;
 import soot.SootClass;
@@ -66,7 +67,7 @@ public class StartPADO01DBSNumerical {
 
         IntegerAnalysis<PADO01DifferenceBoundedState> analysis =
             new IntegerAnalysis<>(b, 2, new PADO01DifferenceBoundedStateFactory());
-        analysis.runAnalysis();
+        AnalysisTimer.time((s) -> analysis.runAnalysis());
 
         if (writeOutputToFile) {
             try (FileWriter writer = new FileWriter(fileName.toFile())) {

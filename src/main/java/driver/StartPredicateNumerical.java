@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import disjoint.analysis.ValueAnalysis;
 import disjoint.domain.Domain;
 import disjoint.domain.reader.DomainReader;
+import util.AnalysisTimer;
 
 
 /**
@@ -79,7 +80,7 @@ public class StartPredicateNumerical {
         List<Domain> domains = domainReader.getReadDomains();
         LOGGER.info("Domains provided:\n{}", domains);
         ValueAnalysis analysis = new ValueAnalysis(new ExceptionalUnitGraph(b), domains, symbolic);
-        analysis.start();
+        AnalysisTimer.time((s) -> analysis.start());
         analysis.report();
     }
 }
