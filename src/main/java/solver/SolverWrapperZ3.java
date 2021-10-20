@@ -172,7 +172,7 @@ public class SolverWrapperZ3 implements SolverWrapper {
                     } else if (rhsBinop instanceof ShrExpr) {
                         // can only handle when rhs,i.e., y is not a variable
                         // x >> y = x / (2^y)
-                        if (rhsArith.isArithmeticNumeral()) {
+                        if (rhsArith.isIntNum()) {
                             IntNum number = (IntNum) rhsArith;
                             rhsArith = ctx.mkInt(1 << number.getInt()); // this is 2^y
                             rhsExpr = ctx.mkDiv(lhsArith, rhsArith);
@@ -183,7 +183,7 @@ public class SolverWrapperZ3 implements SolverWrapper {
                     } else if (rhsBinop instanceof ShlExpr) {
                         // can only handle when rhs, i.e., u is not a variable
                         // x << y = x * (2^y)
-                        if (rhsArith.isArithmeticNumeral()) {
+                        if (rhsArith.isIntNum()) {
                             IntNum number = (IntNum) rhsArith;
                             rhsArith = ctx.mkInt(1 << number.getInt()); // this is 2^y
                             ArithExpr[] operands = new ArithExpr[] {lhsArith, rhsArith};
