@@ -124,7 +124,7 @@ public class SolverWrapperZ3 implements SolverWrapper {
             z3FormulaNot = ctx.mkNot(z3Formula);
             ret = solve(z3FormulaNot);
         } catch (Z3Exception e) {
-            e.printStackTrace();
+            LOGGER.error("error in elvauateNot", e);
         }
         return ret;
 
@@ -199,7 +199,7 @@ public class SolverWrapperZ3 implements SolverWrapper {
                         System.exit(2);
                     }
                 } catch (Z3Exception e) {
-                    e.printStackTrace();
+                    LOGGER.error("error in generate", e);
                 }
             } else if (rhs instanceof NegExpr) {
                 try {
@@ -208,7 +208,7 @@ public class SolverWrapperZ3 implements SolverWrapper {
                             new ArithExpr[] {ctx.mkInt(0), evaluateExpr(((NegExpr) rhs).getOp())};
                     rhsExpr = ctx.mkSub(operands);
                 } catch (Z3Exception e) {
-                    e.printStackTrace();
+                    LOGGER.error("error in generate", e);
                 }
             } else {
                 rhsExpr = evaluateExpr(rhs);
@@ -230,7 +230,8 @@ public class SolverWrapperZ3 implements SolverWrapper {
                     ret = ctx.mkNot(ctx.mkEq(lhsExpr, rhsExpr));
                 }
             } catch (Z3Exception e) {
-                e.printStackTrace();
+                LOGGER.error("error in generate", e);
+
             }
 
         } else if (expr instanceof OrExpr) {
@@ -239,7 +240,7 @@ public class SolverWrapperZ3 implements SolverWrapper {
             try {
                 ret = ctx.mkOr(new BoolExpr[] {lhs, rhs});
             } catch (Z3Exception e) {
-                e.printStackTrace();
+                LOGGER.error("error in generate", e);
             }
         } else if (expr instanceof AndExpr) {
             BoolExpr lhs = generate((BinopExpr) expr.getOp1());
@@ -247,7 +248,7 @@ public class SolverWrapperZ3 implements SolverWrapper {
             try {
                 ret = ctx.mkAnd(new BoolExpr[] {lhs, rhs});
             } catch (Z3Exception e) {
-                e.printStackTrace();
+                LOGGER.error("error in generate", e);
             }
         } else {
             // something else that we don't handle yet :(
@@ -268,7 +269,7 @@ public class SolverWrapperZ3 implements SolverWrapper {
                 try {
                     ret = ctx.mkIntConst(v.toString());
                 } catch (Z3Exception e) {
-                    e.printStackTrace();
+                    LOGGER.error("error in evaluateExpr", e);
                 }
                 sootVarToZ3Var.put(v, ret);
             }
@@ -276,7 +277,7 @@ public class SolverWrapperZ3 implements SolverWrapper {
             try {
                 ret = ctx.mkInt(((IntConstant) v).value);
             } catch (Z3Exception e) {
-                e.printStackTrace();
+                LOGGER.error("error in evaluateExpr", e);
             }
         } else {
             LOGGER.error("Cannot process singleton {} of {}", v, v.getClass());
