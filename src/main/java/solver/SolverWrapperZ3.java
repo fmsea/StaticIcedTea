@@ -179,7 +179,6 @@ public class SolverWrapperZ3 implements SolverWrapper {
                         } else {
                             LOGGER.error("Rhs in ShrExpr is not a number [class={}]",
                                          rhsArith.getClass());
-                            System.exit(2);
                         }
                     } else if (rhsBinop instanceof ShlExpr) {
                         // can only handle when rhs, i.e., u is not a variable
@@ -191,12 +190,10 @@ public class SolverWrapperZ3 implements SolverWrapper {
                             rhsExpr = ctx.mkMul(operands);
                         } else {
                             LOGGER.error("Rhs in ShlExpr is not a number [class={}]", rhsArith.getClass());
-                            System.exit(2);
                         }
 
                     } else {
                         LOGGER.error("Cannot process rhsBinop [class={}]", rhsBinop.getClass());
-                        System.exit(2);
                     }
                 } catch (Z3Exception e) {
                     LOGGER.error("error in generate", e);
@@ -253,7 +250,6 @@ public class SolverWrapperZ3 implements SolverWrapper {
         } else {
             // something else that we don't handle yet :(
             LOGGER.error("Cannot process {}", expr);
-            System.exit(2);
         }
         return ret;
     }
