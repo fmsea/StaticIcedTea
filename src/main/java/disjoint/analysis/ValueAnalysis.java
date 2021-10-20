@@ -187,11 +187,11 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 		//update the sizes of bitvectors in each domain
 		for(int i=0; i< disjointDomainIndex; i++){
 			int size = indexToDisjointDomain.get(i).size();
-			//System.out.println("Size Disj" + size);
+			LOGGER.debug("Size {}", size);
 			IntervalStates.bitsInDomain.add(size);
 		}
 
-		//System.out.println("index " + unstructuredDomainIndex);
+        LOGGER.debug("index {}", unstructuredDomainIndex);
 		for(int i = 0; i < unstructuredDomainIndex; i++){
 			int size = indexToUnstructuredDomain.get(i).size();
 			UnstructuredStates.bitsInDomain.add(size);
@@ -236,7 +236,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
                     time);
 	}
 
-	public void report(){
+	public void report() {
         StringBuilder sb = new StringBuilder();
 		Chain<Local> locals = b.getLocals();
 		//printing the result
@@ -247,7 +247,6 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 			//check against statement after
 			//which state has been changed
 			stmtCount++;
-			//System.out.println("outputStmt " + outputStmt);
 			if(outputStmt.contains(u)){
 				sb.append(stmtCount);
                 sb.append(" ");
@@ -313,8 +312,8 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 	protected void flowThrough(AbstractState in, Unit u, List<AbstractState> fallIn,
 			List<AbstractState> branchOut) {
 		Stmt s = (Stmt) u;
-		//System.out.println("Unit " + u);
-		//System.out.println("In " + in);
+		LOGGER.debug("Unit {}", u);
+		LOGGER.debug("In {}", in);
 		AbstractState inState = in;
 		AbstractState ifStmtTrue = inState.copy(); //instantiated in ifStmt only; outBranch
 		AbstractState ifStmtFalse = inState.copy();//fallIn; out
@@ -339,8 +338,8 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 			copy(ifStmtTrue, it.next());
 		}
 		
-		//System.out.println("outFall " + ifStmtFalse);
-		//System.out.println("outBranch " + ifStmtTrue);
+		LOGGER.debug("outFall {}", ifStmtFalse);
+		LOGGER.debug("outBranch {}", ifStmtTrue);
 
 	}
 
@@ -680,7 +679,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 				sol = solver.evaluateSol(symbState, currentExpr, lhs);
 				if(sol == null){
 					//return top in dnf
-					System.out.println("Timing out, returning upper in DNF");
+                    LOGGER.warn("Timing out, returning upper in DNF");
 					lowerDNF = d.fromCNFtoDNF(upper);
 					//remove unsat predicates?
 					Set<Set<BaseElement>> toRemove = new HashSet<Set<BaseElement>>();
@@ -703,10 +702,9 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 					satSet = d.getSatPredicates(sol, new Value[]{lhs});//why it was null before
 					if(satSet.isEmpty()){
 						//something wrong, perhaps incomplete domain
-						System.out.println("For non-empty solution found no predicates!");
-						System.exit(2);
+						LOGGER.warn("For non-empty solution found no predicates!");
 					}
-					//System.out.println("satSet " + satSet);
+					LOGGER.debug("satSet {}", satSet);
 					//add both of them to the lower
 					//cnf double loop
 					//Set<Set<BaseElement>> toRemove = new HashSet<Set<BaseElement>>();
@@ -812,8 +810,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 							JimpleLocal jl = (JimpleLocal)es.getKey();
 						}
 						//something is wrong
-						System.err.println("Domain value is null");
-						System.out.flush();
+						LOGGER.error("Domain value is null");
 						System.exit(2);
 					}
 					ret.add(dExpr);
@@ -840,7 +837,9 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 
 	@Override
 	protected void merge(AbstractState in1, AbstractState in2, AbstractState out) {
-		//System.out.println("Merging " + in1 + " " + in1.isFeasible() + " with " + in2 + " " + in2.isFeasible());
+		LOGGER.debug("Merging {} {} with {} {}",
+                     in1, in1.isFeasible(),
+                     in2, in2.isFeasible());
 		if(in1.isFeasible() && in2.isFeasible()){
 			out.copy(in1.merge(in2)); //regular
 		} else if (!in2.isFeasible()){
