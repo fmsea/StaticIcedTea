@@ -232,6 +232,7 @@ public class PADO01DifferenceBoundedState implements State {
         }
 
         this.updateState(lVar, inState, c);
+        this.matrix.computeClosure();
     }
 
     public void updateState(Local lVar,
@@ -281,6 +282,7 @@ public class PADO01DifferenceBoundedState implements State {
                         lVar, left, right, operator);
             this.forget(lVar);
         }
+        this.matrix.computeClosure();
     }
 
     public void updateState(Local lVar,
@@ -323,6 +325,7 @@ public class PADO01DifferenceBoundedState implements State {
                         lVar, left, right, operator);
             this.forget(lVar);
         }
+        this.matrix.computeClosure();
     }
 
     public void updateState(Local lVar,
@@ -353,6 +356,7 @@ public class PADO01DifferenceBoundedState implements State {
             break;
         default:
         }
+        this.matrix.computeClosure();
     }
 
     public void updateState(Local lVar, State inState, Value v) {
