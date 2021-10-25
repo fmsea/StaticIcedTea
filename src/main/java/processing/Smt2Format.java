@@ -18,6 +18,7 @@ import java.util.function.BiFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import processing.util.FlowSet;
 
 public class Smt2Format {
     private static String resultsPathFull;
@@ -105,6 +106,27 @@ public class Smt2Format {
         }
         writer.flush();
         writer.close();
+    }
+
+    public static void SMT2FormatIdentifiers(Reader reader, Writer writer) throws IOException {
+        Map<String, FlowSet<String>> statementIdentifierMap = Smt2Reader.getIdentifiersPerStatement(reader);
+        for (String statement : statementIdentifierMap.keySet()) {
+            writer.write(statement);
+            FlowSet<String> flowSet = statementIdentifierMap.get(statement);
+            writer.write("\tfall");
+            for (String identifier : flowSet.getFallThrough()) {
+                writer.write("\t");
+                writer.write(identifier);
+            }
+            writer.write("\n");
+            writer.write(statement);
+            writer.write("\tbranch");
+            for (String identifier : flowSet.getBranchOut()) {
+                writer.write("\t");
+                writer.write(identifier);
+            }
+            writer.write("\n");
+        }
     }
 
     private static String formatConstraints(List<SmtExpression> exprs1, List<SmtExpression> exprs2) {

@@ -5,6 +5,8 @@ import java.io.Writer;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.IOException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -110,6 +112,34 @@ public class Smt2FormatTest {
                                     w1.toString());
         } catch (IOException e) {
             e.printStackTrace(System.err);
+            Assertions.assertTrue(false);
+        }
+    }
+
+    @Test
+    void testSMT2FormatIdentifiers() {
+        Reader r1 = new StringReader("6 i1 = 0:<test.BallonFactory>\n" +
+                                     "i1->(= i1 0)\n" +
+                                     "i1f->(or (<= i1 0) (> i1 0))\n" +
+                                     "b2->(or (<= b2 0) (> b2 0))\n" +
+                                     "b6->(and (<= b6 (+ i1 3))\n" +
+                                     "         (<= b6 (+ b2 4)))\n" +
+                                     "7 b2 = 2:<test.BallonFactory>\n" +
+                                     "b2->(and (< b2 5)\n" +
+                                     "         (> b2 0)\n" +
+                                     "         (>= b2 i4))\n");
+        Writer w1 = new StringWriter();
+        try {
+            Smt2Format.SMT2FormatIdentifiers(r1, w1);
+            Assertions.assertEquals(Stream.of("7 b2 = 2:<test.BallonFactory>\tfall\tb2\ti4",
+                                              "7 b2 = 2:<test.BallonFactory>\tbranch",
+                                              "6 i1 = 0:<test.BallonFactory>\tfall\tb2\tb6\ti1",
+                                              "6 i1 = 0:<test.BallonFactory>\tbranch\ti1",
+                                              "")
+                                    .collect(Collectors.joining("\n")),
+                                    w1.toString());
+        } catch (IOException ex) {
+            ex.printStackTrace(System.err);
             Assertions.assertTrue(false);
         }
     }

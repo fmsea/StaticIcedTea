@@ -19,4 +19,8 @@ class SmtExpression {
     public String toString() {
         return String.format("%s->%s", this.identifier, this.expression);
     }
+
+    public boolean isBranchOut() {
+        return this.identifier.endsWith("f");
+    }
 }

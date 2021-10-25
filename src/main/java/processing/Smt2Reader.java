@@ -13,6 +13,8 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import processing.util.FlowSet;
+
 public class Smt2Reader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Smt2Reader.class);
@@ -88,5 +90,44 @@ public class Smt2Reader {
             }
             return map;
         }
+    }
+
+    public static Map<String, FlowSet<String>> parseExtraIdentifiers(Reader reader) {
+        Map<String, FlowSet<String>> statements = new HashMap<>();
+        try (Scanner scanner = new Scanner(reader)) {
+            while (scanner.hasNext()) {
+                String line = scanner.nextLine().trim();
+                LOGGER.debug("line from extra identifiers file: {}", line);
+                String[] elements = line.split("\t");
+                FlowSet<String> identifiers = statements.getOrDefault(elements[0], new FlowSet<>());
+                for (int i = 2; i < elements.length; i++) {
+                    if ("fall".equals(elements[1])) {
+                        identifiers.addFallThrough(elements[i]);
+                    } else if ("branch".equals(elements[1])) {
+                        identifiers.addBranchOut(elements[i]);
+                    }
+                }
+                LOGGER.debug("statement and identifiers: {}->{}", elements[0], identifiers);
+                statements.put(elements[0], identifiers);
+            }
+        }
+        return statements;
+    }
+
+    public static Map<String, FlowSet<String>> getIdentifiersPerStatement(Reader reader) {
+        Map<String, List<SmtExpression>> smtExpressions = parse(reader);
+        Map<String, FlowSet<String>> result = new HashMap<>();
+        for (String statement : smtExpressions.keySet()) {
+            FlowSet<String> identifiers = new FlowSet<>();
+            result.put(statement, identifiers);
+            for (SmtExpression expr : smtExpressions.get(statement)) {
+                if (expr.isBranchOut()) {
+                    identifiers.addAllBranchOut(expr.identifiers);
+                } else {
+                    identifiers.addAllFallThrough(expr.identifiers);
+                }
+            }
+        }
+        return result;
     }
 }
