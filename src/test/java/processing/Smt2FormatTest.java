@@ -86,4 +86,21 @@ public class Smt2FormatTest {
             Assertions.assertTrue(false);
         }
     }
+
+    @Test
+    void testSMT2FormatFull() {
+        {
+            Reader r1 = new StringReader(ResourceFileUtility.readResourcesFile("processing/format.full.simple.1.in"));
+            Reader r2 = new StringReader(ResourceFileUtility.readResourcesFile("processing/format.full.simple.2.in"));
+            Writer w1 = new StringWriter();
+            try {
+                Smt2Format.SMT2FormatFull(r1, r2, w1);
+                Assertions.assertEquals(ResourceFileUtility.readResourcesFile("processing/format.full.simple.out"),
+                                        w1.toString());
+            } catch (IOException ex) {
+                ex.printStackTrace(System.err);
+                Assertions.assertTrue(false);
+            }
+        }
+    }
 }

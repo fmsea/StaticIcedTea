@@ -18,6 +18,7 @@ import driver.commands.*;
              StartDBSNumericalCommand.class,
              StartPADO01DBSNumericalCommand.class,
              Smt2FormatCommand.class,
+             Smt2FormatFullCommand.class,
              Smt2FormatIdentifiersCommand.class,
              Smt2FormatDirectoryCommand.class,
          })

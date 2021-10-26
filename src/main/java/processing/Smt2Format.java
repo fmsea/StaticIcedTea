@@ -10,10 +10,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,6 +110,57 @@ public class Smt2Format {
         writer.close();
     }
 
+    public static void SMT2FormatFull(Reader reader1, Reader reader2, Writer writer) throws IOException {
+        AnalysisFullSMTReport report1 = Smt2Reader.parseFullReport(reader1);
+        AnalysisFullSMTReport report2 = Smt2Reader.parseFullReport(reader2);
+        Set<String> allVariables = new HashSet<>();
+        allVariables.addAll(report1.variables());
+        allVariables.addAll(report2.variables());
+        Set<String> statements = new TreeSet<>();
+        statements.addAll(report1.statements());
+        statements.addAll(report2.statements());
+        for (String statement : statements.stream().sorted().collect(Collectors.toList())) {
+            writer.write("(echo \"");
+            writer.write(statement);
+            writer.write("\")\n");
+            Optional<String> fall1 = report1.getFallThrough(statement);
+            Optional<String> branch1 = report1.getBranchOut(statement);
+            Optional<String> fall2 = report2.getFallThrough(statement);
+            Optional<String> branch2 = report2.getBranchOut(statement);
+            if (fall1.isEmpty() && fall2.isEmpty()) {
+                // skip
+            } else {
+                Set<String> variables = new HashSet<>();
+                variables.addAll(Smt2Reader.getIdentifiers(fall1.orElse("true")));
+                variables.addAll(Smt2Reader.getIdentifiers(fall2.orElse("true")));
+                writer.write("(echo \"fall through\")\n");
+                writer.write(formatImplies(variables,
+                                           fall1.orElse("true"),
+                                           fall2.orElse("true")));
+                writer.write(formatImplies(variables,
+                                           fall2.orElse("true"),
+                                           fall1.orElse("true")));
+            }
+
+            if (branch1.isEmpty() && branch2.isEmpty()) {
+                // skip
+            } else {
+                Set<String> variables = new HashSet<>();
+                variables.addAll(Smt2Reader.getIdentifiers(branch1.orElse("true")));
+                variables.addAll(Smt2Reader.getIdentifiers(branch2.orElse("true")));
+                writer.write("(echo \"branch out\")\n");
+                writer.write(formatImplies(variables,
+                                           branch1.orElse("true"),
+                                           branch2.orElse("true")));
+                writer.write(formatImplies(variables,
+                                           branch2.orElse("true"),
+                                           branch1.orElse("true")));
+            }
+        }
+        writer.flush();
+        writer.close();
+    }
+
     public static void SMT2FormatIdentifiers(Reader reader, Writer writer) throws IOException {
         Map<String, FlowSet<String>> statementIdentifierMap = Smt2Reader.getIdentifiersPerStatement(reader);
         for (String statement : statementIdentifierMap.keySet()) {
@@ -173,19 +226,49 @@ public class Smt2Format {
     private static String formatImplies(Set<String> vars, String from, String to) {
         StringBuilder sb = new StringBuilder();
         sb.append("(push)\n");
-        sb.append("(assert (forall (");
-        for (String var : vars) {
-            sb.append("(");
-            sb.append(var);
-            sb.append(" Int)");
+        sb.append("(assert ");
+        if (vars.size() > 0) {
+            sb.append("(forall (");
+            for (String var : vars) {
+                sb.append("(");
+                sb.append(var);
+                sb.append(" Int)");
+            }
+            sb.append(")\n");
         }
-        sb.append(")\n");
         sb.append("(=> ");
         sb.append(from);
         sb.append(" ");
         sb.append(to);
-        sb.append(")))\n");
+        if (vars.size() > 0) {
+            sb.append(")))\n");
+        } else {
+            sb.append("))\n");
+        }
         sb.append("(check-sat)\n(pop)\n");
+        return sb.toString();
+    }
+
+    private static String formatImplies(String from, String to) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("(push)\n");
+        sb.append("(assert\n (=> ");
+        sb.append(from);
+        sb.append("\n     ");
+        sb.append(to);
+        sb.append("))\n");
+        sb.append("(check-sat)\n");
+        sb.append("(pop)\n");
+        return sb.toString();
+    }
+
+    private static String formatVariables(Set<String> vars) {
+        StringBuilder sb = new StringBuilder();
+        vars.stream().sorted().forEach(v -> {
+                sb.append("(declare-const ");
+                sb.append(v);
+                sb.append(" Int)\n");
+            });
         return sb.toString();
     }
 
