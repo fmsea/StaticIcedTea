@@ -1,0 +1,4 @@
+7 b2 = 2:<test.BallonFactory>	fall	b2	i4
+7 b2 = 2:<test.BallonFactory>	branch
+6 i1 = 0:<test.BallonFactory>	fall	b2	b6	i1
+6 i1 = 0:<test.BallonFactory>	branch	i1
