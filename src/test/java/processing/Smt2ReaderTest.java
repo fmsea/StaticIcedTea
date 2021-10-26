@@ -268,4 +268,61 @@ public class Smt2ReaderTest {
                       () -> assertTrue(result.get("7 b2 = 2:<test.BallonFactory>").getBranchOut().isEmpty()));
         }
     }
+
+    @Test
+    void testParseFullReport() {
+        {
+            Reader r1 = new StringReader("");
+            AnalysisFullSMTReport report = Smt2Reader.parseFullReport(r1);
+            assertEquals("", report.toString());
+        }
+
+        {
+            String inputAnalysisText = Stream.of("$z0	b0",
+                                                 "1 b0 := @parameter0: byte:<test.Base64: boolean isPad(byte)>",
+                                                 "2 if b0 != 61 goto $z0 = 0:<test.Base64: boolean isPad(byte)>",
+                                                 "fall	(= b0 61)",
+                                                 "3 $z0 = 1:<test.Base64: boolean isPad(byte)>",
+                                                 "fall	(and (= $z0 1) (= b0 61))",
+                                                 "4 goto [?= return $z0]:<test.Base64: boolean isPad(byte)>",
+                                                 "branch	(and (= $z0 1)\n\t(= b0 61))",
+                                                 "5 $z0 = 0:<test.Base64: boolean isPad(byte)>",
+                                                 "fall	(= $z0 0)",
+                                                 "6 return $z0:<test.Base64: boolean isPad(byte)>",
+                                                 "fall	(and (>= $z0 0) (< $z0 0) (>= b0 0) (< b0 0))",
+                                                 "").collect(Collectors.joining("\n"));
+            Reader r1 = new StringReader(inputAnalysisText);
+            AnalysisFullSMTReport report = Smt2Reader.parseFullReport(r1);
+            assertAll(() -> assertTrue(report.variables().contains("$z0")),
+                      () -> assertTrue(report.variables().contains("b0")),
+                      () -> assertTrue(report.statements().contains("1 b0 := @parameter0: byte:<test.Base64: boolean isPad(byte)>")),
+                      () -> assertTrue(report.statements().contains("2 if b0 != 61 goto $z0 = 0:<test.Base64: boolean isPad(byte)>")),
+                      () -> assertTrue(report.statements().contains("3 $z0 = 1:<test.Base64: boolean isPad(byte)>")),
+                      () -> assertTrue(report.statements().contains("4 goto [?= return $z0]:<test.Base64: boolean isPad(byte)>")),
+                      () -> assertTrue(report.statements().contains("5 $z0 = 0:<test.Base64: boolean isPad(byte)>")),
+                      () -> assertTrue(report.statements().contains("6 return $z0:<test.Base64: boolean isPad(byte)>")),
+                      () -> assertTrue(report.getFallThrough("1 b0 := @parameter0: byte:<test.Base64: boolean isPad(byte)>").isEmpty()),
+                      () -> assertTrue(report.getBranchOut("1 b0 := @parameter0: byte:<test.Base64: boolean isPad(byte)>").isEmpty()),
+                      () -> assertTrue(report.getFallThrough("2 if b0 != 61 goto $z0 = 0:<test.Base64: boolean isPad(byte)>").isPresent()),
+                      () -> assertEquals("(= b0 61)",
+                                         report.getFallThrough("2 if b0 != 61 goto $z0 = 0:<test.Base64: boolean isPad(byte)>").get()),
+                      () -> assertTrue(report.getBranchOut("2 if b0 != 61 goto $z0 = 0:<test.Base64: boolean isPad(byte)>").isEmpty()),
+                      () -> assertTrue(report.getFallThrough("3 $z0 = 1:<test.Base64: boolean isPad(byte)>").isPresent()),
+                      () -> assertEquals("(and (= $z0 1) (= b0 61))",
+                                         report.getFallThrough("3 $z0 = 1:<test.Base64: boolean isPad(byte)>").get()),
+                      () -> assertTrue(report.getBranchOut("3 $z0 = 1:<test.Base64: boolean isPad(byte)>").isEmpty()),
+                      () -> assertTrue(report.getFallThrough("4 goto [?= return $z0]:<test.Base64: boolean isPad(byte)>").isEmpty()),
+                      () -> assertTrue(report.getBranchOut("4 goto [?= return $z0]:<test.Base64: boolean isPad(byte)>").isPresent()),
+                      () -> assertEquals("(and (= $z0 1)\n\t(= b0 61))",
+                                         report.getBranchOut("4 goto [?= return $z0]:<test.Base64: boolean isPad(byte)>").get()),
+                      () -> assertTrue(report.getFallThrough("5 $z0 = 0:<test.Base64: boolean isPad(byte)>").isPresent()),
+                      () -> assertEquals("(= $z0 0)",
+                                         report.getFallThrough("5 $z0 = 0:<test.Base64: boolean isPad(byte)>").get()),
+                      () -> assertTrue(report.getBranchOut("5 $z0 = 0:<test.Base64: boolean isPad(byte)>").isEmpty()),
+                      () -> assertTrue(report.getFallThrough("6 return $z0:<test.Base64: boolean isPad(byte)>").isPresent()),
+                      () -> assertEquals("(and (>= $z0 0) (< $z0 0) (>= b0 0) (< b0 0))",
+                                         report.getFallThrough("6 return $z0:<test.Base64: boolean isPad(byte)>").get()),
+                      () -> assertTrue(report.getBranchOut("6 return $z0:<test.Base64: boolean isPad(byte)>").isEmpty()));
+        }
+    }
 }

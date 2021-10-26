@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +49,68 @@ public class Smt2Reader {
         String formula = varFormula[1];
         Set<String> identifiers = getIdentifiers(formula);
         return Optional.of(new SmtExpression(identifier, identifiers, formula));
+    }
+
+    public static AnalysisFullSMTReport parseFullReport(Reader reader) {
+        Set<String> statements = new HashSet<>();
+        Set<String> variables = new HashSet<>();
+        Map<String, String> fallThroughExprs = new HashMap<>();
+        Map<String, String> branchOutExprs = new HashMap<>();
+        BiConsumer<String, String> closeExpression = (statement, expression) -> {
+            if (expression.startsWith("fall\t")) {
+                // "fall\t" is 5 characters
+                fallThroughExprs.put(statement, expression.substring(5).trim());
+            } else if (expression.startsWith("branch\t")) {
+                // "branch\t" is 7 characters
+                branchOutExprs.put(statement, expression.substring(7).trim());
+            }
+        };
+        try (Scanner scanner = new Scanner(reader)) {
+            if (scanner.hasNext()) {
+                variables = parseVariables(scanner.nextLine().trim());
+            }
+            StringBuilder expr = new StringBuilder();
+            String currentStatement = "";
+            while (scanner.hasNext()) {
+                String line = scanner.nextLine();
+                LOGGER.debug("full parsing: {}", line);
+                if (line.matches("^[0-9]+.*")) {
+                    // close out current expression
+                    if (expr.length() > 0) {
+                        closeExpression.accept(currentStatement, expr.toString());
+                        expr = new StringBuilder();
+                    }
+                    currentStatement = line.trim();;
+                    // seed initial mapping
+                    statements.add(currentStatement);
+                    fallThroughExprs.put(currentStatement, null);
+                    branchOutExprs.put(currentStatement, null);
+                } else if (line.startsWith("branch\t") ||
+                           line.startsWith("fall\t")) {
+                    if (expr.length() > 0) {
+                        closeExpression.accept(currentStatement, expr.toString());
+                        expr = new StringBuilder();
+                    }
+                    expr.append(line);
+                    expr.append("\n");
+                } else if (line.isEmpty()) {
+                } else {
+                    expr.append(line);
+                    expr.append("\n");
+                }
+            }
+            closeExpression.accept(currentStatement, expr.toString());
+        }
+        return new AnalysisFullSMTReport(statements,
+                                         variables,
+                                         fallThroughExprs,
+                                         branchOutExprs);
+    }
+
+    private static Set<String> parseVariables(String variablesLine) {
+        Set<String> variables = new HashSet<>();
+        Stream.of(variablesLine.trim().split("\t")).forEach(v -> variables.add(v));
+        return variables;
     }
 
     public static Map<String, List<SmtExpression>> parse(Reader reader) {
