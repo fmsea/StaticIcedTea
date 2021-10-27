@@ -16,6 +16,6 @@ public class AnalysisTimer {
         long start = System.nanoTime();
         analysis.accept(start);
         long end = System.nanoTime();
-        LOG.info("analysis took {}μs", end - start);
+        LOG.info("analysis took {} μs", end - start);
     }
 }
