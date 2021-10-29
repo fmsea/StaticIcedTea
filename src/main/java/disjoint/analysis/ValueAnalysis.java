@@ -19,6 +19,7 @@ import soot.BooleanType;
 import soot.Type;
 import soot.Unit;
 import soot.Value;
+import soot.grimp.Grimp;
 import soot.grimp.internal.GAndExpr;
 import soot.grimp.internal.GEqExpr;
 import soot.grimp.internal.GOrExpr;
@@ -234,6 +235,71 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
                     b.getMethod().getDeclaringClass(),
                     b.getMethod().getSignature(),
                     time);
+    }
+
+    public void reportFullSMT() {
+        StringBuilder sb = new StringBuilder();
+        for (Local l : b.getLocals()) {
+            sb.append(l.toString());
+            sb.append("\t");
+        }
+        // remove last tab
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append("\n");
+
+        String methodSignature = this.b.getMethod().getSignature();
+        int stmtCount = 0;
+        for (Unit unit : this.b.getUnits()) {
+            stmtCount++;
+            sb.append(stmtCount);
+            sb.append(" ");
+            sb.append(unit);
+            sb.append(":");
+            sb.append(methodSignature);
+            sb.append("\n");
+            AbstractState fall = getFallFlowAfter(unit);
+            String fallExpr = formatState(fall);
+            if (!fallExpr.isEmpty()) {
+                sb.append("fall\t");
+                sb.append(fallExpr);
+                sb.append("\n");
+            }
+            List<AbstractState> branches = getBranchFlowAfter(unit);
+            if (!branches.isEmpty()) {
+                for (AbstractState branch : branches) {
+                    String branchExpr = formatState(branch);
+                    if (!branchExpr.isEmpty()) {
+                        sb.append("branch\t");
+                        sb.append(branchExpr);
+                        sb.append("\n");
+                    }
+                }
+            }
+        }
+
+        System.out.println(sb.toString());
+        System.out.flush();
+    }
+
+    private String formatState(AbstractState state) {
+        Chain<Local> locals = b.getLocals();
+        StringBuilder r = new StringBuilder();
+        if (!state.getStates().isEmpty() && state.isFeasible()) {
+            locals.stream().map(l -> evaluateStates(state, l).stream()
+                                .reduce((a, b) -> Grimp.v().newAndExpr(a, b)))
+                .filter(op -> op.isPresent())
+                .map(o -> o.get())
+                .reduce((a, b) -> Grimp.v().newAndExpr(a, b))
+                .ifPresentOrElse(expr -> {
+                        r.append(solver.smt2(expr));
+                        r.append("\n");
+                    }, () -> r.append("true\n"));
+        } else if (!state.getStates().isEmpty() && !state.isFeasible()) {
+            r.append("false\n");
+        } else {
+            r.append("true\n");
+        }
+        return r.toString();
     }
 
     public void report() {
@@ -781,6 +847,9 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
         for (State state : states) {
             if (state instanceof IntervalStates && v != null) {
                 List<BitSet> intervalVal = ((IntervalStates) state).getState(v);
+                if (intervalVal == null) {
+                    continue;
+                }
                 //translate bitset of each domain to its actual predicates
                 for (int i = 0; i < intervalVal.size(); i++) {
                     BitSet value = intervalVal.get(i);
@@ -790,6 +859,9 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
                 }
             } else if (state instanceof UnstructuredStates & v != null) {
                 List<Set<BitSet>> unstructuredVal = ((UnstructuredStates) state).getState(v);
+                if (unstructuredVal == null) {
+                    continue;
+                }
                 //for each domain
                 for (int i = 0; i < unstructuredVal.size(); i++) {
                     Set<BitSet> value = unstructuredVal.get(i);
