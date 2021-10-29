@@ -62,6 +62,20 @@ public class Smt2ReaderTest {
                       () -> assertTrue(result.contains("b2")),
                       () -> assertFalse(result.contains("or")));
         }
+
+        {
+            String smt = "true";
+            Set<String> result = Smt2Reader.getIdentifiers(smt);
+            assertAll("No identifier is found",
+                      () -> assertEquals(0, result.size()));
+        }
+
+        {
+            String smt = "false";
+            Set<String> result = Smt2Reader.getIdentifiers(smt);
+            assertAll("No identifier is found",
+                      () -> assertEquals(0, result.size()));
+        }
     }
 
     @Test

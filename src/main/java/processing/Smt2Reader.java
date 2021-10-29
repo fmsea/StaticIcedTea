@@ -30,7 +30,10 @@ public class Smt2Reader {
             if (token.isEmpty()) {
                 continue;
             } else if (token.matches("^[$A-Za-z][A-Za-z0-9]+$") &&
-                       !(token.equals("or") || token.equals("and"))) {
+                       !(token.equals("or") ||
+                         token.equals("and") ||
+                         token.equals("true") ||
+                         token.equals("false"))) {
                 identifiers.add(token);
             } else {
                 LOGGER.debug("token was not identified: {}", token);
