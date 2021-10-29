@@ -14,7 +14,7 @@ import driver.commands.*;
          description = "Run various dfa-smt utilities",
          subcommands = {
              StartIntervalNumericalCommand.class,
-             StartDisjointAnalysisCommand.class,
+             StartPredicateNumericalCommand.class,
              StartDBSNumericalCommand.class,
              StartPADO01DBSNumericalCommand.class,
              Smt2FormatCommand.class,
