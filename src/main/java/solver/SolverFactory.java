@@ -9,7 +9,7 @@ public class SolverFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(SolverFactory.class);
 
     // 10,000,000 milliseconds, 2.8 hours
-    public static final int SOLVER_TIMEOUT_MS = 10000000;
+    public static final int SOLVER_TIMEOUT_MS = 10000;
 
     public static SolverWrapper getSolver() {
         return getSolver(SOLVER_TIMEOUT_MS);
