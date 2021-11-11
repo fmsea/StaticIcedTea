@@ -13,9 +13,9 @@ public class AnalysisTimer {
 
     public static void time(LongConsumer analysis) {
         System.gc();
-        long start = System.nanoTime();
+        long start = System.currentTimeMillis();
         analysis.accept(start);
-        long end = System.nanoTime();
-        LOG.info("analysis took {} μs", end - start);
+        long end = System.currentTimeMillis();
+        LOG.info("analysis took {} ms", end - start);
     }
 }
