@@ -45,13 +45,11 @@ class PADO01Constraint implements Comparable<PADO01Constraint> {
     }
 
     public boolean isBottom() {
-        return (this.bottom == true ||
-                this.bound.map(b -> b == Integer.MIN_VALUE).orElse(false));
+        return (this.bottom == true && this.bound.isEmpty());
     }
 
     public boolean isTop() {
-        return (this.bottom == false &&
-                this.bound.map(b -> b == Integer.MAX_VALUE).orElse(true));
+        return (this.bottom == false && this.bound.isEmpty());
     }
 
     public PADO01Constraint copy() {

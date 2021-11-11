@@ -15,7 +15,7 @@ public class PADO01ConstraintTest {
                   () -> assertFalse(PADO01Constraint.of(0).isTop()),
                   () -> assertFalse(PADO01Constraint.of(Integer.MAX_VALUE - 1).isTop()),
                   () -> assertTrue(PADO01Constraint.TOP().isTop()),
-                  () -> assertTrue(PADO01Constraint.of(Integer.MAX_VALUE).isTop()),
+                  () -> assertFalse(PADO01Constraint.of(Integer.MAX_VALUE).isTop()),
                   () -> assertTrue(PADO01Constraint.of(Optional.empty()).isTop()));
     }
 
@@ -25,7 +25,7 @@ public class PADO01ConstraintTest {
                   () -> assertFalse(PADO01Constraint.of(0).isBottom()),
                   () -> assertFalse(PADO01Constraint.of(Integer.MIN_VALUE + 1).isBottom()),
                   () -> assertTrue(PADO01Constraint.BOT().isBottom()),
-                  () -> assertTrue(PADO01Constraint.of(Integer.MIN_VALUE).isBottom()),
+                  () -> assertFalse(PADO01Constraint.of(Integer.MIN_VALUE).isBottom()),
                   () -> assertTrue(PADO01Constraint.of(null, true).isBottom()));
     }
 
