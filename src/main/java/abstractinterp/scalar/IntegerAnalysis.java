@@ -170,12 +170,12 @@ public class IntegerAnalysis<S extends State> implements Analysis {
         StringBuilder sb = new StringBuilder();
         String methodSignature = this.b.getMethod().getSignature();
         Set<Unit> outputStmt = this.analysis.getOutputStatements();
-        Map<Unit, Set<Value>> changedVariables = this.analysis.getChangedVariables();
+        Map<Unit, Set<Value>> variables = this.getChangedVariables();
         Chain<Local> locals = this.b.getLocals();
         int stmtCount = 0;
         for (Unit u : this.g.getBody().getUnits()) {
             stmtCount++;
-            if (outputStmt.contains(u) && changedVariables.get(u).size() > 0) {
+            if (outputStmt.contains(u) && variables.get(u).size() > 0) {
                 S state = analysis.getFallFlowAfter(u);
                 sb.append(stmtCount);
                 sb.append(" ");
@@ -185,7 +185,7 @@ public class IntegerAnalysis<S extends State> implements Analysis {
                 sb.append('\n');
                 if (state.isFeasible()) {
                     for (Local l : locals) {
-                        if (changedVariables.get(u).contains(l)) {
+                        if (variables.get(u).contains(l)) {
                             sb.append(l.toString());
                             sb.append("->");
                             sb.append(state.toSMT(l, this.solver));
@@ -198,7 +198,7 @@ public class IntegerAnalysis<S extends State> implements Analysis {
                     for (S branch : branches) {
                         if (branch.isFeasible()) {
                             for (Local l : locals) {
-                                if (changedVariables.get(u).contains(l)) {
+                                if (variables.get(u).contains(l)) {
                                     sb.append(l.toString());
                                     sb.append("f->");
                                     sb.append(branch.toSMT(l, this.solver));
@@ -211,6 +211,10 @@ public class IntegerAnalysis<S extends State> implements Analysis {
             }
         }
         return sb.toString();
+    }
+
+    protected Map<Unit, Set<Value>> getChangedVariables() {
+        return this.analysis.getChangedVariables();
     }
 
     public void writeSMTReport(Writer writer) throws IOException {
