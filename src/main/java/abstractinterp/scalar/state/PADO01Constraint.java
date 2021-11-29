@@ -8,7 +8,11 @@ class PADO01Constraint implements Comparable<PADO01Constraint> {
     private boolean bottom = false;
 
     public PADO01Constraint(Optional<Integer> bound, boolean bottom) {
-        this.bound = bound;
+        if (bound == null) {
+            this.bound = Optional.empty();
+        } else {
+            this.bound = bound;
+        }
         this.bottom = bottom;
     }
 
