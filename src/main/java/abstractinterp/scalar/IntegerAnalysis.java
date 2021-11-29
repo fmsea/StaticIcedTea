@@ -29,7 +29,7 @@ import abstractinterp.scalar.state.factory.StateFactory;
 import solver.SolverWrapper;
 import solver.SolverWrapperZ3;
 
-public class IntegerAnalysis<S extends State> {
+public class IntegerAnalysis<S extends State> implements Analysis {
     private static final Logger LOGGER = LoggerFactory.getLogger(IntegerAnalysis.class);
     protected Body b;
     UnitGraph g;
