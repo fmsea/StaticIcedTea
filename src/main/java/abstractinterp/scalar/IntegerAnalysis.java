@@ -35,6 +35,7 @@ public class IntegerAnalysis<S extends State> {
     UnitGraph g;
     ForwardBranchedFlowNumerical<S> analysis;
     private SolverWrapper solver;
+    private Set<Local> locals;
 
     public IntegerAnalysis(Body b, int iterations, StateFactory<S> stateFactory) {
         this(new SolverWrapperZ3(), b, iterations, stateFactory);
@@ -50,7 +51,7 @@ public class IntegerAnalysis<S extends State> {
         Map<Unit, List<S>> unitToAfterBranchFlow = new HashMap<>();
         Map<Unit, List<S>> unitToAfterFallFlow = new HashMap<>();
         Set<Unit> wideningNode = new HashSet<>();
-        Set<Local> locals = new HashSet<>();
+        this.locals = new HashSet<>();
         for (Local l : b.getLocals()) {
             locals.add(l);
         }
@@ -127,6 +128,14 @@ public class IntegerAnalysis<S extends State> {
 
     public String generateSMTReportFull() {
         StringBuilder sb = new StringBuilder();
+        for (Local l : this.locals) {
+            sb.append(l.toString());
+            sb.append("\t");
+        }
+        // remove last tab
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append("\n");
+
         String methodSignature = this.b.getMethod().getSignature();
         int stmtCount = 0;
         for (Unit u : this.g.getBody().getUnits()) {
@@ -138,10 +147,20 @@ public class IntegerAnalysis<S extends State> {
             sb.append(methodSignature);
             sb.append('\n');
             State state = analysis.getFallFlowAfter(u);
-            sb.append(state.toSMT(this.solver));
+            String fallSmtExpr = state.toSMT(this.solver);
+            if (!fallSmtExpr.isEmpty()) {
+                sb.append("fall\t");
+                sb.append(fallSmtExpr);
+                sb.append("\n");
+            }
             List<S> branches = analysis.getBranchFlowAfter(u);
             for (S branch : branches) {
-                sb.append(branch.toSMT(this.solver));
+                String branchSmtExpr = branch.toSMT(this.solver);
+                if (!branchSmtExpr.isEmpty()) {
+                    sb.append("branch\t");
+                    sb.append(branchSmtExpr);
+                    sb.append("\n");
+                }
             }
         }
         return sb.toString();
