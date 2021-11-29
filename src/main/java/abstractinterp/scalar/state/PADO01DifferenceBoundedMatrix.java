@@ -427,44 +427,28 @@ public class PADO01DifferenceBoundedMatrix {
 
     public String toSMT(SolverWrapper solver) {
         StringBuilder sb = new StringBuilder();
-        List<BinopExpr> exprs = new ArrayList<>(N * 2);
         if (this.isFeasible()) {
+            List<BinopExpr> exprs = new ArrayList<>(N * 2);
             for (int i = 0; i < N; i++) {
                 for (int j = 0; j < N; j++) {
-                    if (i == j || this.matrix[i][j].isTop()) {
-                        continue;
-                    }
                     Local s = this.indicesToLocals.get(i);
                     Local t = this.indicesToLocals.get(j);
+                    if (i == j ||
+                        this.matrix[i][j].isTop() ||
+                        (s.equals(Variable.ZERO) && t.equals(Variable.ZERO))) {
+                        continue;
+                    }
                     exprs.add(this.toGrimpExpr(s, t, this.matrix[i][j]));
                 }
             }
-            if (exprs.size() == 0) {
-                // empty, everything was TOP (⟙)
-                for (int i = 0; i < N; i++) {
-                    Local l = this.indicesToLocals.get(i);
-                    exprs.add(this.toGrimpExpr(l, l, PADO01Constraint.of(0)));
-                }
-            }
+            exprs.stream()
+                .reduce((a, b) -> Grimp.v().newAndExpr(a, b))
+                .ifPresentOrElse((expr) -> {
+                        sb.append(solver.smt2(expr));
+                        sb.append("\n");
+                    }, () -> sb.append("true\n"));
         } else {
-            // DBM is not feasible
-            for (int i = 0; i < N; i++) {
-                Local l = this.indicesToLocals.get(i);
-                exprs.add(this.toGrimpExpr(l, l, PADO01Constraint.of(1)));
-            }
-        }
-        if (exprs.size() > 1) {
-            sb.append("(and ");
-            exprs.forEach(e -> {
-                    sb.append(solver.smt2(e));
-                    sb.append(" ");
-                });
-            sb.deleteCharAt(sb.length() - 1);
-            sb.append(")");
-        } else if (exprs.size() == 1) {
-            sb.append(solver.smt2(exprs.get(0)));
-        } else {
-            LOGGER.error("could not translate DBM to SMT formula");
+            sb.append("false\n");
         }
         return sb.toString();
     }

@@ -161,26 +161,6 @@ public class IntervalBoxStateProperties {
         }
     }
 
-    @Property
-    void toSMT(@ForAll Map<Local, Interval32Box> states) {
-        Set<Local> locals = states.keySet();
-        IntervalBoxState state = new IntervalBoxState(locals, false);
-        states.forEach((l, b) -> state.update(l, b));
-        List<String> expected = states.entrySet().stream().map(e -> {
-                Local l = e.getKey();
-                Interval32Box b = e.getValue();
-                return String.format("%s->%s", l, b.toSMT(l, this.solver));
-            }).sorted().collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
-        List<String> result = Arrays.stream(state.toSMT(this.solver).split("\n"))
-            .filter(s -> !s.isEmpty())
-            .sorted()
-            .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
-        assertEquals(expected.size(), result.size());
-        for (int i = 0; i < expected.size(); i++) {
-            assertEquals(expected.get(i), result.get(i));
-        }
-    }
-
     private int minimum(int... xs) {
         int min = Integer.MAX_VALUE;
         for (int i = 0; i < xs.length; i++) {

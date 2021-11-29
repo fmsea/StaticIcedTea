@@ -9,8 +9,11 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import soot.Local;
 import soot.Value;
+import soot.grimp.Grimp;
+import soot.jimple.BinopExpr;
 import soot.jimple.IntConstant;
 import soot.jimple.internal.JNegExpr;
 import org.jgrapht.Graph;
@@ -276,11 +279,14 @@ public class IntervalBoxState implements State {
 
     public String toSMT(SolverWrapper solver) {
         StringBuilder sb = new StringBuilder();
-        for (Local l : this.state.keySet()) {
-            sb.append(l.toString());
-            sb.append("->");
-            sb.append(this.toSMT(l, solver));
-            sb.append("\n");
+        if (this.isFeasible()) {
+            Optional<BinopExpr> maybeExpr = combineExprs(this.state.keySet().stream());
+            maybeExpr.ifPresentOrElse((expr) -> {
+                    sb.append(solver.smt2(expr));
+                    sb.append("\n");
+                }, () -> sb.append("true\n"));
+        } else {
+            sb.append("false\n");
         }
         return sb.toString();
     }
@@ -290,6 +296,12 @@ public class IntervalBoxState implements State {
         Interval32Box interval = this.state.get(l);
         sb.append(solver.smt2(interval.toGrimpExpr(l)));
         return sb.toString();
+    }
+
+    private Optional<BinopExpr> combineExprs(Stream<Local> locals) {
+        return locals.filter(l -> !this.state.get(l).isTop())
+            .map(l -> this.state.get(l).toGrimpExpr(l))
+            .reduce((a, b) -> Grimp.v().newAndExpr(a, b));
     }
 
     public Graph<Local, DBSConstraint> toGraph() {

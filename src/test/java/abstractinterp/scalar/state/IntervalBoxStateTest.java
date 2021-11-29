@@ -84,11 +84,27 @@ public class IntervalBoxStateTest {
 
     @Test
     void testToSMT() {
-        Set<Local> locals = new HashSet<>();
-        locals.add(Jimple.v().newLocal("l0", IntType.v()));
-        IntervalBoxState box = new IntervalBoxState(locals, false);
-        locals.forEach(l -> box.update(l, new Interval32Box(-5, 5)));
-        assertEquals("l0->(and (>= l0 (- 5)) (<= l0 5))\n", box.toSMT(this.solver));
+        {
+            Set<Local> locals = new HashSet<>();
+            locals.add(Jimple.v().newLocal("l0", IntType.v()));
+            IntervalBoxState box = new IntervalBoxState(locals, false);
+            locals.forEach(l -> box.update(l, new Interval32Box(-5, 5)));
+            assertEquals("(and (>= l0 (- 5)) (<= l0 5))\n", box.toSMT(this.solver));
+        }
+
+        {
+            Set<Local> locals = new HashSet<>();
+            locals.add(Jimple.v().newLocal("l0", IntType.v()));
+            IntervalBoxState box = new IntervalBoxState(locals, false);
+            assertEquals("false\n", box.toSMT(this.solver));
+        }
+
+        {
+            Set<Local> locals = new HashSet<>();
+            locals.add(Jimple.v().newLocal("l0", IntType.v()));
+            IntervalBoxState box = new IntervalBoxState(locals, true);
+            assertEquals("true\n", box.toSMT(this.solver));
+        }
     }
 
     @Test

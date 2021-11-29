@@ -614,8 +614,7 @@ public class Interval32Box {
     public BinopExpr toGrimpExpr(Local local) {
         BinopExpr r = null;
         if (this.isBottom()) {
-            r = Grimp.v().newAndExpr(Grimp.v().newGeExpr(local, IntConstant.v(0)),
-                                     Grimp.v().newLtExpr(local, IntConstant.v(0)));
+            r = Grimp.v().newEqExpr(IntConstant.v(0), IntConstant.v(1));
         } else if (this.isTop()) {
             r = Grimp.v().newOrExpr(Grimp.v().newGeExpr(local, IntConstant.v(0)),
                                     Grimp.v().newLtExpr(local, IntConstant.v(0)));

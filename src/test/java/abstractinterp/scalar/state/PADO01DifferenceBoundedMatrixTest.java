@@ -777,18 +777,12 @@ public class PADO01DifferenceBoundedMatrixTest {
     void testToSMT() {
         {
             PADO01DifferenceBoundedMatrix m = new PADO01DifferenceBoundedMatrix(this.locals, true);
-            String expected = Stream.of("(and (<= !$ZERO0 (+ !$ZERO0 0))",
-                                        "(<= x1 (+ x1 0))",
-                                        "(<= x2 (+ x2 0)))").collect(Collectors.joining(" "));
-            assertEquals(expected, m.toSMT(this.solver));
+            assertEquals("true\n", m.toSMT(this.solver));
         }
 
         {
             PADO01DifferenceBoundedMatrix m = new PADO01DifferenceBoundedMatrix(this.locals, false);
-            String expected = Stream.of("(and (<= !$ZERO0 (+ !$ZERO0 1))",
-                                        "(<= x1 (+ x1 1))",
-                                        "(<= x2 (+ x2 1)))").collect(Collectors.joining(" "));
-            assertEquals(expected, m.toSMT(this.solver));
+            assertEquals("false\n", m.toSMT(this.solver));
         }
 
         {
@@ -802,7 +796,7 @@ public class PADO01DifferenceBoundedMatrixTest {
                                         "(>= x2 1)",
                                         "(<= x1 4)",
                                         "(<= x1 (+ x2 1))",
-                                        "(<= x2 3))").collect(Collectors.joining(" "));
+                                        "(<= x2 3))\n").collect(Collectors.joining(" "));
             assertEquals(expected, m.toSMT(this.solver));
         }
     }

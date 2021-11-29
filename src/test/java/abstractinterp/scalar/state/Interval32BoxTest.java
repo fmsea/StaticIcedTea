@@ -460,7 +460,7 @@ public class Interval32BoxTest {
     void testToSMTFormula() {
         Local l = Jimple.v().newLocal("l0", IntType.v());
         Interval32Box bot = Interval32Box.BOT();
-        assertEquals("(and (>= l0 0) (< l0 0))", bot.toSMT(l, this.solver));
+        assertEquals("(= 0 1)", bot.toSMT(l, this.solver));
         Interval32Box top = Interval32Box.TOP();
         assertEquals("(or (>= l0 0) (< l0 0))", top.toSMT(l, this.solver));
         Interval32Box max = Interval32Box.MAX();
@@ -482,7 +482,7 @@ public class Interval32BoxTest {
         Interval32Box top = Interval32Box.TOP();
         Interval32Box max = Interval32Box.MAX();
         Interval32Box box = new Interval32Box(null, 5);
-        assertEquals("l0 >= 0 & l0 < 0", bot.toGrimpExpr(l).toString());
+        assertEquals("0 == 1", bot.toGrimpExpr(l).toString());
         assertEquals("l0 >= 0 | l0 < 0", top.toGrimpExpr(l).toString());
         assertEquals(String.format("l0 >= %d & l0 <= %d",
                                    Integer.MIN_VALUE,
