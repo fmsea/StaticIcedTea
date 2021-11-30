@@ -227,7 +227,7 @@ public class PADO01DifferenceBoundedState implements State {
             c = IntConstant.v(left.value % right.value);
             break;
         default:
-            LOGGER.info("Encountered unhandled integer binary operator: {}", operator);
+            LOGGER.warn("Encountered unhandled integer binary operator: {}", operator);
             return;
         }
 
@@ -278,7 +278,7 @@ public class PADO01DifferenceBoundedState implements State {
             computeInterval.accept((l, r) -> Interval32Box.divide(l, r));
             break;
         default:
-            LOGGER.info("unhandled binary operator, transfering ⟙ [{} = {} {} {}]",
+            LOGGER.warn("unhandled binary operator, transfering ⟙ [{} = {} {} {}]",
                         lVar, left, right, operator);
             this.forget(lVar);
         }
@@ -321,7 +321,7 @@ public class PADO01DifferenceBoundedState implements State {
             computeInterval.accept((l, r) -> Interval32Box.divide(l, r));
             break;
         default:
-            LOGGER.info("unhandled binary operator, transfering ⟙ [{} = {} {} {}]",
+            LOGGER.warn("unhandled binary operator, transfering ⟙ [{} = {} {} {}]",
                         lVar, left, right, operator);
             this.forget(lVar);
         }
