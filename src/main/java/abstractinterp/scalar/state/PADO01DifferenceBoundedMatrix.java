@@ -102,14 +102,26 @@ public class PADO01DifferenceBoundedMatrix {
     }
 
     public boolean putConstraint(Local source, Local target, PADO01Constraint constraint) {
+        return this.putConstraint(source, target, constraint, this);
+    }
+
+    public boolean putConstraint(Local source,
+                                 Local target,
+                                 PADO01Constraint constraint,
+                                 PADO01DifferenceBoundedMatrix matrix) {
         int i = this.localToIndices.get(source);
         int j = this.localToIndices.get(target);
-        return this.putConstraint(i, j, constraint);
+        return this.putConstraint(i, j, constraint, matrix);
     }
 
     private boolean putConstraint(int i, int j, PADO01Constraint c) {
+        return this.putConstraint(i, j, c, this);
+    }
+
+    private boolean putConstraint(int i, int j, PADO01Constraint c, PADO01DifferenceBoundedMatrix in) {
         boolean added = false;
-        if (PADO01Constraint.compare(c, this.matrix[i][j]) < 0) {
+        LOGGER.trace("Compare to existing constraint: {} ≤ {}", c, in.matrix[i][j]);
+        if (PADO01Constraint.compare(c, in.matrix[i][j]) < 0) {
             this.matrix[i][j] = c;
             added = true;
         }
@@ -117,8 +129,15 @@ public class PADO01DifferenceBoundedMatrix {
     }
 
     public boolean putIncremental(Local source, Local target, PADO01Constraint constraint) {
+        return this.putIncremental(source, target, constraint, this);
+    }
+
+    public boolean putIncremental(Local source,
+                                  Local target,
+                                  PADO01Constraint constraint,
+                                  PADO01DifferenceBoundedMatrix in) {
         boolean feasible = false;
-        if (!putConstraint(source, target, constraint)) {
+        if (!putConstraint(source, target, constraint, in)) {
             feasible = this.isFeasible();
         } else {
             feasible = this.incrementalClosure(source, target);
