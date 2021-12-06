@@ -1,0 +1,46 @@
+$b25	$i26	b0	b1	b2
+1 b0 = 0:<test.ballonFactory: void getArrow()>
+fall	(= b0 0)
+
+2 b1 = 50:<test.ballonFactory: void getArrow()>
+fall	(and (= b0 0) (= b1 50) (= b0 (+ b1 (- 50))))
+
+3 b2 = 60:<test.ballonFactory: void getArrow()>
+fall	(and (= b0 0)
+     (= b1 50)
+     (= b2 60)
+     (= b0 (+ b1 (- 50)))
+     (= b0 (+ b2 (- 60)))
+     (= b1 (+ b2 (- 10))))
+
+4 $b25 = neg b2:<test.ballonFactory: void getArrow()>
+fall	(and (= $b25 (- 60))
+     (= b0 0)
+     (= b1 50)
+     (= b2 60)
+     (= $b25 (+ b0 (- 60)))
+     (= $b25 (+ b1 (- 110)))
+     (= $b25 (+ b2 (- 120)))
+     (= b0 (+ b1 (- 50)))
+     (= b0 (+ b2 (- 60)))
+     (= b1 (+ b2 (- 10))))
+
+5 $i26 = $b25 / 2:<test.ballonFactory: void getArrow()>
+fall	(and (= $b25 (- 60))
+     (= $i26 (- 30))
+     (= b0 0)
+     (= b1 50)
+     (= b2 60)
+     (= $b25 (+ $i26 (- 30)))
+     (= $b25 (+ b0 (- 60)))
+     (= $b25 (+ b1 (- 110)))
+     (= $b25 (+ b2 (- 120)))
+     (= $i26 (+ b0 (- 30)))
+     (= $i26 (+ b1 (- 80)))
+     (= $i26 (+ b2 (- 90)))
+     (= b0 (+ b1 (- 50)))
+     (= b0 (+ b2 (- 60)))
+     (= b1 (+ b2 (- 10))))
+
+6 return:<test.ballonFactory: void getArrow()>
+fall	false

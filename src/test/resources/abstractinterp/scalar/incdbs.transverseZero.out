@@ -1,0 +1,56 @@
+r0	u0	x0	y0
+1 x0 = 60:<test.transverse: int zero()>
+fall	(= x0 60)
+
+2 y0 = neg x0:<test.transverse: int zero()>
+fall	(and (= x0 60) (= y0 (- 60)) (= x0 (+ y0 120)))
+
+3 u0 = x0 - y0:<test.transverse: int zero()>
+fall	(and (= u0 120)
+     (= x0 60)
+     (= y0 (- 60))
+     (= u0 (+ x0 60))
+     (= u0 (+ y0 180))
+     (= x0 (+ y0 120)))
+
+4 if u0 > 120 goto r0 = 1:<test.transverse: int zero()>
+fall	(and (= u0 120)
+     (= x0 60)
+     (= y0 (- 60))
+     (= u0 (+ x0 60))
+     (= u0 (+ y0 180))
+     (= x0 (+ y0 120)))
+
+branch	false
+
+5 r0 = neg 1:<test.transverse: int zero()>
+fall	(and (= r0 (- 1))
+     (= u0 120)
+     (= x0 60)
+     (= y0 (- 60))
+     (= r0 (+ u0 (- 121)))
+     (= r0 (+ x0 (- 61)))
+     (= r0 (+ y0 59))
+     (= u0 (+ x0 60))
+     (= u0 (+ y0 180))
+     (= x0 (+ y0 120)))
+
+6 goto [?= return r0]:<test.transverse: int zero()>
+fall	false
+
+branch	(and (= r0 (- 1))
+     (= u0 120)
+     (= x0 60)
+     (= y0 (- 60))
+     (= r0 (+ u0 (- 121)))
+     (= r0 (+ x0 (- 61)))
+     (= r0 (+ y0 59))
+     (= u0 (+ x0 60))
+     (= u0 (+ y0 180))
+     (= x0 (+ y0 120)))
+
+7 r0 = 1:<test.transverse: int zero()>
+fall	false
+
+8 return r0:<test.transverse: int zero()>
+fall	false
