@@ -14,6 +14,7 @@ public class PADO01DBSMiniJavaExamplesProvider extends MiniJavaExamplesProvider 
                          example("miniExample2", "pado"),
                          example("miniExample3", "pado"),
                          example("miniExample4", "pado"),
-                         example("miniExample5", "pado"));
+                         example("miniExample5", "pado"),
+                         example("miniExample6", "pado"));
     }
 }
