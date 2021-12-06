@@ -345,9 +345,7 @@ public class PADO01DifferenceBoundedStateTest {
         in.add(xs[2], xs[1], PADO01Constraint.of(+1));
         PADO01DifferenceBoundedState out = new PADO01DifferenceBoundedState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertFalse(out.updateCond(in, xs[1], xs[2], PredicateType.Eq)),
-                  () -> assertEquals(PADO01Constraint.of(-2), matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(PADO01Constraint.of(-1), matrix.getConstraint(xs[2], xs[1])));
+        assertAll(() -> assertFalse(out.updateCond(in, xs[1], xs[2], PredicateType.Eq)));
     }
 
     @Test
@@ -358,9 +356,7 @@ public class PADO01DifferenceBoundedStateTest {
         in.add(xs[2], xs[1], PADO01Constraint.of(-3));
         PADO01DifferenceBoundedState out = new PADO01DifferenceBoundedState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertFalse(out.updateCond(in, xs[1], xs[2], PredicateType.Eq)),
-                  () -> assertEquals(PADO01Constraint.of(-3), matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(PADO01Constraint.of(-6), matrix.getConstraint(xs[2], xs[1])));
+        assertAll(() -> assertFalse(out.updateCond(in, xs[1], xs[2], PredicateType.Eq)));
     }
 
     @Test
