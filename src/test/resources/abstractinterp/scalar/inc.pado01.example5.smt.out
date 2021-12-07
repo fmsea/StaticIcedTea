@@ -1,0 +1,25 @@
+2 b2 = 1:<test.Example1M: int example_5(int)>
+b2
+sat
+sat
+3 b3 = 3:<test.Example1M: int example_5(int)>
+b3
+sat
+sat
+4 if b3 != 0 goto i4 = b3 + b2:<test.Example1M: int example_5(int)>
+b3f
+sat
+sat
+5 i4 = b3 - b2:<test.Example1M: int example_5(int)>
+7 i4 = b3 + b2:<test.Example1M: int example_5(int)>
+i4
+sat
+sat
+8 $i0 = b3 * i4:<test.Example1M: int example_5(int)>
+$i0
+sat
+sat
+9 i5 = $i0 - 18:<test.Example1M: int example_5(int)>
+i5
+sat
+sat

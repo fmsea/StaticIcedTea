@@ -1,0 +1,15 @@
+1 l1 = 4:<test.neqBranch: void neq()>
+l1
+sat
+sat
+2 if l0 != 0 goto return:<test.neqBranch: void neq()>
+l0
+sat
+sat
+l0f
+sat
+sat
+3 l2 = l1 + 1:<test.neqBranch: void neq()>
+l2
+sat
+sat
