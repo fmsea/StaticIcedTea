@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import soot.Body;
 import soot.Local;
@@ -128,8 +130,10 @@ public class IntegerAnalysis<S extends State> implements Analysis {
 
     public String generateSMTReportFull() {
         StringBuilder sb = new StringBuilder();
-        for (Local l : this.locals) {
-            sb.append(l.toString());
+        Set<String> locals = new TreeSet<>();
+        locals.addAll(this.locals.stream().map(l -> l.toString()).collect(Collectors.toSet()));
+        for (String l : locals) {
+            sb.append(l);
             sb.append("\t");
         }
         // remove last tab
