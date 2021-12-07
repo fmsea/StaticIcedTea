@@ -139,8 +139,6 @@ public class PADO01DifferenceBoundedState implements State {
     }
 
     public void mergeWith(PADO01DifferenceBoundedState inState) {
-        this.matrix.computeClosure();
-        inState.matrix.computeClosure();
         this.matrix.union(inState.matrix);
     }
 
@@ -153,7 +151,6 @@ public class PADO01DifferenceBoundedState implements State {
     }
 
     public void widenWith(PADO01DifferenceBoundedState inState) {
-        inState.matrix.computeClosure();
         this.matrix.widenWith(inState.matrix);
     }
 
@@ -166,8 +163,6 @@ public class PADO01DifferenceBoundedState implements State {
     }
 
     public boolean isSubset(PADO01DifferenceBoundedState inState) {
-        this.matrix.computeClosure();
-        inState.matrix.computeClosure();
         return this.matrix.isSubset(inState.matrix);
     }
 
