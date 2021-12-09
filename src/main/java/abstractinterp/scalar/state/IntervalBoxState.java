@@ -280,7 +280,9 @@ public class IntervalBoxState implements State {
     public String toSMT(SolverWrapper solver) {
         StringBuilder sb = new StringBuilder();
         if (this.isFeasible()) {
-            Optional<BinopExpr> maybeExpr = combineExprs(this.state.keySet().stream());
+            Stream<Local> locals = this.state.keySet()
+                .stream().sorted((a, b) -> a.toString().compareTo(b.toString()));
+            Optional<BinopExpr> maybeExpr = combineExprs(locals);
             maybeExpr.ifPresentOrElse((expr) -> {
                     sb.append(solver.smt2(expr));
                     sb.append("\n");
