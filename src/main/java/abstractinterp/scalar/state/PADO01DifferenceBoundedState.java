@@ -271,11 +271,11 @@ public class PADO01DifferenceBoundedState implements State {
             break;
         case MULTIPLICATION:
             this.forget(lVar);
-            computeInterval.accept((l, r) -> Interval32Box.multiply(l, r));
+            computeInterval.accept(Interval32Box::multiply);
             break;
         case DIVISION:
             this.forget(lVar);
-            computeInterval.accept((l, r) -> Interval32Box.divide(l, r));
+            computeInterval.accept(Interval32Box::divide);
             break;
         default:
             LOGGER.warn("unhandled binary operator, transfering ⟙ [{} = {} {} {}]",
@@ -310,15 +310,15 @@ public class PADO01DifferenceBoundedState implements State {
             break;
         case SUBTRACTION:
             this.forget(lVar);
-            computeInterval.accept((l, r) -> Interval32Box.subtract(l, r));
+            computeInterval.accept(Interval32Box::subtract);
             break;
         case MULTIPLICATION:
             this.forget(lVar);
-            computeInterval.accept((l, r) -> Interval32Box.multiply(l, r));
+            computeInterval.accept(Interval32Box::multiply);
             break;
         case DIVISION:
             this.forget(lVar);
-            computeInterval.accept((l, r) -> Interval32Box.divide(l, r));
+            computeInterval.accept(Interval32Box::divide);
             break;
         default:
             LOGGER.warn("unhandled binary operator, transfering ⟙ [{} = {} {} {}]",
@@ -343,16 +343,16 @@ public class PADO01DifferenceBoundedState implements State {
         this.forget(lVar);
         switch (operator) {
         case ADDITION:
-            computeInterval.accept((l, r) -> Interval32Box.add(l, r));
+            computeInterval.accept(Interval32Box::add);
             break;
         case SUBTRACTION:
-            computeInterval.accept((l, r) -> Interval32Box.subtract(l, r));
+            computeInterval.accept(Interval32Box::subtract);
             break;
         case MULTIPLICATION:
-            computeInterval.accept((l, r) -> Interval32Box.multiply(l, r));
+            computeInterval.accept(Interval32Box::multiply);
             break;
         case DIVISION:
-            computeInterval.accept((l, r) -> Interval32Box.divide(l, r));
+            computeInterval.accept(Interval32Box::divide);
             break;
         default:
         }
