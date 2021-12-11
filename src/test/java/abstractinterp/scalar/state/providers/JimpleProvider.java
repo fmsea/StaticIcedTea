@@ -433,4 +433,32 @@ public class JimpleProvider implements ArbitraryProvider {
 
         return body;
     }
+
+    public static Body factorial() {
+        Jimple jimple = Jimple.v();
+        SootClass testClass = new SootClass("test.Factorial", Modifier.PUBLIC);
+        testClass.setSuperclass(Scene.v().getSootClass("java.lang.Object"));
+        SootMethod method = new SootMethod("factorial",
+                                           Arrays.asList(new Type[] {IntType.v()}),
+                                           IntType.v());
+        testClass.addMethod(method);
+        Scene.v().addClass(testClass);
+        JimpleBody body = jimple.newBody(method);
+        method.setActiveBody(body);
+        Chain<Unit> units = body.getUnits();
+        Local n = jimple.newLocal("$i0", IntType.v());
+        Local f = jimple.newLocal("i1", IntType.v());
+        Stream.of(n, f).forEach(l -> body.getLocals().add(l));
+        Unit exit = jimple.newReturnStmt(f);
+        Unit loopGuard = jimple.newIfStmt(jimple.newLeExpr(n, IntConstant.v(0)), exit);
+        units.add(jimple.newIdentityStmt(n, jimple.newParameterRef(IntType.v(), 0)));
+        units.add(jimple.newAssignStmt(n, IntConstant.v(1)));
+        units.add(loopGuard);
+        units.add(jimple.newAssignStmt(f, jimple.newMulExpr(f, n)));
+        units.add(jimple.newAssignStmt(n, jimple.newSubExpr(n, IntConstant.v(1))));
+        units.add(jimple.newGotoStmt(loopGuard));
+        units.add(exit);
+
+        return body;
+    }
 }

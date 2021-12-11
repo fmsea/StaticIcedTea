@@ -238,6 +238,19 @@ public class IntervalNumericalTest extends AbstractNumericalTest {
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
     }
 
+    @Test
+    void testFactorial() {
+        Body body = JimpleProvider.factorial();
+        IntegerAnalysis<IntervalBoxState> analysis =
+            new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
+        analysis.runAnalysis();
+        String[] actual = analysis.generateSMTReportFull().split("\n");
+        String[] expected = readResourcesFile("int.factorial.out").split("\n");
+        assertEquals(expected.length, actual.length);
+        assertAll(IntStream.range(0, expected.length)
+                  .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
+    }
+
     private void assertReportOutputEquals(String[] expected, String[] actual) {
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
