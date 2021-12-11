@@ -3,7 +3,7 @@ package abstractinterp.scalar.state;
 import java.util.Optional;
 import soot.jimple.IntConstant;
 
-class PADO01Constraint implements Comparable<PADO01Constraint> {
+public class PADO01Constraint implements Comparable<PADO01Constraint> {
     private Optional<Integer> bound;
     private boolean bottom = false;
 
