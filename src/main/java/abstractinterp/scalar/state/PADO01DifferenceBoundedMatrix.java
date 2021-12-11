@@ -446,22 +446,39 @@ public class PADO01DifferenceBoundedMatrix {
 
     public String toSMT(SolverWrapper solver) {
         StringBuilder sb = new StringBuilder();
+        Grimp g = Grimp.v();
         if (this.isFeasible()) {
             List<BinopExpr> exprs = new ArrayList<>(N * 2);
             for (int i = 0; i < N; i++) {
-                for (int j = 0; j < N; j++) {
+                for (int j = i; j < N; j++) {
                     Local s = this.indicesToLocals.get(i);
                     Local t = this.indicesToLocals.get(j);
                     if (i == j ||
-                        this.matrix[i][j].isTop() ||
-                        (s.equals(Variable.ZERO) && t.equals(Variable.ZERO))) {
+                        (s.equals(Variable.ZERO) && t.equals(Variable.ZERO)) ||
+                        (this.matrix[i][j].isTop() && this.matrix[j][i].isTop())) {
                         continue;
+                    } else if (!this.matrix[i][j].isTop() &&
+                               !this.matrix[j][i].isTop() &&
+                               this.matrix[i][j].bound().equals(this.matrix[j][i].bound().map(b -> b * -1))) {
+                        if (s.equals(Variable.ZERO)) {
+                            exprs.add(g.newEqExpr(t, IntConstant.v(this.matrix[i][j].bound().map(b -> b * -1).get())));
+                        } else if (t.equals(Variable.ZERO)) {
+                            exprs.add(g.newEqExpr(s, IntConstant.v(this.matrix[i][j].bound().get())));
+                        } else {
+                            exprs.add(g.newEqExpr(s, g.newAddExpr(t, IntConstant.v((this.matrix[i][j].bound().get())))));
+                        }
+                    } else {
+                        if (!this.matrix[i][j].isTop()) {
+                            exprs.add(this.toGrimpExpr(s, t, this.matrix[i][j]));
+                        }
+                        if (!this.matrix[j][i].isTop()) {
+                            exprs.add(this.toGrimpExpr(t, s, this.matrix[j][i]));
+                        }
                     }
-                    exprs.add(this.toGrimpExpr(s, t, this.matrix[i][j]));
                 }
             }
             exprs.stream()
-                .reduce((a, b) -> Grimp.v().newAndExpr(a, b))
+                .reduce((a, b) -> g.newAndExpr(a, b))
                 .ifPresentOrElse((expr) -> {
                         sb.append(solver.smt2(expr));
                         sb.append("\n");
