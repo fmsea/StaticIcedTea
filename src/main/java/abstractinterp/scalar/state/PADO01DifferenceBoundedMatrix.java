@@ -94,7 +94,7 @@ public class PADO01DifferenceBoundedMatrix {
     private void setConstraint(int i, int j, PADO01Constraint c) {
         if (i == j && c.bound().map(b -> b < 0).orElse(false)) {
             this.matrix[i][j] = PADO01Constraint.BOT();
-        } else if (i == j) {
+        } else if (i == j && (!c.isBottom() || c.bound().map(b -> b > 0).orElse(false))) {
             this.matrix[i][j] = PADO01Constraint.of(0);
         } else {
             this.matrix[i][j] = c;
@@ -158,7 +158,7 @@ public class PADO01DifferenceBoundedMatrix {
         LOGGER.debug("computing least upper bound");
         LOGGER.trace("{} ⊔ {}", this, other);
         this.iterateMatrix((i, j) -> {
-                this.matrix[i][j] = PADO01Constraint.max(this.matrix[i][j], other.matrix[i][j]);
+                this.setConstraint(i, j, PADO01Constraint.max(this.matrix[i][j], other.matrix[i][j]));
             });
         LOGGER.debug("finished least upper bound");
         LOGGER.trace("⊔ result: {}", this);
@@ -171,7 +171,7 @@ public class PADO01DifferenceBoundedMatrix {
         LOGGER.debug("computing intersection");
         LOGGER.trace("{} ⊓ {}", this, other);
         this.iterateMatrix((i, j) -> {
-                this.matrix[i][j] = PADO01Constraint.min(this.matrix[i][j], other.matrix[i][j]);
+                this.setConstraint(i, j, PADO01Constraint.min(this.matrix[i][j], other.matrix[i][j]));
             });
         LOGGER.debug("finished computing intersection");
         LOGGER.trace("⊓ result:", this);
@@ -253,14 +253,14 @@ public class PADO01DifferenceBoundedMatrix {
                                                                       this.matrix[k][j]);
                     PADO01Constraint newConstraint = PADO01Constraint.min(this.matrix[i][j],
                                                                           candidate);
-                    this.matrix[i][j] = newConstraint;
+                    this.setConstraint(i, j, newConstraint);
                 }
             }
         }
 
         boolean feasible = true;
         for (int i = 0; i < N; i++) {
-            if (this.matrix[i][i].bound().orElse(0) < 0) {
+            if (this.matrix[i][i].isBottom() || this.matrix[i][i].bound().orElse(0) < 0) {
                 feasible = false;
                 break;
             }
@@ -293,7 +293,7 @@ public class PADO01DifferenceBoundedMatrix {
                     PADO01Constraint transitivePath = PADO01Constraint.add(this.matrix[i][k],
                                                                            this.matrix[k][j]);
                     if (PADO01Constraint.compare(this.matrix[i][j], transitivePath) >= 0) {
-                        this.matrix[i][j] = PADO01Constraint.TOP();
+                        this.setConstraint(i, j, PADO01Constraint.TOP());
                     }
                 }
             }
@@ -322,12 +322,12 @@ public class PADO01DifferenceBoundedMatrix {
         int k = this.localToIndices.get(local);
         iterateMatrix((i, j) -> {
                 if (i == j && j == k) {
-                    this.matrix[i][j] = PADO01Constraint.of(0);
+                    this.setConstraint(i, j, PADO01Constraint.of(0));
                 } else if (i != k && j != k) {
                     PADO01Constraint c = PADO01Constraint.min(this.matrix[i][j],
                                                               PADO01Constraint.add(this.matrix[i][k],
                                                                                    this.matrix[k][j]));
-                    this.matrix[i][j] = c;
+                    this.setConstraint(i, j, c);
                 } else {
                     this.matrix[i][j] = PADO01Constraint.TOP();
                 }
@@ -372,7 +372,7 @@ public class PADO01DifferenceBoundedMatrix {
             if (i == k) {
                 continue;
             }
-            this.matrix[i][k] = PADO01Constraint.add(from.matrix[i][k], add);
+            this.setConstraint(i, k, PADO01Constraint.add(from.matrix[i][k], add));
         }
     }
 
@@ -382,7 +382,7 @@ public class PADO01DifferenceBoundedMatrix {
             if (i == k) {
                 continue;
             }
-            this.matrix[k][i] = PADO01Constraint.add(from.matrix[k][i], add);
+            this.setConstraint(k, i, PADO01Constraint.add(from.matrix[k][i], add));
         }
     }
 
@@ -392,7 +392,7 @@ public class PADO01DifferenceBoundedMatrix {
             if (i == k) {
                 continue;
             }
-            this.matrix[i][k] = PADO01Constraint.subtract(from.matrix[i][k], sub);
+            this.setConstraint(i, k, PADO01Constraint.subtract(from.matrix[i][k], sub));
         }
     }
 
@@ -402,7 +402,7 @@ public class PADO01DifferenceBoundedMatrix {
             if (i == k) {
                 continue;
             }
-            this.matrix[k][i] = PADO01Constraint.subtract(from.matrix[k][i], sub);
+            this.setConstraint(k, i, PADO01Constraint.subtract(from.matrix[k][i], sub));
         }
     }
 

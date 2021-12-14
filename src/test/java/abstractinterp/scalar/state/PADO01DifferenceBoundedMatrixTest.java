@@ -361,23 +361,23 @@ public class PADO01DifferenceBoundedMatrixTest {
             m.setConstraint(xs[1], xs[2], PADO01Constraint.of(1));
             m.setConstraint(xs[2], xs[0], PADO01Constraint.of(3));
             assertAll(() -> assertFalse(m.computeClosure()),
-                      () -> assertEquals(PADO01Constraint.of(-2),
+                      () -> assertEquals(PADO01Constraint.BOT(),
                                          m.getConstraint(xs[0], xs[0])),
-                      () -> assertEquals(PADO01Constraint.of(-3),
+                      () -> assertEquals(PADO01Constraint.BOT(),
                                          m.getConstraint(xs[1], xs[1])),
-                      () -> assertEquals(PADO01Constraint.of(-6),
+                      () -> assertEquals(PADO01Constraint.BOT(),
                                          m.getConstraint(xs[2], xs[2])),
-                      () -> assertEquals(PADO01Constraint.of(-3),
+                      () -> assertEquals(PADO01Constraint.BOT(),
                                          m.getConstraint(xs[0], xs[1])),
-                      () -> assertEquals(PADO01Constraint.of(-6),
+                      () -> assertEquals(PADO01Constraint.BOT(),
                                          m.getConstraint(xs[0], xs[2])),
-                      () -> assertEquals(PADO01Constraint.of(-2),
+                      () -> assertEquals(PADO01Constraint.BOT(),
                                          m.getConstraint(xs[1], xs[0])),
-                      () -> assertEquals(PADO01Constraint.of(-6),
+                      () -> assertEquals(PADO01Constraint.BOT(),
                                          m.getConstraint(xs[1], xs[2])),
-                      () -> assertEquals(PADO01Constraint.of(-2),
+                      () -> assertEquals(PADO01Constraint.BOT(),
                                          m.getConstraint(xs[2], xs[0])),
-                      () -> assertEquals(PADO01Constraint.of(-3),
+                      () -> assertEquals(PADO01Constraint.BOT(),
                                          m.getConstraint(xs[2], xs[1])));
         }
 
