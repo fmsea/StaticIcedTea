@@ -461,4 +461,42 @@ public class JimpleProvider implements ArbitraryProvider {
 
         return body;
     }
+
+    public static Body decode() {
+        Jimple jimple = Jimple.v();
+        SootClass testClass = new SootClass("test.Example", Modifier.PUBLIC);
+        testClass.setSuperclass(Scene.v().getSootClass("java.lang.Object"));
+        SootMethod method = new SootMethod("decode",
+                                           Arrays.asList(new Type[] {IntType.v()}),
+                                           IntType.v());
+        testClass.addMethod(method);
+        JimpleBody body = jimple.newBody(method);
+        method.setActiveBody(body);
+        Chain<Unit> units = body.getUnits();
+        Local[] xs = new Local[] {
+            jimple.newLocal("$i0", IntType.v()),
+            jimple.newLocal("i0", IntType.v()),
+            jimple.newLocal("i1", IntType.v()),
+            jimple.newLocal("i2", IntType.v()),
+            jimple.newLocal("i3", IntType.v()),
+            jimple.newLocal("i4", IntType.v()),
+            jimple.newLocal("i5", IntType.v()),
+            jimple.newLocal("i6", IntType.v()),
+        };
+        Stream.of(xs).forEach(x -> body.getLocals().add(x));
+        Unit exit = jimple.newReturnStmt(xs[6]);
+        Unit loopLabel = jimple.newAssignStmt(xs[5], jimple.newSubExpr(xs[6], IntConstant.v(1)));
+        units.add(jimple.newIdentityStmt(xs[0], jimple.newParameterRef(IntType.v(), 0)));
+        units.add(jimple.newAssignStmt(xs[1], IntConstant.v(0)));
+        units.add(jimple.newAssignStmt(xs[2], IntConstant.v(0)));
+        units.add(jimple.newAssignStmt(xs[3], IntConstant.v(0)));
+        units.add(jimple.newAssignStmt(xs[4], IntConstant.v(0)));
+        units.add(loopLabel);
+        units.add(jimple.newIfStmt(jimple.newGeExpr(xs[1], xs[5]), exit));
+        units.add(jimple.newAssignStmt(xs[3], jimple.newAddExpr(xs[2], IntConstant.v(1))));
+        units.add(jimple.newAssignStmt(xs[1], jimple.newAddExpr(xs[1], IntConstant.v(1))));
+        units.add(jimple.newGotoStmt(loopLabel));
+        units.add(exit);
+        return body;
+    }
 }

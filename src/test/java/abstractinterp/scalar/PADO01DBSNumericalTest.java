@@ -194,4 +194,18 @@ public class PADO01DBSNumericalTest extends AbstractNumericalTest {
         assertAll(IntStream.range(0, expected.length)
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
     }
+
+
+    @Test
+    void testDecode() {
+        Body body = JimpleProvider.decode();
+        IntegerAnalysis<PADO01DifferenceBoundedState> analysis =
+            new IntegerAnalysis<>(body, 2, new PADO01DifferenceBoundedStateFactory());
+        analysis.runAnalysis();
+        String[] actual = analysis.generateSMTReportFull().split("\n");
+        String[] expected = readResourcesFile("pado01.decode.out").split("\n");
+        assertEquals(expected.length, actual.length);
+        assertAll(IntStream.range(0, expected.length)
+                  .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
+    }
 }
