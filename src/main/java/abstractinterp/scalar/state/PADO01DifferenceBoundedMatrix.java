@@ -17,6 +17,7 @@ import java.util.function.BinaryOperator;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import java.util.stream.IntStream;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -38,12 +39,14 @@ public class PADO01DifferenceBoundedMatrix {
     private final int N;
     private PADO01Constraint[][] matrix;
     private Set<Local> locals;
+    protected Set<Local> constants;
     private Map<Local, Integer> localToIndices;
     private Map<Integer, Local> indicesToLocals;
 
     public PADO01DifferenceBoundedMatrix(Set<Local> locals, boolean top) {
         this.N = locals.size();
         this.locals = new HashSet<>(N * 2);
+        this.constants = new HashSet<>();
         this.locals.addAll(locals);
         this.localToIndices = new HashMap<>(N * 2 + 1, 0.7f);
         this.indicesToLocals = new HashMap<>(N * 2 + 1, 0.7f);
@@ -70,6 +73,7 @@ public class PADO01DifferenceBoundedMatrix {
 
     public PADO01DifferenceBoundedMatrix(PADO01DifferenceBoundedMatrix copy) {
         this(copy.locals, false);
+        this.constants.addAll(copy.constants);
         iterateMatrix((i, j) -> {
                 this.matrix[i][j] = copy.matrix[i][j].copy();
             });
@@ -79,10 +83,24 @@ public class PADO01DifferenceBoundedMatrix {
         iterateMatrix((i, j) -> {
                 destination.matrix[i][j] = this.matrix[i][j].copy();
             });
+        destination.constants.addAll(this.constants);
     }
 
     public Set<Local> getLocals() {
         return this.locals;
+    }
+
+    public Set<Local> getConstants() {
+        return Collections.unmodifiableSet(this.constants);
+    }
+
+    public void checkConstants() {
+        Set<Local> constants = Collections.unmodifiableSet(this.constants);
+        for (Local constant : constants) {
+            if (!isConstant(constant, Variable.ZERO)) {
+                this.constants.remove(constant);
+            }
+        }
     }
 
     public void setConstraint(Local source, Local target, PADO01Constraint constraint) {
@@ -92,12 +110,31 @@ public class PADO01DifferenceBoundedMatrix {
     }
 
     private void setConstraint(int i, int j, PADO01Constraint c) {
+        Local source = this.indicesToLocals.get(i);
+        Local target = this.indicesToLocals.get(j);
         if (i == j && c.bound().map(b -> b < 0).orElse(false)) {
             this.matrix[i][j] = PADO01Constraint.BOT();
         } else if (i == j && (!c.isBottom() || c.bound().map(b -> b > 0).orElse(false))) {
             this.matrix[i][j] = PADO01Constraint.of(0);
         } else {
             this.matrix[i][j] = c;
+            if (this.isConstant(i, j)) {
+                if (source.equals(Variable.ZERO)) {
+                    this.constants.add(target);
+                    LOGGER.debug("Established constant [source={}, target={}]", source, target);
+                } else if (target.equals(Variable.ZERO)) {
+                    this.constants.add(source);
+                    LOGGER.debug("Established constant [source={}, target={}]", source, target);
+                }
+            } else {
+                if (source.equals(Variable.ZERO)) {
+                    this.constants.remove(target);
+                    LOGGER.debug("Removed constant [source={}, target={}]", source, target);
+                } else if (target.equals(Variable.ZERO)) {
+                    this.constants.remove(source);
+                    LOGGER.debug("Removed constant [source={}, target={}]", source, target);
+                }
+            }
         }
     }
 
@@ -122,7 +159,7 @@ public class PADO01DifferenceBoundedMatrix {
         boolean added = false;
         LOGGER.trace("Compare to existing constraint: {} ≤ {}", c, in.matrix[i][j]);
         if (PADO01Constraint.compare(c, in.matrix[i][j]) < 0) {
-            this.matrix[i][j] = c;
+            this.setConstraint(i, j, c);
             added = true;
         }
         return added;
@@ -137,7 +174,8 @@ public class PADO01DifferenceBoundedMatrix {
                                   PADO01Constraint constraint,
                                   PADO01DifferenceBoundedMatrix in) {
         boolean feasible = false;
-        if (!putConstraint(source, target, constraint, in)) {
+        boolean edgeAdded = putConstraint(source, target, constraint, in);
+        if (!edgeAdded) {
             feasible = this.isFeasible();
         } else {
             feasible = this.incrementalClosure(source, target);
@@ -177,6 +215,12 @@ public class PADO01DifferenceBoundedMatrix {
         LOGGER.trace("⊓ result:", this);
     }
 
+    public static PADO01DifferenceBoundedMatrix intersect(PADO01DifferenceBoundedMatrix m1,
+                                                          PADO01DifferenceBoundedMatrix m2) {
+        m1.intersection(m2);
+        return m1;
+    }
+
     /** Compute if matrix represents feasible bounding region
      *
      * @return region represents feasible region
@@ -203,6 +247,18 @@ public class PADO01DifferenceBoundedMatrix {
             });
     }
 
+    public void closeConstants(Set<Local> sources) {
+        LOGGER.debug("These are no longer constants: {}", sources);
+        PADO01DifferenceBoundedMatrix newMatrix = constants.stream().flatMap(c -> {
+                return sources.stream().map(s -> {
+                        PADO01DifferenceBoundedMatrix m = new PADO01DifferenceBoundedMatrix(this);
+                        m.computeProjectedClosure(s, c);
+                        return m;
+                    });
+            }).reduce(PADO01DifferenceBoundedMatrix::intersect).get();
+        this.intersection(newMatrix);
+    }
+
     private boolean incrementalClosure(Local source, Local target) {
         int si = this.localToIndices.get(source);
         int ti = this.localToIndices.get(target);
@@ -218,9 +274,9 @@ public class PADO01DifferenceBoundedMatrix {
             }
         }
 
-        for (int i = 0; i < N; i++) {
-            for (Local l : worklist) {
-                int c = this.localToIndices.get(l);
+        for (Local l : worklist) {
+            int c = this.localToIndices.get(l);
+            for (int i = 0; i < N; i++) {
                 this.putConstraint(i, c, PADO01Constraint.add(this.matrix[i][si],
                                                               this.matrix[si][c]));
             }
@@ -257,6 +313,36 @@ public class PADO01DifferenceBoundedMatrix {
                 }
             }
         }
+
+        boolean feasible = true;
+        for (int i = 0; i < N; i++) {
+            if (this.matrix[i][i].isBottom() || this.matrix[i][i].bound().orElse(0) < 0) {
+                feasible = false;
+                break;
+            }
+        }
+        return feasible;
+    }
+
+    public boolean computeProjectedClosure(Local source, Local target) {
+        if (this.anyBottoms()) {
+            return false;
+        }
+
+        int s = this.localToIndices.get(source);
+        int t = this.localToIndices.get(target);
+        int k = this.localToIndices.get(Variable.ZERO); // should be 0
+
+        this.putIncremental(source,
+                            target,
+                            PADO01Constraint.min(this.matrix[s][t],
+                                                 PADO01Constraint.add(this.matrix[s][k],
+                                                                      this.matrix[k][t])));
+        this.putIncremental(target,
+                            source,
+                            PADO01Constraint.min(this.matrix[t][s],
+                                                 PADO01Constraint.add(this.matrix[t][k],
+                                                                      this.matrix[k][s])));
 
         boolean feasible = true;
         for (int i = 0; i < N; i++) {
@@ -423,6 +509,19 @@ public class PADO01DifferenceBoundedMatrix {
             equal = reduceMatrixToBool((i, j) -> this.matrix[i][j].equals(other.matrix[i][j]));
         }
         return equal;
+    }
+
+    private boolean isConstant(Local source, Local target) {
+        int i = this.localToIndices.get(source);
+        int j = this.localToIndices.get(target);
+        return this.isConstant(i, j);
+    }
+
+    private boolean isConstant(int i, int j) {
+        return ((i == 0 || j == 0) &&
+                this.matrix[i][j].bound()
+                .flatMap(a -> this.matrix[j][i].bound().map(b -> Math.abs(a) == Math.abs(b)))
+                .orElse(false));
     }
 
     @Override
