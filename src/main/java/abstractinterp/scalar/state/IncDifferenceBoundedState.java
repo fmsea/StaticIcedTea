@@ -562,7 +562,7 @@ public class IncDifferenceBoundedState implements State {
     }
 
     public void forget(Local local) {
-        this.matrix.forgetConstraints(local);
+        this.matrix.forgetConstraintsSimple(local);
     }
 
     public void makeInfeasible() {
