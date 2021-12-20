@@ -42,6 +42,7 @@ public class PADO01DifferenceBoundedMatrix {
     protected Set<Local> constants;
     private Map<Local, Integer> localToIndices;
     private Map<Integer, Local> indicesToLocals;
+    private boolean isClosed = false;
 
     public PADO01DifferenceBoundedMatrix(Set<Local> locals, boolean top) {
         this.N = locals.size();
@@ -73,6 +74,7 @@ public class PADO01DifferenceBoundedMatrix {
 
     public PADO01DifferenceBoundedMatrix(PADO01DifferenceBoundedMatrix copy) {
         this(copy.locals, false);
+        this.isClosed = copy.isClosed;
         this.constants.addAll(copy.constants);
         iterateMatrix((i, j) -> {
                 this.matrix[i][j] = copy.matrix[i][j].copy();
@@ -84,6 +86,7 @@ public class PADO01DifferenceBoundedMatrix {
                 destination.matrix[i][j] = this.matrix[i][j].copy();
             });
         destination.constants.addAll(this.constants);
+        destination.isClosed = this.isClosed;
     }
 
     public Set<Local> getLocals() {
@@ -112,6 +115,7 @@ public class PADO01DifferenceBoundedMatrix {
     private void setConstraint(int i, int j, PADO01Constraint c) {
         Local source = this.indicesToLocals.get(i);
         Local target = this.indicesToLocals.get(j);
+        this.isClosed = false;
         if (i == j && c.bound().map(b -> b < 0).orElse(false)) {
             this.matrix[i][j] = PADO01Constraint.BOT();
         } else if (i == j && (!c.isBottom() || c.bound().map(b -> b > 0).orElse(false))) {
@@ -282,6 +286,7 @@ public class PADO01DifferenceBoundedMatrix {
             }
         }
 
+        this.isClosed = true;
         return this.isFeasible();
     }
 
@@ -297,19 +302,21 @@ public class PADO01DifferenceBoundedMatrix {
             return false;
         }
 
-        // ensure diagonal is zeroed.
-        for (int i = 0; i < N; i++) {
-            this.matrix[i][i] = PADO01Constraint.of(0);
-        }
-
-        for (int k = 0; k < N; k++) {
+        if (!this.isClosed) {
+            // ensure diagonal is zeroed.
             for (int i = 0; i < N; i++) {
-                for (int j = 0; j < N; j++) {
-                    PADO01Constraint candidate = PADO01Constraint.add(this.matrix[i][k],
-                                                                      this.matrix[k][j]);
-                    PADO01Constraint newConstraint = PADO01Constraint.min(this.matrix[i][j],
-                                                                          candidate);
-                    this.setConstraint(i, j, newConstraint);
+                this.matrix[i][i] = PADO01Constraint.of(0);
+            }
+
+            for (int k = 0; k < N; k++) {
+                for (int i = 0; i < N; i++) {
+                    for (int j = 0; j < N; j++) {
+                        PADO01Constraint candidate = PADO01Constraint.add(this.matrix[i][k],
+                                                                          this.matrix[k][j]);
+                        PADO01Constraint newConstraint = PADO01Constraint.min(this.matrix[i][j],
+                                                                              candidate);
+                        this.setConstraint(i, j, newConstraint);
+                    }
                 }
             }
         }
@@ -321,6 +328,7 @@ public class PADO01DifferenceBoundedMatrix {
                 break;
             }
         }
+        this.isClosed = true;
         return feasible;
     }
 
