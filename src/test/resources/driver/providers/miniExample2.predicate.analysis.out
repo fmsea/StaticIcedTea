@@ -1,15 +1,58 @@
+i0	$i1	r0	i2	i3
+1 r0 := @this: miniExample2:<miniExample2: int example(int)>
+fall	(and (or (> i0 0) (= i0 0) (< i0 0))
+     (or (> $i1 0) (= $i1 0) (< $i1 0))
+     (or (> i2 0) (= i2 0) (< i2 0))
+     (or (> i3 0) (= i3 0) (< i3 0)))
+
+2 i0 := @parameter0: int:<miniExample2: int example(int)>
+fall	(and (or (> i0 0) (= i0 0) (< i0 0))
+     (or (> $i1 0) (= $i1 0) (< $i1 0))
+     (or (> i2 0) (= i2 0) (< i2 0))
+     (or (> i3 0) (= i3 0) (< i3 0)))
+
 3 i2 = 0:<miniExample2: int example(int)>
-i2->(= i2 0)
+fall	(and (or (> i0 0) (= i0 0) (< i0 0))
+     (or (> $i1 0) (= $i1 0) (< $i1 0))
+     (= i2 0)
+     (or (> i3 0) (= i3 0) (< i3 0)))
+
 4 i3 = 0:<miniExample2: int example(int)>
-i3->(= i3 0)
+fall	(and (or (> i0 0) (= i0 0) (< i0 0))
+     (or (> $i1 0) (= $i1 0) (< $i1 0))
+     (= i2 0)
+     (= i3 0))
+
 5 if i3 >= i0 goto return i2:<miniExample2: int example(int)>
-i0->(> i0 0)
-i3->(or (> i3 0) (= i3 0))
-i0f->(or (> i0 0) (= i0 0) (< i0 0))
-i3f->(or (> i3 0) (= i3 0))
+fall	(and (> i0 0)
+     (or (> $i1 0) (= $i1 0) (< $i1 0))
+     (or (> i2 0) (= i2 0))
+     (or (> i3 0) (= i3 0)))
+
+branch	(and (or (> i0 0) (= i0 0) (< i0 0))
+     (or (> $i1 0) (= $i1 0) (< $i1 0))
+     (or (> i2 0) (= i2 0))
+     (or (> i3 0) (= i3 0)))
+
 6 $i1 = i0 * i3:<miniExample2: int example(int)>
-$i1->(or (> $i1 0) (= $i1 0))
+fall	(and (> i0 0)
+     (or (> $i1 0) (= $i1 0))
+     (or (> i2 0) (= i2 0))
+     (or (> i3 0) (= i3 0)))
+
 7 i2 = i2 + $i1:<miniExample2: int example(int)>
-i2->(or (> i2 0) (= i2 0))
+fall	(and (> i0 0)
+     (or (> $i1 0) (= $i1 0))
+     (or (> i2 0) (= i2 0))
+     (or (> i3 0) (= i3 0)))
+
 8 i3 = i3 + 1:<miniExample2: int example(int)>
-i3->(> i3 0)
+fall	(and (> i0 0) (or (> $i1 0) (= $i1 0)) (or (> i2 0) (= i2 0)) (> i3 0))
+
+9 goto [?= (branch)]:<miniExample2: int example(int)>
+fall	false
+
+branch	(and (> i0 0) (or (> $i1 0) (= $i1 0)) (or (> i2 0) (= i2 0)) (> i3 0))
+
+10 return i2:<miniExample2: int example(int)>
+fall	false

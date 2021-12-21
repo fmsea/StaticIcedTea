@@ -13,30 +13,31 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import util.Compiler;
 
-import driver.providers.DBSMiniJavaExamplesProvider;
+import driver.providers.PADO01DBSMiniJavaExamplesProvider;
 
-public class StartDBSNumericalTest {
+public class PADO01DBSNumericalAnalysisTest {
 
     @ParameterizedTest
-    @ArgumentsSource(DBSMiniJavaExamplesProvider.class)
-    void testDBSNumericalAnalysis(String name, String source, String expected) throws Exception {
+    @ArgumentsSource(PADO01DBSMiniJavaExamplesProvider.class)
+    void testAnalysis(String name, String source, String expected) throws Exception {
         Path clazz = Compiler.compileSource(name, source);
         Process analysis = Runtime.getRuntime().exec(new String [] {
                 "java",
                 "-classpath",
                 System.getProperty("java.class.path"),
-                "driver.StartDBSNumerical",
-                "",
-                name,
+                "driver.Main",
+                "pado-numerical",
+                "--classpath",
                 clazz.getParent().toString(),
+                "--full-report",
+                name,
                 "1",
-                "n",
             });
         analysis.waitFor(60l, TimeUnit.SECONDS);
         String out = new BufferedReader(new InputStreamReader(analysis.getInputStream(),
                                                               StandardCharsets.UTF_8))
             .lines()
-            .collect(Collectors.joining("\n"));
+            .collect(Collectors.joining("\n")).trim();
 
         assertEquals(expected, out);
     }

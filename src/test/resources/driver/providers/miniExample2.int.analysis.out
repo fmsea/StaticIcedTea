@@ -1,15 +1,34 @@
+$i1	i0	i2	i3	r0
+1 r0 := @this: miniExample2:<miniExample2: int example(int)>
+fall	true
+
+2 i0 := @parameter0: int:<miniExample2: int example(int)>
+fall	true
+
 3 i2 = 0:<miniExample2: int example(int)>
-i2->(= i2 0)
+fall	(= i2 0)
+
 4 i3 = 0:<miniExample2: int example(int)>
-i3->(= i3 0)
+fall	(and (= i2 0) (= i3 0))
+
 5 if i3 >= i0 goto return i2:<miniExample2: int example(int)>
-i0->(>= i0 1)
-i3->(>= i3 0)
-i0f->(or (>= i0 0) (< i0 0))
-i3f->(>= i3 0)
+fall	(and (>= i0 1) (>= i3 0))
+
+branch	(>= i3 0)
+
 6 $i1 = i0 * i3:<miniExample2: int example(int)>
-$i1->(or (>= $i1 0) (< $i1 0))
+fall	(and (>= i0 1) (>= i3 0))
+
 7 i2 = i2 + $i1:<miniExample2: int example(int)>
-i2->(or (>= i2 0) (< i2 0))
+fall	(and (>= i0 1) (>= i3 0))
+
 8 i3 = i3 + 1:<miniExample2: int example(int)>
-i3->(>= i3 1)
+fall	(and (>= i0 1) (>= i3 1))
+
+9 goto [?= (branch)]:<miniExample2: int example(int)>
+fall	false
+
+branch	(and (>= i0 1) (>= i3 1))
+
+10 return i2:<miniExample2: int example(int)>
+fall	false
