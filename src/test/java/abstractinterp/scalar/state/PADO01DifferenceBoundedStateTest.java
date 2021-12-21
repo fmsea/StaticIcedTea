@@ -907,9 +907,9 @@ public class PADO01DifferenceBoundedStateTest {
         PADO01DifferenceBoundedState out = new PADO01DifferenceBoundedState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[2], BinaryOperatorType.SUBTRACTION);
-        assertAll(() -> assertEquals(PADO01Constraint.of(-1),
+        assertAll(() -> assertEquals(PADO01Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(PADO01Constraint.of(+1),
+                  () -> assertEquals(PADO01Constraint.TOP(),
                                      matrix.getConstraint(xs[2], xs[1])),
                   () -> assertEquals(PADO01Constraint.of(+1),
                                      matrix.getConstraint(xs[1], xs[0])),
@@ -934,6 +934,7 @@ public class PADO01DifferenceBoundedStateTest {
         in.add(xs[1], xs[2], PADO01Constraint.of(+2));
         in.add(xs[2], xs[1], PADO01Constraint.of(-2));
         in.add(xs[0], xs[1], PADO01Constraint.of(-3));
+        in.add(xs[1], xs[0], PADO01Constraint.of(+3));
         PADO01DifferenceBoundedState out = new PADO01DifferenceBoundedState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[1], BinaryOperatorType.SUBTRACTION);
@@ -941,7 +942,7 @@ public class PADO01DifferenceBoundedStateTest {
                                      matrix.getConstraint(xs[1], xs[2])),
                   () -> assertEquals(PADO01Constraint.TOP(),
                                      matrix.getConstraint(xs[2], xs[1])),
-                  () -> assertEquals(PADO01Constraint.TOP(),
+                  () -> assertEquals(PADO01Constraint.of(0),
                                      matrix.getConstraint(xs[0], xs[1])),
                   () -> assertEquals(PADO01Constraint.of(0),
                                      matrix.getConstraint(xs[1], xs[0])));
@@ -1167,9 +1168,9 @@ public class PADO01DifferenceBoundedStateTest {
         PADO01DifferenceBoundedState out = new PADO01DifferenceBoundedState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], xs[2], BinaryOperatorType.SUBTRACTION);
-        assertAll(() -> assertEquals(PADO01Constraint.of(+2),
+        assertAll(() -> assertEquals(PADO01Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(PADO01Constraint.of(+1),
+                  () -> assertEquals(PADO01Constraint.TOP(),
                                      matrix.getConstraint(xs[2], xs[1])),
                   () -> assertEquals(PADO01Constraint.of(+2),
                                      matrix.getConstraint(xs[2], xs[0])),
@@ -1222,8 +1223,8 @@ public class PADO01DifferenceBoundedStateTest {
     @DisplayName("test update state, update value, with bound matrix (l1 = l1 ★ l2)")
     void testUpdateState224() {
         PADO01DifferenceBoundedState in = new PADO01DifferenceBoundedState(this.locals, true);
-        in.add(xs[1], xs[2], PADO01Constraint.of(+2));
-        in.add(xs[2], xs[1], PADO01Constraint.of(-2));
+        in.add(xs[1], xs[2], PADO01Constraint.of(-1));
+        in.add(xs[2], xs[1], PADO01Constraint.of(+1));
         in.add(xs[0], xs[1], PADO01Constraint.of(-3));
         in.add(xs[1], xs[0], PADO01Constraint.of(+3));
         in.add(xs[0], xs[2], PADO01Constraint.of(-4));
@@ -1231,9 +1232,9 @@ public class PADO01DifferenceBoundedStateTest {
         PADO01DifferenceBoundedState out = new PADO01DifferenceBoundedState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], xs[2], BinaryOperatorType.MULTIPLICATION);
-        assertAll(() -> assertEquals(PADO01Constraint.of(+8),
+        assertAll(() -> assertEquals(PADO01Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(PADO01Constraint.of(-8),
+                  () -> assertEquals(PADO01Constraint.TOP(),
                                      matrix.getConstraint(xs[2], xs[1])),
                   () -> assertEquals(PADO01Constraint.of(-4),
                                      matrix.getConstraint(xs[0], xs[2])),
@@ -1295,9 +1296,9 @@ public class PADO01DifferenceBoundedStateTest {
         PADO01DifferenceBoundedState out = new PADO01DifferenceBoundedState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], xs[2], BinaryOperatorType.DIVISION);
-        assertAll(() -> assertEquals(PADO01Constraint.of(+2),
+        assertAll(() -> assertEquals(PADO01Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(PADO01Constraint.of(-2),
+                  () -> assertEquals(PADO01Constraint.TOP(),
                                      matrix.getConstraint(xs[2], xs[1])),
                   () -> assertEquals(PADO01Constraint.of(-1),
                                      matrix.getConstraint(xs[0], xs[2])),

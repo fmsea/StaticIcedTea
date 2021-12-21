@@ -3,15 +3,10 @@ l0	l1	l2	l3
 fall	(= l0 3)
 
 2 l1 = l0 + 6:<moreConstantMathSootClass: void moreConstantMath()>
-fall	(and (= l0 3) (= l1 9) (= l0 (+ l1 (- 6))))
+fall	(and (= l0 3) (= l0 (+ l1 (- 6))))
 
 3 l2 = l1 - l0:<moreConstantMathSootClass: void moreConstantMath()>
-fall	(and (= l0 3)
-     (= l1 9)
-     (= l2 6)
-     (= l0 (+ l1 (- 6)))
-     (= l0 (+ l2 (- 3)))
-     (= l1 (+ l2 3)))
+fall	(and (= l0 3) (= l1 9) (= l2 6) (= l0 (+ l1 (- 6))))
 
 4 l3 = l2 * -1:<moreConstantMathSootClass: void moreConstantMath()>
 fall	(and (= l0 3)
@@ -20,19 +15,13 @@ fall	(and (= l0 3)
      (= l3 (- 6))
      (= l0 (+ l1 (- 6)))
      (= l0 (+ l2 (- 3)))
-     (= l0 (+ l3 9))
-     (= l1 (+ l2 3))
-     (= l1 (+ l3 15))
-     (= l2 (+ l3 12)))
+     (= l1 (+ l2 3)))
 
 5 l0 = l3 / l2:<moreConstantMathSootClass: void moreConstantMath()>
 fall	(and (= l0 (- 1))
      (= l1 9)
      (= l2 6)
      (= l3 (- 6))
-     (= l0 (+ l1 (- 10)))
-     (= l0 (+ l2 (- 7)))
-     (= l0 (+ l3 5))
      (= l1 (+ l2 3))
      (= l1 (+ l3 15))
      (= l2 (+ l3 12)))

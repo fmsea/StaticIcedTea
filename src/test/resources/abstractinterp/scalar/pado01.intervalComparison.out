@@ -29,12 +29,7 @@ fall	(and (>= u0 0)
      (<= w0 38)
      (>= x0 0)
      (<= x0 19)
-     (<= u0 (+ w0 19))
-     (<= w0 (+ u0 38))
-     (= u0 (+ x0 0))
-     (<= w0 (+ x0 38))
-     (<= x0 (+ w0 19)))
+     (= u0 (+ x0 0)))
 
 7 return w0:<test.ints: int compareIntervals()>
 fall	false
-

@@ -3,10 +3,10 @@ l0	l1	l2	l3
 fall	(= l0 4)
 
 2 l1 = 0:<anotherSimpleIfSootClass: void anotherSimpleIf()>
-fall	(and (= l0 4) (= l1 0) (= l0 (+ l1 4)))
+fall	(and (= l0 4) (= l1 0))
 
 3 l2 = 0:<anotherSimpleIfSootClass: void anotherSimpleIf()>
-fall	(and (= l0 4) (= l1 0) (= l2 0) (= l0 (+ l1 4)) (= l0 (+ l2 4)) (= l1 (+ l2 0)))
+fall	(and (= l0 4) (= l1 0) (= l2 0))
 
 4 if l0 >= 3 goto l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>
 fall	false
@@ -23,10 +23,7 @@ fall	(and (= l0 4)
      (= l3 6)
      (= l0 (+ l1 4))
      (= l0 (+ l2 4))
-     (= l0 (+ l3 (- 2)))
-     (= l1 (+ l2 0))
-     (= l1 (+ l3 (- 6)))
-     (= l2 (+ l3 (- 6))))
+     (= l1 (+ l2 0)))
 
 7 return:<anotherSimpleIfSootClass: void anotherSimpleIf()>
 fall	false

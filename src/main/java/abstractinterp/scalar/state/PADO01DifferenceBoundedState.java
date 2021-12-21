@@ -139,6 +139,8 @@ public class PADO01DifferenceBoundedState implements State {
     }
 
     public void mergeWith(PADO01DifferenceBoundedState inState) {
+        this.matrix.computeClosure();
+        inState.matrix.computeClosure();
         this.matrix.union(inState.matrix);
     }
 
@@ -151,6 +153,8 @@ public class PADO01DifferenceBoundedState implements State {
     }
 
     public void widenWith(PADO01DifferenceBoundedState inState) {
+        this.matrix.computeClosure();
+        inState.matrix.computeClosure();
         this.matrix.widenWith(inState.matrix);
     }
 
@@ -163,6 +167,8 @@ public class PADO01DifferenceBoundedState implements State {
     }
 
     public boolean isSubset(PADO01DifferenceBoundedState inState) {
+        this.matrix.computeClosure();
+        inState.matrix.computeClosure();
         return this.matrix.isSubset(inState.matrix);
     }
 
@@ -196,7 +202,6 @@ public class PADO01DifferenceBoundedState implements State {
                         lVar, left, operator, right);
             this.forget(lVar);
         }
-        this.matrix.computeClosure();
     }
 
     public void updateState(Local lVar,
@@ -227,7 +232,6 @@ public class PADO01DifferenceBoundedState implements State {
         }
 
         this.updateState(lVar, inState, c);
-        this.matrix.computeClosure();
     }
 
     public void updateState(Local lVar,
@@ -236,7 +240,8 @@ public class PADO01DifferenceBoundedState implements State {
                             IntConstant right,
                             BinaryOperatorType operator) {
         Consumer<BinaryOperator<Interval32Box>> computeInterval = (binop) -> {
-            Interval32Box leftInterval = inState.matrix.projectToInterval(left);
+            this.matrix.computeClosure();
+            Interval32Box leftInterval = this.matrix.projectToInterval(left);
             Interval32Box newValue = binop.apply(leftInterval, new Interval32Box(right.value));
             this.add(lVar, ZERO, PADO01Constraint.of(newValue.upperBound()));
             this.add(ZERO, lVar, PADO01Constraint.of(newValue.lowerBound().map(b -> b * -1)));
@@ -277,7 +282,6 @@ public class PADO01DifferenceBoundedState implements State {
                         lVar, left, right, operator);
             this.forget(lVar);
         }
-        this.matrix.computeClosure();
     }
 
     public void updateState(Local lVar,
@@ -286,8 +290,10 @@ public class PADO01DifferenceBoundedState implements State {
                             Local right,
                             BinaryOperatorType operator) {
         Consumer<BinaryOperator<Interval32Box>> computeInterval = (binop) -> {
-            Interval32Box rightInterval = inState.matrix.projectToInterval(right);
+            this.matrix.computeClosure();
+            Interval32Box rightInterval = this.matrix.projectToInterval(right);
             Interval32Box newValue = binop.apply(new Interval32Box(left.value), rightInterval);
+            this.forget(lVar);
             this.add(lVar, ZERO, PADO01Constraint.of(newValue.upperBound()));
             this.add(ZERO, lVar, PADO01Constraint.of(newValue.lowerBound().map(b -> b * -1)));
         };
@@ -304,15 +310,12 @@ public class PADO01DifferenceBoundedState implements State {
             }
             break;
         case SUBTRACTION:
-            this.forget(lVar);
             computeInterval.accept(Interval32Box::subtract);
             break;
         case MULTIPLICATION:
-            this.forget(lVar);
             computeInterval.accept(Interval32Box::multiply);
             break;
         case DIVISION:
-            this.forget(lVar);
             computeInterval.accept(Interval32Box::divide);
             break;
         default:
@@ -320,7 +323,6 @@ public class PADO01DifferenceBoundedState implements State {
                         lVar, left, right, operator);
             this.forget(lVar);
         }
-        this.matrix.computeClosure();
     }
 
     public void updateState(Local lVar,
@@ -329,13 +331,14 @@ public class PADO01DifferenceBoundedState implements State {
                             Local right,
                             BinaryOperatorType operator) {
         Consumer<BinaryOperator<Interval32Box>> computeInterval = (binop) -> {
-            Interval32Box leftInterval = inState.matrix.projectToInterval(left);
-            Interval32Box rightInterval = inState.matrix.projectToInterval(right);
+            this.matrix.computeClosure();
+            Interval32Box leftInterval = this.matrix.projectToInterval(left);
+            Interval32Box rightInterval = this.matrix.projectToInterval(right);
             Interval32Box newValue = binop.apply(leftInterval, rightInterval);
+            this.forget(lVar);
             this.add(lVar, ZERO, PADO01Constraint.of(newValue.upperBound()));
             this.add(ZERO, lVar, PADO01Constraint.of(newValue.lowerBound().map(b -> b * -1)));
         };
-        this.forget(lVar);
         switch (operator) {
         case ADDITION:
             computeInterval.accept(Interval32Box::add);
@@ -350,8 +353,8 @@ public class PADO01DifferenceBoundedState implements State {
             computeInterval.accept(Interval32Box::divide);
             break;
         default:
+            this.forget(lVar);
         }
-        this.matrix.computeClosure();
     }
 
     public void updateState(Local lVar, State inState, Value v) {
@@ -363,7 +366,6 @@ public class PADO01DifferenceBoundedState implements State {
     }
 
     public void updateState(Local lVar, PADO01DifferenceBoundedState inState, Value v) {
-        this.forget(lVar);
         if (v instanceof JNegExpr) {
             v = ((JNegExpr)v).getOp();
             if (v instanceof IntConstant) {
@@ -371,8 +373,10 @@ public class PADO01DifferenceBoundedState implements State {
                 this.updateState(lVar, inState, IntConstant.v(ic.value * -1));
             } else if (v instanceof Local) {
                 Local l = (Local)v;
-                Interval32Box interval = inState.matrix.projectToInterval(l);
+                this.matrix.computeClosure();
+                Interval32Box interval = this.matrix.projectToInterval(l);
                 interval.negate();
+                this.forget(lVar);
                 this.add(lVar, ZERO, PADO01Constraint.of(interval.upperBound()));
                 this.add(ZERO, lVar, PADO01Constraint.of(interval.lowerBound().map(b -> b * -1)));
             }
@@ -383,7 +387,6 @@ public class PADO01DifferenceBoundedState implements State {
         } else {
             LOGGER.warn("missing handler for {} = {}", lVar, v);
         }
-        this.matrix.computeClosure();
     }
 
     public void updateState(Local lVar, PADO01DifferenceBoundedState inState, IntConstant c) {
@@ -555,6 +558,8 @@ public class PADO01DifferenceBoundedState implements State {
     }
 
     public boolean equals(PADO01DifferenceBoundedState other) {
+        this.matrix.computeClosure();
+        other.matrix.computeClosure();
         return other != null && this.matrix.equals(other.matrix);
     }
 }

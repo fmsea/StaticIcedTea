@@ -6,7 +6,7 @@ fall	true
 fall	(= i1 0)
 
 3 i2 = 1:<miniExample6: void example()>
-fall	(and (= i1 0) (= i2 1) (= i1 (+ i2 (- 1))))
+fall	(and (= i1 0) (= i2 1))
 
 4 $i3 = virtualinvoke r0.<miniExample6: int random()>():<miniExample6: void example()>
 fall	(and (= i1 0) (= i2 1) (= i1 (+ i2 (- 1))))
@@ -57,3 +57,5 @@ branch	false
 
 13 return:<miniExample6: void example()>
 fall	false
+
+

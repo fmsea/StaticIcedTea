@@ -17,7 +17,7 @@ fall	(<= $i2 119)
 branch	(>= $i2 120)
 
 6 b3 = 1:<miniExample1: int example(int)>
-fall	(and (<= $i2 119) (= b3 1) (<= $i2 (+ b3 118)))
+fall	(and (<= $i2 119) (= b3 1))
 
 7 goto [?= return b3]:<miniExample1: int example(int)>
 fall	false
@@ -25,8 +25,7 @@ fall	false
 branch	(and (<= $i2 119) (= b3 1) (<= $i2 (+ b3 118)))
 
 8 b3 = -1:<miniExample1: int example(int)>
-fall	(and (>= $i2 120) (= b3 (- 1)) (<= b3 (+ $i2 (- 121))))
+fall	(and (>= $i2 120) (= b3 (- 1)))
 
 9 return b3:<miniExample1: int example(int)>
 fall	false
-

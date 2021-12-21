@@ -3,15 +3,10 @@ r0	u0	x0	y0
 fall	(= x0 60)
 
 2 y0 = neg x0:<test.transverse: int zero()>
-fall	(and (= x0 60) (= y0 (- 60)) (= x0 (+ y0 120)))
+fall	(and (= x0 60) (= y0 (- 60)))
 
 3 u0 = x0 - y0:<test.transverse: int zero()>
-fall	(and (= u0 120)
-     (= x0 60)
-     (= y0 (- 60))
-     (= u0 (+ x0 60))
-     (= u0 (+ y0 180))
-     (= x0 (+ y0 120)))
+fall	(and (= u0 120) (= x0 60) (= y0 (- 60)) (= x0 (+ y0 120)))
 
 4 if u0 > 120 goto r0 = 1:<test.transverse: int zero()>
 fall	(and (= u0 120)
@@ -28,9 +23,6 @@ fall	(and (= r0 (- 1))
      (= u0 120)
      (= x0 60)
      (= y0 (- 60))
-     (= r0 (+ u0 (- 121)))
-     (= r0 (+ x0 (- 61)))
-     (= r0 (+ y0 59))
      (= u0 (+ x0 60))
      (= u0 (+ y0 180))
      (= x0 (+ y0 120)))
@@ -42,9 +34,6 @@ branch	(and (= r0 (- 1))
      (= u0 120)
      (= x0 60)
      (= y0 (- 60))
-     (= r0 (+ u0 (- 121)))
-     (= r0 (+ x0 (- 61)))
-     (= r0 (+ y0 59))
      (= u0 (+ x0 60))
      (= u0 (+ y0 180))
      (= x0 (+ y0 120)))
@@ -54,4 +43,3 @@ fall	false
 
 8 return r0:<test.transverse: int zero()>
 fall	false
-
