@@ -1,20 +1,24 @@
 1 b0 = 0:<test.ballonFactory: void getArrow()>
-b0
+fall through
 sat
 sat
 2 b1 = 50:<test.ballonFactory: void getArrow()>
-b1
+fall through
 sat
-unsat
+sat
 3 b2 = 60:<test.ballonFactory: void getArrow()>
-b2
+fall through
 sat
-unsat
+sat
 4 $b25 = neg b2:<test.ballonFactory: void getArrow()>
-$b25
+fall through
 sat
-unsat
+sat
 5 $i26 = $b25 / 2:<test.ballonFactory: void getArrow()>
-$i26
+fall through
 sat
-unsat
+sat
+6 return:<test.ballonFactory: void getArrow()>
+fall through
+sat
+sat

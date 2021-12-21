@@ -1,19 +1,67 @@
+i0	i1	i2	i3	i4
+1 i0 := @parameter0: int:<test.Fibonacci: int fibonacci(int)>
+fall	true
+
 2 i2 = 0:<test.Fibonacci: int fibonacci(int)>
-i2->(and (>= i2 0) (<= i2 0))
+fall	(= i2 0)
+
 3 i3 = 1:<test.Fibonacci: int fibonacci(int)>
-i3->(and (>= i3 1) (<= i3 1) (<= i2 (+ i3 (- 1))) (<= i3 (+ i2 1)))
+fall	(and (= i2 0) (= i3 1) (= i2 (+ i3 (- 1))))
+
 4 i4 = 2:<test.Fibonacci: int fibonacci(int)>
-i4->(and (>= i4 2) (<= i4 2) (<= i2 (+ i4 (- 2))) (<= i4 (+ i2 2)) (<= i3 (+ i4 (- 1))) (<= i4 (+ i3 1)))
+fall	(and (= i2 0)
+     (= i3 1)
+     (= i4 2)
+     (= i2 (+ i3 (- 1)))
+     (= i2 (+ i4 (- 2)))
+     (= i3 (+ i4 (- 1))))
+
 5 if i4 >= i0 goto return i3:<test.Fibonacci: int fibonacci(int)>
-i0->(and (>= i0 3) (<= i4 (+ i0 (- 1))))
-i4->(and (>= i4 2) (<= i4 (+ i0 (- 1))))
-i0f->(<= i0 (+ i4 0))
-i4f->(and (>= i4 2) (<= i0 (+ i4 0)))
+fall	(and (>= i0 3) (>= i2 0) (>= i3 1) (>= i4 2) (<= i4 (+ i0 (- 1))))
+
+branch	(and (>= i2 0) (>= i3 1) (>= i4 2) (<= i0 (+ i4 0)))
+
 6 i1 = i2 + i3:<test.Fibonacci: int fibonacci(int)>
-i1->(>= i1 1)
+fall	(and (>= i0 3) (>= i1 1) (>= i2 0) (>= i3 1) (>= i4 2) (<= i4 (+ i0 (- 1))))
+
 7 i2 = i3:<test.Fibonacci: int fibonacci(int)>
-i2->(and (>= i2 1) (<= i3 (+ i2 0)) (<= i2 (+ i3 0)))
+fall	(and (>= i0 3)
+     (>= i1 1)
+     (>= i2 1)
+     (>= i3 1)
+     (>= i4 2)
+     (<= i4 (+ i0 (- 1)))
+     (= i2 (+ i3 0)))
+
 8 i3 = i1:<test.Fibonacci: int fibonacci(int)>
-i3->(and (>= i3 1) (<= i1 (+ i3 0)) (<= i3 (+ i1 0)))
+fall	(and (>= i0 3)
+     (>= i1 1)
+     (>= i2 1)
+     (>= i3 1)
+     (>= i4 2)
+     (<= i4 (+ i0 (- 1)))
+     (= i1 (+ i3 0)))
+
 9 i4 = i4 + 1:<test.Fibonacci: int fibonacci(int)>
-i4->(and (>= i4 3) (<= i4 (+ i0 0)))
+fall	(and (>= i0 3)
+     (>= i1 1)
+     (>= i2 1)
+     (>= i3 1)
+     (>= i4 3)
+     (<= i4 (+ i0 0))
+     (= i1 (+ i3 0)))
+
+10 goto [?= (branch)]:<test.Fibonacci: int fibonacci(int)>
+fall	false
+
+branch	(and (>= i0 3)
+     (>= i1 1)
+     (>= i2 1)
+     (>= i3 1)
+     (>= i4 3)
+     (<= i4 (+ i0 0))
+     (= i1 (+ i3 0)))
+
+11 return i3:<test.Fibonacci: int fibonacci(int)>
+fall	false
+

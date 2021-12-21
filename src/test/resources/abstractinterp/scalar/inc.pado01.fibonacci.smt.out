@@ -1,41 +1,50 @@
+1 i0 := @parameter0: int:<test.Fibonacci: int fibonacci(int)>
+fall through
+sat
+sat
+10 goto [?= (branch)]:<test.Fibonacci: int fibonacci(int)>
+fall through
+sat
+sat
+branch out
+sat
+sat
+11 return i3:<test.Fibonacci: int fibonacci(int)>
+fall through
+sat
+sat
 2 i2 = 0:<test.Fibonacci: int fibonacci(int)>
-i2
+fall through
 sat
 sat
 3 i3 = 1:<test.Fibonacci: int fibonacci(int)>
-i3
+fall through
 sat
 sat
 4 i4 = 2:<test.Fibonacci: int fibonacci(int)>
-i4
+fall through
 sat
 sat
 5 if i4 >= i0 goto return i3:<test.Fibonacci: int fibonacci(int)>
-i0
+fall through
 sat
 sat
-i0f
-sat
-sat
-i4
-sat
-sat
-i4f
+branch out
 sat
 sat
 6 i1 = i2 + i3:<test.Fibonacci: int fibonacci(int)>
-i1
+fall through
 sat
 sat
 7 i2 = i3:<test.Fibonacci: int fibonacci(int)>
-i2
+fall through
 sat
 sat
 8 i3 = i1:<test.Fibonacci: int fibonacci(int)>
-i3
+fall through
 sat
 sat
 9 i4 = i4 + 1:<test.Fibonacci: int fibonacci(int)>
-i4
+fall through
 sat
 sat

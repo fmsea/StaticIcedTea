@@ -30,7 +30,7 @@ public class PADO01DBSNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<PADO01DifferenceBoundedState> analysis =
             new IntegerAnalysis<>(body, 2, new PADO01DifferenceBoundedStateFactory());
         analysis.runAnalysis();
-        String[] actual = analysis.generateSMTReport().split("\n");
+        String[] actual = analysis.generateSMTReportFull().split("\n");
         String[] expected = readResourcesFile("pado01.constantValuePropagation.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
@@ -43,7 +43,7 @@ public class PADO01DBSNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<PADO01DifferenceBoundedState> analysis =
             new IntegerAnalysis<>(body, 2, new PADO01DifferenceBoundedStateFactory());
         analysis.runAnalysis();
-        String[] actual = analysis.generateSMTReport().split("\n");
+        String[] actual = analysis.generateSMTReportFull().split("\n");
         String[] expected = readResourcesFile("pado01.constantMathPropagation.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
@@ -56,7 +56,7 @@ public class PADO01DBSNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<PADO01DifferenceBoundedState> analysis =
             new IntegerAnalysis<>(body, 2, new PADO01DifferenceBoundedStateFactory());
         analysis.runAnalysis();
-        String[] actual = analysis.generateSMTReport().split("\n");
+        String[] actual = analysis.generateSMTReportFull().split("\n");
         String[] expected = readResourcesFile("pado01.branching.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
@@ -69,7 +69,7 @@ public class PADO01DBSNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<PADO01DifferenceBoundedState> analysis =
             new IntegerAnalysis<>(body, 2, new PADO01DifferenceBoundedStateFactory());
         analysis.runAnalysis();
-        String[] actual = analysis.generateSMTReport().split("\n");
+        String[] actual = analysis.generateSMTReportFull().split("\n");
         String[] expected = readResourcesFile("pado01.looping.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
@@ -82,7 +82,7 @@ public class PADO01DBSNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<PADO01DifferenceBoundedState> analysis =
             new IntegerAnalysis<>(body, 2, new PADO01DifferenceBoundedStateFactory());
         analysis.runAnalysis();
-        String[] actual = analysis.generateSMTReport().split("\n");
+        String[] actual = analysis.generateSMTReportFull().split("\n");
         String[] expected = readResourcesFile("pado01.example5.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
@@ -95,7 +95,7 @@ public class PADO01DBSNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<PADO01DifferenceBoundedState> analysis =
             new IntegerAnalysis<>(body, 2, new PADO01DifferenceBoundedStateFactory());
         analysis.runAnalysis();
-        String[] actual = analysis.generateSMTReport().split("\n");
+        String[] actual = analysis.generateSMTReportFull().split("\n");
         String[] expected = readResourcesFile("pado01.nonsenseExample.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
@@ -108,7 +108,7 @@ public class PADO01DBSNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<PADO01DifferenceBoundedState> analysis =
             new IntegerAnalysis<>(body, 2, new PADO01DifferenceBoundedStateFactory());
         analysis.runAnalysis();
-        String[] actual = analysis.generateSMTReport().split("\n");
+        String[] actual = analysis.generateSMTReportFull().split("\n");
         String[] expected = readResourcesFile("pado01.neqLoop.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
@@ -121,7 +121,7 @@ public class PADO01DBSNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<PADO01DifferenceBoundedState> analysis =
             new IntegerAnalysis<>(body, 2, new PADO01DifferenceBoundedStateFactory());
         analysis.runAnalysis();
-        String[] actual = analysis.generateSMTReport().split("\n");
+        String[] actual = analysis.generateSMTReportFull().split("\n");
         String[] expected = readResourcesFile("pado01.getArrowSubset.out").split("\n");
 
         assertEquals(expected.length, actual.length);
@@ -135,7 +135,7 @@ public class PADO01DBSNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<PADO01DifferenceBoundedState> analysis =
             new IntegerAnalysis<>(body, 2, new PADO01DifferenceBoundedStateFactory());
         analysis.runAnalysis();
-        String[] actual = analysis.generateSMTReport().split("\n");
+        String[] actual = analysis.generateSMTReportFull().split("\n");
         String[] expected = readResourcesFile("pado01.intervalComparison.out").split("\n");
 
         assertEquals(expected.length, actual.length);
@@ -149,7 +149,7 @@ public class PADO01DBSNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<PADO01DifferenceBoundedState> analysis =
             new IntegerAnalysis<>(body, 2, new PADO01DifferenceBoundedStateFactory());
         analysis.runAnalysis();
-        String[] actual = analysis.generateSMTReport().split("\n");
+        String[] actual = analysis.generateSMTReportFull().split("\n");
         String[] expected = readResourcesFile("pado01.transverseZero.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
@@ -162,7 +162,7 @@ public class PADO01DBSNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<PADO01DifferenceBoundedState> analysis =
             new IntegerAnalysis<>(body, 2, new PADO01DifferenceBoundedStateFactory());
         analysis.runAnalysis();
-        String[] actual = analysis.generateSMTReport().split("\n");
+        String[] actual = analysis.generateSMTReportFull().split("\n");
         String[] expected = readResourcesFile("pado01.fibonacci.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
@@ -175,7 +175,7 @@ public class PADO01DBSNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<PADO01DifferenceBoundedState> analysis =
             new IntegerAnalysis<>(body, 2, new PADO01DifferenceBoundedStateFactory());
         analysis.runAnalysis();
-        String[] actual = analysis.generateSMTReport().split("\n");
+        String[] actual = analysis.generateSMTReportFull().split("\n");
         String[] expected = readResourcesFile("pado01.tribonacci.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)

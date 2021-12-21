@@ -1,23 +1,34 @@
 1 l0 = 5:<z3_simple_loopSootClass: void z3_simple_loop()>
-l0
+fall through
 sat
 sat
 2 l1 = 0:<z3_simple_loopSootClass: void z3_simple_loop()>
-l1
+fall through
 sat
 sat
 3 if l1 >= 5 goto l3 = l0 + l1:<z3_simple_loopSootClass: void z3_simple_loop()>
-l1
+fall through
 sat
 sat
-l1f
+branch out
 sat
 sat
 4 l1 = l1 + 1:<z3_simple_loopSootClass: void z3_simple_loop()>
-l1
+fall through
+sat
+sat
+5 goto [?= (branch)]:<z3_simple_loopSootClass: void z3_simple_loop()>
+fall through
+sat
+sat
+branch out
 sat
 sat
 6 l3 = l0 + l1:<z3_simple_loopSootClass: void z3_simple_loop()>
-l3
+fall through
+sat
+sat
+7 return:<z3_simple_loopSootClass: void z3_simple_loop()>
+fall through
 sat
 sat

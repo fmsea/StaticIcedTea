@@ -74,8 +74,8 @@ public class PADO01DBSIntervalComparativeTest extends AbstractNumericalTest {
         dbsAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.constantValuePropagation.smt.out");
-        Assertions.assertTrue(runComparison(dbsAnalysis.generateSMTReport(),
-                                            intervalAnalysis.generateSMTReport(),
+        Assertions.assertTrue(runComparison(dbsAnalysis.generateSMTReportFull(),
+                                            intervalAnalysis.generateSMTReportFull(),
                                             expected));
     }
 
@@ -89,8 +89,8 @@ public class PADO01DBSIntervalComparativeTest extends AbstractNumericalTest {
         dbsAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.constantMathPropagation.smt.out");
-        Assertions.assertTrue(runComparison(dbsAnalysis.generateSMTReport(),
-                                            intervalAnalysis.generateSMTReport(),
+        Assertions.assertTrue(runComparison(dbsAnalysis.generateSMTReportFull(),
+                                            intervalAnalysis.generateSMTReportFull(),
                                             expected));
     }
 
@@ -104,8 +104,8 @@ public class PADO01DBSIntervalComparativeTest extends AbstractNumericalTest {
         dbsAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.branching.smt.out");
-        Assertions.assertTrue(runComparison(dbsAnalysis.generateSMTReport(),
-                                            intervalAnalysis.generateSMTReport(),
+        Assertions.assertTrue(runComparison(dbsAnalysis.generateSMTReportFull(),
+                                            intervalAnalysis.generateSMTReportFull(),
                                             expected));
     }
 
@@ -119,8 +119,8 @@ public class PADO01DBSIntervalComparativeTest extends AbstractNumericalTest {
         dbsAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.looping.smt.out");
-        Assertions.assertTrue(runComparison(dbsAnalysis.generateSMTReport(),
-                                            intervalAnalysis.generateSMTReport(),
+        Assertions.assertTrue(runComparison(dbsAnalysis.generateSMTReportFull(),
+                                            intervalAnalysis.generateSMTReportFull(),
                                             expected));
     }
 
@@ -134,8 +134,8 @@ public class PADO01DBSIntervalComparativeTest extends AbstractNumericalTest {
         dbsAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.example5.smt.out");
-        Assertions.assertTrue(runComparison(dbsAnalysis.generateSMTReport(),
-                                            intervalAnalysis.generateSMTReport(),
+        Assertions.assertTrue(runComparison(dbsAnalysis.generateSMTReportFull(),
+                                            intervalAnalysis.generateSMTReportFull(),
                                             expected));
     }
 
@@ -149,8 +149,8 @@ public class PADO01DBSIntervalComparativeTest extends AbstractNumericalTest {
         dbsAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.nonsenseExample.smt.out");
-        Assertions.assertTrue(runComparison(dbsAnalysis.generateSMTReport(),
-                                            intervalAnalysis.generateSMTReport(),
+        Assertions.assertTrue(runComparison(dbsAnalysis.generateSMTReportFull(),
+                                            intervalAnalysis.generateSMTReportFull(),
                                             expected));
     }
 
@@ -164,8 +164,8 @@ public class PADO01DBSIntervalComparativeTest extends AbstractNumericalTest {
         dbsAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.neqLoop.smt.out");
-        Assertions.assertTrue(runComparison(dbsAnalysis.generateSMTReport(),
-                                            intervalAnalysis.generateSMTReport(),
+        Assertions.assertTrue(runComparison(dbsAnalysis.generateSMTReportFull(),
+                                            intervalAnalysis.generateSMTReportFull(),
                                             expected));
     }
 
@@ -179,8 +179,8 @@ public class PADO01DBSIntervalComparativeTest extends AbstractNumericalTest {
         dbsAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.getArrowSubset.smt.out");
-        Assertions.assertTrue(runComparison(dbsAnalysis.generateSMTReport(),
-                                            intervalAnalysis.generateSMTReport(),
+        Assertions.assertTrue(runComparison(dbsAnalysis.generateSMTReportFull(),
+                                            intervalAnalysis.generateSMTReportFull(),
                                             expected));
     }
 
@@ -194,8 +194,8 @@ public class PADO01DBSIntervalComparativeTest extends AbstractNumericalTest {
         dbsAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.intervalComparison.smt.out");
-        Assertions.assertTrue(runComparison(dbsAnalysis.generateSMTReport(),
-                                            intervalAnalysis.generateSMTReport(),
+        Assertions.assertTrue(runComparison(dbsAnalysis.generateSMTReportFull(),
+                                            intervalAnalysis.generateSMTReportFull(),
                                             expected));
     }
 
@@ -209,8 +209,8 @@ public class PADO01DBSIntervalComparativeTest extends AbstractNumericalTest {
         dbsAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.fibonacci.smt.out");
-        Assertions.assertTrue(runComparison(dbsAnalysis.generateSMTReport(),
-                                            intervalAnalysis.generateSMTReport(),
+        Assertions.assertTrue(runComparison(dbsAnalysis.generateSMTReportFull(),
+                                            intervalAnalysis.generateSMTReportFull(),
                                             expected));
     }
 
@@ -219,7 +219,7 @@ public class PADO01DBSIntervalComparativeTest extends AbstractNumericalTest {
         Reader rightReader = new StringReader(right);
         try {
             Writer writer = new FileWriter(this.z3TestFile.toFile());
-            Smt2Format.SMT2Format(leftReader, rightReader, writer);
+            Smt2Format.SMT2FormatFull(leftReader, rightReader, writer);
             Process z3 = Runtime.getRuntime().exec(new String[] {"z3",
                                                                  "-smt2",
                                                                  this.z3TestFile.toString()});
