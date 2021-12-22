@@ -1,0 +1,54 @@
+$i0	i0	i1	i2	i3	i4	i5	i6
+1 $i0 := @parameter0: int:<test.Example: int decode(int)>
+fall	true
+
+2 i0 = 0:<test.Example: int decode(int)>
+fall	(= i0 0)
+
+3 i1 = 0:<test.Example: int decode(int)>
+fall	(and (= i0 0) (= i1 0))
+
+4 i2 = 0:<test.Example: int decode(int)>
+fall	(and (= i0 0) (= i1 0) (= i2 0))
+
+5 i3 = 0:<test.Example: int decode(int)>
+fall	(and (= i0 0) (= i1 0) (= i2 0) (= i3 0))
+
+6 i4 = i5 - 1:<test.Example: int decode(int)>
+fall	(and (= i1 0) (>= i2 0) (<= i2 1) (= i3 0) (<= i2 (+ i0 0)) (= i4 (+ i5 (- 1))))
+
+7 if i0 >= i4 goto return i5:<test.Example: int decode(int)>
+fall	(and (= i1 0)
+     (>= i2 0)
+     (<= i2 1)
+     (= i3 0)
+     (<= i2 (+ i0 0))
+     (<= i0 (+ i4 (- 1)))
+     (= i4 (+ i5 (- 1))))
+
+branch	(and (= i1 0)
+     (>= i2 0)
+     (<= i2 1)
+     (= i3 0)
+     (<= i2 (+ i0 0))
+     (<= i4 (+ i0 0))
+     (= i4 (+ i5 (- 1))))
+
+8 i2 = i1 + 1:<test.Example: int decode(int)>
+fall	(and (>= i0 0)
+     (= i1 0)
+     (= i2 1)
+     (= i3 0)
+     (<= i0 (+ i4 (- 1)))
+     (= i4 (+ i5 (- 1))))
+
+9 i0 = i0 + 1:<test.Example: int decode(int)>
+fall	(and (>= i0 1) (= i1 0) (= i2 1) (= i3 0) (<= i0 (+ i4 0)) (= i4 (+ i5 (- 1))))
+
+10 goto [?= i4 = i5 - 1]:<test.Example: int decode(int)>
+fall	false
+
+branch	(and (>= i0 1) (= i1 0) (= i2 1) (= i3 0) (<= i0 (+ i4 0)) (= i4 (+ i5 (- 1))))
+
+11 return i5:<test.Example: int decode(int)>
+fall	false

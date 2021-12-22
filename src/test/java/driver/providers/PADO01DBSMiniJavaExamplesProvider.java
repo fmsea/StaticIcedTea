@@ -10,11 +10,11 @@ public class PADO01DBSMiniJavaExamplesProvider extends MiniJavaExamplesProvider 
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext)
         throws Exception {
 
-        return Stream.of(example("miniExample1", "pado"),
-                         example("miniExample2", "pado"),
-                         example("miniExample3", "pado"),
-                         example("miniExample4", "pado"),
-                         example("miniExample5", "pado"),
-                         example("miniExample6", "pado"));
+        return Stream.of(example("miniExample1", "zones"),
+                         example("miniExample2", "zones"),
+                         example("miniExample3", "zones"),
+                         example("miniExample4", "zones"),
+                         example("miniExample5", "zones"),
+                         example("miniExample6", "zones"));
     }
 }

@@ -31,7 +31,7 @@ public class IncDBSNumericalTest extends AbstractNumericalTest {
             new IntegerAnalysis<>(body, 2, new IncDifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReportFull().split("\n");
-        String[] expected = readResourcesFile("incdbs.constantValuePropagation.out").split("\n");
+        String[] expected = readResourcesFile("zones.constantValuePropagation.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
@@ -44,7 +44,7 @@ public class IncDBSNumericalTest extends AbstractNumericalTest {
             new IntegerAnalysis<>(body, 2, new IncDifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReportFull().split("\n");
-        String[] expected = readResourcesFile("incdbs.constantMathPropagation.out").split("\n");
+        String[] expected = readResourcesFile("zones.constantMathPropagation.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
@@ -57,7 +57,7 @@ public class IncDBSNumericalTest extends AbstractNumericalTest {
             new IntegerAnalysis<>(body, 2, new IncDifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReportFull().split("\n");
-        String[] expected = readResourcesFile("incdbs.branching.out").split("\n");
+        String[] expected = readResourcesFile("zones.branching.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
@@ -70,7 +70,7 @@ public class IncDBSNumericalTest extends AbstractNumericalTest {
             new IntegerAnalysis<>(body, 2, new IncDifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReportFull().split("\n");
-        String[] expected = readResourcesFile("incdbs.looping.out").split("\n");
+        String[] expected = readResourcesFile("zones.looping.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
@@ -83,7 +83,7 @@ public class IncDBSNumericalTest extends AbstractNumericalTest {
             new IntegerAnalysis<>(body, 2, new IncDifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReportFull().split("\n");
-        String[] expected = readResourcesFile("incdbs.example5.out").split("\n");
+        String[] expected = readResourcesFile("zones.example5.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
@@ -96,7 +96,7 @@ public class IncDBSNumericalTest extends AbstractNumericalTest {
             new IntegerAnalysis<>(body, 2, new IncDifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReportFull().split("\n");
-        String[] expected = readResourcesFile("incdbs.nonsenseExample.out").split("\n");
+        String[] expected = readResourcesFile("zones.nonsenseExample.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
@@ -109,7 +109,7 @@ public class IncDBSNumericalTest extends AbstractNumericalTest {
             new IntegerAnalysis<>(body, 2, new IncDifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReportFull().split("\n");
-        String[] expected = readResourcesFile("incdbs.neqLoop.out").split("\n");
+        String[] expected = readResourcesFile("zones.neqLoop.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
@@ -122,7 +122,7 @@ public class IncDBSNumericalTest extends AbstractNumericalTest {
             new IntegerAnalysis<>(body, 2, new IncDifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReportFull().split("\n");
-        String[] expected = readResourcesFile("incdbs.getArrowSubset.out").split("\n");
+        String[] expected = readResourcesFile("zones.getArrowSubset.out").split("\n");
 
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
@@ -136,7 +136,7 @@ public class IncDBSNumericalTest extends AbstractNumericalTest {
             new IntegerAnalysis<>(body, 2, new IncDifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReportFull().split("\n");
-        String[] expected = readResourcesFile("incdbs.intervalComparison.out").split("\n");
+        String[] expected = readResourcesFile("zones.intervalComparison.out").split("\n");
 
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
@@ -150,7 +150,7 @@ public class IncDBSNumericalTest extends AbstractNumericalTest {
             new IntegerAnalysis<>(body, 2, new IncDifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReportFull().split("\n");
-        String[] expected = readResourcesFile("incdbs.transverseZero.out").split("\n");
+        String[] expected = readResourcesFile("zones.transverseZero.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                              .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
@@ -163,7 +163,7 @@ public class IncDBSNumericalTest extends AbstractNumericalTest {
             new IntegerAnalysis<>(body, 2, new IncDifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReportFull().split("\n");
-        String[] expected = readResourcesFile("incdbs.fibonacci.out").split("\n");
+        String[] expected = readResourcesFile("zones.fibonacci.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
@@ -176,7 +176,7 @@ public class IncDBSNumericalTest extends AbstractNumericalTest {
             new IntegerAnalysis<>(body, 2, new IncDifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReportFull().split("\n");
-        String[] expected = readResourcesFile("incdbs.tribonacci.out").split("\n");
+        String[] expected = readResourcesFile("zones.tribonacci.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
@@ -189,7 +189,7 @@ public class IncDBSNumericalTest extends AbstractNumericalTest {
             new IntegerAnalysis<>(body, 2, new IncDifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReportFull().split("\n");
-        String[] expected = readResourcesFile("incdbs.factorial.out").split("\n");
+        String[] expected = readResourcesFile("zones.factorial.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
@@ -202,7 +202,7 @@ public class IncDBSNumericalTest extends AbstractNumericalTest {
             new IntegerAnalysis<>(body, 2, new IncDifferenceBoundedStateFactory());
         analysis.runAnalysis();
         String[] actual = analysis.generateSMTReportFull().split("\n");
-        String[] expected = readResourcesFile("incdbs.decode.out").split("\n");
+        String[] expected = readResourcesFile("zones.decode.out").split("\n");
         assertEquals(expected.length, actual.length);
         assertAll(IntStream.range(0, expected.length)
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));

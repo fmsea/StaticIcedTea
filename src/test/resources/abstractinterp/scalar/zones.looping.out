@@ -1,0 +1,25 @@
+l0	l1	l2	l3
+1 l0 = 5:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>
+fall	(= l0 5)
+
+2 l1 = 0:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>
+fall	(and (= l0 5) (= l1 0))
+
+3 if l1 >= 5 goto l3 = l0 + l1:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>
+fall	(and (= l0 5) (>= l1 0) (<= l1 4))
+
+branch	(and (= l0 5) (>= l1 5))
+
+4 l1 = l1 + 1:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>
+fall	(and (= l0 5) (>= l1 1) (<= l1 5))
+
+5 goto [?= (branch)]:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>
+fall	false
+
+branch	(and (= l0 5) (>= l1 1) (<= l1 5))
+
+6 l3 = l0 + l1:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>
+fall	(and (= l0 5) (>= l1 5) (>= l3 10))
+
+7 return:<anotherSimpleLoopSootClass: void anotherSimpleLoop()>
+fall	false

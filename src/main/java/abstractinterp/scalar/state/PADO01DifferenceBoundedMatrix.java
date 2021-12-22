@@ -564,6 +564,7 @@ public class PADO01DifferenceBoundedMatrix {
     }
 
     public String toSMT(SolverWrapper solver) {
+        this.computeReducedClosure();
         StringBuilder sb = new StringBuilder();
         Grimp g = Grimp.v();
         if (this.isFeasible()) {

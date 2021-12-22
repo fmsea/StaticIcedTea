@@ -1,0 +1,82 @@
+$i1	i0	i2	i3	i4	i5	i6
+1 i0 := @parameter0: int:<test.Tribonacci: int tribonacci(int)>
+fall	true
+
+2 i3 = 0:<test.Tribonacci: int tribonacci(int)>
+fall	(= i3 0)
+
+3 i4 = 1:<test.Tribonacci: int tribonacci(int)>
+fall	(and (= i3 0) (= i4 1))
+
+4 i5 = 1:<test.Tribonacci: int tribonacci(int)>
+fall	(and (= i3 0) (= i4 1) (= i5 1))
+
+5 i6 = 3:<test.Tribonacci: int tribonacci(int)>
+fall	(and (= i3 0) (= i4 1) (= i5 1) (= i6 3))
+
+6 if i6 >= i0 goto return i5:<test.Tribonacci: int tribonacci(int)>
+fall	(and (>= i3 0) (>= i4 1) (>= i5 1) (>= i6 3) (<= i6 (+ i0 (- 1))))
+
+branch	(and (>= i3 0) (>= i4 1) (>= i5 1) (>= i6 3) (<= i0 (+ i6 0)))
+
+7 $i1 = i5 + i4:<test.Tribonacci: int tribonacci(int)>
+fall	(and (>= $i1 2) (>= i3 0) (>= i4 1) (>= i5 1) (>= i6 3) (<= i6 (+ i0 (- 1))))
+
+8 i2 = $i1 + i3:<test.Tribonacci: int tribonacci(int)>
+fall	(and (>= $i1 2)
+     (>= i2 2)
+     (>= i3 0)
+     (>= i4 1)
+     (>= i5 1)
+     (>= i6 3)
+     (<= i6 (+ i0 (- 1))))
+
+9 i3 = i4:<test.Tribonacci: int tribonacci(int)>
+fall	(and (>= $i1 2)
+     (>= i2 2)
+     (>= i3 1)
+     (>= i5 1)
+     (>= i6 3)
+     (<= i6 (+ i0 (- 1)))
+     (= i3 (+ i4 0)))
+
+10 i4 = i5:<test.Tribonacci: int tribonacci(int)>
+fall	(and (>= $i1 2)
+     (>= i2 2)
+     (>= i3 1)
+     (>= i4 1)
+     (>= i6 3)
+     (<= i6 (+ i0 (- 1)))
+     (= i4 (+ i5 0)))
+
+11 i5 = i2:<test.Tribonacci: int tribonacci(int)>
+fall	(and (>= $i1 2)
+     (>= i2 2)
+     (>= i3 1)
+     (>= i4 1)
+     (>= i6 3)
+     (<= i6 (+ i0 (- 1)))
+     (= i2 (+ i5 0)))
+
+12 i6 = i6 + 1:<test.Tribonacci: int tribonacci(int)>
+fall	(and (>= $i1 2)
+     (>= i2 2)
+     (>= i3 1)
+     (>= i4 1)
+     (>= i6 4)
+     (<= i6 (+ i0 0))
+     (= i2 (+ i5 0)))
+
+13 goto [?= (branch)]:<test.Tribonacci: int tribonacci(int)>
+fall	false
+
+branch	(and (>= $i1 2)
+     (>= i2 2)
+     (>= i3 1)
+     (>= i4 1)
+     (>= i6 4)
+     (<= i6 (+ i0 0))
+     (= i2 (+ i5 0)))
+
+14 return i5:<test.Tribonacci: int tribonacci(int)>
+fall	false

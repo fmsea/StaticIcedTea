@@ -1,0 +1,34 @@
+$i0	b2	b3	i1	i4	i5
+1 i1 := @parameter0: int:<test.Example1M: int example_5(int)>
+fall	true
+
+2 b2 = 1:<test.Example1M: int example_5(int)>
+fall	(= b2 1)
+
+3 b3 = 3:<test.Example1M: int example_5(int)>
+fall	(and (= b2 1) (= b3 3))
+
+4 if b3 != 0 goto i4 = b3 + b2:<test.Example1M: int example_5(int)>
+fall	false
+
+branch	(and (= b2 1) (= b3 3))
+
+5 i4 = b3 - b2:<test.Example1M: int example_5(int)>
+fall	false
+
+6 goto [?= $i0 = b3 * i4]:<test.Example1M: int example_5(int)>
+fall	false
+
+branch	false
+
+7 i4 = b3 + b2:<test.Example1M: int example_5(int)>
+fall	(and (= b2 1) (= b3 3) (= i4 4))
+
+8 $i0 = b3 * i4:<test.Example1M: int example_5(int)>
+fall	(and (= $i0 12) (= b2 1) (= b3 3) (= i4 4))
+
+9 i5 = $i0 - 18:<test.Example1M: int example_5(int)>
+fall	(and (= $i0 12) (= b2 1) (= b3 3) (= i4 4) (= i5 (- 6)))
+
+10 return i5:<test.Example1M: int example_5(int)>
+fall	false

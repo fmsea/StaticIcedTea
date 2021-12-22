@@ -1,0 +1,41 @@
+l0	l1	l2	l3	l4
+1 l0 = 3:<test.Nonsense: void decode()>
+fall	(= l0 3)
+
+2 l1 = 4:<test.Nonsense: void decode()>
+fall	(and (= l0 3) (= l1 4))
+
+3 l2 = 1:<test.Nonsense: void decode()>
+fall	(and (= l0 3) (= l1 4) (= l2 1))
+
+4 if l3 > 20 goto return:<test.Nonsense: void decode()>
+fall	(and (= l0 3) (= l1 4) (= l2 1) (<= l3 20))
+
+branch	(and (= l0 3) (= l1 4) (= l2 1) (>= l3 21))
+
+5 l4 = l3 % 2:<test.Nonsense: void decode()>
+fall	(and (= l0 3) (= l1 4) (= l2 1) (<= l3 20))
+
+6 if l1 == 0 goto l3 = l3 + 1:<test.Nonsense: void decode()>
+fall	(and (= l0 3) (= l1 4) (= l2 1) (<= l3 20))
+
+branch	false
+
+7 l3 = l0 - 2:<test.Nonsense: void decode()>
+fall	(and (= l0 3) (= l1 4) (= l2 1) (= l3 1))
+
+8 goto [?= (branch)]:<test.Nonsense: void decode()>
+fall	false
+
+branch	(and (= l0 3) (= l1 4) (= l2 1) (= l3 1))
+
+9 l3 = l3 + 1:<test.Nonsense: void decode()>
+fall	false
+
+10 goto [?= (branch)]:<test.Nonsense: void decode()>
+fall	false
+
+branch	false
+
+11 return:<test.Nonsense: void decode()>
+fall	false
