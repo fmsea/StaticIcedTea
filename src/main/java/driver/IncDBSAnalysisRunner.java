@@ -60,7 +60,10 @@ public class IncDBSAnalysisRunner implements Runnable {
         LOGGER.debug("Soot Method Body\n:{}", this.body);
         AnalysisTimer.time((s) -> analysis.runAnalysis());
         if (this.fullReport) {
-            System.out.println(analysis.generateSMTReportFull());
+            AnalysisTimer.time((s) -> {
+                    System.out.println(analysis.generateSMTReportFull());
+                        },
+                "reporting smt took {} ms");
         } else {
             analysis.report();
         }

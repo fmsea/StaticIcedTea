@@ -12,10 +12,14 @@ public class AnalysisTimer {
     }
 
     public static void time(LongConsumer analysis) {
+        AnalysisTimer.time(analysis, "analysis took {} ms");
+    }
+
+    public static void time(LongConsumer analysis, String messageFormat) {
         System.gc();
         long start = System.currentTimeMillis();
         analysis.accept(start);
         long end = System.currentTimeMillis();
-        LOG.info("analysis took {} ms", end - start);
+        LOG.info(messageFormat, end - start);
     }
 }
