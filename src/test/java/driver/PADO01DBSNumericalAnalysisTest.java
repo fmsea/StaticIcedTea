@@ -13,12 +13,12 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import util.Compiler;
 
-import driver.providers.PADO01DBSMiniJavaExamplesProvider;
+import driver.providers.ZonesMiniJavaExamplesProvider;
 
 public class PADO01DBSNumericalAnalysisTest {
 
     @ParameterizedTest
-    @ArgumentsSource(PADO01DBSMiniJavaExamplesProvider.class)
+    @ArgumentsSource(ZonesMiniJavaExamplesProvider.class)
     void testAnalysis(String name, String source, String expected) throws Exception {
         Path clazz = Compiler.compileSource(name, source);
         Process analysis = Runtime.getRuntime().exec(new String [] {

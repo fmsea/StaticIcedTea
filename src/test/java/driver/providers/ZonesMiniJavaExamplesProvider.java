@@ -4,7 +4,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 
-public class PADO01DBSMiniJavaExamplesProvider extends MiniJavaExamplesProvider {
+public class ZonesMiniJavaExamplesProvider extends MiniJavaExamplesProvider {
 
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext)
