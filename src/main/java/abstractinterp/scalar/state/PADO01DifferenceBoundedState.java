@@ -370,6 +370,7 @@ public class PADO01DifferenceBoundedState implements State {
             v = ((JNegExpr)v).getOp();
             if (v instanceof IntConstant) {
                 IntConstant ic = (IntConstant)v;
+                this.forget(lVar);
                 this.updateState(lVar, inState, IntConstant.v(ic.value * -1));
             } else if (v instanceof Local) {
                 Local l = (Local)v;
