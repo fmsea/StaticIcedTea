@@ -425,17 +425,19 @@ public class PADO01DifferenceBoundedMatrix {
     }
 
     public void forgetConstraints(Local local) {
-        int k = this.localToIndices.get(local);
-        iterateMatrix((i, j) -> {
-                if (i == j && j == k) {
-                    this.setConstraint(i, j, PADO01Constraint.of(0));
-                } else if (i != k && j != k) {
-                    PADO01Constraint c = PADO01Constraint.min(this.matrix[i][j],
-                                                              PADO01Constraint.add(this.matrix[i][k],
-                                                                                   this.matrix[k][j]));
-                    this.setConstraint(i, j, c);
-                }
-            });
+        if (!this.isClosed) {
+            int k = this.localToIndices.get(local);
+            iterateMatrix((i, j) -> {
+                    if (i == j && j == k) {
+                        this.setConstraint(i, j, PADO01Constraint.of(0));
+                    } else if (i != k && j != k) {
+                        PADO01Constraint c = PADO01Constraint.min(this.matrix[i][j],
+                                                                  PADO01Constraint.add(this.matrix[i][k],
+                                                                                       this.matrix[k][j]));
+                        this.setConstraint(i, j, c);
+                    }
+                });
+        }
         this.forgetConstraintsSimple(local);
     }
 
