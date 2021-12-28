@@ -434,10 +434,9 @@ public class PADO01DifferenceBoundedMatrix {
                                                               PADO01Constraint.add(this.matrix[i][k],
                                                                                    this.matrix[k][j]));
                     this.setConstraint(i, j, c);
-                } else {
-                    this.matrix[i][j] = PADO01Constraint.TOP();
                 }
             });
+        this.forgetConstraintsSimple(local);
     }
 
     public void makeInfeasible() {

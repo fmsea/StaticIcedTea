@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.function.BiConsumer;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -709,6 +710,147 @@ public class PADO01DifferenceBoundedMatrixTest {
                                          m.getConstraint(xs[3], xs[4])),
                       () -> assertEquals(PADO01Constraint.of(+1),
                                          m.getConstraint(xs[4], xs[3])));
+        }
+
+        {
+            Local[] xs = new Local[] {
+                Variable.ZERO,
+                Jimple.v().newLocal("x1", IntType.v()),
+                Jimple.v().newLocal("x2", IntType.v()),
+                Jimple.v().newLocal("x3", IntType.v()),
+                Jimple.v().newLocal("x4", IntType.v()),
+                Jimple.v().newLocal("x5", IntType.v()),
+                Jimple.v().newLocal("x6", IntType.v()),
+            };
+            int N = xs.length;
+            Set<Local> locals = new HashSet<>();
+            for (Local x : xs) { locals.add(x); }
+            PADO01DifferenceBoundedMatrix m = new PADO01DifferenceBoundedMatrix(locals, true);
+            // [[0, -1, -2, -3, -4, -5, -6],
+            //  [1,  0, -1, -2, -3, -4, -5],
+            //  [2,  1,  0, -1, -2, -3, -4],
+            //  [3,  2,  1,  0, -1, -2, -3],
+            //  [4,  3,  2,  1,  0, -1, -2],
+            //  [5,  4,  3,  2,  1,  0, -1],
+            //  [6,  5,  4,  3,  2,  1,  0]]
+            IntStream.range(0, N).forEach(i -> {
+                    IntStream.range(i, N).forEach(j -> {
+                            m.setConstraint(xs[i], xs[j], PADO01Constraint.of(i - j));
+                            m.setConstraint(xs[j], xs[i], PADO01Constraint.of(j - i));
+                        });
+                });
+            m.forgetConstraints(xs[4]);
+            IntStream.range(0, N).forEach(i -> {
+                    IntStream.range(i, N).forEach(j -> {
+                            if (i == j) {
+                                assertAll(() -> assertEquals(PADO01Constraint.of(0),
+                                                             m.getConstraint(xs[i], xs[j])));
+                            } else if (i == 4 || j == 4) {
+                                assertAll(() -> assertEquals(PADO01Constraint.TOP(),
+                                                             m.getConstraint(xs[i], xs[j])),
+                                          () -> assertEquals(PADO01Constraint.TOP(),
+                                                             m.getConstraint(xs[j], xs[i])));
+                            } else {
+                                assertAll(() -> assertEquals(PADO01Constraint.of(i - j),
+                                                             m.getConstraint(xs[i], xs[j])),
+                                          () -> assertEquals(PADO01Constraint.of(j - i),
+                                                             m.getConstraint(xs[j], xs[i])));
+                            }
+                        });
+                });
+        }
+
+        {
+            Local[] xs = new Local[] {
+                Variable.ZERO,
+                Jimple.v().newLocal("x1", IntType.v()),
+                Jimple.v().newLocal("x2", IntType.v()),
+                Jimple.v().newLocal("x3", IntType.v()),
+            };
+            Set<Local> locals = new HashSet<>();
+            for (Local x : xs) { locals.add(x); }
+            PADO01DifferenceBoundedMatrix m = new PADO01DifferenceBoundedMatrix(locals, true);
+            m.setConstraint(xs[1], xs[2], PADO01Constraint.of(0));
+            m.setConstraint(xs[2], xs[1], PADO01Constraint.of(0));
+            m.setConstraint(xs[2], xs[3], PADO01Constraint.of(-1));
+            m.forgetConstraints(xs[2]);
+            assertAll(() -> assertEquals(PADO01Constraint.of(-1),
+                                         m.getConstraint(xs[1], xs[3])),
+                      () -> assertEquals(PADO01Constraint.TOP(),
+                                         m.getConstraint(xs[1], xs[2])),
+                      () -> assertEquals(PADO01Constraint.TOP(),
+                                         m.getConstraint(xs[2], xs[1])),
+                      () -> assertEquals(PADO01Constraint.TOP(),
+                                         m.getConstraint(xs[2], xs[3])));
+        }
+    }
+
+    @Test
+    void testSimpleForget() {
+        {
+            PADO01DifferenceBoundedMatrix m = new PADO01DifferenceBoundedMatrix(locals, true);
+            m.setConstraint(xs[0], xs[1], PADO01Constraint.of(-1));
+            m.setConstraint(xs[0], xs[2], PADO01Constraint.of(-2));
+            m.setConstraint(xs[1], xs[0], PADO01Constraint.of(+1));
+            m.setConstraint(xs[1], xs[2], PADO01Constraint.of(-1));
+            m.setConstraint(xs[2], xs[0], PADO01Constraint.of(+2));
+            m.setConstraint(xs[2], xs[1], PADO01Constraint.of(+1));
+            m.forgetConstraintsSimple(xs[2]);
+            assertAll(() -> assertEquals(PADO01Constraint.of(-1),
+                                         m.getConstraint(xs[0], xs[1])),
+                      () -> assertEquals(PADO01Constraint.TOP(),
+                                         m.getConstraint(xs[0], xs[2])),
+                      () -> assertEquals(PADO01Constraint.of(+1),
+                                         m.getConstraint(xs[1], xs[0])),
+                      () -> assertEquals(PADO01Constraint.TOP(),
+                                         m.getConstraint(xs[1], xs[2])),
+                      () -> assertEquals(PADO01Constraint.TOP(),
+                                         m.getConstraint(xs[2], xs[0])),
+                      () -> assertEquals(PADO01Constraint.TOP(),
+                                         m.getConstraint(xs[2], xs[1])));
+        }
+
+        {
+            int N = 100;
+            Local[] xs = Stream.concat(Stream.of(Variable.ZERO),
+                                       IntStream.range(1, N+1).mapToObj(i -> Jimple.v().newLocal("x" + i, IntType.v())))
+                .toArray(Local[]::new);
+            Set<Local> locals = new HashSet<>();
+            for (Local x : xs) { locals.add(x); }
+            PADO01DifferenceBoundedMatrix m = new PADO01DifferenceBoundedMatrix(locals, true);
+            // m = [[0, -1, -2, -3, -4, -5, -6, ..., -99],
+            //      [1,  0, -1, -2, -3, -4, -5, ..., -98],
+            //      [2,  1,  0, -1, -2, -3, -4, ..., -97],
+            //      [3,  2,  1,  0, -1, -2, -3, ..., -96],
+            //      [4,  3,  2,  1,  0, -1, -2, ..., -95],
+            //      [5,  4,  3,  2,  1,  0, -1, ..., -94],
+            //      [6,  5,  4,  3,  2,  1,  0, ..., -93],
+            //      ...                                  ]
+            IntStream.range(0, N).forEach(i -> {
+                    IntStream.range(i, N).forEach(j -> {
+                            m.setConstraint(xs[i], xs[j], PADO01Constraint.of(i - j));
+                            m.setConstraint(xs[j], xs[i], PADO01Constraint.of(j - i));
+                        });
+                });
+            m.forgetConstraintsSimple(xs[4]);
+            IntStream.range(0, N).forEach(i -> {
+                    IntStream.range(i, N).forEach(j -> {
+                            if (i == j) {
+                                assertAll(() -> assertEquals(PADO01Constraint.of(0),
+                                                             m.getConstraint(xs[i], xs[j])));
+                            } else if (i == 4 || j == 4) {
+                                assertAll(() -> assertEquals(PADO01Constraint.TOP(),
+                                                             m.getConstraint(xs[i], xs[j])),
+                                          () -> assertEquals(PADO01Constraint.TOP(),
+                                                             m.getConstraint(xs[j], xs[i])));
+                            } else {
+                                assertAll(() -> assertEquals(PADO01Constraint.of(i - j),
+                                                             m.getConstraint(xs[i], xs[j])),
+                                          () -> assertEquals(PADO01Constraint.of(j - i),
+                                                             m.getConstraint(xs[j], xs[i])));
+                            }
+                        });
+                });
         }
     }
 
