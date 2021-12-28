@@ -207,4 +207,17 @@ public class IncDBSNumericalTest extends AbstractNumericalTest {
         assertAll(IntStream.range(0, expected.length)
                   .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
     }
+
+    @Test
+    void testSwap() {
+        Body body = JimpleProvider.swap();
+        IntegerAnalysis<IncDifferenceBoundedState> analysis =
+            new IntegerAnalysis<>(body, 2, new IncDifferenceBoundedStateFactory());
+        analysis.runAnalysis();
+        String[] actual = analysis.generateSMTReportFull().split("\n");
+        String[] expected = readResourcesFile("zones.swap.out").split("\n");
+        assertEquals(expected.length, actual.length);
+        assertAll(IntStream.range(0, expected.length)
+                  .mapToObj(i -> () -> assertEquals(expected[i], actual[i])));
+    }
 }

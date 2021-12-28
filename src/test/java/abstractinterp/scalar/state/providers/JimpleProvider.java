@@ -499,4 +499,32 @@ public class JimpleProvider implements ArbitraryProvider {
         units.add(exit);
         return body;
     }
+
+    public static Body swap() {
+        Jimple jimple = Jimple.v();
+        SootClass testClass = new SootClass("test.Example", Modifier.PUBLIC);
+        testClass.setSuperclass(Scene.v().getSootClass("java.lang.Object"));
+        SootMethod method = new SootMethod("swap",
+                                           Arrays.asList(new Type[] { IntType.v() }),
+                                           IntType.v());
+        testClass.addMethod(method);
+        JimpleBody body = jimple.newBody(method);
+        method.setActiveBody(body);
+
+        Chain<Unit> units = body.getUnits();
+        Local[] xs = new Local[] {
+            jimple.newLocal("i0", IntType.v()),
+            jimple.newLocal("i1", IntType.v()),
+            jimple.newLocal("i2", IntType.v()),
+        };
+        Stream.of(xs).forEach(x -> body.getLocals().add(x));
+        Unit exit = jimple.newReturnStmt(xs[0]);
+        units.add(jimple.newIdentityStmt(xs[0], jimple.newParameterRef(IntType.v(), 0)));
+        units.add(jimple.newIfStmt(jimple.newLeExpr(xs[1], xs[0]), exit));
+        units.add(jimple.newAssignStmt(xs[2], xs[1]));
+        units.add(jimple.newAssignStmt(xs[1], xs[0]));
+        units.add(jimple.newAssignStmt(xs[0], xs[2]));
+        units.add(exit);
+        return body;
+    }
 }
