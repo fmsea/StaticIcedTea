@@ -17,6 +17,8 @@ import driver.commands.*;
              StartPredicateNumericalCommand.class,
              StartIncDBSNumericalCommand.class,
              StartPADO01DBSNumericalCommand.class,
+             StartMinDBSNumericalCommand.class,
+             StartMaxDBSNumericalCommand.class,
              Smt2FormatCommand.class,
              Smt2FormatFullCommand.class,
              Smt2FormatIdentifiersCommand.class,
