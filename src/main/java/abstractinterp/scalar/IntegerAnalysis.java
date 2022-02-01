@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import abstractinterp.scalar.state.State;
 import abstractinterp.scalar.state.factory.StateFactory;
 import solver.SolverWrapper;
-import solver.SolverWrapperZ3;
+import solver.SolverFactory;
 
 public class IntegerAnalysis<S extends State> implements Analysis {
     private static final Logger LOGGER = LoggerFactory.getLogger(IntegerAnalysis.class);
@@ -40,7 +40,7 @@ public class IntegerAnalysis<S extends State> implements Analysis {
     private Set<Local> locals;
 
     public IntegerAnalysis(Body b, int iterations, StateFactory<S> stateFactory) {
-        this(new SolverWrapperZ3(), b, iterations, stateFactory);
+        this(SolverFactory.getSolver(), b, iterations, stateFactory);
     }
 
     public IntegerAnalysis(SolverWrapper solver, Body b, int iterations, StateFactory<S> stateFactory) {
