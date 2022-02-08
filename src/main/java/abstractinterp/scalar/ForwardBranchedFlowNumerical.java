@@ -13,6 +13,7 @@ import soot.jimple.ConditionExpr;
 import soot.jimple.IdentityStmt;
 import soot.jimple.IfStmt;
 import soot.jimple.NumericConstant;
+import soot.jimple.ParameterRef;
 import soot.jimple.internal.JimpleLocal;
 import soot.jimple.internal.JNegExpr;
 import soot.BooleanType;
@@ -125,6 +126,7 @@ public class ForwardBranchedFlowNumerical<S extends State>
                            rhs instanceof JNegExpr) {
                     ifStmtFall.updateState(lVar, in, rhs);
                 } else {
+                    LOGGER.debug("Unhandled assignment expression [lhs={}, rhs={}]", lhs, rhs);
                     ifStmtFall.forget(lVar);
                 }
             }
@@ -150,13 +152,8 @@ public class ForwardBranchedFlowNumerical<S extends State>
             if (right instanceof JimpleLocal) {
                 track.add(right);
             }
-        }
-
-        if (s instanceof IdentityStmt) {
-            IdentityStmt param = (IdentityStmt) s;
-            if (isIntType(param.getLeftOp())) {
-                ifStmtFall.updateTop((Local) param.getLeftOp());
-            }
+        } else if (s instanceof IdentityStmt) {
+            // skip
         }
 
         for (S state : fallOut) {
