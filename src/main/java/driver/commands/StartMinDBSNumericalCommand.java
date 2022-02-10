@@ -7,6 +7,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import driver.MinDBSAnalysisRunner;
+import driver.util.SootInitialization;
 
 @Command(name = "mindbs-numerical",
          mixinStandardHelpOptions = true,
@@ -38,11 +39,11 @@ public class StartMinDBSNumericalCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
+        SootInitialization.initializeSoot(className, classpath);
         Runnable runner = new MinDBSAnalysisRunner(className,
-                                                      methodId,
-                                                      classpath,
-                                                      outputResultsPath,
-                                                      fullReport);
+                                                   methodId,
+                                                   outputResultsPath,
+                                                   fullReport);
         runner.run();
         return 0;
     }

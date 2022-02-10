@@ -31,7 +31,6 @@ public class PredicateAnalysisRunner implements Runnable {
 
     private final String className;
     private final int methodId;
-    private final Path classpath;
     private final Path outputResultsPath;
     private final File domainFile;
     private final boolean symbolic;
@@ -42,20 +41,16 @@ public class PredicateAnalysisRunner implements Runnable {
 
     public PredicateAnalysisRunner(String className,
                                    int methodId,
-                                   Path classpath,
                                    Path outputResultsPath,
                                    File domainFile,
                                    boolean symbolic,
                                    boolean fullReport) {
         this.className = className;
         this.methodId = methodId;
-        this.classpath = classpath;
         this.outputResultsPath = outputResultsPath;
         this.domainFile = domainFile;
         this.symbolic = symbolic;
-        this.sootMethod = SootInitialization.initializeSoot(className,
-                                                            methodId,
-                                                            classpath.toAbsolutePath().toString());
+        this.sootMethod = SootInitialization.getSootMethod(className, methodId);
         this.body = this.sootMethod.retrieveActiveBody();
         this.fullReport = fullReport;
         LOGGER.debug("Reading {} for domains", domainFile);

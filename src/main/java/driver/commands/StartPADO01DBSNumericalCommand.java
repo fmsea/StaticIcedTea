@@ -7,6 +7,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import driver.PADO01DBSAnalysisRunner;
+import driver.util.SootInitialization;
 
 @Command(name = "pado-numerical",
          mixinStandardHelpOptions = true,
@@ -38,9 +39,9 @@ public class StartPADO01DBSNumericalCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
+        SootInitialization.initializeSoot(className, classpath);
         Runnable runner = new PADO01DBSAnalysisRunner(className,
                                                       methodId,
-                                                      classpath,
                                                       outputResultsPath,
                                                       fullReport);
         runner.run();

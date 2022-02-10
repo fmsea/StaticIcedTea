@@ -6,6 +6,7 @@ import java.util.concurrent.Callable;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
+import driver.util.SootInitialization;
 import driver.IncDBSAnalysisRunner;
 
 @Command(name = "incdbs-numerical",
@@ -37,9 +38,9 @@ public class StartIncDBSNumericalCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
+        SootInitialization.initializeSoot(className, classpath);
         Runnable runner = new IncDBSAnalysisRunner(className,
                                                    methodId,
-                                                   classpath,
                                                    outputResultsPath,
                                                    fullReport);
         runner.run();

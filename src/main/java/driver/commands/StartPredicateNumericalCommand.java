@@ -9,6 +9,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import driver.PredicateAnalysisRunner;
+import driver.util.SootInitialization;
 
 @Command(name = "predicate",
          mixinStandardHelpOptions = true,
@@ -48,9 +49,9 @@ public class StartPredicateNumericalCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
+        SootInitialization.initializeSoot(className, classpath);
         Runnable runner = new PredicateAnalysisRunner(className,
                                                       methodId,
-                                                      classpath,
                                                       outputResultsPath,
                                                       domainFile,
                                                       symbolic.equals("Y"),

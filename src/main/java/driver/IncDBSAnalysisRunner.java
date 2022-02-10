@@ -31,7 +31,6 @@ public class IncDBSAnalysisRunner implements Runnable {
 
     private final String className;
     private final int methodId;
-    private final Path classpath;
     private final Path outputResultsPath;
     private final SootMethod sootMethod;
     private final Body body;
@@ -40,16 +39,12 @@ public class IncDBSAnalysisRunner implements Runnable {
 
     public IncDBSAnalysisRunner(String className,
                                 int methodId,
-                                Path classpath,
                                 Path outputResultsPath,
                                 boolean fullReport) {
         this.className = className;
         this.methodId = methodId;
-        this.classpath = classpath;
         this.outputResultsPath = outputResultsPath;
-        this.sootMethod = SootInitialization.initializeSoot(className,
-                                                            methodId,
-                                                            classpath.toAbsolutePath().toString());
+        this.sootMethod = SootInitialization.getSootMethod(className, methodId);
         this.body = this.sootMethod.retrieveActiveBody();
         this.fullReport = fullReport;
         this.analysis = new IntegerAnalysis<>(this.body, 2, new IncDifferenceBoundedStateFactory());

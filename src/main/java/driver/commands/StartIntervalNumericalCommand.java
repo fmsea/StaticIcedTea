@@ -43,9 +43,9 @@ public class StartIntervalNumericalCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
+        SootInitialization.initializeSoot(className, classpath);
         Runnable runner = new IntervalAnalysisRunner(className,
                                                      methodId,
-                                                     classpath,
                                                      outputResultsPath,
                                                      fullReport);
         runner.run();

@@ -7,6 +7,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import driver.MaxDBSAnalysisRunner;
+import driver.util.SootInitialization;
 
 @Command(name = "maxdbs-numerical",
          mixinStandardHelpOptions = true,
@@ -38,11 +39,11 @@ public class StartMaxDBSNumericalCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
+        SootInitialization.initializeSoot(className, classpath);
         Runnable runner = new MaxDBSAnalysisRunner(className,
-                                                      methodId,
-                                                      classpath,
-                                                      outputResultsPath,
-                                                      fullReport);
+                                                   methodId,
+                                                   outputResultsPath,
+                                                   fullReport);
         runner.run();
         return 0;
     }
