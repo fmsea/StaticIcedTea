@@ -9,6 +9,14 @@ let
     javaBindings = true;
     jdk = jdk;
   });
+  python = (pkgs.python38.buildEnv.override {
+    extraLibs = [
+      pkgs.python38Packages.matplotlib
+      pkgs.python38Packages.pandas
+      pkgs.python38Packages.scipy
+      pkgs.python38Packages.numpy
+    ];
+  });
 in pkgs.mkShell {
   nativeBuildInputs = [
     jdk
@@ -16,6 +24,8 @@ in pkgs.mkShell {
 
     # keep this line if you use bash
     pkgs.bashInteractive
+    pkgs.gnuplot
+    python
   ];
   buildInputs = [
     jdk
