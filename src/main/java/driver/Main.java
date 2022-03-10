@@ -19,6 +19,7 @@ import driver.commands.*;
              StartPADO01DBSNumericalCommand.class,
              StartMinDBSNumericalCommand.class,
              StartMaxDBSNumericalCommand.class,
+             StartMethodStatsCommand.class,
              Smt2FormatCommand.class,
              Smt2FormatFullCommand.class,
              Smt2FormatIdentifiersCommand.class,
