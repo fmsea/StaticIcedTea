@@ -13,7 +13,9 @@ let
     extraLibs = [
       pkgs.python38Packages.matplotlib
       pkgs.python38Packages.pandas
+      pkgs.python38Packages.scikit-learn
       pkgs.python38Packages.scipy
+      pkgs.python38Packages.statsmodels
       pkgs.python38Packages.numpy
     ];
   });
