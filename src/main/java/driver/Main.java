@@ -13,6 +13,7 @@ import driver.commands.*;
          version = "1.0",
          description = "Run various dfa-smt utilities",
          subcommands = {
+             PrintJimpleCommand.class,
              StartIntervalNumericalCommand.class,
              StartPredicateNumericalCommand.class,
              StartIncDBSNumericalCommand.class,
