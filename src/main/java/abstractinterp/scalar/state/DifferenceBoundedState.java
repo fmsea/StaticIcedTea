@@ -572,6 +572,10 @@ public class DifferenceBoundedState implements State {
         return this.dbs.toString();
     }
 
+    public Optional<BinopExpr> toBinop() {
+        throw new UnsupportedOperationException();
+    }
+
     public String toSMT(SolverWrapper solver) {
         StringBuilder sb = new StringBuilder();
         for (DBSTriple triple : this.dbs.getConstraints()) {

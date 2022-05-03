@@ -407,6 +407,10 @@ public class PADO01DifferenceBoundedState implements State {
         return this.matrix.toString();
     }
 
+    public Optional<BinopExpr> toBinop() {
+        return this.matrix.toBinop();
+    }
+
     public String toSMT(SolverWrapper solver) {
         return this.matrix.toSMT(solver);
     }

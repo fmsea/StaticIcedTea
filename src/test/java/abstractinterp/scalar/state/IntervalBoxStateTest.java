@@ -4,6 +4,7 @@ import java.util.Set;
 import java.util.List;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.HashMap;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import soot.Local;
 import soot.IntType;
+import soot.jimple.BinopExpr;
 import soot.jimple.IntConstant;
 import soot.jimple.Jimple;
 
@@ -236,5 +238,30 @@ public class IntervalBoxStateTest {
 
         assertAll(locals.stream().map(l -> () -> assertEquals(Interval32Box.BOT(),
                                                               path2.getValue(l))));
+    }
+
+    @Test
+    void testToBinop() {
+        {
+            Set<Local> locals = new HashSet<>();
+            locals.add(Jimple.v().newLocal("l0", IntType.v()));
+            IntervalBoxState box = new IntervalBoxState(locals, false);
+            locals.forEach(l -> box.update(l, new Interval32Box(-5, 5)));
+            assertEquals("(and (>= l0 (- 5)) (<= l0 5))", this.solver.smt2(box.toBinop().get()));
+        }
+
+        {
+            Set<Local> locals = new HashSet<>();
+            locals.add(Jimple.v().newLocal("l0", IntType.v()));
+            IntervalBoxState box = new IntervalBoxState(locals, false);
+            assertEquals("(= 0 1)", this.solver.smt2(box.toBinop().get()));
+        }
+
+        {
+            Set<Local> locals = new HashSet<>();
+            locals.add(Jimple.v().newLocal("l0", IntType.v()));
+            IntervalBoxState box = new IntervalBoxState(locals, true);
+            assertTrue(box.toBinop().isEmpty());
+        }
     }
 }

@@ -1,5 +1,7 @@
 package abstractinterp.scalar.state;
 
+import java.util.Optional;
+import soot.jimple.BinopExpr;
 import soot.Local;
 import soot.Value;
 import org.jgrapht.Graph;
@@ -25,6 +27,7 @@ public interface State {
     public boolean isSubset(State inState);
     public void updateState(Local var, State inState, Value left, Value right, BinaryOperatorType operator);
     public void updateState(Local var, State inState, Value v);
+    public Optional<BinopExpr> toBinop();
     public String toSMT(SolverWrapper solver);
     public String toSMT(Local l, SolverWrapper solver);
     public Graph<Local, DBSConstraint> toGraph();

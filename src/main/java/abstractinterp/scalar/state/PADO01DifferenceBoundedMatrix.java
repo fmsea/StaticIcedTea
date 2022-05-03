@@ -564,9 +564,8 @@ public class PADO01DifferenceBoundedMatrix {
         return sb.toString();
     }
 
-    public String toSMT(SolverWrapper solver) {
+    public Optional<BinopExpr> toBinop() {
         this.computeReducedClosure();
-        StringBuilder sb = new StringBuilder();
         Grimp g = Grimp.v();
         if (this.isFeasible()) {
             List<BinopExpr> exprs = new ArrayList<>(N * 2);
@@ -598,9 +597,19 @@ public class PADO01DifferenceBoundedMatrix {
                     }
                 }
             }
-            exprs.stream()
-                .reduce((a, b) -> g.newAndExpr(a, b))
-                .ifPresentOrElse((expr) -> {
+            return exprs.stream().reduce((a, b) -> g.newAndExpr(a, b));
+        } else {
+            // False
+            return Optional.of(g.newEqExpr(IntConstant.v(0), IntConstant.v(1)));
+        }
+    }
+
+    public String toSMT(SolverWrapper solver) {
+        this.computeReducedClosure();
+        StringBuilder sb = new StringBuilder();
+        Grimp g = Grimp.v();
+        if (this.isFeasible()) {
+            this.toBinop().ifPresentOrElse((expr) -> {
                         sb.append(solver.smt2(expr));
                         sb.append("\n");
                     }, () -> sb.append("true\n"));

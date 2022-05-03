@@ -277,13 +277,16 @@ public class IntervalBoxState implements State {
         return sb.toString();
     }
 
+    public Optional<BinopExpr> toBinop() {
+        Stream<Local> locals = this.state.keySet()
+            .stream().sorted((a, b) -> a.toString().compareTo(b.toString()));
+        return combineExprs(locals);
+    }
+
     public String toSMT(SolverWrapper solver) {
         StringBuilder sb = new StringBuilder();
         if (this.isFeasible()) {
-            Stream<Local> locals = this.state.keySet()
-                .stream().sorted((a, b) -> a.toString().compareTo(b.toString()));
-            Optional<BinopExpr> maybeExpr = combineExprs(locals);
-            maybeExpr.ifPresentOrElse((expr) -> {
+            this.toBinop().ifPresentOrElse((expr) -> {
                     sb.append(solver.smt2(expr));
                     sb.append("\n");
                 }, () -> sb.append("true\n"));

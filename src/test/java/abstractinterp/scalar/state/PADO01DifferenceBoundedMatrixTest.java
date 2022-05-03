@@ -996,6 +996,46 @@ public class PADO01DifferenceBoundedMatrixTest {
     }
 
     @Test
+    void testToBinop() {
+        {
+            PADO01DifferenceBoundedMatrix m = new PADO01DifferenceBoundedMatrix(this.locals, true);
+            assertTrue(m.toBinop().isEmpty());
+        }
+
+        {
+            PADO01DifferenceBoundedMatrix m = new PADO01DifferenceBoundedMatrix(this.locals, false);
+            assertEquals("(= 0 1)", this.solver.smt2(m.toBinop().get()));
+        }
+
+        {
+            PADO01DifferenceBoundedMatrix m = new PADO01DifferenceBoundedMatrix(this.locals, true);
+            m.setConstraint(xs[0], xs[1], PADO01Constraint.of(-1));
+            m.setConstraint(xs[0], xs[2], PADO01Constraint.of(-1));
+            m.setConstraint(xs[1], xs[0], PADO01Constraint.of(4));
+            m.setConstraint(xs[1], xs[2], PADO01Constraint.of(1));
+            m.setConstraint(xs[2], xs[0], PADO01Constraint.of(3));
+            String expected = Stream.of("(and (>= x1 1)",
+                                        "(>= x2 1)",
+                                        "(<= x2 3)",
+                                        "(<= x1 (+ x2 1)))").collect(Collectors.joining(" "));
+            assertEquals(expected, this.solver.smt2(m.toBinop().get()));
+        }
+
+        {
+            PADO01DifferenceBoundedMatrix m = new PADO01DifferenceBoundedMatrix(this.locals, true);
+            m.setConstraint(xs[0], xs[1], PADO01Constraint.of(-1));
+            m.setConstraint(xs[0], xs[2], PADO01Constraint.of(-1));
+            m.setConstraint(xs[1], xs[0], PADO01Constraint.of(1));
+            m.setConstraint(xs[1], xs[2], PADO01Constraint.of(1));
+            m.setConstraint(xs[2], xs[0], PADO01Constraint.of(3));
+            String expected = Stream.of("(and (= x1 1)",
+                                        "(>= x2 1)",
+                                        "(<= x2 3))").collect(Collectors.joining(" "));
+            assertEquals(expected, this.solver.smt2(m.toBinop().get()));
+        }
+    }
+
+    @Test
     void testLocalToSMT() {
         {
             PADO01DifferenceBoundedMatrix m = new PADO01DifferenceBoundedMatrix(this.locals, false);
