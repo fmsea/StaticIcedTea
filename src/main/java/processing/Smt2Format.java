@@ -92,7 +92,7 @@ public class Smt2Format {
         keys.addAll(file2Map.keySet());
         for (String key : keys) {
             writer.write("(echo \"");
-            writer.write(key);
+            writer.write(key.replaceAll("\"", "\"\""));
             writer.write("\")\n");
             List<SmtExpression> exprs1 = file1Map.get(key);
             List<SmtExpression> exprs2 = file2Map.get(key);
@@ -121,7 +121,7 @@ public class Smt2Format {
         statements.addAll(report2.statements());
         for (String statement : statements.stream().sorted().collect(Collectors.toList())) {
             writer.write("(echo \"");
-            writer.write(statement);
+            writer.write(statement.replaceAll("\"", "\"\""));
             writer.write("\")\n");
             Optional<String> fall1 = report1.getFallThrough(statement);
             Optional<String> branch1 = report1.getBranchOut(statement);
