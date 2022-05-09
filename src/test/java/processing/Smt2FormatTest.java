@@ -118,4 +118,21 @@ public class Smt2FormatTest {
             }
         }
     }
+
+    @Test
+    void testSMT2FormatStatementsSorted() {
+        {
+            Reader r1 = new StringReader(ResourceFileUtility.readResourcesFile("processing/format.full.sorted.1.in"));
+            Reader r2 = new StringReader(ResourceFileUtility.readResourcesFile("processing/format.full.sorted.2.in"));
+            Writer w1 = new StringWriter();
+            try {
+                Smt2Format.SMT2FormatFull(r1, r2, w1);
+                Assertions.assertEquals(ResourceFileUtility.readResourcesFile("processing/format.full.sorted.out"),
+                                        w1.toString());
+            } catch (IOException ex) {
+                ex.printStackTrace(System.err);
+                Assertions.assertTrue(false);
+            }
+        }
+    }
 }

@@ -2,17 +2,6 @@
 fall through
 sat
 sat
-10 goto [?= (branch)]:<test.Nonsense: void decode()>
-fall through
-sat
-sat
-branch out
-sat
-sat
-11 return:<test.Nonsense: void decode()>
-fall through
-sat
-sat
 2 l1 = 4:<test.Nonsense: void decode()>
 fall through
 sat
@@ -51,6 +40,17 @@ branch out
 sat
 sat
 9 l3 = l3 + 1:<test.Nonsense: void decode()>
+fall through
+sat
+sat
+10 goto [?= (branch)]:<test.Nonsense: void decode()>
+fall through
+sat
+sat
+branch out
+sat
+sat
+11 return:<test.Nonsense: void decode()>
 fall through
 sat
 sat

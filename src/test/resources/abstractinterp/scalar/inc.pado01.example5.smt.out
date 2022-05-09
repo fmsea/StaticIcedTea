@@ -2,10 +2,6 @@
 fall through
 sat
 sat
-10 return i5:<test.Example1M: int example_5(int)>
-fall through
-sat
-sat
 2 b2 = 1:<test.Example1M: int example_5(int)>
 fall through
 sat
@@ -41,6 +37,10 @@ fall through
 sat
 sat
 9 i5 = $i0 - 18:<test.Example1M: int example_5(int)>
+fall through
+sat
+sat
+10 return i5:<test.Example1M: int example_5(int)>
 fall through
 sat
 sat

@@ -119,7 +119,17 @@ public class Smt2Format {
         Set<String> statements = new TreeSet<>();
         statements.addAll(report1.statements());
         statements.addAll(report2.statements());
-        for (String statement : statements.stream().sorted().collect(Collectors.toList())) {
+        List<String> sortedStatements = statements.stream().sorted((a, b) -> {
+                try {
+                    int aCount = Integer.parseInt(a.split(" ")[0]);
+                    int bCount = Integer.parseInt(b.split(" ")[0]);
+                    return Integer.compare(aCount, bCount);
+                } catch (NumberFormatException ex) {
+                    LOGGER.error("Exception during parsing: {}", ex);
+                    return a.compareTo(b);
+                }
+            }).collect(Collectors.toList());
+        for (String statement : sortedStatements) {
             writer.write("(echo \"");
             writer.write(statement.replaceAll("\"", "\"\""));
             writer.write("\")\n");

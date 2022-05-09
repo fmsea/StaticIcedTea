@@ -2,17 +2,6 @@
 fall through
 sat
 sat
-10 goto [?= (branch)]:<test.Fibonacci: int fibonacci(int)>
-fall through
-sat
-sat
-branch out
-sat
-unsat
-11 return i3:<test.Fibonacci: int fibonacci(int)>
-fall through
-sat
-sat
 2 i2 = 0:<test.Fibonacci: int fibonacci(int)>
 fall through
 sat
@@ -48,3 +37,14 @@ unsat
 fall through
 sat
 unsat
+10 goto [?= (branch)]:<test.Fibonacci: int fibonacci(int)>
+fall through
+sat
+sat
+branch out
+sat
+unsat
+11 return i3:<test.Fibonacci: int fibonacci(int)>
+fall through
+sat
+sat

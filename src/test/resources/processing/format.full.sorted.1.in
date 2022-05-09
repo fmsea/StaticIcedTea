@@ -1,0 +1,27 @@
+$z0	b0
+1 b0 := @parameter0: byte:<test.Base64: boolean isPad(byte)>
+fall	true
+2 if b0 != 61 goto $z0 = 0:<test.Base64: boolean isPad(byte)>
+fall	(= b0 61)
+3 $z0 = 1:<test.Base64: boolean isPad(byte)>
+fall	(and (= $z0 1) (= b0 61))
+4 goto [?= return $z0]:<test.Base64: boolean isPad(byte)>
+fall	false
+branch	(and (= $z0 1) (= b0 61))
+5 $z0 = 0:<test.Base64: boolean isPad(byte)>
+fall	(= $z0 0)
+6 return $z0:<test.Base64: boolean isPad(byte)>
+fall	(and (>= $z0 0) (< $z0 0) (>= b0 0) (< b0 0))
+10 b0 := @parameter0: byte:<test.Base64: boolean isPad(byte)>
+fall	true
+20 if b0 != 61 goto $z0 = 0:<test.Base64: boolean isPad(byte)>
+fall	(= b0 61)
+30 $z0 = 1:<test.Base64: boolean isPad(byte)>
+fall	(and (= $z0 1) (= b0 61))
+40 goto [?= return $z0]:<test.Base64: boolean isPad(byte)>
+fall	false
+branch	(and (= $z0 1) (= b0 61))
+50 $z0 = 0:<test.Base64: boolean isPad(byte)>
+fall	(= $z0 0)
+60 return $z0:<test.Base64: boolean isPad(byte)>
+fall	(and (>= $z0 0) (< $z0 0) (>= b0 0) (< b0 0))
