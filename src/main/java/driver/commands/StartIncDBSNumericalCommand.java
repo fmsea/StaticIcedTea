@@ -15,18 +15,13 @@ import driver.IncDBSAnalysisRunner;
 public class StartIncDBSNumericalCommand implements Callable<Integer> {
     @Option(names = {"-o", "--output"},
             description = "Output file path for results",
-            required = false)
+            required = true)
     private Path outputResultsPath;
 
     @Option(names = {"-cp", "--classpath"},
             description = "Classpath to bytecode to analyze",
             required = true)
     private Path classpath;
-
-    @Option(names = {"--full-report"},
-            description = "print the entire state for each program unit",
-            required = false)
-    private boolean fullReport;
 
     @Parameters(index = "0",
                 description = "Class name of artifact to analyze")
@@ -41,8 +36,7 @@ public class StartIncDBSNumericalCommand implements Callable<Integer> {
         SootInitialization.initializeSoot(className, classpath);
         Runnable runner = new IncDBSAnalysisRunner(className,
                                                    methodId,
-                                                   outputResultsPath,
-                                                   fullReport);
+                                                   outputResultsPath);
         runner.run();
         return 0;
     }

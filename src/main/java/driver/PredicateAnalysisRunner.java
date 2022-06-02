@@ -37,14 +37,12 @@ public class PredicateAnalysisRunner implements Runnable {
     private final SootMethod sootMethod;
     private final Body body;
     private final ValueAnalysis analysis;
-    private final boolean fullReport;
 
     public PredicateAnalysisRunner(String className,
                                    int methodId,
                                    Path outputResultsPath,
                                    File domainFile,
-                                   boolean symbolic,
-                                   boolean fullReport) {
+                                   boolean symbolic) {
         this.className = className;
         this.methodId = methodId;
         this.outputResultsPath = outputResultsPath;
@@ -52,7 +50,6 @@ public class PredicateAnalysisRunner implements Runnable {
         this.symbolic = symbolic;
         this.sootMethod = SootInitialization.getSootMethod(className, methodId);
         this.body = this.sootMethod.retrieveActiveBody();
-        this.fullReport = fullReport;
         LOGGER.debug("Reading {} for domains", domainFile);
         DomainReader domainReader = new DomainReader(domainFile.toString());
         List<Domain> domains = domainReader.getReadDomains();
@@ -64,10 +61,35 @@ public class PredicateAnalysisRunner implements Runnable {
         LOGGER.info("Analyzing Method {} in {}", this.sootMethod.getName(), this.className);
         LOGGER.debug("Soot Method Body\n:{}", this.body);
         AnalysisTimer.time((s) -> analysis.start());
-        if (this.fullReport) {
-            analysis.reportFullSMT();
-        } else {
-            analysis.report();
-        }
+        AnalysisTimer.time((s) -> {
+                File changed = Path.of(this.outputResultsPath.toString(),
+                                       String.format("%s_%d-S%s.changed.out",
+                                                     className,
+                                                     methodId,
+                                                     this.symbolic ? "Y" : "N")).toFile();
+                File fullSmt = Path.of(this.outputResultsPath.toString(),
+                                       String.format("%s_%d-S%s.smt.out",
+                                                     className,
+                                                     methodId,
+                                                     this.symbolic ? "Y" : "N")).toFile();
+
+                File dir = this.outputResultsPath.toFile();
+                dir.mkdirs();
+
+                try (FileWriter fw = new FileWriter(changed)) {
+                    fw.write(this.analysis.generateReport());
+                    fw.flush();
+                } catch (IOException ex) {
+                    LOGGER.error("Unable to write changed output file: {}", ex.getMessage());
+                }
+
+                try (FileWriter fw = new FileWriter(fullSmt)) {
+                    fw.write(this.analysis.generateFullSMT());
+                    fw.flush();
+                } catch (IOException ex) {
+                    LOGGER.error("Unable to write full SMT output file: {}", ex.getMessage());
+                }
+            },
+            "Analysis reporting took {} ms");
     }
 }

@@ -1,0 +1,25 @@
+3 i3 = 0:<miniExample3: int example(int)>
+i3->(and (>= i3 0) (<= i3 0))
+4 i4 = 1:<miniExample3: int example(int)>
+i4->(and (>= i4 1) (<= i4 1) (<= i3 (+ i4 (- 1))) (<= i4 (+ i3 1)))
+5 i5 = 1:<miniExample3: int example(int)>
+i5->(and (>= i5 1) (<= i5 1) (<= i3 (+ i5 (- 1))) (<= i5 (+ i3 1)) (<= i4 (+ i5 0)) (<= i5 (+ i4 0)))
+6 i6 = 3:<miniExample3: int example(int)>
+i6->(and (>= i6 3) (<= i6 3) (<= i3 (+ i6 (- 3))) (<= i6 (+ i3 3)) (<= i4 (+ i6 (- 2))) (<= i6 (+ i4 2)) (<= i5 (+ i6 (- 2))) (<= i6 (+ i5 2)))
+7 if i6 >= i0 goto return i5:<miniExample3: int example(int)>
+i0->(and (>= i0 4) (<= i6 (+ i0 (- 1))))
+i6->(and (>= i6 3) (<= i6 (+ i0 (- 1))))
+i0f->(<= i0 (+ i6 0))
+i6f->(and (>= i6 3) (<= i0 (+ i6 0)))
+8 $i1 = i5 + i4:<miniExample3: int example(int)>
+$i1->(>= $i1 2)
+9 i2 = $i1 + i3:<miniExample3: int example(int)>
+i2->(>= i2 2)
+10 i3 = i4:<miniExample3: int example(int)>
+i3->(and (>= i3 1) (<= i4 (+ i3 0)) (<= i3 (+ i4 0)))
+11 i4 = i5:<miniExample3: int example(int)>
+i4->(and (>= i4 1) (<= i5 (+ i4 0)) (<= i4 (+ i5 0)))
+12 i5 = i2:<miniExample3: int example(int)>
+i5->(and (>= i5 2) (<= i2 (+ i5 0)) (<= i5 (+ i2 0)))
+13 i6 = i6 + 1:<miniExample3: int example(int)>
+i6->(and (>= i6 4) (<= i6 (+ i0 0)))

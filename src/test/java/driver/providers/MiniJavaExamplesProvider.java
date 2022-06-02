@@ -14,8 +14,12 @@ public abstract class MiniJavaExamplesProvider implements ArgumentsProvider {
 
     protected Arguments example(String name, String type) throws IOException {
         String source = readResourcesFile("driver/providers/" + name + ".java");
-        String output = readResourcesFile("driver/providers/" + name + "." + type + ".analysis.out");
-        return Arguments.arguments(name, source, output.trim());
+        String expectedChangedOutput = readResourcesFile("driver/providers/" + name + "." + type + ".changed.out");
+        String expectedFullSmtOutput = readResourcesFile("driver/providers/" + name + "." + type + ".smt.out");
+        return Arguments.arguments(name,
+                                   source,
+                                   expectedChangedOutput.trim(),
+                                   expectedFullSmtOutput.trim());
     }
 
     protected String readResourcesFile(String fileName) throws IOException {

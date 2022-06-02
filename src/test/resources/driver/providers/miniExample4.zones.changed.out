@@ -1,0 +1,19 @@
+3 i2 = 0:<miniExample4: int example(int)>
+i2->(and (>= i2 0) (<= i2 0))
+4 i3 = 1:<miniExample4: int example(int)>
+i3->(and (>= i3 1) (<= i3 1) (<= i2 (+ i3 (- 1))) (<= i3 (+ i2 1)))
+5 i4 = 2:<miniExample4: int example(int)>
+i4->(and (>= i4 2) (<= i4 2) (<= i2 (+ i4 (- 2))) (<= i4 (+ i2 2)) (<= i3 (+ i4 (- 1))) (<= i4 (+ i3 1)))
+6 if i4 >= i0 goto return i3:<miniExample4: int example(int)>
+i0->(and (>= i0 3) (<= i4 (+ i0 (- 1))))
+i4->(and (>= i4 2) (<= i4 (+ i0 (- 1))))
+i0f->(<= i0 (+ i4 0))
+i4f->(and (>= i4 2) (<= i0 (+ i4 0)))
+7 i1 = i2 + i3:<miniExample4: int example(int)>
+i1->(>= i1 1)
+8 i2 = i3:<miniExample4: int example(int)>
+i2->(and (>= i2 1) (<= i3 (+ i2 0)) (<= i2 (+ i3 0)))
+9 i3 = i1:<miniExample4: int example(int)>
+i3->(and (>= i3 1) (<= i1 (+ i3 0)) (<= i3 (+ i1 0)))
+10 i4 = i4 + 1:<miniExample4: int example(int)>
+i4->(and (>= i4 3) (<= i4 (+ i0 0)))

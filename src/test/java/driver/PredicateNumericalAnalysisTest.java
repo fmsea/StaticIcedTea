@@ -1,14 +1,16 @@
 package driver;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.nio.file.Path;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
@@ -16,11 +18,14 @@ import util.Compiler;
 
 import driver.providers.PredicateMiniJavaExamplesProvider;
 
-public class PredicateNumericalAnalysisTest {
+public class PredicateNumericalAnalysisTest extends NumericalAnalysisTest {
 
     @ParameterizedTest
     @ArgumentsSource(PredicateMiniJavaExamplesProvider.class)
-    void testPredicateNumericalAnalysis(String name, String source, String expected) throws Exception {
+    void testPredicateNumericalAnalysis(String name,
+                                        String source,
+                                        String expectedChangedOutput,
+                                        String expectedFullSmtOutput) throws Exception {
         Path clazz = Compiler.compileSource(name, source);
 
         Process analysis = Runtime.getRuntime().exec(new String[] {
@@ -31,7 +36,8 @@ public class PredicateNumericalAnalysisTest {
                 "predicate",
                 "--classpath",
                 clazz.getParent().toString(),
-                "--full-report",
+                "--output",
+                this.testOutputDir.toString(),
                 name,
                 "1",
                 "--domain",
@@ -40,11 +46,19 @@ public class PredicateNumericalAnalysisTest {
                 "Y",
             });
         analysis.waitFor(60l, TimeUnit.SECONDS);
-        String out = new BufferedReader(new InputStreamReader(analysis.getInputStream(),
-                                                              StandardCharsets.UTF_8))
-            .lines()
-            .collect(Collectors.joining("\n")).trim();
-
-        assertEquals(expected, out);
+        try {
+            Path changedOutputPath = Paths.get(this.testOutputDir.toString(),
+                                               String.format("%s_1-SY.changed.out", name));
+            Path fullSmtOutputPath = Paths.get(this.testOutputDir.toString(),
+                                               String.format("%s_1-SY.smt.out", name));
+            String changedOutput = Files.readString(changedOutputPath);
+            String fullSmtOutput = Files.readString(fullSmtOutputPath);
+            assertAll(() -> assertEquals(expectedChangedOutput, changedOutput.trim()),
+                      () -> assertEquals(expectedFullSmtOutput, fullSmtOutput.trim()));
+        } catch (IOException ex) {
+            System.err.println("Unable to assert analysis");
+            System.err.println(ex.getMessage());
+            assertTrue(false);
+        }
     }
 }

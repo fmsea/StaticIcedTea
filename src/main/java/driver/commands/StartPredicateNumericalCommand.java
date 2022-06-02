@@ -18,18 +18,13 @@ public class StartPredicateNumericalCommand implements Callable<Integer> {
 
     @Option(names = {"-o", "--output"},
             description = "Output file path for results",
-            required = false)
+            required = true)
     private Path outputResultsPath;
 
     @Option(names = {"-cp", "--classpath"},
             description = "Classpath of bytecode to analyze",
             required = true)
     private Path classpath;
-
-    @Option(names = {"--full-report"},
-            description = "Print the entire state for each unit",
-            required = false)
-    private boolean fullReport;
 
     @Option(names = {"--domain"}, description = "Domain file for analysis", required = true)
     private File domainFile;
@@ -54,8 +49,7 @@ public class StartPredicateNumericalCommand implements Callable<Integer> {
                                                       methodId,
                                                       outputResultsPath,
                                                       domainFile,
-                                                      symbolic.equals("Y"),
-                                                      fullReport);
+                                                      symbolic.equals("Y"));
         runner.run();
         return 0;
     }

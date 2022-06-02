@@ -237,7 +237,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
                     time);
     }
 
-    public void reportFullSMT() {
+    public String generateFullSMT() {
         StringBuilder sb = new StringBuilder();
         for (Local l : b.getLocals()) {
             sb.append(l.toString());
@@ -277,7 +277,11 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
             }
         }
 
-        System.out.println(sb.toString());
+        return sb.toString();
+    }
+
+    public void reportFullSMT() {
+        System.out.println(generateFullSMT());
         System.out.flush();
     }
 
@@ -302,7 +306,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
         return r.toString();
     }
 
-    public void report() {
+    public String generateReport() {
         StringBuilder sb = new StringBuilder();
         Chain<Local> locals = b.getLocals();
         //printing the result
@@ -370,7 +374,12 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
                 }
             }//end outputStmt check
         }
-        System.out.print(sb.toString());
+
+        return sb.toString();
+    }
+
+    public void report() {
+        System.out.print(generateReport());
         System.out.flush();
     }
 
