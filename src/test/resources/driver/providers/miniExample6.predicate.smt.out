@@ -1,0 +1,64 @@
+r0	$i0	i1	i2	$i3
+1 r0 := @this: miniExample6:<miniExample6: void example()>
+fall	(and (or (> $i0 0) (= $i0 0) (< $i0 0))
+     (or (> i1 0) (= i1 0) (< i1 0))
+     (or (> i2 0) (= i2 0) (< i2 0))
+     (or (> $i3 0) (= $i3 0) (< $i3 0)))
+
+2 i1 = 0:<miniExample6: void example()>
+fall	(and (or (> $i0 0) (= $i0 0) (< $i0 0))
+     (= i1 0)
+     (or (> i2 0) (= i2 0) (< i2 0))
+     (or (> $i3 0) (= $i3 0) (< $i3 0)))
+
+3 i2 = 1:<miniExample6: void example()>
+fall	(and (or (> $i0 0) (= $i0 0) (< $i0 0))
+     (= i1 0)
+     (> i2 0)
+     (or (> $i3 0) (= $i3 0) (< $i3 0)))
+
+4 $i3 = virtualinvoke r0.<miniExample6: int random()>():<miniExample6: void example()>
+fall	(and (or (> $i0 0) (= $i0 0) (< $i0 0))
+     (= i1 0)
+     (> i2 0)
+     (or (> $i3 0) (= $i3 0) (< $i3 0)))
+
+5 if 1 != $i3 goto return:<miniExample6: void example()>
+fall	(and (or (> $i0 0) (= $i0 0) (< $i0 0)) (= i1 0) (> i2 0) (> $i3 0))
+
+branch	(and (or (> $i0 0) (= $i0 0) (< $i0 0))
+     (= i1 0)
+     (> i2 0)
+     (or (> $i3 0) (= $i3 0) (< $i3 0)))
+
+6 if i1 != i2 goto $i3 = virtualinvoke r0.<miniExample6: int random()>():<miniExample6: void example()>
+fall	false
+
+branch	(and (or (> $i0 0) (= $i0 0) (< $i0 0)) (= i1 0) (> i2 0) (> $i3 0))
+
+7 $i0 = virtualinvoke r0.<miniExample6: int random()>():<miniExample6: void example()>
+fall	false
+
+8 if 1 != $i0 goto i1 = i2 + 1:<miniExample6: void example()>
+fall	false
+
+branch	false
+
+9 i2 = i1 + 1:<miniExample6: void example()>
+fall	false
+
+10 goto [?= $i3 = virtualinvoke r0.<miniExample6: int random()>()]:<miniExample6: void example()>
+fall	false
+
+branch	false
+
+11 i1 = i2 + 1:<miniExample6: void example()>
+fall	false
+
+12 goto [?= $i3 = virtualinvoke r0.<miniExample6: int random()>()]:<miniExample6: void example()>
+fall	false
+
+branch	false
+
+13 return:<miniExample6: void example()>
+fall	false

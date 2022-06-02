@@ -1,0 +1,12 @@
+2 i1 = 0:<miniExample6: void example()>
+i1->(= i1 0)
+3 i2 = 1:<miniExample6: void example()>
+i2->(> i2 0)
+4 $i3 = virtualinvoke r0.<miniExample6: int random()>():<miniExample6: void example()>
+$i3->(or (> $i3 0) (= $i3 0) (< $i3 0))
+5 if 1 != $i3 goto return:<miniExample6: void example()>
+$i3->(> $i3 0)
+$i3f->(or (> $i3 0) (= $i3 0) (< $i3 0))
+6 if i1 != i2 goto $i3 = virtualinvoke r0.<miniExample6: int random()>():<miniExample6: void example()>
+i1f->(= i1 0)
+i2f->(> i2 0)
