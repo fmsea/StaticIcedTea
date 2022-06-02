@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 
 import soot.ByteType;
@@ -282,6 +283,58 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 
     public void reportFullSMT() {
         System.out.println(generateFullSMT());
+        System.out.flush();
+    }
+
+    public String generateSymbolicSMT() {
+        StringBuilder sb = new StringBuilder();
+        for (Local l : b.getLocals()) {
+            sb.append(l.toString());
+            sb.append("\t");
+        }
+        // remove last tab
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append("\n");
+        String methodSignature = this.b.getMethod().getSignature();
+        int stmtCount = 0;
+        for (Unit unit : this.b.getUnits()) {
+            stmtCount++;
+            sb.append(stmtCount);
+            sb.append(" ");
+            sb.append(unit);
+            sb.append(":");
+            sb.append(methodSignature);
+            sb.append("\n");
+            AbstractState fall = getFallFlowAfter(unit);
+            Optional<SymbolicState> symbState = fall.getStates().stream()
+                .filter(s -> s instanceof SymbolicState)
+                .map(s -> (SymbolicState)s)
+                .findFirst();
+            symbState.ifPresentOrElse(state -> {
+                    sb.append("fall\t");
+                    sb.append(state.toSMT(this.solver));
+                    sb.append("\n");
+                }, () -> sb.append("fall\ttrue\n"));
+            List<AbstractState> branches = getBranchFlowAfter(unit);
+            if (!branches.isEmpty()) {
+                for (AbstractState branch : branches) {
+                    Optional<SymbolicState> symbBranch = branch.getStates().stream()
+                        .filter(s -> s instanceof SymbolicState)
+                        .map(s -> (SymbolicState)s)
+                        .findFirst();
+                    symbBranch.ifPresent(state -> {
+                            sb.append("branch\t");
+                            sb.append(state.toSMT(this.solver));
+                            sb.append("\n");
+                        });
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    public void reportSymbolicSMT() {
+        System.out.println(generateSymbolicSMT());
         System.out.flush();
     }
 

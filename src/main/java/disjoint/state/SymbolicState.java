@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 
 import soot.Local;
@@ -14,12 +15,15 @@ import soot.jimple.AssignStmt;
 import soot.jimple.BinopExpr;
 import soot.jimple.IfStmt;
 import soot.jimple.Stmt;
+import soot.grimp.Grimp;
 /* Symbolic state holds the set of soot 
  * assignment of conditional statements
  * that can be used to expressed
  * the current state symbolically
  */
 import soot.jimple.internal.ImmediateBox;
+import solver.SolverWrapper;
+import disjoint.util.StatementParser;
 
 public class SymbolicState implements State {
 	//initialize to all statements because we need to do
@@ -211,6 +215,25 @@ public class SymbolicState implements State {
 		ret += ")";
 		return ret;
 	}
+
+    public String toSMT(SolverWrapper solver) {
+        StringBuilder sb = new StringBuilder();
+        this.reachedStmt.stream().map((s) -> {
+                Optional<BinopExpr> r = Optional.empty();
+                if (s instanceof IfStmt) {
+                    r = Optional.of(this.condToExpr.get(s));
+                } else if (s instanceof AssignStmt) {
+                    r = StatementParser.parse((AssignStmt)s);
+                }
+                return r;
+            }).filter(s -> s.isPresent())
+            .map(s -> s.get())
+            .reduce((a, b) -> Grimp.v().newAndExpr(a, b))
+            .ifPresentOrElse(expr -> {
+                    sb.append(solver.smt2(expr));
+                }, () -> sb.append("true"));
+        return sb.toString();
+    }
 
 	@Override
 	public boolean equals(Object o){
