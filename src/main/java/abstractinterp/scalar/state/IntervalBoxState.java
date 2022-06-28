@@ -75,7 +75,7 @@ public class IntervalBoxState implements State {
             Local l = entry.getKey();
             Interval32Box val = entry.getValue();
             // create a new entry
-            Interval32Box newVal = new Interval32Box(val);
+            Interval32Box newVal = Interval32Box.of(val);
             dest.update(l, newVal);
         }
     }
@@ -202,11 +202,11 @@ public class IntervalBoxState implements State {
      */
     public static Interval32Box negate(Interval32Box inBox) {
         inBox.negate();
-        return new Interval32Box(inBox);
+        return Interval32Box.of(inBox);
     }
 
     public static Interval32Box constant(int val) {
-        Interval32Box ret = new Interval32Box(val, val);
+        Interval32Box ret = Interval32Box.of(val, val);
         return ret;
     }
 

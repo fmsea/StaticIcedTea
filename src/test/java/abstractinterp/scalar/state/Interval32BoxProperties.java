@@ -18,14 +18,14 @@ public class Interval32BoxProperties {
                                 @ForAll int y) {
         int lower = Math.min(x, y);
         int upper = Math.max(x, y);
-        Interval32Box box = new Interval32Box(lower, upper);
+        Interval32Box box = Interval32Box.of(lower, upper);
         assertTrue(box.isBounded());
     }
 
     @Property
     void unboundedBoxesAreUnbounded(@ForAll @Negative int x,
                                     @ForAll @Positive int y) {
-        Interval32Box box = new Interval32Box(y, x);
+        Interval32Box box = Interval32Box.of(y, x);
         assertAll(() -> assertFalse(box.isBounded()),
                   () -> assertTrue(box.isBottom()));
     }
@@ -33,7 +33,7 @@ public class Interval32BoxProperties {
     @Property
     void intervalsContainPoints(@ForAll int lower,
                                 @ForAll int upper) {
-        Interval32Box box = new Interval32Box(lower, upper);
+        Interval32Box box = Interval32Box.of(lower, upper);
         if (lower <= upper) {
             assertTrue(box.containsIntegerPoint());
         } else {
@@ -83,7 +83,7 @@ public class Interval32BoxProperties {
 
     @Property
     void widenWithBottomTakesOther(@ForAll Interval32Box box) {
-        Interval32Box a = new Interval32Box(box);
+        Interval32Box a = Interval32Box.of(box);
         Interval32Box bot = Interval32Box.BOT();
         a.wideningAssign(bot);
         bot.wideningAssign(box);
@@ -111,7 +111,7 @@ public class Interval32BoxProperties {
 
     @Property
     void negateInterval(@ForAll int x, @ForAll int y) {
-        Interval32Box box = new Interval32Box(x, y);
+        Interval32Box box = Interval32Box.of(x, y);
         box.negate();
         assertAll(() -> assertEquals(y * -1, box.lowerBound().get()),
                   () -> assertEquals(x * -1, box.upperBound().get()));
@@ -119,28 +119,28 @@ public class Interval32BoxProperties {
 
     @Property
     boolean intervalsCanBeSingletons(@ForAll int x) {
-        Interval32Box box = new Interval32Box(x, x);
+        Interval32Box box = Interval32Box.of(x, x);
         return box.isSingleton();
     }
 
     @Property
     void equalIntervalsAreEqual(@ForAll int x, @ForAll int y) {
         {
-            Interval32Box xBox = new Interval32Box(null, x);
-            Interval32Box yBox = new Interval32Box(null, x);
+            Interval32Box xBox = Interval32Box.of(null, x);
+            Interval32Box yBox = Interval32Box.of(null, x);
             assertAll(() -> assertTrue(xBox.equals(yBox)),
                       () -> assertTrue(yBox.equals(xBox)));
         }
         {
-            Interval32Box xBox = new Interval32Box(x, null);
-            Interval32Box yBox = new Interval32Box(x, null);
+            Interval32Box xBox = Interval32Box.of(x, null);
+            Interval32Box yBox = Interval32Box.of(x, null);
             assertAll(() -> assertTrue(xBox.equals(yBox)),
                       () -> assertTrue(yBox.equals(xBox)));
         }
 
         {
-            Interval32Box xBox = new Interval32Box(x, y);
-            Interval32Box yBox = new Interval32Box(x, y);
+            Interval32Box xBox = Interval32Box.of(x, y);
+            Interval32Box yBox = Interval32Box.of(x, y);
             assertAll(() -> assertTrue(xBox.equals(yBox)),
                       () -> assertTrue(yBox.equals(xBox)));
         }
@@ -321,7 +321,7 @@ public class Interval32BoxProperties {
 
     @Property
     void translationMappingDoesNotAlterOriginal(@ForAll Interval32Box box) {
-        Interval32Box orig = new Interval32Box(box);
+        Interval32Box orig = Interval32Box.of(box);
         box.lowerBound().map(b -> b * -1);
         box.upperBound().map(b -> b * -1);
         assertAll(() -> assertEquals(orig, box));

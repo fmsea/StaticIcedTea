@@ -444,9 +444,9 @@ public class DifferenceBoundedState implements State {
             Optional<Constraint> leftUpper = inState.getValue(left, ZERO);
             Optional<Constraint> rightLower = inState.getValue(ZERO, right);
             Optional<Constraint> rightUpper = inState.getValue(right, ZERO);
-            Interval32Box interval_c = new Interval32Box(leftLower.map(x -> x.bound()),
+            Interval32Box interval_c = Interval32Box.of(leftLower.map(x -> x.bound()),
                                                      leftUpper.map(x -> x.bound()));
-            Interval32Box interval_d = new Interval32Box(rightLower.map(x -> x.bound()),
+            Interval32Box interval_d = Interval32Box.of(rightLower.map(x -> x.bound()),
                                                      rightUpper.map(x -> x.bound()));
             PredicateType predicateType = Stream.of(Constraint.superiorPredicate(leftLower, rightLower),
                                                     Constraint.superiorPredicate(leftLower, rightUpper),

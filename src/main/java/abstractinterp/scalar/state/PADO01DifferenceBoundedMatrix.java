@@ -454,7 +454,7 @@ public class PADO01DifferenceBoundedMatrix {
         int j = this.localToIndices.get(target);
         Optional<Integer> lower = this.matrix[j][i].bound().map(b -> b * -1);
         Optional<Integer> upper = this.matrix[i][j].bound();
-        return new Interval32Box(lower, upper);
+        return Interval32Box.of(lower, upper);
     }
 
     public void addIncoming(Local target, PADO01Constraint add) {

@@ -47,15 +47,15 @@ public class ForwardBranchedFlowIntervalNumericalBoxTest {
         locals.add(l0);
         locals.add(l1);
         IntervalBoxState path1 = new IntervalBoxState(locals, true);
-        path1.update(l0, new Interval32Box(1, 3));
-        path1.update(l1, new Interval32Box(3, 5));
+        path1.update(l0, Interval32Box.of(1, 3));
+        path1.update(l1, Interval32Box.of(3, 5));
         IntervalBoxState path2 = new IntervalBoxState(locals, true);
-        path2.update(l0, new Interval32Box(3));
-        path2.update(l1, new Interval32Box(5));
+        path2.update(l0, Interval32Box.of(3));
+        path2.update(l1, Interval32Box.of(5));
         IntervalBoxState out = new IntervalBoxState(locals, true);
         this.flow.merge(path1, path2, out);
-        assertAll(() -> assertEquals(new Interval32Box(1, 3), out.getValue(l0)),
-                  () -> assertEquals(new Interval32Box(3, 5), out.getValue(l1)));
+        assertAll(() -> assertEquals(Interval32Box.of(1, 3), out.getValue(l0)),
+                  () -> assertEquals(Interval32Box.of(3, 5), out.getValue(l1)));
     }
 
     @Test
@@ -66,22 +66,22 @@ public class ForwardBranchedFlowIntervalNumericalBoxTest {
         locals.add(l0);
         locals.add(l1);
         IntervalBoxState path1 = new IntervalBoxState(locals, true);
-        path1.update(l0, new Interval32Box(1, 3));
-        path1.update(l1, new Interval32Box(3, 5));
+        path1.update(l0, Interval32Box.of(1, 3));
+        path1.update(l1, Interval32Box.of(3, 5));
         IntervalBoxState path2 = new IntervalBoxState(locals, true);
         locals.forEach(l -> path2.update(l, Interval32Box.BOT()));
         {
             IntervalBoxState out = new IntervalBoxState(locals, true);
             this.flow.merge(path1, path2, out);
-            assertAll(() -> assertEquals(new Interval32Box(1, 3), out.getValue(l0)),
-                      () -> assertEquals(new Interval32Box(3, 5), out.getValue(l1)));
+            assertAll(() -> assertEquals(Interval32Box.of(1, 3), out.getValue(l0)),
+                      () -> assertEquals(Interval32Box.of(3, 5), out.getValue(l1)));
         }
 
         {
             IntervalBoxState out = new IntervalBoxState(locals, true);
             this.flow.merge(path2, path1, out);
-            assertAll(() -> assertEquals(new Interval32Box(1, 3), out.getValue(l0)),
-                      () -> assertEquals(new Interval32Box(3, 5), out.getValue(l1)));
+            assertAll(() -> assertEquals(Interval32Box.of(1, 3), out.getValue(l0)),
+                      () -> assertEquals(Interval32Box.of(3, 5), out.getValue(l1)));
         }
     }
 
@@ -93,23 +93,23 @@ public class ForwardBranchedFlowIntervalNumericalBoxTest {
         locals.add(l0);
         locals.add(l1);
         IntervalBoxState path1 = new IntervalBoxState(locals, true);
-        path1.update(l0, new Interval32Box(3));
-        path1.update(l1, new Interval32Box(5));
+        path1.update(l0, Interval32Box.of(3));
+        path1.update(l1, Interval32Box.of(5));
         IntervalBoxState path2 = new IntervalBoxState(locals, true);
         path2.update(l0, Interval32Box.BOT());
         path2.update(l1, Interval32Box.TOP());
         {
             IntervalBoxState out = new IntervalBoxState(locals, true);
             this.flow.merge(path1, path2, out);
-            assertAll(() -> assertEquals(new Interval32Box(3), out.getValue(l0)),
-                      () -> assertEquals(new Interval32Box(5), out.getValue(l1)));
+            assertAll(() -> assertEquals(Interval32Box.of(3), out.getValue(l0)),
+                      () -> assertEquals(Interval32Box.of(5), out.getValue(l1)));
         }
 
         {
             IntervalBoxState out = new IntervalBoxState(locals, true);
             this.flow.merge(path2, path1, out);
-            assertAll(() -> assertEquals(new Interval32Box(3), out.getValue(l0)),
-                      () -> assertEquals(new Interval32Box(5), out.getValue(l1)));
+            assertAll(() -> assertEquals(Interval32Box.of(3), out.getValue(l0)),
+                      () -> assertEquals(Interval32Box.of(5), out.getValue(l1)));
         }
     }
 

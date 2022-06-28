@@ -235,7 +235,7 @@ public class MaxDifferenceBoundedState implements State {
                             BinaryOperatorType operator) {
         Consumer<BinaryOperator<Interval32Box>> computeInterval = (binop) -> {
             Interval32Box leftInterval = this.matrix.projectToInterval(left);
-            Interval32Box newValue = binop.apply(leftInterval, new Interval32Box(right.value));
+            Interval32Box newValue = binop.apply(leftInterval, Interval32Box.of(right.value));
             this.add(lVar, ZERO, PADO01Constraint.of(newValue.upperBound()));
             this.add(ZERO, lVar, PADO01Constraint.of(newValue.lowerBound().map(b -> b * -1)));
         };
@@ -285,7 +285,7 @@ public class MaxDifferenceBoundedState implements State {
                             BinaryOperatorType operator) {
         Consumer<BinaryOperator<Interval32Box>> computeInterval = (binop) -> {
             Interval32Box rightInterval = this.matrix.projectToInterval(right);
-            Interval32Box newValue = binop.apply(new Interval32Box(left.value), rightInterval);
+            Interval32Box newValue = binop.apply(Interval32Box.of(left.value), rightInterval);
             this.forget(lVar);
             this.add(lVar, ZERO, PADO01Constraint.of(newValue.upperBound()));
             this.add(ZERO, lVar, PADO01Constraint.of(newValue.lowerBound().map(b -> b * -1)));

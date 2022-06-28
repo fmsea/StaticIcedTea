@@ -80,6 +80,27 @@ public class Interval32Box {
         return new Interval32Box(Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
+    public static Interval32Box of(Interval32Box copy) {
+        return new Interval32Box(copy);
+    }
+
+    public static Interval32Box of(int singleton) {
+        return new Interval32Box(singleton);
+    }
+
+    public static Interval32Box of(int lowerBound, int upperBound) {
+        return new Interval32Box(lowerBound, upperBound);
+    }
+
+    public static Interval32Box of(Integer lowerBound, Integer upperBound) {
+        return new Interval32Box(lowerBound, upperBound);
+    }
+
+    public static Interval32Box of(Optional<Integer> lowerBound,
+                                   Optional<Integer> upperBound) {
+        return new Interval32Box(lowerBound,upperBound);
+    }
+
     public static Interval32Box BOT() {
         return new Interval32Box(Optional.empty(), Optional.empty(), true);
     }
@@ -164,7 +185,7 @@ public class Interval32Box {
     }
 
     public static Interval32Box upperBoundAssign(Interval32Box a, Interval32Box b) {
-        Interval32Box c = new Interval32Box(a);
+        Interval32Box c = Interval32Box.of(a);
         c.upperBoundAssign(b);
         return c;
     }
@@ -184,7 +205,7 @@ public class Interval32Box {
     }
 
     public static Interval32Box wideningAssign(Interval32Box m, Interval32Box n) {
-        Interval32Box c = new Interval32Box(m);
+        Interval32Box c = Interval32Box.of(m);
         c.wideningAssign(n);
         return c;
     }
@@ -427,12 +448,12 @@ public class Interval32Box {
             ret.add(Interval32Box.BOT());
             ret.add(Interval32Box.BOT());
         } else {
-            ret.add(new Interval32Box(negate(minimum(negate(lhs.lowerBound),
-                                                     negate(rhs.lowerBound))),
-                                      minimum(lhs.upperBound, rhs.upperBound)));
-            ret.add(new Interval32Box(negate(minimum(negate(lhs.lowerBound),
-                                                     negate(rhs.lowerBound))),
-                                      minimum(lhs.upperBound, rhs.upperBound)));
+            ret.add(Interval32Box.of(negate(minimum(negate(lhs.lowerBound),
+                                                    negate(rhs.lowerBound))),
+                                     minimum(lhs.upperBound, rhs.upperBound)));
+            ret.add(Interval32Box.of(negate(minimum(negate(lhs.lowerBound),
+                                                    negate(rhs.lowerBound))),
+                                     minimum(lhs.upperBound, rhs.upperBound)));
         }
         return ret;
     }
@@ -445,8 +466,8 @@ public class Interval32Box {
             ret.add(BOT());
             ret.add(BOT());
         } else {
-            ret.add(new Interval32Box(lhs));
-            ret.add(new Interval32Box(rhs));
+            ret.add(Interval32Box.of(lhs));
+            ret.add(Interval32Box.of(rhs));
         }
         return ret;
     }
@@ -460,18 +481,18 @@ public class Interval32Box {
             ret.add(Interval32Box.BOT());
             ret.add(Interval32Box.BOT());
         } else if (lhs.upperBound.flatMap(b -> rhs.lowerBound.map(c -> b <= c)).orElse(false)) {
-            ret.add(new Interval32Box(lhs));
-            ret.add(new Interval32Box(rhs));
+            ret.add(Interval32Box.of(lhs));
+            ret.add(Interval32Box.of(rhs));
         } else {
-            ret.add(new Interval32Box(negate(minimum(negate(lhs.lowerBound),
-                                                     sub(sub(rhs.upperBound, lhs.lowerBound),
-                                                         rhs.lowerBound))),
-                                      minimum(lhs.upperBound, rhs.upperBound)));
-            ret.add(new Interval32Box(negate(minimum(negate(rhs.lowerBound),
-                                                     negate(lhs.lowerBound))),
-                                      minimum(rhs.upperBound,
-                                              add(sub(rhs.upperBound, lhs.lowerBound),
-                                                  lhs.upperBound))));
+            ret.add(Interval32Box.of(negate(minimum(negate(lhs.lowerBound),
+                                                    sub(sub(rhs.upperBound, lhs.lowerBound),
+                                                        rhs.lowerBound))),
+                                     minimum(lhs.upperBound, rhs.upperBound)));
+            ret.add(Interval32Box.of(negate(minimum(negate(rhs.lowerBound),
+                                                    negate(lhs.lowerBound))),
+                                     minimum(rhs.upperBound,
+                                             add(sub(rhs.upperBound, lhs.lowerBound),
+                                                 lhs.upperBound))));
         }
         return ret;
     }
@@ -489,12 +510,12 @@ public class Interval32Box {
             ret.add(Interval32Box.BOT());
             ret.add(Interval32Box.BOT());
         } else if (b.flatMap(B -> c.map(C -> B <= C - 1)).orElse(false)) {
-            ret.add(new Interval32Box(lhs));
-            ret.add(new Interval32Box(rhs));
+            ret.add(Interval32Box.of(lhs));
+            ret.add(Interval32Box.of(rhs));
         } else {
-            ret.add(new Interval32Box(a, minimum(b, sub(d, Optional.of(1)))));
-            ret.add(new Interval32Box(negate(minimum(negate(c), add(negate(a), Optional.of(-1)))),
-                                      minimum(d, add(d, add(negate(a), b)))));
+            ret.add(Interval32Box.of(a, minimum(b, sub(d, Optional.of(1)))));
+            ret.add(Interval32Box.of(negate(minimum(negate(c), add(negate(a), Optional.of(-1)))),
+                                     minimum(d, add(d, add(negate(a), b)))));
         }
         return ret;
     }
@@ -508,18 +529,18 @@ public class Interval32Box {
             ret.add(Interval32Box.BOT());
             ret.add(Interval32Box.BOT());
         } else if (rhs.upperBound.flatMap(d -> lhs.lowerBound.map(a -> d <= a)).orElse(false)) {
-            ret.add(new Interval32Box(lhs));
-            ret.add(new Interval32Box(rhs));
+            ret.add(Interval32Box.of(lhs));
+            ret.add(Interval32Box.of(rhs));
         } else {
-            ret.add(new Interval32Box(negate(minimum(negate(lhs.lowerBound),
-                                                     negate(rhs.lowerBound))),
-                                      minimum(lhs.upperBound,
-                                              add(rhs.upperBound, sub(lhs.upperBound, rhs.lowerBound)))));
-            ret.add(new Interval32Box(negate(minimum(negate(rhs.lowerBound),
-                                                     add(lhs.upperBound,
-                                                         add(negate(rhs.lowerBound),
-                                                             negate(lhs.lowerBound))))),
-                                      minimum(rhs.upperBound, lhs.upperBound)));
+            ret.add(Interval32Box.of(negate(minimum(negate(lhs.lowerBound),
+                                                    negate(rhs.lowerBound))),
+                                     minimum(lhs.upperBound,
+                                             add(rhs.upperBound, sub(lhs.upperBound, rhs.lowerBound)))));
+            ret.add(Interval32Box.of(negate(minimum(negate(rhs.lowerBound),
+                                                    add(lhs.upperBound,
+                                                        add(negate(rhs.lowerBound),
+                                                            negate(lhs.lowerBound))))),
+                                     minimum(rhs.upperBound, lhs.upperBound)));
         }
         return ret;
     }
@@ -537,12 +558,12 @@ public class Interval32Box {
             ret.add(Interval32Box.BOT());
             ret.add(Interval32Box.BOT());
         } else if (a.flatMap(A -> d.map(D -> A > D)).orElse(false)) {
-            ret.add(new Interval32Box(lhs));
-            ret.add(new Interval32Box(rhs));
+            ret.add(Interval32Box.of(lhs));
+            ret.add(Interval32Box.of(rhs));
         } else {
-            ret.add(new Interval32Box(negate(minimum(negate(a), sub(negate(c), Optional.of(1)))), b));
-        ret.add(new Interval32Box(negate(minimum(negate(c), add(negate(a), sub(b, c)))),
-                                  minimum(d, sub(b, Optional.of(1)))));
+            ret.add(Interval32Box.of(negate(minimum(negate(a), sub(negate(c), Optional.of(1)))), b));
+            ret.add(Interval32Box.of(negate(minimum(negate(c), add(negate(a), sub(b, c)))),
+                                     minimum(d, sub(b, Optional.of(1)))));
         }
         return ret;
     }
@@ -602,7 +623,7 @@ public class Interval32Box {
             } else if (this.isUpperBounded() && !this.isLowerBounded()) {
                 return String.format("(-∞, %d]", this.upperBound.get());
             } else {
-            return String.format("[%d, %d]", this.lowerBound.get(), this.upperBound.get());
+                return String.format("[%d, %d]", this.lowerBound.get(), this.upperBound.get());
             }
         }
     }

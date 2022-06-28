@@ -254,7 +254,7 @@ public class IncDifferenceBoundedState implements State {
                             BinaryOperatorType operator) {
         Consumer<BinaryOperator<Interval32Box>> computeInterval = (binop) -> {
             Interval32Box leftInterval = inState.matrix.projectToInterval(left);
-            Interval32Box newValue = binop.apply(leftInterval, new Interval32Box(right.value));
+            Interval32Box newValue = binop.apply(leftInterval, Interval32Box.of(right.value));
             this.assign(lVar, ZERO, newValue);
         };
         switch (operator) {
@@ -302,7 +302,7 @@ public class IncDifferenceBoundedState implements State {
                             BinaryOperatorType operator) {
         Consumer<BinaryOperator<Interval32Box>> computeInterval = (binop) -> {
             Interval32Box rightInterval = inState.matrix.projectToInterval(right);
-            Interval32Box newValue = binop.apply(new Interval32Box(left.value), rightInterval);
+            Interval32Box newValue = binop.apply(Interval32Box.of(left.value), rightInterval);
             this.assign(lVar, ZERO, newValue);
         };
         switch (operator) {
@@ -397,7 +397,7 @@ public class IncDifferenceBoundedState implements State {
 
     public void updateState(Local lVar, IncDifferenceBoundedState inState, IntConstant c) {
         this.forget(lVar);
-        this.assign(lVar, ZERO, new Interval32Box(c.value));
+        this.assign(lVar, ZERO, Interval32Box.of(c.value));
     }
 
     public void updateState(Local lVar, IncDifferenceBoundedState inState, Local l) {
@@ -438,8 +438,8 @@ public class IncDifferenceBoundedState implements State {
     protected boolean isConstant(Local lVar, IncDifferenceBoundedState inState) {
         PADO01Constraint upper = this.matrix.getConstraint(lVar, ZERO);
         PADO01Constraint lower = this.matrix.getConstraint(ZERO, lVar);
-        Interval32Box interval = new Interval32Box(lower.bound().map(b -> b * -1),
-                                                   upper.bound());
+        Interval32Box interval = Interval32Box.of(lower.bound().map(b -> b * -1),
+                                                  upper.bound());
         // Testing whether the value is a "singleton" in the interval sense is
         // equivalent to testing if the value is a constant.  Specifically,
         // isSingleton tests whether the interval is bounded and the bounds are
