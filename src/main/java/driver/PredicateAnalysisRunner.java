@@ -63,20 +63,17 @@ public class PredicateAnalysisRunner implements Runnable {
         AnalysisTimer.time((s) -> analysis.start());
         AnalysisTimer.time((s) -> {
                 File changed = Path.of(this.outputResultsPath.toString(),
-                                       String.format("%s_%d-S%s.changed.out",
+                                       String.format("%s_%d.changed.out",
                                                      className,
-                                                     methodId,
-                                                     this.symbolic ? "Y" : "N")).toFile();
+                                                     methodId)).toFile();
                 File fullSmt = Path.of(this.outputResultsPath.toString(),
-                                       String.format("%s_%d-S%s.smt.out",
+                                       String.format("%s_%d.smt.out",
                                                      className,
-                                                     methodId,
-                                                     this.symbolic ? "Y" : "N")).toFile();
+                                                     methodId)).toFile();
                 File symbSmt = Path.of(this.outputResultsPath.toString(),
-                                       String.format("%s_%d-S%s.symbolic.out",
+                                       String.format("%s_%d.symbolic.out",
                                                      className,
-                                                     methodId,
-                                                     this.symbolic ? "Y" : "N")).toFile();
+                                                     methodId)).toFile();
 
                 File dir = this.outputResultsPath.toFile();
                 dir.mkdirs();
