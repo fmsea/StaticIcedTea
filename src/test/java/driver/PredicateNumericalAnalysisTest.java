@@ -48,9 +48,9 @@ public class PredicateNumericalAnalysisTest extends NumericalAnalysisTest {
         analysis.waitFor(60l, TimeUnit.SECONDS);
         try {
             Path changedOutputPath = Paths.get(this.testOutputDir.toString(),
-                                               String.format("%s_1-SY.changed.out", name));
+                                               String.format("%s_1.changed.out", name));
             Path fullSmtOutputPath = Paths.get(this.testOutputDir.toString(),
-                                               String.format("%s_1-SY.smt.out", name));
+                                               String.format("%s_1.smt.out", name));
             String changedOutput = Files.readString(changedOutputPath);
             String fullSmtOutput = Files.readString(fullSmtOutputPath);
             assertAll(() -> assertEquals(expectedChangedOutput, changedOutput.trim()),
