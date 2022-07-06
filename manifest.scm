@@ -85,7 +85,7 @@
        maven
        bash
        gnuplot
-       python
+       python-wrapper
        python-matplotlib
        python-pandas
        python-scikit-learn
