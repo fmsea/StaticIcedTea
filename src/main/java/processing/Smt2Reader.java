@@ -83,7 +83,7 @@ public class Smt2Reader {
                         closeExpression.accept(currentStatement, expr.toString());
                         expr = new StringBuilder();
                     }
-                    currentStatement = line.trim();;
+                    currentStatement = line.trim();
                     // seed initial mapping
                     statements.add(currentStatement);
                     fallThroughExprs.put(currentStatement, null);
