@@ -88,14 +88,14 @@ public class Smt2ReaderTest {
         }
 
         {
-            Optional<SmtExpression> result = Smt2Reader.parseExpression("");
+            Optional<SmtIdentifierExpression> result = Smt2Reader.parseExpression("");
             assertAll("Empty expression is parsed as empty",
                       () -> assertFalse(result.isPresent()));
         }
 
         {
             String varFormula = "i0->(= i0 0)";
-            SmtExpression result = Smt2Reader.parseExpression(varFormula).get();
+            SmtIdentifierExpression result = Smt2Reader.parseExpression(varFormula).get();
             assertAll("Expression Parsed Correctly",
                       () -> assertEquals("i0", result.identifier),
                       () -> assertTrue(result.identifiers.contains("i0")),
@@ -104,7 +104,7 @@ public class Smt2ReaderTest {
 
         {
             String varFormula = "b2->(and (< b2 5) (> b2 0) (>= b2 i4))";
-            SmtExpression result = Smt2Reader.parseExpression(varFormula).get();
+            SmtIdentifierExpression result = Smt2Reader.parseExpression(varFormula).get();
             assertAll("Expression Parsed Correctly",
                       () -> assertEquals("b2", result.identifier),
                       () -> assertTrue(result.identifiers.contains("b2")),
@@ -116,7 +116,7 @@ public class Smt2ReaderTest {
 
         {
             String varFormula = "b2f->(and (< b2 5) (> b2 0) (>= b2 i4))";
-            SmtExpression result = Smt2Reader.parseExpression(varFormula).get();
+            SmtIdentifierExpression result = Smt2Reader.parseExpression(varFormula).get();
             assertAll("Expression Parsed Correctly",
                       () -> assertEquals("b2f", result.identifier),
                       () -> assertFalse(result.identifiers.contains("b2f")),
@@ -135,7 +135,7 @@ public class Smt2ReaderTest {
                                          "i1->(= i1 0)\n" +
                                          "7 b2 = 2:<test.BallonFactory>\n" +
                                          "b2->(and (< b2 5) (> b2 0) (>= b2 2))\n");
-            Map<String, List<SmtExpression>> result = Smt2Reader.parse(r1);
+            Map<String, List<SmtIdentifierExpression>> result = Smt2Reader.parse(r1);
             assertAll("analysis output was parsed correctly",
                       () -> assertEquals(2, result.keySet().size()),
                       () -> assertTrue(result.containsKey("6 i1 = 0:<test.BallonFactory>")),
@@ -155,7 +155,7 @@ public class Smt2ReaderTest {
                                          "b2->(and (< b2 5)\n" +
                                          "         (> b2 0)\n" +
                                          "         (>= b2 2))\n");
-            Map<String, List<SmtExpression>> result = Smt2Reader.parse(r1);
+            Map<String, List<SmtIdentifierExpression>> result = Smt2Reader.parse(r1);
             assertAll("analysis output was parsed correctly",
                       () -> assertEquals(2, result.keySet().size()),
                       () -> assertTrue(result.containsKey("6 i1 = 0:<test.BallonFactory>")),
@@ -177,7 +177,7 @@ public class Smt2ReaderTest {
                                          "b2->(and (< b2 5)\n" +
                                          "         (> b2 0)\n" +
                                          "         (>= b2 i4))\n");
-            Map<String, List<SmtExpression>> result = Smt2Reader.parse(r1);
+            Map<String, List<SmtIdentifierExpression>> result = Smt2Reader.parse(r1);
             assertAll("analysis output was parsed correctly",
                       () -> assertEquals(2, result.keySet().size()),
                       () -> assertTrue(result.containsKey("6 i1 = 0:<test.BallonFactory>")),

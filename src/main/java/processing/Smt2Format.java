@@ -85,8 +85,8 @@ public class Smt2Format {
     }
 
     public static void SMT2Format(Reader reader1, Reader reader2, Writer writer) throws IOException {
-        Map<String, List<SmtExpression>> file1Map = Smt2Reader.parse(reader1);
-        Map<String, List<SmtExpression>> file2Map = Smt2Reader.parse(reader2);
+        Map<String, List<SmtIdentifierExpression>> file1Map = Smt2Reader.parse(reader1);
+        Map<String, List<SmtIdentifierExpression>> file2Map = Smt2Reader.parse(reader2);
         Set<String> keys = new TreeSet<>();
         keys.addAll(file1Map.keySet());
         keys.addAll(file2Map.keySet());
@@ -94,8 +94,8 @@ public class Smt2Format {
             writer.write("(echo \"");
             writer.write(key.replaceAll("\"", "\"\""));
             writer.write("\")\n");
-            List<SmtExpression> exprs1 = file1Map.get(key);
-            List<SmtExpression> exprs2 = file2Map.get(key);
+            List<SmtIdentifierExpression> exprs1 = file1Map.get(key);
+            List<SmtIdentifierExpression> exprs2 = file2Map.get(key);
             if (exprs1 == null && exprs2 == null) {
                 // nothing to do, carry on?
             } else if (exprs1 == null && exprs2 != null) {
@@ -192,27 +192,27 @@ public class Smt2Format {
         }
     }
 
-    private static String formatConstraints(List<SmtExpression> exprs1, List<SmtExpression> exprs2) {
+    private static String formatConstraints(List<SmtIdentifierExpression> exprs1, List<SmtIdentifierExpression> exprs2) {
         StringBuilder sb = new StringBuilder();
         Collections.sort(exprs1, (a, b) -> a.identifier.compareTo(b.identifier));
         Collections.sort(exprs2, (a, b) -> a.identifier.compareTo(b.identifier));
-        BiFunction<Integer, List<SmtExpression>, SmtExpression> getExpr = (index, exprs) -> {
+        BiFunction<Integer, List<SmtIdentifierExpression>, SmtIdentifierExpression> getExpr = (index, exprs) -> {
             if (index >= exprs.size()) {
-                return new SmtExpression("empty", new HashSet<String>(), "(= 0 0)");
+                return new SmtIdentifierExpression("empty", new HashSet<String>(), "(= 0 0)");
             } else {
                 return exprs.get(index);
             }
         };
         int len = Math.max(exprs1.size(), exprs2.size());
         for (int i = 0; i < len; i++) {
-            SmtExpression expr1 = getExpr.apply(i, exprs1);
-            SmtExpression expr2 = getExpr.apply(i, exprs2);
+            SmtIdentifierExpression expr1 = getExpr.apply(i, exprs1);
+            SmtIdentifierExpression expr2 = getExpr.apply(i, exprs2);
             sb.append(Smt2Format.formatConstraint(expr1, expr2));
         }
         return sb.toString();
     }
 
-    private static String formatConstraint(SmtExpression expr1, SmtExpression expr2) {
+    private static String formatConstraint(SmtIdentifierExpression expr1, SmtIdentifierExpression expr2) {
         LOGGER.debug("formatting constraint {} <=> {}", expr1, expr2);
         StringBuilder sb = new StringBuilder();
         // local

@@ -42,7 +42,7 @@ public class Smt2Reader {
         return identifiers;
     }
 
-    public static Optional<SmtExpression> parseExpression(String smtWithIdentifier) {
+    public static Optional<SmtIdentifierExpression> parseExpression(String smtWithIdentifier) {
         if (smtWithIdentifier.indexOf("->") < 0) {
             return Optional.empty();
         }
@@ -51,7 +51,7 @@ public class Smt2Reader {
         String identifier = varFormula[0];
         String formula = varFormula[1];
         Set<String> identifiers = getIdentifiers(formula);
-        return Optional.of(new SmtExpression(identifier, identifiers, formula));
+        return Optional.of(new SmtIdentifierExpression(identifier, identifiers, formula));
     }
 
     public static AnalysisFullSMTReport parseFullReport(Reader reader) {
@@ -116,10 +116,10 @@ public class Smt2Reader {
         return variables;
     }
 
-    public static Map<String, List<SmtExpression>> parse(Reader reader) {
+    public static Map<String, List<SmtIdentifierExpression>> parse(Reader reader) {
         try (Scanner scanner = new Scanner(reader)) {
-            Map<String, List<SmtExpression>> map = new HashMap<>();
-            List<SmtExpression> expressions = null;
+            Map<String, List<SmtIdentifierExpression>> map = new HashMap<>();
+            List<SmtIdentifierExpression> expressions = null;
             StringBuilder expr = new StringBuilder();
             while (scanner.hasNext()) {
                 String line = scanner.nextLine().trim();
@@ -127,7 +127,7 @@ public class Smt2Reader {
                 if (line.matches("^[0-9]+.*")) {
                     // close out current expression
                     if (expr.length() > 0) {
-                        Optional<SmtExpression> smtExpr = parseExpression(expr.toString());
+                        Optional<SmtIdentifierExpression> smtExpr = parseExpression(expr.toString());
                         if (smtExpr.isPresent()) {
                             expressions.add(smtExpr.get());
                         }
@@ -139,7 +139,7 @@ public class Smt2Reader {
                 } else if (line.contains("->")) {
                     // clear any current expression
                     if (expr.length() > 0) {
-                        Optional<SmtExpression> smtExpr = parseExpression(expr.toString());
+                        Optional<SmtIdentifierExpression> smtExpr = parseExpression(expr.toString());
                         if (smtExpr.isPresent()) {
                             expressions.add(smtExpr.get());
                         }
@@ -152,7 +152,7 @@ public class Smt2Reader {
                 }
             }
             // close out last expression
-            Optional<SmtExpression> smtExpr = parseExpression(expr.toString());
+            Optional<SmtIdentifierExpression> smtExpr = parseExpression(expr.toString());
             if (smtExpr.isPresent()) {
                 expressions.add(smtExpr.get());
             }
@@ -183,12 +183,12 @@ public class Smt2Reader {
     }
 
     public static Map<String, FlowSet<String>> getIdentifiersPerStatement(Reader reader) {
-        Map<String, List<SmtExpression>> smtExpressions = parse(reader);
+        Map<String, List<SmtIdentifierExpression>> smtExpressions = parse(reader);
         Map<String, FlowSet<String>> result = new HashMap<>();
         for (String statement : smtExpressions.keySet()) {
             FlowSet<String> identifiers = new FlowSet<>();
             result.put(statement, identifiers);
-            for (SmtExpression expr : smtExpressions.get(statement)) {
+            for (SmtIdentifierExpression expr : smtExpressions.get(statement)) {
                 if (expr.isBranchOut()) {
                     identifiers.addAllBranchOut(expr.identifiers);
                 } else {

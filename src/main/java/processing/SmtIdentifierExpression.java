@@ -2,12 +2,12 @@ package processing;
 
 import java.util.Set;
 
-class SmtExpression {
+class SmtIdentifierExpression {
     String identifier;
     Set<String> identifiers;
     String expression;
 
-    public SmtExpression(String identifier,
+    public SmtIdentifierExpression(String identifier,
                          Set<String> identifiers,
                          String expression) {
         this.identifier = identifier;
