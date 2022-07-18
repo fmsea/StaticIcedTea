@@ -32,6 +32,7 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 
 import solver.SolverWrapper;
+import util.Configuration;
 
 public class PADO01DifferenceBoundedMatrix {
 
@@ -565,7 +566,11 @@ public class PADO01DifferenceBoundedMatrix {
     }
 
     public Optional<BinopExpr> toBinop() {
-        this.computeReducedClosure();
+        Configuration.getBoolean("OutputMinimizedZoneStates").ifPresentOrElse((b) -> {
+                if (b) {
+                    this.computeReducedClosure();
+                }
+            }, this::computeReducedClosure);
         Grimp g = Grimp.v();
         if (this.isFeasible()) {
             List<BinopExpr> exprs = new ArrayList<>(N * 2);
