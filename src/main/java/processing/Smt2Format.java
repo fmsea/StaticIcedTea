@@ -119,16 +119,7 @@ public class Smt2Format {
         Set<String> statements = new TreeSet<>();
         statements.addAll(report1.statements());
         statements.addAll(report2.statements());
-        List<String> sortedStatements = statements.stream().sorted((a, b) -> {
-                try {
-                    int aCount = Integer.parseInt(a.split(" ")[0]);
-                    int bCount = Integer.parseInt(b.split(" ")[0]);
-                    return Integer.compare(aCount, bCount);
-                } catch (NumberFormatException ex) {
-                    LOGGER.error("Exception during parsing: {}", ex);
-                    return a.compareTo(b);
-                }
-            }).collect(Collectors.toList());
+        List<String> sortedStatements = sortStatements(statements);
         for (String statement : sortedStatements) {
             writer.write("(echo \"");
             writer.write(statement.replaceAll("\"", "\"\""));
@@ -292,6 +283,19 @@ public class Smt2Format {
             identifier = expr1;
         }
         return identifier;
+    }
+
+    protected static List<String> sortStatements(Set<String> statements) {
+        return statements.stream().sorted((a, b) -> {
+                try {
+                    int aCount = Integer.parseInt(a.split(" ")[0]);
+                    int bCount = Integer.parseInt(b.split(" ")[0]);
+                    return Integer.compare(aCount, bCount);
+                } catch (NumberFormatException ex) {
+                    LOGGER.error("Exception during parsing: {}", ex);
+                    return a.compareTo(b);
+                }
+            }).collect(Collectors.toList());
     }
 }
 
