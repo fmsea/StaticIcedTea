@@ -11,6 +11,7 @@ public class Number extends SmtExpression {
     private final int value;
 
     public Number(int value) {
+        super();
         this.value = value;
     }
 
@@ -22,7 +23,19 @@ public class Number extends SmtExpression {
         return Optional.empty();
     }
 
+    public Optional<Value> getValue(Set<Local> variables) {
+        return Optional.empty();
+    }
+
     public Map<Local, Set<Local>> getConnectedVariables() {
         return Map.of();
+    }
+
+    public String toSmt2() {
+        return String.format("%d", this.value);
+    }
+
+    public Optional<String> toSmt2(Local id) {
+        return Optional.empty();
     }
 }

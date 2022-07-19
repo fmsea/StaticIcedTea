@@ -21,7 +21,7 @@ public interface SolverWrapper {
 
     public List<Long> evaluateSol(BinopExpr e1, BinopExpr e2, Value... unknown);
 
-    public String smt2(BinopExpr e);
+    public String smt2(Value e);
 
     public void setTimeOut(int valueInMilliseconds);
 

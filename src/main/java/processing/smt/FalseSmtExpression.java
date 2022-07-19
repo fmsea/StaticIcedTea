@@ -10,6 +10,10 @@ import soot.jimple.IntConstant;
 
 public class FalseSmtExpression extends SmtExpression {
 
+    public FalseSmtExpression() {
+        super();
+    }
+
     public Value getValue() {
         return Jimple.v().newEqExpr(IntConstant.v(0), IntConstant.v(1));
     }
@@ -20,5 +24,13 @@ public class FalseSmtExpression extends SmtExpression {
 
     public Optional<Value> getValue(Local id) {
         return Optional.empty();
+    }
+
+    public Optional<Value> getValue(Set<Local> variables) {
+        return Optional.empty();
+    }
+
+    public String toSmt2() {
+        return "false";
     }
 }

@@ -33,4 +33,12 @@ public class OrSmtExpression extends ConnectiveSmtExpression {
     public Optional<Value> getValue(Local id) {
         return this.getValue(id, OrSmtExpression::combinator);
     }
+
+    public Optional<Value> getValue(Set<Local> variables) {
+        return this.getValue(variables, OrSmtExpression::combinator);
+    }
+
+    public String toSmt2() {
+        return this.toSmt2(OrSmtExpression::combinator);
+    }
 }

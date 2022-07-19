@@ -13,6 +13,7 @@ public class NotSmtExpression extends SmtExpression {
     private SmtExpression expr;
 
     public NotSmtExpression(SmtExpression expr) {
+        super();
         this.expr = expr;
     }
 
@@ -27,5 +28,14 @@ public class NotSmtExpression extends SmtExpression {
     public Optional<Value> getValue(Local id) {
         return this.expr.getValue(id)
             .map(v -> Grimp.v().newNeExpr(v, IntConstant.v(1)));
+    }
+
+    public Optional<Value> getValue(Set<Local> variables) {
+        return this.expr.getValue(variables)
+            .map(v -> Grimp.v().newNeExpr(v, IntConstant.v(1)));
+    }
+
+    public String toSmt2() {
+        return String.format("(not %s)", this.expr.toSmt2());
     }
 }

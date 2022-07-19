@@ -27,4 +27,8 @@ public class SmtExpressionReader {
     public SmtExpression getSmtExpression() {
         return this.expr;
     }
+
+    public static SmtExpression parse(String expression) {
+        return new SmtExpressionReader(expression).getSmtExpression();
+    }
 }

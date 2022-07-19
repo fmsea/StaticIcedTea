@@ -6,7 +6,16 @@ import java.util.Set;
 import soot.Local;
 import soot.Value;
 
+import solver.SolverWrapper;
+import solver.SolverFactory;
+
 public abstract class SmtExpression {
+
+    protected SolverWrapper solver;
+
+    public SmtExpression() {
+        this.solver = SolverFactory.getSolver();
+    }
 
     public abstract Value getValue();
 
@@ -16,9 +25,29 @@ public abstract class SmtExpression {
      */
     public abstract Optional<Value> getValue(Local id);
 
+    public abstract Optional<Value> getValue(Set<Local> variables);
+
+    public Set<Local> getLocals() {
+        return ValueToMap.getLocals(this.getValue());
+    }
+
+    public Set<Local> getLocals(Local id) {
+        return this.getConnectedVariables().get(id);
+    }
+
     @Override
     public String toString() {
         return this.getValue().toString();
+    }
+
+    public abstract String toSmt2();
+
+    public Optional<String> toSmt2(Local id) {
+        return this.getValue(id).map(v -> this.solver.smt2(v));
+    }
+
+    public Optional<String> toSmt2(Set<Local> variables) {
+        return this.getValue(variables).map(v -> this.solver.smt2(v));
     }
 
     @Override

@@ -10,10 +10,14 @@ import soot.Local;
 import soot.Value;
 import soot.jimple.BinopExpr;
 
+import solver.SolverWrapper;
+import solver.SolverFactory;
+
 public class BinopSmtExpression extends SmtExpression {
     private final BinopExpr expression;
 
     public BinopSmtExpression(BinopExpr expression) {
+        super();
         this.expression = expression;
     }
 
@@ -27,6 +31,14 @@ public class BinopSmtExpression extends SmtExpression {
             .map(l -> l.toString())
             .collect(Collectors.toSet());
         if (expressionLocals.contains(id.toString())) {
+            return Optional.of(this.expression);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Value> getValue(Set<Local> variables) {
+        if (this.getLocals().containsAll(variables)) {
             return Optional.of(this.expression);
         } else {
             return Optional.empty();
@@ -52,5 +64,10 @@ public class BinopSmtExpression extends SmtExpression {
                     });
             });
         return connectedVariables;
+    }
+
+    public String toSmt2() {
+        SolverWrapper solver = SolverFactory.getSolver();
+        return solver.smt2(this.expression);
     }
 }

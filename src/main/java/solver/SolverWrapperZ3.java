@@ -24,6 +24,7 @@ import soot.jimple.RemExpr;
 import soot.jimple.ShlExpr;
 import soot.jimple.ShrExpr;
 import soot.jimple.SubExpr;
+import soot.jimple.UnopExpr;
 import soot.jimple.internal.JimpleLocal;
 import soot.Value;
 
@@ -130,8 +131,12 @@ public class SolverWrapperZ3 implements SolverWrapper {
 
     }
 
-    public String smt2(BinopExpr expr) {
-        return generate(expr).toString();
+    public String smt2(Value expr) {
+        if (expr instanceof BinopExpr) {
+            return generate((BinopExpr)expr).toString();
+        } else {
+            return evaluateExpr(expr).toString();
+        }
     }
 
     private BoolExpr generate(BinopExpr expr) {
@@ -143,7 +148,7 @@ public class SolverWrapperZ3 implements SolverWrapper {
             // 12-29-14, not right now when we
             // have more general formula
             Value lhs = condExpr.getOp1();
-            IntExpr lhsExpr = evaluateExpr(lhs);
+            ArithExpr lhsExpr = evaluateExpr(lhs);
 
             // rhs can also be an arithmetic expression
             // from converting assignments to equality
@@ -152,8 +157,8 @@ public class SolverWrapperZ3 implements SolverWrapper {
             // add conditionals here first to check
             if (rhs instanceof BinopExpr) {
                 BinopExpr rhsBinop = (BinopExpr) rhs;
-                IntExpr lhsArith = evaluateExpr(rhsBinop.getOp1());
-                IntExpr rhsArith = evaluateExpr(rhsBinop.getOp2());
+                ArithExpr lhsArith = evaluateExpr(rhsBinop.getOp1());
+                ArithExpr rhsArith = evaluateExpr(rhsBinop.getOp2());
                 // now determine the operator add, sub, mult
                 try {
                     if (rhsBinop instanceof AddExpr) {
@@ -195,15 +200,6 @@ public class SolverWrapperZ3 implements SolverWrapper {
                     } else {
                         LOGGER.error("Cannot process rhsBinop [class={}]", rhsBinop.getClass());
                     }
-                } catch (Z3Exception e) {
-                    LOGGER.error("error in generate", e);
-                }
-            } else if (rhs instanceof NegExpr) {
-                try {
-                    ArithExpr[] operands;
-                    operands =
-                            new ArithExpr[] {ctx.mkInt(0), evaluateExpr(((NegExpr) rhs).getOp())};
-                    rhsExpr = ctx.mkSub(operands);
                 } catch (Z3Exception e) {
                     LOGGER.error("error in generate", e);
                 }
@@ -255,25 +251,33 @@ public class SolverWrapperZ3 implements SolverWrapper {
     }
 
 
-    private IntExpr evaluateExpr(Value v) {
-        IntExpr ret = null;
+    private ArithExpr evaluateExpr(Value v) {
+        ArithExpr ret = null;
         if (v instanceof JimpleLocal) {
             // check in the map
             if (sootVarToZ3Var.containsKey(v)) {
                 ret = sootVarToZ3Var.get(v);
             } else {
                 try {
-                    ret = ctx.mkIntConst(v.toString());
+                    IntExpr id = ctx.mkIntConst(v.toString());
+                    ret = id;
+                    sootVarToZ3Var.put(v, id);
                 } catch (Z3Exception e) {
                     LOGGER.error("error in evaluateExpr", e);
                 }
-                sootVarToZ3Var.put(v, ret);
             }
         } else if (v instanceof IntConstant) {
             try {
                 ret = ctx.mkInt(((IntConstant) v).value);
             } catch (Z3Exception e) {
                 LOGGER.error("error in evaluateExpr", e);
+            }
+        } else if (v instanceof NegExpr) {
+            NegExpr expr = (NegExpr)v;
+            try {
+                ret = ctx.mkUnaryMinus(evaluateExpr(expr.getOp()));
+            } catch (Z3Exception ex) {
+                LOGGER.error("error in evaluateExpr", ex.getMessage());
             }
         } else {
             LOGGER.error("Cannot process singleton {} of {}", v, v.getClass());
