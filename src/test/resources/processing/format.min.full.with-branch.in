@@ -1,0 +1,8 @@
+$i8	i4	$i5	b0	b1	b2	b3	$z0	$r1
+12 $i8 = i4 - $i5:<test.BallonFactory: java.awt.Rectangle getTextBounds(int,int,int,int)>
+fall	(and (= $i5 0) (= b0 0) (= b1 0) (= b2 50) (= b3 60))
+
+17 if $z0 == 0 goto $r1 = new java.awt.Rectangle:<test.BallonFactory: java.awt.Rectangle getTextBounds(int,int,int,int)>
+fall	(and (= $i5 0) (= b0 0) (= b1 0) (= b2 50) (= b3 60))
+
+branch	(and (= $i5 0) (= $z0 0) (= b0 0) (= b1 0) (= b2 50) (= b3 60))

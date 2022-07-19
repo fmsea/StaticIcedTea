@@ -203,7 +203,7 @@ public class Smt2Format {
         return sb.toString();
     }
 
-    private static String formatConstraint(SmtIdentifierExpression expr1, SmtIdentifierExpression expr2) {
+    protected static String formatConstraint(SmtIdentifierExpression expr1, SmtIdentifierExpression expr2) {
         LOGGER.debug("formatting constraint {} <=> {}", expr1, expr2);
         StringBuilder sb = new StringBuilder();
         // local
@@ -224,7 +224,7 @@ public class Smt2Format {
         return sb.toString();
     }
 
-    private static String formatImplies(Set<String> vars, String from, String to) {
+    protected static String formatImplies(Set<String> vars, String from, String to) {
         StringBuilder sb = new StringBuilder();
         sb.append("(push)\n");
         sb.append("(assert ");
@@ -250,7 +250,7 @@ public class Smt2Format {
         return sb.toString();
     }
 
-    private static String formatImplies(String from, String to) {
+    protected static String formatImplies(String from, String to) {
         StringBuilder sb = new StringBuilder();
         sb.append("(push)\n");
         sb.append("(assert\n (=> ");
@@ -273,7 +273,7 @@ public class Smt2Format {
         return sb.toString();
     }
 
-    private static String getIdentifier(String expr1, String expr2) {
+    protected static String getIdentifier(String expr1, String expr2) {
         String identifier = "empty";
         if (expr1.equals(expr2)) {
             identifier = expr1;

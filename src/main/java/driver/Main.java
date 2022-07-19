@@ -25,6 +25,7 @@ import driver.commands.*;
              Smt2FormatFullCommand.class,
              Smt2FormatIdentifiersCommand.class,
              Smt2FormatDirectoryCommand.class,
+             Smt2FormatMinCommand.class,
          })
 public class Main implements Callable<Integer> {
 

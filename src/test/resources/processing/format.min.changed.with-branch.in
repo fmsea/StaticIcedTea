@@ -1,0 +1,5 @@
+12 $i8 = i4 - $i5:<test.BallonFactory: java.awt.Rectangle getTextBounds(int,int,int,int)>
+$i8->(or (>= $i8 0) (< $i8 0))
+17 if $z0 == 0 goto $r1 = new java.awt.Rectangle:<test.BallonFactory: java.awt.Rectangle getTextBounds(int,int,int,int)>
+$z0->(or (>= $z0 0) (< $z0 0))
+$z0f->(= $z0 0)
