@@ -24,3 +24,7 @@ hs_err_pid*
 /.m2
 dependency-reduced-pom.xml
 .jqwik-database
+
+# Ignore Slurm output files
+slurm-*.out
+slurm-*.err
