@@ -33,6 +33,10 @@ public class Configuration {
         }
     }
 
+    public static Optional<Boolean> getEnvBoolean(String key) {
+        return Optional.of(Boolean.parseBoolean(System.getenv(key)));
+    }
+
     public static Optional<Boolean> getBoolean(String key) {
         if (instance == null) {
             instance = new Configuration();

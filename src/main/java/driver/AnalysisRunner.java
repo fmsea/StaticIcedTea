@@ -7,6 +7,7 @@ import java.io.Reader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ import abstractinterp.scalar.state.State;
 import abstractinterp.scalar.state.factory.StateFactory;
 import driver.util.SootInitialization;
 import util.AnalysisTimer;
+import util.Configuration;
 import soot.Body;
 import soot.Scene;
 import soot.SootClass;
@@ -77,5 +79,15 @@ public abstract class AnalysisRunner<S extends State>  implements Runnable {
         } catch (IOException ex) {
             LOGGER.error("Unable to write full SMT output file: {}", ex.getMessage());
         }
+
+        Configuration.getEnvBoolean("DFA_EXPORT_GRAPH_STATES").ifPresent(export -> {
+                if (export) {
+                    Path graphOutputDir = Path.of(this.outputResultsPath.toString(),
+                                                  String.format("%s_%d",
+                                                                this.className,
+                                                                this.methodId));
+                    this.analysis.generateGraphOutputs(graphOutputDir);
+                }
+            });
     }
 }

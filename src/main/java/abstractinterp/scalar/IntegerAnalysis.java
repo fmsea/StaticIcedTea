@@ -1,7 +1,10 @@
 package abstractinterp.scalar;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import abstractinterp.scalar.state.State;
 import abstractinterp.scalar.state.factory.StateFactory;
+import abstractinterp.scalar.util.StateGraphExporter;
 import solver.SolverWrapper;
 import solver.SolverFactory;
 
@@ -215,6 +219,23 @@ public class IntegerAnalysis<S extends State> implements Analysis {
             }
         }
         return sb.toString();
+    }
+
+    public void generateGraphOutputs(Path output) {
+        File outputDir = output.toFile();
+        outputDir.mkdirs();
+        int stmtCount = 0;
+        for (Unit u : this.g.getBody().getUnits()) {
+            stmtCount++;
+            State state = analysis.getFallFlowAfter(u);
+            String fallOutput = Paths.get(output.toString(), String.format("/%d-fall.dot", stmtCount)).toString();
+            StateGraphExporter.toDot(fallOutput, state);
+            List<S> branches = analysis.getBranchFlowAfter(u);
+            for (S branch : branches) {
+                String branchOutput = Paths.get(output.toString(), String.format("/%d-branch.dot", stmtCount)).toString();
+                StateGraphExporter.toDot(branchOutput, branch);
+            }
+        }
     }
 
     protected Map<Unit, Set<Value>> getChangedVariables() {
