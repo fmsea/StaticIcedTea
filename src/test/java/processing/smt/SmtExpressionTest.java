@@ -17,6 +17,7 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 import soot.Local;
 import soot.Value;
 
+import processing.providers.SmtExpressionProvider;
 import processing.providers.SmtExpressionIdentityProvider;
 import processing.providers.SmtExpressionConnectedProvider;
 
@@ -45,11 +46,23 @@ public class SmtExpressionTest {
     @ArgumentsSource(SmtExpressionConnectedProvider.class)
     void testGetValueById(String smtExpression, Local id, Optional<Value> expected) {
         try {
-        SmtExpression expr = new SmtExpressionReader(smtExpression).getSmtExpression();
-        assertEquals(expected.map(e -> e.toString()),
+            SmtExpression expr = new SmtExpressionReader(smtExpression).getSmtExpression();
+            assertEquals(expected.map(e -> e.toString()),
                      expr.getValue(id).map(e -> e.toString()));
         } catch (Exception ex) {
-            ex.printStackTrace();
+            ex.printStackTrace(System.err);
+        }
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(SmtExpressionProvider.class)
+    void testGetValueByIds(String smtExpression, Set<Local> variables, Optional<Value> expected) {
+        try {
+            SmtExpression expr = new SmtExpressionReader(smtExpression).getSmtExpression();
+            assertEquals(expected.map(e -> e.toString()),
+                         expr.getValue(variables).map(e -> e.toString()));
+        } catch (Exception ex) {
+            ex.printStackTrace(System.err);
         }
     }
 }
