@@ -26,18 +26,16 @@ public class SmtExpressionTest {
     @ParameterizedTest
     @ArgumentsSource(SmtExpressionIdentityProvider.class)
     void testGetConnectedVariables(String smtExpression,
-                                   Map<String, Set<String>> expected) {
+                                   Map<Local, Set<Local>> expected) {
         SmtExpression expr = new SmtExpressionReader(smtExpression).getSmtExpression();
         Map<Local, Set<Local>> connectedVariables = expr.getConnectedVariables();
         assertAll(Stream.concat(connectedVariables.keySet().stream()
-                                .map(k -> () -> assertTrue(expected.containsKey(k.toString()))),
+                                .map(k -> () -> assertTrue(expected.containsKey(k))),
                                 connectedVariables.entrySet().stream()
                                 .map(kv -> {
                                         return () -> {
-                                            assertEquals(expected.get(kv.getKey().toString()),
-                                                         kv.getValue()
-                                                         .stream().map(v -> v.toString())
-                                                         .collect(Collectors.toSet()));
+                                            assertEquals(expected.get(kv.getKey()),
+                                                         kv.getValue());
                                         };
                                     })));
     }

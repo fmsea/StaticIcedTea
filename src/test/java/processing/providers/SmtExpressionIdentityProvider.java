@@ -14,6 +14,8 @@ import soot.jimple.Jimple;
 import soot.jimple.IntConstant;
 import soot.grimp.Grimp;
 
+import processing.Locals;
+
 public class SmtExpressionIdentityProvider implements ArgumentsProvider {
 
     @Override
@@ -21,18 +23,19 @@ public class SmtExpressionIdentityProvider implements ArgumentsProvider {
         throws Exception {
 
         return Stream.of(Arguments.arguments("(= i0 0)",
-                                             Map.of("i0", Set.of())),
+                                             Map.of(Locals.get("i0"), Set.of())),
                          Arguments.arguments("true",
                                              Map.of()),
                          Arguments.arguments("false",
                                              Map.of()),
                          Arguments.arguments("(or (= i0 1) (>= i1 2))",
-                                             Map.of("i0", Set.of(),
-                                                    "i1", Set.of())),
+                                             Map.of(Locals.get("i0"), Set.of(),
+                                                    Locals.get("i1"), Set.of())),
                          Arguments.arguments("(and (= $z0 0) (>= i3 0) (<= i4 (+ i0 (- 1))) (<= i3 (+ i4 0)))",
-                                             Map.of("$z0", Set.of(),
-                                                    "i3", Set.of("i4"),
-                                                    "i4", Set.of("i0", "i3"),
-                                                    "i0", Set.of("i4"))));
+                                             Map.of(Locals.get("$z0"), Set.of(),
+                                                    Locals.get("i3"), Set.of(Locals.get("i4")),
+                                                    Locals.get("i4"), Set.of(Locals.get("i0"),
+                                                                             Locals.get("i3")),
+                                                    Locals.get("i0"), Set.of(Locals.get("i4")))));
     }
 }
