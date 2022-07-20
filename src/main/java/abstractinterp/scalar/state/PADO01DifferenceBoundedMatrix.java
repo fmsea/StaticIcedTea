@@ -676,15 +676,25 @@ public class PADO01DifferenceBoundedMatrix {
     public Graph<Local, DBSConstraint> toGraph() {
         Graph<Local, DBSConstraint> graph = new DefaultDirectedGraph<>(DBSConstraint.class);
         this.locals.forEach(l -> graph.addVertex(l));
-        iterateMatrix((i, j) -> {
-                Local s = this.indicesToLocals.get(i);
-                Local t = this.indicesToLocals.get(j);
-                if (this.matrix[i][j].isTop() || i == j) {
-                } else {
-                    DBSConstraint c = DBSConstraint.from(this.matrix[i][j]);
-                    graph.addEdge(s, t, c);
-                }
-            });
+        if (this.isFeasible()) {
+            iterateMatrix((i, j) -> {
+                    Local s = this.indicesToLocals.get(i);
+                    Local t = this.indicesToLocals.get(j);
+                    if (this.matrix[i][j].isTop() || i == j) {
+                    } else {
+                        DBSConstraint c = DBSConstraint.from(this.matrix[i][j]);
+                        graph.addEdge(s, t, c);
+                    }
+                });
+        } else {
+            iterateMatrix((i, j) -> {
+                    if (i == j) {
+                        Local s = this.indicesToLocals.get(i);
+                        DBSConstraint c = DBSConstraint.from(this.matrix[i][j]);
+                        graph.addEdge(s, s, c);
+                    }
+                });
+        }
         return graph;
     }
 

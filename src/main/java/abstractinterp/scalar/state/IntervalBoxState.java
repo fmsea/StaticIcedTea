@@ -314,8 +314,13 @@ public class IntervalBoxState implements State {
         graph.addVertex(Variable.ZERO);
         this.state.forEach((l, i) -> {
                 graph.addVertex(l);
-                graph.addEdge(l, Variable.ZERO, DBSConstraint.from(i.upperBound(), i.isBottom()));
-                graph.addEdge(Variable.ZERO, l, DBSConstraint.from(i.lowerBound().map(b -> b * -1), i.isBottom()));
+                if (i.isBottom()) {
+                    graph.addEdge(l, l, DBSConstraint.from(Optional.empty(), true));
+                } else if (i.isTop()) {
+                } else {
+                    graph.addEdge(l, Variable.ZERO, DBSConstraint.from(i.upperBound(), i.isBottom()));
+                    graph.addEdge(Variable.ZERO, l, DBSConstraint.from(i.lowerBound().map(b -> b * -1), i.isBottom()));
+                }
             });
         return graph;
     }
