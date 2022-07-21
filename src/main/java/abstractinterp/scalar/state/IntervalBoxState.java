@@ -325,6 +325,10 @@ public class IntervalBoxState implements State {
         return graph;
     }
 
+    public Set<Local> getConnectedVariablesOf(Local id) {
+        return Set.of(id);
+    }
+
     @Override
     public boolean equals(Object a) {
         boolean equal = false;

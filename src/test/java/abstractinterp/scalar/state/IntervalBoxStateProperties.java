@@ -161,6 +161,12 @@ public class IntervalBoxStateProperties {
         }
     }
 
+    @Property
+    void getConnectedPropertiesOfAlwaysReturnsItself(@ForAll Set<Local> locals) {
+        IntervalBoxState state = new IntervalBoxState(locals, true);
+        assertAll(locals.stream().map(l -> () -> assertEquals(Set.of(l), state.getConnectedVariablesOf(l))));
+    }
+
     private int minimum(int... xs) {
         int min = Integer.MAX_VALUE;
         for (int i = 0; i < xs.length; i++) {

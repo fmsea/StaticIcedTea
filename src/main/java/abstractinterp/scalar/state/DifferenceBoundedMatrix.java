@@ -1,9 +1,11 @@
 package abstractinterp.scalar.state;
 
 import java.util.Arrays;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.HashSet;
 import java.util.List;
@@ -11,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
@@ -694,6 +697,56 @@ public class DifferenceBoundedMatrix {
                 });
         }
         return graph;
+    }
+
+    public Set<Local> getConnectedVariablesOf(Local id) {
+        if (id.equals(Variable.ZERO) || !this.computeClosure()) {
+            return Set.of();
+        } else {
+            Set<Local> connected = new HashSet<>();
+            Deque<Local> toVisit = new ArrayDeque<>();
+            connected.add(id);
+            toVisit.push(id);
+            while (toVisit.peek() != null) {
+                Local current = toVisit.pop();
+                Stream<Local> preds = this.predecessorsOf(current);
+                Stream<Local> succs = this.successorsOf(current);
+                Stream.concat(preds, succs)
+                    .forEach(c -> {
+                            if (!connected.contains(c)) {
+                                connected.add(c);
+                                toVisit.push(c);
+                            }
+                        });
+            }
+            return Set.copyOf(connected);
+        }
+    }
+
+    private Stream<Local> predecessorsOf(Local t) {
+        int j = this.localToIndices.get(t);
+        Stream<Optional<Local>> preds = IntStream.range(1, N).mapToObj(i -> {
+                if (this.matrix[i][j].isTop()) {
+                    return Optional.empty();
+                } else {
+                    return Optional.of(this.indicesToLocals.get(i));
+                }
+            });
+        return preds.filter(o -> o.isPresent())
+            .map(o -> o.get());
+    }
+
+    private Stream<Local> successorsOf(Local s) {
+        int i = this.localToIndices.get(s);
+        Stream<Optional<Local>> succs = IntStream.range(1, N).mapToObj(j -> {
+                if (this.matrix[i][j].isTop()) {
+                    return Optional.empty();
+                } else {
+                    return Optional.of(this.indicesToLocals.get(j));
+                }
+            });
+        return succs.filter(o -> o.isPresent())
+            .map(o -> o.get());
     }
 
     private BinopExpr toGrimpExpr(Local s, Local t, ZoneConstraint c) {

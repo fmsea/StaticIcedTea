@@ -1,6 +1,7 @@
 package abstractinterp.scalar.state;
 
 import java.util.Optional;
+import java.util.Set;
 import soot.jimple.BinopExpr;
 import soot.Local;
 import soot.Value;
@@ -35,4 +36,5 @@ public interface State {
     public boolean updateCond(State inState, Value left, Value right, PredicateType type);
     public void forget(Local local);
     public void makeInfeasible();
+    public Set<Local> getConnectedVariablesOf(Local local);
 }

@@ -1056,14 +1056,20 @@ public class DifferenceBoundedMatrixTest {
             m.setConstraint(xs[1], xs[0], ZoneConstraint.of(4));
             m.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
             m.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
-            assertAll(() -> assertEquals(Stream.of("(and (>= x1 1)",
-                                                   "(<= x1 4)",
-                                                   "(<= x1 (+ x2 1)))")
+            assertAll(() -> assertEquals(Set.of(xs[1], xs[2]), m.getConnectedVariablesOf(xs[1])),
+                      () -> assertEquals(Stream.of("(and (<= x1 4)",
+                                                   "(<= x1 (+ x2 1))",
+                                                   "(>= x1 1)",
+                                                   "(<= x2 3)",
+                                                   "(>= x2 1))")
                                          .collect(Collectors.joining(" ")),
                                          m.toSMT(xs[1], this.solver)),
-                      () -> assertEquals(Stream.of("(and (>= x2 1)",
+                      () -> assertEquals(Set.of(xs[1], xs[2]), m.getConnectedVariablesOf(xs[2])),
+                      () -> assertEquals(Stream.of("(and (<= x1 4)",
+                                                   "(<= x1 (+ x2 1))",
+                                                   "(>= x1 1)",
                                                    "(<= x2 3)",
-                                                   "(<= x1 (+ x2 1)))")
+                                                   "(>= x2 1))")
                                          .collect(Collectors.joining(" ")),
                                          m.toSMT(xs[2], this.solver)));
         }
@@ -1462,6 +1468,82 @@ public class DifferenceBoundedMatrixTest {
                                          m.getConstraint(xs[4], xs[2])),
                       () -> assertEquals(ZoneConstraint.of(-1),
                                          m.getConstraint(xs[4], xs[3])));
+        }
+    }
+
+    @Test
+    void testGetConnectedVariables() {
+        {
+            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(0));
+            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(1));
+            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(0));
+            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(1));
+            assertAll(() -> assertEquals(Set.of(), m.getConnectedVariablesOf(xs[0])),
+                      () -> assertEquals(Set.of(xs[1]), m.getConnectedVariablesOf(xs[1])),
+                      () -> assertEquals(Set.of(xs[2]), m.getConnectedVariablesOf(xs[2])));
+        }
+
+        {
+            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(0));
+            assertAll(() -> assertEquals(Set.of(xs[1], xs[2]),
+                                         m.getConnectedVariablesOf(xs[1])),
+                      () -> assertEquals(Set.of(xs[1], xs[2]), m.getConnectedVariablesOf(xs[2])));
+        }
+
+        {
+            xs = new Local[] {
+                Variable.ZERO,
+                Jimple.v().newLocal("x1", IntType.v()),
+                Jimple.v().newLocal("x2", IntType.v()),
+                Jimple.v().newLocal("x3", IntType.v()),
+                Jimple.v().newLocal("x4", IntType.v()),
+            };
+            locals = Stream.of(xs).collect(Collectors.toSet());
+            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(0));
+            m.setConstraint(xs[2], xs[3], ZoneConstraint.of(1));
+            assertAll(() -> assertEquals(Set.of(xs[1], xs[2], xs[3]),
+                                         m.getConnectedVariablesOf(xs[1])),
+                      () -> assertEquals(Set.of(xs[1], xs[2], xs[3]),
+                                         m.getConnectedVariablesOf(xs[2])),
+                      () -> assertEquals(Set.of(xs[1], xs[2], xs[3]),
+                                         m.getConnectedVariablesOf(xs[3])));
+        }
+
+        {
+            xs = new Local[] {
+                Variable.ZERO,
+                Jimple.v().newLocal("x1", IntType.v()),
+                Jimple.v().newLocal("x2", IntType.v()),
+                Jimple.v().newLocal("x3", IntType.v()),
+                Jimple.v().newLocal("x4", IntType.v()),
+                Jimple.v().newLocal("x5", IntType.v()),
+                Jimple.v().newLocal("x6", IntType.v()),
+            };
+            locals = Stream.of(xs).collect(Collectors.toSet());
+            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
+            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
+            m.setConstraint(xs[0], xs[5], ZoneConstraint.of(-1));
+            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(+4));
+            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(+1));
+            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(+3));
+            m.setConstraint(xs[3], xs[1], ZoneConstraint.of(+1));
+            m.setConstraint(xs[3], xs[2], ZoneConstraint.of(+2));
+            m.setConstraint(xs[3], xs[6], ZoneConstraint.of(+2));
+            m.setConstraint(xs[5], xs[0], ZoneConstraint.of(+1));
+            assertAll(() -> assertEquals(Set.of(xs[1], xs[2], xs[3], xs[6]),
+                                         m.getConnectedVariablesOf(xs[1])),
+                      () -> assertEquals(Set.of(xs[1], xs[2], xs[3], xs[6]),
+                                         m.getConnectedVariablesOf(xs[2])),
+                      () -> assertEquals(Set.of(xs[1], xs[2], xs[3], xs[6]),
+                                         m.getConnectedVariablesOf(xs[3])),
+                      () -> assertEquals(Set.of(xs[1], xs[2], xs[3], xs[6]),
+                                         m.getConnectedVariablesOf(xs[6])),
+                      () -> assertEquals(Set.of(xs[5]),
+                                         m.getConnectedVariablesOf(xs[5])));
         }
     }
 }

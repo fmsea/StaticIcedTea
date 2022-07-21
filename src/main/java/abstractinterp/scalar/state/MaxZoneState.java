@@ -547,6 +547,10 @@ public class MaxZoneState implements State {
         this.matrix.makeInfeasible();
     }
 
+    public Set<Local> getConnectedVariablesOf(Local source) {
+        return this.matrix.getConnectedVariablesOf(source);
+    }
+
     @Override
     public boolean equals(Object o) {
         boolean equal = false;
