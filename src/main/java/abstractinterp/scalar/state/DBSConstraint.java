@@ -37,7 +37,7 @@ public class DBSConstraint {
         return new DBSConstraint(bound, bottom);
     }
 
-    public static DBSConstraint from(PADO01Constraint constraint) {
+    public static DBSConstraint from(ZoneConstraint constraint) {
         return new DBSConstraint(constraint.bound(), constraint.isBottom());
     }
 
