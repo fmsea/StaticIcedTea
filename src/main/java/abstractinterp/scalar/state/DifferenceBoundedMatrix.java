@@ -399,6 +399,32 @@ public class DifferenceBoundedMatrix {
         return true;
     }
 
+    /** Compute transitive closure W0Z reduced
+     *
+     * Compute the full closure of the matrix, then remove any direct edges if
+     * the transitive edge of length two which passes through z0 is equal or
+     * greater than the direct edge.  Direct edges which are less than the
+     * transitive edge are more restrictive and therefore should be removed.
+     */
+    public boolean w0zReduction() {
+        if (!this.computeClosure()) {
+            return false;
+        }
+        for (int i = 1; i < N; i++) {
+            for (int j = 1; j < N; j++) {
+                if (i == j) {
+                    continue;
+                }
+                ZoneConstraint transitivePath = ZoneConstraint.add(this.matrix[i][0],
+                                                                   this.matrix[0][j]);
+                if (ZoneConstraint.compare(this.matrix[i][j], transitivePath) >= 0) {
+                    this.setConstraint(i, j, ZoneConstraint.TOP());
+                }
+            }
+        }
+        return true;
+    }
+
     public static DifferenceBoundedMatrix widen(DifferenceBoundedMatrix m,
                                                 DifferenceBoundedMatrix n) {
         DifferenceBoundedMatrix res = new DifferenceBoundedMatrix(m);

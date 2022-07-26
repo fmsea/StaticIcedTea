@@ -549,6 +549,49 @@ public class DifferenceBoundedMatrixTest {
     }
 
     @Test
+    void testW0ZReduction() {
+        Local[] xs = new Local[] {
+            Variable.ZERO,
+            Jimple.v().newLocal("x1", IntType.v()),
+            Jimple.v().newLocal("x2", IntType.v()),
+            Jimple.v().newLocal("x3", IntType.v()),
+        };
+        Set<Local> locals = Stream.of(xs).collect(Collectors.toSet());
+        DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+        m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
+        m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
+        m.setConstraint(xs[1], xs[0], ZoneConstraint.of(4));
+        m.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
+        m.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
+        m.setConstraint(xs[3], xs[0], ZoneConstraint.of(2));
+        m.w0zReduction();
+        assertAll(() -> assertEquals(ZoneConstraint.of(-1),
+                                     m.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(ZoneConstraint.of(-1),
+                                     m.getConstraint(xs[0], xs[2])),
+                  () -> assertEquals(ZoneConstraint.TOP(),
+                                     m.getConstraint(xs[0], xs[3])),
+                  () -> assertEquals(ZoneConstraint.of(4),
+                                     m.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(ZoneConstraint.of(1),
+                                     m.getConstraint(xs[1], xs[2])),
+                  () -> assertEquals(ZoneConstraint.TOP(),
+                                     m.getConstraint(xs[1], xs[3])),
+                  () -> assertEquals(ZoneConstraint.of(3),
+                                     m.getConstraint(xs[2], xs[0])),
+                  () -> assertEquals(ZoneConstraint.TOP(),
+                                     m.getConstraint(xs[2], xs[1])),
+                  () -> assertEquals(ZoneConstraint.TOP(),
+                                     m.getConstraint(xs[2], xs[3])),
+                  () -> assertEquals(ZoneConstraint.of(2),
+                                     m.getConstraint(xs[3], xs[0])),
+                  () -> assertEquals(ZoneConstraint.TOP(),
+                                     m.getConstraint(xs[3], xs[1])),
+                  () -> assertEquals(ZoneConstraint.TOP(),
+                                     m.getConstraint(xs[3], xs[2])));
+    }
+
+    @Test
     void testWidening() {
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
