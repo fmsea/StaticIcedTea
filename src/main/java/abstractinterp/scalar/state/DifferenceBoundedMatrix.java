@@ -747,6 +747,28 @@ public class DifferenceBoundedMatrix {
         return graph;
     }
 
+    public static DifferenceBoundedGraph to(DifferenceBoundedMatrix m) {
+        DifferenceBoundedGraph g;
+        if (m.isFeasible()) {
+            g = new DifferenceBoundedGraph(m.locals, true);
+            m.iterateMatrix((i, j) -> {
+                    Local s = m.indicesToLocals.get(i);
+                    Local t = m.indicesToLocals.get(j);
+                    if (m.matrix[i][j].isTop() || i == j) {
+                    } else {
+                        g.setConstraint(s, t, m.matrix[i][j].copy());
+                    }
+                });
+        } else {
+            g = new DifferenceBoundedGraph(m.locals, false);
+        }
+        return g;
+    }
+
+    public static DifferenceBoundedMatrix from(DifferenceBoundedGraph graph) {
+        return DifferenceBoundedGraph.to(graph);
+    }
+
     public Set<Local> getConnectedVariablesOf(Local id) {
         if (id.equals(Variable.ZERO)) {
             return Set.of();
