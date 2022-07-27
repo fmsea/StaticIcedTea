@@ -22,8 +22,7 @@ public class Configuration {
     private Configuration() {
         this.properties = new Properties();
         ClassLoader loader = getClass().getClassLoader();
-        File resourceFile = Paths.get(loader.getResource("user.properties").getFile()).toFile();
-        try (InputStream stream = new FileInputStream(resourceFile)) {
+        try (InputStream stream = loader.getResourceAsStream("user.properties")) {
             this.properties.load(stream);
         } catch (Exception ex) {
             LOGGER.error("Unable to load properties: {}", ex.getMessage());
