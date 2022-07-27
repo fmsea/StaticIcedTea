@@ -1081,15 +1081,13 @@ public class DifferenceBoundedMatrixTest {
     void testLocalToSMT() {
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, false);
-            assertEquals(Stream.of("(and (and (<= x1 0) (> x1 0))",
-                                   "(and (<= x1 (+ x2 0)) (> x1 (+ x2 0))))").collect(Collectors.joining(" ")),
-                         m.toSMT(xs[1], this.solver));
+            assertEquals("false", m.toSMT(xs[1], this.solver));
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            assertAll(() -> assertEquals("(or (<= x1 0) (> x1 0))", m.toSMT(xs[1], this.solver)),
-                      () -> assertEquals("(or (<= x2 0) (> x2 0))", m.toSMT(xs[2], this.solver)));
+            assertAll(() -> assertEquals("true", m.toSMT(xs[1], this.solver)),
+                      () -> assertEquals("true", m.toSMT(xs[2], this.solver)));
         }
 
         {

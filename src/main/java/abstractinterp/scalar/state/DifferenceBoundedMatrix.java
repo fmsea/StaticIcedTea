@@ -19,6 +19,7 @@ import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.IntStream;
 import java.util.stream.Collectors;
@@ -654,46 +655,67 @@ public class DifferenceBoundedMatrix {
     }
 
     public String toSMT(Local source, SolverWrapper solver) {
-        StringBuilder sb = new StringBuilder();
-        List<BinopExpr> exprs = new ArrayList<>(N * 2);
-        int k = this.localToIndices.get(source);
-        if (this.isFeasible()) {
-            for (int i = 0; i < N; i++) {
-                if (i == k) {
-                    continue;
-                }
-                Local t = this.indicesToLocals.get(i);
-                if (!this.matrix[i][k].isTop()) {
-                    exprs.add(this.toGrimpExpr(t, source, this.matrix[i][k]));
-                }
-
-                if (!this.matrix[k][i].isTop()) {
-                    exprs.add(this.toGrimpExpr(source, t, this.matrix[k][i]));
-                }
-            }
+        if (!this.computeReducedClosure()) {
+            return "false";
         } else {
-            for (int i = 0; i < N; i++) {
-                if (i == k) {
-                    continue;
+            return this.toBinop(this.getConnectedVariablesOf(source)).stream()
+                .sorted((a, b) -> a.toString().compareTo(b.toString()))
+                .reduce((a, b) -> Grimp.v().newAndExpr(a, b))
+                .map(expr -> solver.smt2(expr))
+                .orElse("true");
+        }
+    }
+
+    private Set<BinopExpr> toBinop(Set<Local> sources) {
+        Set<BinopExpr> exprs = Set.of();
+        for (Local source : sources) {
+            exprs = this.toBinop(source, exprs);
+        }
+        return exprs;
+    }
+
+    private Set<BinopExpr> toBinop(Local source) {
+        return this.toBinop(source, Set.of());
+    }
+
+    private Set<BinopExpr> toBinop(Local source, Set<BinopExpr> acc) {
+        Set<BinopExpr> exprs = new HashSet<>();
+        exprs.addAll(acc);
+        Predicate isMember = expr -> exprs.stream()
+            .map(e -> e.toString())
+            .collect(Collectors.toSet())
+            .contains(expr.toString());
+        int k = this.localToIndices.get(source);
+        for (int i = 0; i < N; i++) {
+            if (i == k) {
+                continue;
+            }
+            Local t = this.indicesToLocals.get(i);
+            if (!this.matrix[i][k].isTop()) {
+                BinopExpr expr = this.toGrimpExpr(t, source, this.matrix[i][k]);
+                if (!isMember.test(expr)) {
+                    exprs.add(expr);
                 }
-                Local l = this.indicesToLocals.get(i);
-                exprs.add(this.toGrimpExpr(source, l, ZoneConstraint.BOT()));
+            }
+
+            if (!this.matrix[k][i].isTop()) {
+                BinopExpr expr = this.toGrimpExpr(source, t, this.matrix[k][i]);
+                if (!isMember.test(expr)) {
+                    exprs.add(expr);
+                }
             }
         }
-        if (exprs.size() > 1) {
-            sb.append("(and ");
-            exprs.forEach(e -> {
-                    sb.append(solver.smt2(e));
-                    sb.append(" ");
-                });
-            sb.deleteCharAt(sb.length() - 1);
-            sb.append(")");
-        } else if (exprs.size() == 1) {
-            sb.append(solver.smt2(exprs.get(0)));
-        } else if (exprs.size() == 0) {
-            sb.append(solver.smt2(this.toGrimpExpr(source, Variable.ZERO, ZoneConstraint.TOP())));
+        return exprs;
+    }
+
+    private Optional<BinopExpr> toBinop(Local source, Local target) {
+        int i = this.localToIndices.get(source);
+        int j = this.localToIndices.get(target);
+        if (this.matrix[i][j].isTop()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(this.toGrimpExpr(source, target, this.matrix[i][j]));
         }
-        return sb.toString();
     }
 
     public String toSMT(Local source, Local target, SolverWrapper solver) {
@@ -726,8 +748,10 @@ public class DifferenceBoundedMatrix {
     }
 
     public Set<Local> getConnectedVariablesOf(Local id) {
-        if (id.equals(Variable.ZERO) || !this.computeClosure()) {
+        if (id.equals(Variable.ZERO)) {
             return Set.of();
+        } else if (!this.w0zReduction()) {
+            return Set.of(id);
         } else {
             Set<Local> connected = new HashSet<>();
             Deque<Local> toVisit = new ArrayDeque<>();
