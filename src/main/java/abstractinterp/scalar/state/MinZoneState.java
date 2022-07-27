@@ -419,7 +419,7 @@ public class MinZoneState implements State {
         return this.matrix.toSMT(l, solver);
     }
 
-    public Graph<Local, DBSConstraint> toGraph() {
+    public Graph<Local, ZoneConstraint> toGraph() {
         return this.matrix.toGraph();
     }
 

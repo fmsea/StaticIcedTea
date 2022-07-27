@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import abstractinterp.scalar.state.State;
-import abstractinterp.scalar.state.DBSConstraint;
+import abstractinterp.scalar.state.ZoneConstraint;
 
 public class StateGraphExporter {
 
@@ -38,7 +38,7 @@ public class StateGraphExporter {
     }
 
     public static void toDot(Writer writer, State abstractState) {
-        DOTExporter<Local, DBSConstraint> exporter = new DOTExporter<>();
+        DOTExporter<Local, ZoneConstraint> exporter = new DOTExporter<>();
         exporter.setEdgeAttributeProvider(e -> {
                 Map<String, Attribute> m = new HashMap<>(2);
                 m.put("label", DefaultAttribute.createAttribute(e.toString()));

@@ -309,17 +309,17 @@ public class IntervalBoxState implements State {
             .reduce((a, b) -> Grimp.v().newAndExpr(a, b));
     }
 
-    public Graph<Local, DBSConstraint> toGraph() {
-        Graph<Local, DBSConstraint> graph = new DefaultDirectedGraph<>(DBSConstraint.class);
+    public Graph<Local, ZoneConstraint> toGraph() {
+        Graph<Local, ZoneConstraint> graph = new DefaultDirectedGraph<>(ZoneConstraint.class);
         graph.addVertex(Variable.ZERO);
         this.state.forEach((l, i) -> {
                 graph.addVertex(l);
                 if (i.isBottom()) {
-                    graph.addEdge(l, l, DBSConstraint.from(Optional.empty(), true));
+                    graph.addEdge(l, l, ZoneConstraint.of(Optional.empty(), true));
                 } else if (i.isTop()) {
                 } else {
-                    graph.addEdge(l, Variable.ZERO, DBSConstraint.from(i.upperBound(), i.isBottom()));
-                    graph.addEdge(Variable.ZERO, l, DBSConstraint.from(i.lowerBound().map(b -> b * -1), i.isBottom()));
+                    graph.addEdge(l, Variable.ZERO, ZoneConstraint.of(i.upperBound(), i.isBottom()));
+                    graph.addEdge(Variable.ZERO, l, ZoneConstraint.of(i.lowerBound().map(b -> b * -1), i.isBottom()));
                 }
             });
         return graph;

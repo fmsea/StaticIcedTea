@@ -673,8 +673,8 @@ public class DifferenceBoundedMatrix {
         return solver.smt2(this.toGrimpExpr(source, target, this.matrix[i][j]));
     }
 
-    public Graph<Local, DBSConstraint> toGraph() {
-        Graph<Local, DBSConstraint> graph = new DefaultDirectedGraph<>(DBSConstraint.class);
+    public Graph<Local, ZoneConstraint> toGraph() {
+        Graph<Local, ZoneConstraint> graph = new DefaultDirectedGraph<>(ZoneConstraint.class);
         this.locals.forEach(l -> graph.addVertex(l));
         if (this.isFeasible()) {
             iterateMatrix((i, j) -> {
@@ -682,16 +682,14 @@ public class DifferenceBoundedMatrix {
                     Local t = this.indicesToLocals.get(j);
                     if (this.matrix[i][j].isTop() || i == j) {
                     } else {
-                        DBSConstraint c = DBSConstraint.from(this.matrix[i][j]);
-                        graph.addEdge(s, t, c);
+                        graph.addEdge(s, t, this.matrix[i][j].copy());
                     }
                 });
         } else {
             iterateMatrix((i, j) -> {
                     if (i == j) {
                         Local s = this.indicesToLocals.get(i);
-                        DBSConstraint c = DBSConstraint.from(this.matrix[i][j]);
-                        graph.addEdge(s, s, c);
+                        graph.addEdge(s, s, ZoneConstraint.BOT());
                     }
                 });
         }

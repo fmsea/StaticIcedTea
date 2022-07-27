@@ -30,7 +30,7 @@ public interface State {
     public Optional<BinopExpr> toBinop();
     public String toSMT(SolverWrapper solver);
     public String toSMT(Local l, SolverWrapper solver);
-    public Graph<Local, DBSConstraint> toGraph();
+    public Graph<Local, ZoneConstraint> toGraph();
     public void updateTop(Local local);
     public boolean updateCond(State inState, Value left, Value right, PredicateType type);
     public void forget(Local local);
