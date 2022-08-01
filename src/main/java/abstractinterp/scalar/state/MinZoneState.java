@@ -10,7 +10,6 @@ import java.util.stream.Stream;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 
-import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import soot.Local;
@@ -20,6 +19,7 @@ import soot.jimple.BinopExpr;
 import soot.jimple.IntConstant;
 import soot.jimple.internal.JNegExpr;
 
+import abstractinterp.scalar.state.util.GraphProjection;
 import solver.SolverWrapper;
 
 public class MinZoneState implements State {
@@ -419,7 +419,7 @@ public class MinZoneState implements State {
         return this.matrix.toSMT(l, solver);
     }
 
-    public Graph<Local, ZoneConstraint> toGraph() {
+    public GraphProjection toGraph() {
         return this.matrix.toGraph();
     }
 

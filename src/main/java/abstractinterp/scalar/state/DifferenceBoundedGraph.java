@@ -37,6 +37,7 @@ import org.jgrapht.Graphs;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DefaultDirectedGraph;
 
+import abstractinterp.scalar.state.util.GraphProjection;
 import solver.SolverWrapper;
 import util.Configuration;
 
@@ -118,9 +119,15 @@ public class DifferenceBoundedGraph {
         return Set.copyOf(connected);
     }
 
-    public Graph<Local, ZoneConstraint> toGraph() {
-        //return this.graph;
-        return null;
+    public GraphProjection toGraph() {
+        GraphProjection g = new GraphProjection(this.getLocals());
+        this.graph.edgeSet().stream().forEach(e -> {
+                Local s = this.graph.getEdgeSource(e);
+                Local t = this.graph.getEdgeTarget(e);
+                ZoneConstraint c = this.constraints.get(e);
+                g.setConstraint(s, t, c);
+            });
+        return g;
     }
 
     public static DifferenceBoundedMatrix to(DifferenceBoundedGraph g) {

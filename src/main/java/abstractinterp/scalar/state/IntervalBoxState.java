@@ -21,6 +21,7 @@ import org.jgrapht.graph.DefaultDirectedGraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import abstractinterp.scalar.state.util.GraphProjection;
 import solver.SolverWrapper;
 
 public class IntervalBoxState implements State {
@@ -309,17 +310,16 @@ public class IntervalBoxState implements State {
             .reduce((a, b) -> Grimp.v().newAndExpr(a, b));
     }
 
-    public Graph<Local, ZoneConstraint> toGraph() {
-        Graph<Local, ZoneConstraint> graph = new DefaultDirectedGraph<>(ZoneConstraint.class);
-        graph.addVertex(Variable.ZERO);
+    public GraphProjection toGraph() {
+        GraphProjection graph = new GraphProjection(Stream.concat(Stream.of(Variable.ZERO), this.state.keySet().stream())
+                                                    .collect(Collectors.toSet()));
         this.state.forEach((l, i) -> {
-                graph.addVertex(l);
                 if (i.isBottom()) {
-                    graph.addEdge(l, l, ZoneConstraint.of(Optional.empty(), true));
+                    graph.setConstraint(l, l, ZoneConstraint.BOT());
                 } else if (i.isTop()) {
                 } else {
-                    graph.addEdge(l, Variable.ZERO, ZoneConstraint.of(i.upperBound(), i.isBottom()));
-                    graph.addEdge(Variable.ZERO, l, ZoneConstraint.of(i.lowerBound().map(b -> b * -1), i.isBottom()));
+                    graph.setConstraint(l, Variable.ZERO, ZoneConstraint.of(i.upperBound(), i.isBottom()));
+                    graph.setConstraint(Variable.ZERO, l, ZoneConstraint.of(i.lowerBound().map(b -> b * -1), i.isBottom()));
                 }
             });
         return graph;

@@ -5,7 +5,7 @@ import java.util.Set;
 import soot.jimple.BinopExpr;
 import soot.Local;
 import soot.Value;
-import org.jgrapht.Graph;
+import abstractinterp.scalar.state.util.GraphProjection;
 
 import solver.SolverWrapper;
 
@@ -31,7 +31,7 @@ public interface State {
     public Optional<BinopExpr> toBinop();
     public String toSMT(SolverWrapper solver);
     public String toSMT(Local l, SolverWrapper solver);
-    public Graph<Local, ZoneConstraint> toGraph();
+    public GraphProjection toGraph();
     public void updateTop(Local local);
     public boolean updateCond(State inState, Value left, Value right, PredicateType type);
     public void forget(Local local);

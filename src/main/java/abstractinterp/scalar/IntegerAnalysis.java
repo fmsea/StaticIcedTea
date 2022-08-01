@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 
 import abstractinterp.scalar.state.State;
 import abstractinterp.scalar.state.factory.StateFactory;
-import abstractinterp.scalar.util.StateGraphExporter;
 import solver.SolverWrapper;
 import solver.SolverFactory;
 
@@ -229,11 +228,11 @@ public class IntegerAnalysis<S extends State> implements Analysis {
             stmtCount++;
             State state = analysis.getFallFlowAfter(u);
             String fallOutput = Paths.get(output.toString(), String.format("/%d-fall.dot", stmtCount)).toString();
-            StateGraphExporter.toDot(fallOutput, state);
+            state.toGraph().toDot(fallOutput);
             List<S> branches = analysis.getBranchFlowAfter(u);
             for (S branch : branches) {
                 String branchOutput = Paths.get(output.toString(), String.format("/%d-branch.dot", stmtCount)).toString();
-                StateGraphExporter.toDot(branchOutput, branch);
+                branch.toGraph().toDot(branchOutput);
             }
         }
     }

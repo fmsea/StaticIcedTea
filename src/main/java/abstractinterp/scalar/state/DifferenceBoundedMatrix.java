@@ -32,9 +32,8 @@ import soot.grimp.Grimp;
 import soot.jimple.BinopExpr;
 import soot.jimple.IntConstant;
 import soot.jimple.internal.JNegExpr;
-import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultDirectedGraph;
 
+import abstractinterp.scalar.state.util.GraphProjection;
 import solver.SolverWrapper;
 import util.Configuration;
 
@@ -724,23 +723,22 @@ public class DifferenceBoundedMatrix {
         return solver.smt2(this.toGrimpExpr(source, target, this.matrix[i][j]));
     }
 
-    public Graph<Local, ZoneConstraint> toGraph() {
-        Graph<Local, ZoneConstraint> graph = new DefaultDirectedGraph<>(ZoneConstraint.class);
-        this.locals.forEach(l -> graph.addVertex(l));
+    public GraphProjection toGraph() {
+        GraphProjection graph = new GraphProjection(this.locals);
         if (this.isFeasible()) {
             iterateMatrix((i, j) -> {
                     Local s = this.indicesToLocals.get(i);
                     Local t = this.indicesToLocals.get(j);
                     if (this.matrix[i][j].isTop() || i == j) {
                     } else {
-                        graph.addEdge(s, t, this.matrix[i][j].copy());
+                        graph.setConstraint(s, t, this.matrix[i][j].copy());
                     }
                 });
         } else {
             iterateMatrix((i, j) -> {
                     if (i == j) {
                         Local s = this.indicesToLocals.get(i);
-                        graph.addEdge(s, s, ZoneConstraint.BOT());
+                        graph.setConstraint(s, s, ZoneConstraint.BOT());
                     }
                 });
         }
