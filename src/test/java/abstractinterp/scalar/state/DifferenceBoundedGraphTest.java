@@ -42,28 +42,28 @@ public class DifferenceBoundedGraphTest {
     void testGetConnectedVariables() {
         {
             DifferenceBoundedGraph g = new DifferenceBoundedGraph(this.locals, true);
-            g.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            g.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            g.setConstraint(xs[1], xs[0], ZoneConstraint.of(4));
-            g.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
+            g.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            g.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            g.setConstraint(xs[1], xs[0], Constraint.of(4));
+            g.setConstraint(xs[2], xs[0], Constraint.of(3));
             assertAll(() -> assertEquals(Set.of(xs[1]), g.getConnectedVariablesOf(xs[1])),
                       () -> assertEquals(Set.of(xs[2]), g.getConnectedVariablesOf(xs[2])));
         }
 
         {
             DifferenceBoundedGraph g = new DifferenceBoundedGraph(this.locals, true);
-            g.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
+            g.setConstraint(xs[1], xs[2], Constraint.of(1));
             assertAll(() -> assertEquals(Set.of(xs[1], xs[2]), g.getConnectedVariablesOf(xs[1])),
                       () -> assertEquals(Set.of(xs[1], xs[2]), g.getConnectedVariablesOf(xs[2])));
         }
 
         {
             DifferenceBoundedGraph g = new DifferenceBoundedGraph(this.locals, true);
-            g.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            g.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            g.setConstraint(xs[1], xs[0], ZoneConstraint.of(4));
-            g.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
-            g.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
+            g.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            g.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            g.setConstraint(xs[1], xs[0], Constraint.of(4));
+            g.setConstraint(xs[1], xs[2], Constraint.of(1));
+            g.setConstraint(xs[2], xs[0], Constraint.of(3));
             assertAll(() -> assertEquals(Set.of(xs[1], xs[2]), g.getConnectedVariablesOf(xs[1])),
                       () -> assertEquals(Set.of(xs[1], xs[2]), g.getConnectedVariablesOf(xs[2])));
         }
@@ -80,16 +80,16 @@ public class DifferenceBoundedGraphTest {
             };
             locals = Stream.of(this.xs).collect(Collectors.toSet());
             DifferenceBoundedGraph g = new DifferenceBoundedGraph(this.locals, true);
-            g.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            g.setConstraint(xs[0], xs[2], ZoneConstraint.of(-2));
-            g.setConstraint(xs[0], xs[5], ZoneConstraint.of(-3));
-            g.setConstraint(xs[1], xs[0], ZoneConstraint.of(+4));
-            g.setConstraint(xs[1], xs[2], ZoneConstraint.of(+1));
-            g.setConstraint(xs[2], xs[0], ZoneConstraint.of(+3));
-            g.setConstraint(xs[3], xs[1], ZoneConstraint.of(+2));
-            g.setConstraint(xs[3], xs[2], ZoneConstraint.of(+3));
-            g.setConstraint(xs[3], xs[6], ZoneConstraint.of(-4));
-            g.setConstraint(xs[5], xs[0], ZoneConstraint.of(+5));
+            g.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            g.setConstraint(xs[0], xs[2], Constraint.of(-2));
+            g.setConstraint(xs[0], xs[5], Constraint.of(-3));
+            g.setConstraint(xs[1], xs[0], Constraint.of(+4));
+            g.setConstraint(xs[1], xs[2], Constraint.of(+1));
+            g.setConstraint(xs[2], xs[0], Constraint.of(+3));
+            g.setConstraint(xs[3], xs[1], Constraint.of(+2));
+            g.setConstraint(xs[3], xs[2], Constraint.of(+3));
+            g.setConstraint(xs[3], xs[6], Constraint.of(-4));
+            g.setConstraint(xs[5], xs[0], Constraint.of(+5));
             assertAll(() -> assertEquals(Set.of(xs[1], xs[2], xs[3], xs[6]),
                                          g.getConnectedVariablesOf(xs[1])),
                       () -> assertEquals(Set.of(xs[1], xs[2], xs[3], xs[6]),

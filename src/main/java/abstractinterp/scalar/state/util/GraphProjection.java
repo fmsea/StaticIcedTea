@@ -43,13 +43,13 @@ import org.jgrapht.nio.dot.DOTExporter;
 import org.jgrapht.nio.Attribute;
 import org.jgrapht.nio.DefaultAttribute;
 
-import abstractinterp.scalar.state.ZoneConstraint;
+import abstractinterp.scalar.state.Constraint;
 
 public class GraphProjection {
     private static Logger LOGGER = LoggerFactory.getLogger(GraphProjection.class);
 
     private Graph<Local, DefaultEdge> graph;
-    private Map<DefaultEdge, ZoneConstraint> constraints;
+    private Map<DefaultEdge, Constraint> constraints;
 
     public GraphProjection(Set<Local> locals) {
         this.graph = new DefaultDirectedGraph<>(DefaultEdge.class);
@@ -57,14 +57,14 @@ public class GraphProjection {
         locals.forEach(l -> this.graph.addVertex(l));
     }
 
-    public void setConstraint(Local source, Local target, ZoneConstraint constraint) {
+    public void setConstraint(Local source, Local target, Constraint constraint) {
         if (source.equals(target) && constraint.bound().map(b -> b < 0).orElse(false)) {
             DefaultEdge edge = this.graph.addEdge(source, target);
-            this.constraints.put(edge, ZoneConstraint.BOT());
+            this.constraints.put(edge, Constraint.BOT());
         } else if (source.equals(target) &&
                    (!constraint.isBottom() || constraint.bound().map(b -> b > 0).orElse(false))) {
             DefaultEdge edge = this.graph.addEdge(source, target);
-            this.constraints.put(edge, ZoneConstraint.of(0));
+            this.constraints.put(edge, Constraint.of(0));
         } else {
             if (this.graph.containsEdge(source, target)) {
                 DefaultEdge edge = this.graph.removeEdge(source, target);
@@ -91,9 +91,9 @@ public class GraphProjection {
 
     public void toDot(Writer writer) {
         DOTExporter<Local, DefaultEdge> exporter = new DOTExporter<>();
-        Map<DefaultEdge, ZoneConstraint> edges = Map.copyOf(this.constraints);
+        Map<DefaultEdge, Constraint> edges = Map.copyOf(this.constraints);
         exporter.setEdgeAttributeProvider(e -> {
-                ZoneConstraint c = edges.get(e);
+                Constraint c = edges.get(e);
                 Map<String, Attribute> m = Map.of("label",
                                                   DefaultAttribute.createAttribute(c.toString()));
                 return m;

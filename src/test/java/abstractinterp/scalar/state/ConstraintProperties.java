@@ -3,11 +3,11 @@ package abstractinterp.scalar.state;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
 
-public class ZoneConstraintProperties {
+public class ConstraintProperties {
 
     @Property
-    boolean testCopy(@ForAll ZoneConstraint c) {
-        ZoneConstraint d = c.copy();
+    boolean testCopy(@ForAll Constraint c) {
+        Constraint d = c.copy();
         return d.equals(c) && d.hashCode() == c.hashCode();
     }
 }

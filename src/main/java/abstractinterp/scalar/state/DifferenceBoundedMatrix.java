@@ -41,7 +41,7 @@ public class DifferenceBoundedMatrix {
 
     private static Logger LOGGER = LoggerFactory.getLogger(DifferenceBoundedMatrix.class);
     private final int N;
-    private ZoneConstraint[][] matrix;
+    private Constraint[][] matrix;
     private Set<Local> locals;
     protected Set<Local> constants;
     private Map<Local, Integer> localToIndices;
@@ -55,7 +55,7 @@ public class DifferenceBoundedMatrix {
         this.locals.addAll(locals);
         this.localToIndices = new HashMap<>(N * 2 + 1, 0.7f);
         this.indicesToLocals = new HashMap<>(N * 2 + 1, 0.7f);
-        this.matrix = new ZoneConstraint[N][N];
+        this.matrix = new Constraint[N][N];
         {
             int i = 0;
             Collection<Local> ls = locals.stream()
@@ -69,9 +69,9 @@ public class DifferenceBoundedMatrix {
         }
         iterateMatrix((i, j) -> {
                 if (top && i == j) {
-                    this.matrix[i][j] = ZoneConstraint.of(0);
+                    this.matrix[i][j] = Constraint.of(0);
                 } else {
-                    this.matrix[i][j] = top ? ZoneConstraint.TOP() : ZoneConstraint.BOT();
+                    this.matrix[i][j] = top ? Constraint.TOP() : Constraint.BOT();
                 }
             });
     }
@@ -110,20 +110,20 @@ public class DifferenceBoundedMatrix {
         }
     }
 
-    public void setConstraint(Local source, Local target, ZoneConstraint constraint) {
+    public void setConstraint(Local source, Local target, Constraint constraint) {
         int i = this.localToIndices.get(source);
         int j = this.localToIndices.get(target);
         this.setConstraint(i, j, constraint);
     }
 
-    private void setConstraint(int i, int j, ZoneConstraint c) {
+    private void setConstraint(int i, int j, Constraint c) {
         Local source = this.indicesToLocals.get(i);
         Local target = this.indicesToLocals.get(j);
         this.isClosed = false;
         if (i == j && c.bound().map(b -> b < 0).orElse(false)) {
-            this.matrix[i][j] = ZoneConstraint.BOT();
+            this.matrix[i][j] = Constraint.BOT();
         } else if (i == j && (!c.isBottom() || c.bound().map(b -> b > 0).orElse(false))) {
-            this.matrix[i][j] = ZoneConstraint.of(0);
+            this.matrix[i][j] = Constraint.of(0);
         } else {
             this.matrix[i][j] = c;
             if (this.isConstant(i, j)) {
@@ -146,40 +146,40 @@ public class DifferenceBoundedMatrix {
         }
     }
 
-    public boolean putConstraint(Local source, Local target, ZoneConstraint constraint) {
+    public boolean putConstraint(Local source, Local target, Constraint constraint) {
         return this.putConstraint(source, target, constraint, this);
     }
 
     public boolean putConstraint(Local source,
-                                     Local target,
-                                     ZoneConstraint constraint,
-                                     DifferenceBoundedMatrix matrix) {
+                                 Local target,
+                                 Constraint constraint,
+                                 DifferenceBoundedMatrix matrix) {
         int i = this.localToIndices.get(source);
         int j = this.localToIndices.get(target);
         return this.putConstraint(i, j, constraint, matrix);
     }
 
-    private boolean putConstraint(int i, int j, ZoneConstraint c) {
+    private boolean putConstraint(int i, int j, Constraint c) {
         return this.putConstraint(i, j, c, this);
     }
 
-    private boolean putConstraint(int i, int j, ZoneConstraint c, DifferenceBoundedMatrix in) {
+    private boolean putConstraint(int i, int j, Constraint c, DifferenceBoundedMatrix in) {
         boolean added = false;
         LOGGER.trace("Compare to existing constraint: {} ≤ {}", c, in.matrix[i][j]);
-        if (ZoneConstraint.compare(c, in.matrix[i][j]) < 0) {
+        if (Constraint.compare(c, in.matrix[i][j]) < 0) {
             this.setConstraint(i, j, c);
             added = true;
         }
         return added;
     }
 
-    public boolean putIncremental(Local source, Local target, ZoneConstraint constraint) {
+    public boolean putIncremental(Local source, Local target, Constraint constraint) {
         return this.putIncremental(source, target, constraint, this);
     }
 
     public boolean putIncremental(Local source,
                                   Local target,
-                                  ZoneConstraint constraint,
+                                  Constraint constraint,
                                   DifferenceBoundedMatrix in) {
         boolean feasible = false;
         boolean edgeAdded = putConstraint(source, target, constraint, in);
@@ -191,7 +191,7 @@ public class DifferenceBoundedMatrix {
         return feasible;
     }
 
-    public ZoneConstraint getConstraint(Local source, Local target) {
+    public Constraint getConstraint(Local source, Local target) {
         int i = this.localToIndices.get(source);
         int j = this.localToIndices.get(target);
         return this.matrix[i][j];
@@ -204,7 +204,7 @@ public class DifferenceBoundedMatrix {
         LOGGER.debug("computing least upper bound");
         LOGGER.trace("{} ⊔ {}", this, other);
         this.iterateMatrix((i, j) -> {
-                this.setConstraint(i, j, ZoneConstraint.max(this.matrix[i][j], other.matrix[i][j]));
+                this.setConstraint(i, j, Constraint.max(this.matrix[i][j], other.matrix[i][j]));
             });
         LOGGER.debug("finished least upper bound");
         LOGGER.trace("⊔ result: {}", this);
@@ -217,7 +217,7 @@ public class DifferenceBoundedMatrix {
         LOGGER.debug("computing intersection");
         LOGGER.trace("{} ⊓ {}", this, other);
         this.iterateMatrix((i, j) -> {
-                this.setConstraint(i, j, ZoneConstraint.min(this.matrix[i][j], other.matrix[i][j]));
+                this.setConstraint(i, j, Constraint.min(this.matrix[i][j], other.matrix[i][j]));
             });
         LOGGER.debug("finished computing intersection");
         LOGGER.trace("⊓ result:", this);
@@ -250,8 +250,8 @@ public class DifferenceBoundedMatrix {
      */
     public boolean isSubset(DifferenceBoundedMatrix other) {
         return reduceMatrixToBool((i, j) -> {
-                return ZoneConstraint.compare(this.matrix[i][j],
-                                              other.matrix[i][j]) <= 0;
+                return Constraint.compare(this.matrix[i][j],
+                                          other.matrix[i][j]) <= 0;
             });
     }
 
@@ -276,8 +276,8 @@ public class DifferenceBoundedMatrix {
         // foreach child of target (ti), put a constraint
         // we do not skip self references to ensure we capture a negative cycle
         for (int i = 0; i < N; i++) {
-            if (this.putConstraint(si, i, ZoneConstraint.add(this.matrix[si][ti],
-                                                                 this.matrix[ti][i]))) {
+            if (this.putConstraint(si, i, Constraint.add(this.matrix[si][ti],
+                                                         this.matrix[ti][i]))) {
                 worklist.add(this.indicesToLocals.get(i));
             }
         }
@@ -285,8 +285,8 @@ public class DifferenceBoundedMatrix {
         for (Local l : worklist) {
             int c = this.localToIndices.get(l);
             for (int i = 0; i < N; i++) {
-                this.putConstraint(i, c, ZoneConstraint.add(this.matrix[i][si],
-                                                                this.matrix[si][c]));
+                this.putConstraint(i, c, Constraint.add(this.matrix[i][si],
+                                                        this.matrix[si][c]));
             }
         }
 
@@ -309,17 +309,17 @@ public class DifferenceBoundedMatrix {
         if (!this.isClosed) {
             // ensure diagonal is zeroed.
             for (int i = 0; i < N; i++) {
-                this.matrix[i][i] = ZoneConstraint.of(0);
+                this.matrix[i][i] = Constraint.of(0);
             }
 
             for (int k = 0; k < N; k++) {
                 for (int i = 0; i < N; i++) {
                     for (int j = 0; j < N; j++) {
-                        ZoneConstraint candidate = ZoneConstraint.add(this.matrix[i][k],
-                                                                      this.matrix[k][j]);
-                        ZoneConstraint newZoneConstraint = ZoneConstraint.min(this.matrix[i][j],
-                                                                              candidate);
-                        this.setConstraint(i, j, newZoneConstraint);
+                        Constraint candidate = Constraint.add(this.matrix[i][k],
+                                                              this.matrix[k][j]);
+                        Constraint newConstraint = Constraint.min(this.matrix[i][j],
+                                                                  candidate);
+                        this.setConstraint(i, j, newConstraint);
                     }
                 }
             }
@@ -347,14 +347,14 @@ public class DifferenceBoundedMatrix {
 
         this.putIncremental(source,
                             target,
-                            ZoneConstraint.min(this.matrix[s][t],
-                                               ZoneConstraint.add(this.matrix[s][k],
-                                                                  this.matrix[k][t])));
+                            Constraint.min(this.matrix[s][t],
+                                           Constraint.add(this.matrix[s][k],
+                                                          this.matrix[k][t])));
         this.putIncremental(target,
                             source,
-                            ZoneConstraint.min(this.matrix[t][s],
-                                               ZoneConstraint.add(this.matrix[t][k],
-                                                                  this.matrix[k][s])));
+                            Constraint.min(this.matrix[t][s],
+                                           Constraint.add(this.matrix[t][k],
+                                                          this.matrix[k][s])));
 
         boolean feasible = true;
         for (int i = 0; i < N; i++) {
@@ -388,10 +388,10 @@ public class DifferenceBoundedMatrix {
                     if (i == j || i == k || j == k) {
                         continue;
                     }
-                    ZoneConstraint transitivePath = ZoneConstraint.add(this.matrix[i][k],
-                                                                       this.matrix[k][j]);
-                    if (ZoneConstraint.compare(this.matrix[i][j], transitivePath) >= 0) {
-                        this.setConstraint(i, j, ZoneConstraint.TOP());
+                    Constraint transitivePath = Constraint.add(this.matrix[i][k],
+                                                               this.matrix[k][j]);
+                    if (Constraint.compare(this.matrix[i][j], transitivePath) >= 0) {
+                        this.setConstraint(i, j, Constraint.TOP());
                     }
                 }
             }
@@ -415,10 +415,10 @@ public class DifferenceBoundedMatrix {
                 if (i == j) {
                     continue;
                 }
-                ZoneConstraint transitivePath = ZoneConstraint.add(this.matrix[i][0],
-                                                                   this.matrix[0][j]);
-                if (ZoneConstraint.compare(this.matrix[i][j], transitivePath) >= 0) {
-                    this.setConstraint(i, j, ZoneConstraint.TOP());
+                Constraint transitivePath = Constraint.add(this.matrix[i][0],
+                                                           this.matrix[0][j]);
+                if (Constraint.compare(this.matrix[i][j], transitivePath) >= 0) {
+                    this.setConstraint(i, j, Constraint.TOP());
                 }
             }
         }
@@ -434,10 +434,10 @@ public class DifferenceBoundedMatrix {
 
     public void widenWith(DifferenceBoundedMatrix n) {
         iterateMatrix((i, j) -> {
-                ZoneConstraint c1 = this.matrix[i][j];
-                ZoneConstraint c2 = n.matrix[i][j];
+                Constraint c1 = this.matrix[i][j];
+                Constraint c2 = n.matrix[i][j];
                 if (!(c1.isBottom() || c2.isBottom()) && c2.compareTo(c1) == 1) {
-                    this.matrix[i][j] = ZoneConstraint.TOP();
+                    this.matrix[i][j] = Constraint.TOP();
                 }
             });
     }
@@ -448,8 +448,8 @@ public class DifferenceBoundedMatrix {
             if (i == k) {
                 continue;
             } else {
-                this.setConstraint(k, i, ZoneConstraint.TOP());
-                this.setConstraint(i, k, ZoneConstraint.TOP());
+                this.setConstraint(k, i, Constraint.TOP());
+                this.setConstraint(i, k, Constraint.TOP());
             }
         }
     }
@@ -459,11 +459,11 @@ public class DifferenceBoundedMatrix {
             int k = this.localToIndices.get(local);
             iterateMatrix((i, j) -> {
                     if (i == j && j == k) {
-                        this.setConstraint(i, j, ZoneConstraint.of(0));
+                        this.setConstraint(i, j, Constraint.of(0));
                     } else if (i != k && j != k) {
-                        ZoneConstraint c = ZoneConstraint.min(this.matrix[i][j],
-                                                              ZoneConstraint.add(this.matrix[i][k],
-                                                                                 this.matrix[k][j]));
+                        Constraint c = Constraint.min(this.matrix[i][j],
+                                                      Constraint.add(this.matrix[i][k],
+                                                                     this.matrix[k][j]));
                         this.setConstraint(i, j, c);
                     }
                 });
@@ -472,7 +472,7 @@ public class DifferenceBoundedMatrix {
     }
 
     public void makeInfeasible() {
-        iterateMatrix((i, j) -> this.matrix[i][j] = ZoneConstraint.BOT());
+        iterateMatrix((i, j) -> this.matrix[i][j] = Constraint.BOT());
     }
 
     public Interval32Box projectToInterval(Local source) {
@@ -487,59 +487,59 @@ public class DifferenceBoundedMatrix {
         return Interval32Box.of(lower, upper);
     }
 
-    public void addIncoming(Local target, ZoneConstraint add) {
+    public void addIncoming(Local target, Constraint add) {
         this.addIncoming(target, add, this);
     }
 
-    public void addOutgoing(Local source, ZoneConstraint add) {
+    public void addOutgoing(Local source, Constraint add) {
         this.addOutgoing(source, add, this);
     }
 
-    public void subIncoming(Local target, ZoneConstraint sub) {
+    public void subIncoming(Local target, Constraint sub) {
         this.subIncoming(target, sub, this);
     }
 
-    public void subOutgoing(Local source, ZoneConstraint sub) {
+    public void subOutgoing(Local source, Constraint sub) {
         this.subOutgoing(source, sub, this);
     }
 
-    public void addIncoming(Local target, ZoneConstraint add, DifferenceBoundedMatrix from) {
+    public void addIncoming(Local target, Constraint add, DifferenceBoundedMatrix from) {
         int k = this.localToIndices.get(target);
         for (int i = 0; i < N; i++) {
             if (i == k) {
                 continue;
             }
-            this.setConstraint(i, k, ZoneConstraint.add(from.matrix[i][k], add));
+            this.setConstraint(i, k, Constraint.add(from.matrix[i][k], add));
         }
     }
 
-    public void addOutgoing(Local source, ZoneConstraint add, DifferenceBoundedMatrix from) {
+    public void addOutgoing(Local source, Constraint add, DifferenceBoundedMatrix from) {
         int k = this.localToIndices.get(source);
         for (int i = 0; i < N; i++) {
             if (i == k) {
                 continue;
             }
-            this.setConstraint(k, i, ZoneConstraint.add(from.matrix[k][i], add));
+            this.setConstraint(k, i, Constraint.add(from.matrix[k][i], add));
         }
     }
 
-    public void subIncoming(Local target, ZoneConstraint sub, DifferenceBoundedMatrix from) {
+    public void subIncoming(Local target, Constraint sub, DifferenceBoundedMatrix from) {
         int k = this.localToIndices.get(target);
         for (int i = 0; i < N; i++) {
             if (i == k) {
                 continue;
             }
-            this.setConstraint(i, k, ZoneConstraint.subtract(from.matrix[i][k], sub));
+            this.setConstraint(i, k, Constraint.subtract(from.matrix[i][k], sub));
         }
     }
 
-    public void subOutgoing(Local source, ZoneConstraint sub, DifferenceBoundedMatrix from) {
+    public void subOutgoing(Local source, Constraint sub, DifferenceBoundedMatrix from) {
         int k = this.localToIndices.get(source);
         for (int i = 0; i < N; i++) {
             if (i == k) {
                 continue;
             }
-            this.setConstraint(k, i, ZoneConstraint.subtract(from.matrix[k][i], sub));
+            this.setConstraint(k, i, Constraint.subtract(from.matrix[k][i], sub));
         }
     }
 
@@ -738,7 +738,7 @@ public class DifferenceBoundedMatrix {
             iterateMatrix((i, j) -> {
                     if (i == j) {
                         Local s = this.indicesToLocals.get(i);
-                        graph.setConstraint(s, s, ZoneConstraint.BOT());
+                        graph.setConstraint(s, s, Constraint.BOT());
                     }
                 });
         }
@@ -819,7 +819,7 @@ public class DifferenceBoundedMatrix {
             .map(o -> o.get());
     }
 
-    private BinopExpr toGrimpExpr(Local s, Local t, ZoneConstraint c) {
+    private BinopExpr toGrimpExpr(Local s, Local t, Constraint c) {
         BinopExpr r = null;
         Grimp g = Grimp.v();
         Function<Local, BinopExpr> top = l -> {
@@ -861,7 +861,7 @@ public class DifferenceBoundedMatrix {
     }
 
     private boolean anyBottoms() {
-        return reduceMatrix((i, j) -> this.matrix[i][j].equals(ZoneConstraint.BOT()),
+        return reduceMatrix((i, j) -> this.matrix[i][j].equals(Constraint.BOT()),
                             (a, b) -> a || b,
                             false);
     }

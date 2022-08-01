@@ -2,8 +2,8 @@ package abstractinterp.scalar.state;
 
 import java.util.Optional;
 
-class BotZoneConstraint extends ZoneConstraint {
-    public BotZoneConstraint() {
+class BotConstraint extends Constraint {
+    public BotConstraint() {
         super(Optional.empty(), true);
     }
 
@@ -12,42 +12,42 @@ class BotZoneConstraint extends ZoneConstraint {
         return "⟘";
     }
 
-    private ZoneConstraint combine(ZoneConstraint c) {
+    private Constraint combine(Constraint c) {
         return this;
     }
 
     @Override
-    public ZoneConstraint add(ZoneConstraint c) {
+    public Constraint add(Constraint c) {
         return this;
     }
 
     @Override
-    public ZoneConstraint subtract(ZoneConstraint c) {
+    public Constraint subtract(Constraint c) {
         return this;
     }
 
     @Override
-    public ZoneConstraint multiply(ZoneConstraint c) {
+    public Constraint multiply(Constraint c) {
         return this;
     }
 
     @Override
-    public ZoneConstraint divide(ZoneConstraint c) {
+    public Constraint divide(Constraint c) {
         return this;
     }
 
     @Override
     public boolean equals(Object o) {
         boolean equal = false;
-        if (o != null && o instanceof ZoneConstraint) {
-            equal = this.equals((ZoneConstraint) o);
+        if (o != null && o instanceof Constraint) {
+            equal = this.equals((Constraint) o);
         }
         return equal;
     }
 
-    public boolean equals(ZoneConstraint c) {
+    public boolean equals(Constraint c) {
         boolean equal = false;
-        if (c instanceof BotZoneConstraint || c.isBottom()) {
+        if (c instanceof BotConstraint || c.isBottom()) {
             equal = true;
         }
         return equal;

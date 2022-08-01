@@ -45,7 +45,7 @@ public class DifferenceBoundedGraph {
     private static Logger LOGGER = LoggerFactory.getLogger(DifferenceBoundedGraph.class);
 
     private Graph<Local, DefaultEdge> graph;
-    private Map<DefaultEdge, ZoneConstraint> constraints;
+    private Map<DefaultEdge, Constraint> constraints;
 
     public DifferenceBoundedGraph(Set<Local> locals, boolean top) {
         this.graph = new DefaultDirectedGraph<>(DefaultEdge.class);
@@ -56,10 +56,10 @@ public class DifferenceBoundedGraph {
                 this.graph.vertexSet().forEach(t -> {
                         if (s.equals(t)) {
                             DefaultEdge edge = this.graph.addEdge(s, t);
-                            this.constraints.put(edge, ZoneConstraint.of(0));
+                            this.constraints.put(edge, Constraint.of(0));
                         } else {
                             DefaultEdge edge = this.graph.addEdge(s, t);
-                            this.constraints.put(edge, top ? ZoneConstraint.TOP() : ZoneConstraint.BOT());
+                            this.constraints.put(edge, top ? Constraint.TOP() : Constraint.BOT());
                         }
                     });
             });
@@ -69,14 +69,14 @@ public class DifferenceBoundedGraph {
         return Collections.unmodifiableSet(this.graph.vertexSet());
     }
 
-    public void setConstraint(Local source, Local target, ZoneConstraint constraint) {
+    public void setConstraint(Local source, Local target, Constraint constraint) {
         if (source.equals(target) && constraint.bound().map(b -> b < 0).orElse(false)) {
             DefaultEdge edge = this.graph.addEdge(source, target);
-            this.constraints.put(edge, ZoneConstraint.BOT());
+            this.constraints.put(edge, Constraint.BOT());
         } else if (source.equals(target) &&
                    (!constraint.isBottom() || constraint.bound().map(b -> b > 0).orElse(false))) {
             DefaultEdge edge = this.graph.addEdge(source, target);
-            this.constraints.put(edge, ZoneConstraint.of(0));
+            this.constraints.put(edge, Constraint.of(0));
         } else {
             if (this.graph.containsEdge(source, target)) {
                 DefaultEdge edge = this.graph.removeEdge(source, target);
@@ -100,12 +100,12 @@ public class DifferenceBoundedGraph {
             List<Local> succs = Graphs.successorListOf(this.graph, current);
             Stream.concat(preds.stream().filter(p -> {
                         DefaultEdge e = this.graph.getEdge(p, current);
-                        ZoneConstraint c = this.constraints.get(e);
+                        Constraint c = this.constraints.get(e);
                         return !c.isTop();
                     }),
                 succs.stream().filter(s -> {
                         DefaultEdge e = this.graph.getEdge(current, s);
-                        ZoneConstraint c = this.constraints.get(e);
+                        Constraint c = this.constraints.get(e);
                         return !c.isTop();
                     }))
                 .filter(c -> !c.equals(Variable.ZERO))
@@ -124,7 +124,7 @@ public class DifferenceBoundedGraph {
         this.graph.edgeSet().stream().forEach(e -> {
                 Local s = this.graph.getEdgeSource(e);
                 Local t = this.graph.getEdgeTarget(e);
-                ZoneConstraint c = this.constraints.get(e);
+                Constraint c = this.constraints.get(e);
                 g.setConstraint(s, t, c);
             });
         return g;
@@ -136,7 +136,7 @@ public class DifferenceBoundedGraph {
         g.graph.edgeSet().stream().forEach(e -> {
                 Local s = g.graph.getEdgeSource(e);
                 Local t = g.graph.getEdgeTarget(e);
-                ZoneConstraint c = g.constraints.get(e);
+                Constraint c = g.constraints.get(e);
                 m.setConstraint(s, t, c);
             });
         return m;

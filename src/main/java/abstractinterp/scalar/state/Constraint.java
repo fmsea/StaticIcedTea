@@ -3,11 +3,11 @@ package abstractinterp.scalar.state;
 import java.util.Optional;
 import soot.jimple.IntConstant;
 
-public class ZoneConstraint implements Comparable<ZoneConstraint> {
+public class Constraint implements Comparable<Constraint> {
     private Optional<Integer> bound;
     private boolean bottom = false;
 
-    public ZoneConstraint(Optional<Integer> bound, boolean bottom) {
+    public Constraint(Optional<Integer> bound, boolean bottom) {
         if (bound == null) {
             this.bound = Optional.empty();
         } else {
@@ -16,32 +16,32 @@ public class ZoneConstraint implements Comparable<ZoneConstraint> {
         this.bottom = bottom;
     }
 
-    public static ZoneConstraint TOP() {
-        return new TopZoneConstraint();
+    public static Constraint TOP() {
+        return new TopConstraint();
     }
 
-    public static ZoneConstraint BOT() {
-        return new BotZoneConstraint();
+    public static Constraint BOT() {
+        return new BotConstraint();
     }
 
-    public static ZoneConstraint of(int bound) {
-        return new ZoneConstraint(Optional.of(bound), false);
+    public static Constraint of(int bound) {
+        return new Constraint(Optional.of(bound), false);
     }
 
-    public static ZoneConstraint of(int bound, boolean bottom) {
-        return new ZoneConstraint(Optional.of(bound), bottom);
+    public static Constraint of(int bound, boolean bottom) {
+        return new Constraint(Optional.of(bound), bottom);
     }
 
-    public static ZoneConstraint of(Integer bound) {
-        return new ZoneConstraint(Optional.ofNullable(bound), false);
+    public static Constraint of(Integer bound) {
+        return new Constraint(Optional.ofNullable(bound), false);
     }
 
-    public static ZoneConstraint of(Optional<Integer> bound) {
-        return new ZoneConstraint(bound, false);
+    public static Constraint of(Optional<Integer> bound) {
+        return new Constraint(bound, false);
     }
 
-    public static ZoneConstraint of(Optional<Integer> bound, boolean bottom) {
-        return new ZoneConstraint(bound, bottom);
+    public static Constraint of(Optional<Integer> bound, boolean bottom) {
+        return new Constraint(bound, bottom);
     }
 
     public Optional<Integer> bound() {
@@ -56,8 +56,8 @@ public class ZoneConstraint implements Comparable<ZoneConstraint> {
         return (this.bottom == false && this.bound.isEmpty());
     }
 
-    public ZoneConstraint copy() {
-        ZoneConstraint c = new ZoneConstraint(this.bound, this.bottom);
+    public Constraint copy() {
+        Constraint c = new Constraint(this.bound, this.bottom);
         return c;
     }
 
@@ -71,35 +71,35 @@ public class ZoneConstraint implements Comparable<ZoneConstraint> {
         this.bound = Optional.empty();
     }
 
-    public static ZoneConstraint add(ZoneConstraint x,
-                                     ZoneConstraint y) {
-        ZoneConstraint z = x.copy();
+    public static Constraint add(Constraint x,
+                                     Constraint y) {
+        Constraint z = x.copy();
         z.add(y);
         return z;
     }
 
-    public static ZoneConstraint subtract(ZoneConstraint x,
-                                          ZoneConstraint y) {
-        ZoneConstraint z = x.copy();
+    public static Constraint subtract(Constraint x,
+                                          Constraint y) {
+        Constraint z = x.copy();
         z.subtract(y);
         return z;
     }
 
-    public static ZoneConstraint multiply(ZoneConstraint x,
-                                          ZoneConstraint y) {
-        ZoneConstraint z = x.copy();
+    public static Constraint multiply(Constraint x,
+                                          Constraint y) {
+        Constraint z = x.copy();
         z.multiply(y);
         return z;
     }
 
-    public static ZoneConstraint divide(ZoneConstraint x,
-                                        ZoneConstraint y) {
-        ZoneConstraint z = x.copy();
+    public static Constraint divide(Constraint x,
+                                        Constraint y) {
+        Constraint z = x.copy();
         z.divide(y);
         return z;
     }
 
-    public ZoneConstraint add(ZoneConstraint c) {
+    public Constraint add(Constraint c) {
         if (this.isBottom() || c.isBottom()) {
             this.makeBottom();
         } else if (this.isTop() || c.isTop()) {
@@ -114,7 +114,7 @@ public class ZoneConstraint implements Comparable<ZoneConstraint> {
         return this;
     }
 
-    public ZoneConstraint subtract(ZoneConstraint c) {
+    public Constraint subtract(Constraint c) {
         if (this.isBottom() || c.isBottom()) {
             this.makeBottom();
         } else if (this.isTop() || c.isTop()) {
@@ -129,7 +129,7 @@ public class ZoneConstraint implements Comparable<ZoneConstraint> {
         return this;
     }
 
-    public ZoneConstraint multiply(ZoneConstraint c) {
+    public Constraint multiply(Constraint c) {
         if (this.isBottom() || c.isBottom()) {
             this.makeBottom();
         } else if (this.isTop() || c.isTop()) {
@@ -144,7 +144,7 @@ public class ZoneConstraint implements Comparable<ZoneConstraint> {
         return this;
     }
 
-    public ZoneConstraint divide(ZoneConstraint c) {
+    public Constraint divide(Constraint c) {
         if (this.isBottom() || c.isBottom()) {
             this.makeBottom();
         } else if (this.isTop() || c.isTop()) {
@@ -157,7 +157,7 @@ public class ZoneConstraint implements Comparable<ZoneConstraint> {
         return this;
     }
 
-    public static int compare(ZoneConstraint A, ZoneConstraint B) {
+    public static int compare(Constraint A, Constraint B) {
         int r;
         if (A.equals(B)) {
             r = 0;
@@ -171,8 +171,8 @@ public class ZoneConstraint implements Comparable<ZoneConstraint> {
         return r;
     }
 
-    public static ZoneConstraint max(ZoneConstraint a, ZoneConstraint b) {
-        ZoneConstraint r = ZoneConstraint.BOT();
+    public static Constraint max(Constraint a, Constraint b) {
+        Constraint r = Constraint.BOT();
         int c = compare(a, b);
         if (c <= 0) {
             r = b.copy();
@@ -182,8 +182,8 @@ public class ZoneConstraint implements Comparable<ZoneConstraint> {
         return r;
     }
 
-    public static ZoneConstraint min(ZoneConstraint a, ZoneConstraint b) {
-        ZoneConstraint r = ZoneConstraint.BOT();
+    public static Constraint min(Constraint a, Constraint b) {
+        Constraint r = Constraint.BOT();
         int c = compare(a, b);
         if (c <= 0) {
             r = a.copy();
@@ -194,20 +194,20 @@ public class ZoneConstraint implements Comparable<ZoneConstraint> {
     }
 
     @Override
-    public int compareTo(ZoneConstraint other) {
-        return ZoneConstraint.compare(this, other);
+    public int compareTo(Constraint other) {
+        return Constraint.compare(this, other);
     }
 
     @Override
     public boolean equals(Object o) {
         boolean equal = false;
-        if (o != null && o instanceof ZoneConstraint) {
-            equal = this.equals((ZoneConstraint) o);
+        if (o != null && o instanceof Constraint) {
+            equal = this.equals((Constraint) o);
         }
         return equal;
     }
 
-    public boolean equals(ZoneConstraint c) {
+    public boolean equals(Constraint c) {
         return (c != null &&
                 ((this.isBottom() && c.isBottom()) ||
                  (this.bottom == c.bottom &&

@@ -51,10 +51,10 @@ public class DifferenceBoundedMatrixTest {
         DifferenceBoundedMatrix matrix = new DifferenceBoundedMatrix(this.locals, true);
         checkMatrixCondition((s, t) -> {
                 if (s.equals(t)) {
-                    assertEquals(ZoneConstraint.of(0),
+                    assertEquals(Constraint.of(0),
                                  matrix.getConstraint(s, t));
                 } else {
-                    assertEquals(ZoneConstraint.TOP(),
+                    assertEquals(Constraint.TOP(),
                                  matrix.getConstraint(s, t));
                 }
             });
@@ -64,7 +64,7 @@ public class DifferenceBoundedMatrixTest {
     void testInitializeWithoutTop() {
         DifferenceBoundedMatrix matrix = new DifferenceBoundedMatrix(this.locals, false);
         checkMatrixCondition((s, t) -> {
-                assertEquals(ZoneConstraint.BOT(), matrix.getConstraint(s, t));
+                assertEquals(Constraint.BOT(), matrix.getConstraint(s, t));
             });
     }
 
@@ -82,24 +82,24 @@ public class DifferenceBoundedMatrixTest {
     void testPutConstraint() {
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.putConstraint(xs[0], xs[1], ZoneConstraint.of(3));
-            assertEquals(ZoneConstraint.of(3),
+            m.putConstraint(xs[0], xs[1], Constraint.of(3));
+            assertEquals(Constraint.of(3),
                          m.getConstraint(xs[0], xs[1]));
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(3));
-            m.putConstraint(xs[0], xs[1], ZoneConstraint.of(4));
-            assertEquals(ZoneConstraint.of(3),
+            m.setConstraint(xs[0], xs[1], Constraint.of(3));
+            m.putConstraint(xs[0], xs[1], Constraint.of(4));
+            assertEquals(Constraint.of(3),
                          m.getConstraint(xs[0], xs[1]));
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(4));
-            m.putConstraint(xs[0], xs[1], ZoneConstraint.of(3));
-            assertEquals(ZoneConstraint.of(3),
+            m.setConstraint(xs[0], xs[1], Constraint.of(4));
+            m.putConstraint(xs[0], xs[1], Constraint.of(3));
+            assertEquals(Constraint.of(3),
                          m.getConstraint(xs[0], xs[1]));
         }
     }
@@ -108,16 +108,16 @@ public class DifferenceBoundedMatrixTest {
     void testSetConstraint() {
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[1], xs[1], ZoneConstraint.of(3));
-            assertEquals(ZoneConstraint.of(0),
+            m.setConstraint(xs[1], xs[1], Constraint.of(3));
+            assertEquals(Constraint.of(0),
                          m.getConstraint(xs[1], xs[1]));
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[1], xs[1], ZoneConstraint.of(-3));
+            m.setConstraint(xs[1], xs[1], Constraint.of(-3));
             assertAll(() -> assertFalse(m.isFeasible()),
-                      () -> assertEquals(ZoneConstraint.BOT(),
+                      () -> assertEquals(Constraint.BOT(),
                                          m.getConstraint(xs[1], xs[1])));
         }
     }
@@ -130,9 +130,9 @@ public class DifferenceBoundedMatrixTest {
             m.union(n);
             checkMatrixCondition((s, t) -> {
                     if (s.equals(t)) {
-                        assertEquals(ZoneConstraint.of(0), m.getConstraint(s, t));
+                        assertEquals(Constraint.of(0), m.getConstraint(s, t));
                     } else {
-                        assertEquals(ZoneConstraint.TOP(), m.getConstraint(s, t));
+                        assertEquals(Constraint.TOP(), m.getConstraint(s, t));
                     }
                 });
         }
@@ -143,39 +143,39 @@ public class DifferenceBoundedMatrixTest {
             m.union(n);
             checkMatrixCondition((s, t) -> {
                     if (s.equals(t)) {
-                        assertEquals(ZoneConstraint.of(0), m.getConstraint(s, t));
+                        assertEquals(Constraint.of(0), m.getConstraint(s, t));
                     } else {
-                        assertEquals(ZoneConstraint.TOP(), m.getConstraint(s, t));
+                        assertEquals(Constraint.TOP(), m.getConstraint(s, t));
                     }
                 });
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(4));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[1], xs[0], Constraint.of(4));
+            m.setConstraint(xs[1], xs[2], Constraint.of(1));
+            m.setConstraint(xs[2], xs[0], Constraint.of(3));
             DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(this.locals, true);
-            n.setConstraint(xs[0], xs[1], ZoneConstraint.of(-2));
-            n.setConstraint(xs[0], xs[2], ZoneConstraint.of(-3));
-            n.setConstraint(xs[1], xs[0], ZoneConstraint.of(5));
-            n.setConstraint(xs[1], xs[2], ZoneConstraint.of(2));
-            n.setConstraint(xs[2], xs[0], ZoneConstraint.of(6));
-            n.setConstraint(xs[2], xs[1], ZoneConstraint.of(1));
+            n.setConstraint(xs[0], xs[1], Constraint.of(-2));
+            n.setConstraint(xs[0], xs[2], Constraint.of(-3));
+            n.setConstraint(xs[1], xs[0], Constraint.of(5));
+            n.setConstraint(xs[1], xs[2], Constraint.of(2));
+            n.setConstraint(xs[2], xs[0], Constraint.of(6));
+            n.setConstraint(xs[2], xs[1], Constraint.of(1));
             m.union(n);
-            assertAll(() -> assertEquals(ZoneConstraint.of(-1),
+            assertAll(() -> assertEquals(Constraint.of(-1),
                                          m.getConstraint(xs[0], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(-1),
+                      () -> assertEquals(Constraint.of(-1),
                                          m.getConstraint(xs[0], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(5),
+                      () -> assertEquals(Constraint.of(5),
                                          m.getConstraint(xs[1], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(2),
+                      () -> assertEquals(Constraint.of(2),
                                          m.getConstraint(xs[1], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(6),
+                      () -> assertEquals(Constraint.of(6),
                                          m.getConstraint(xs[2], xs[0])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[2], xs[1])));
         }
     }
@@ -187,7 +187,7 @@ public class DifferenceBoundedMatrixTest {
             DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(this.locals, false);
             m.intersection(n);
             checkMatrixCondition((s, t) -> {
-                    assertEquals(ZoneConstraint.BOT(), m.getConstraint(s, t));
+                    assertEquals(Constraint.BOT(), m.getConstraint(s, t));
                 });
         }
 
@@ -196,36 +196,36 @@ public class DifferenceBoundedMatrixTest {
             DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(this.locals, true);
             m.intersection(n);
             checkMatrixCondition((s, t) -> {
-                    assertEquals(ZoneConstraint.BOT(), m.getConstraint(s, t));
+                    assertEquals(Constraint.BOT(), m.getConstraint(s, t));
                 });
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(4));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[1], xs[0], Constraint.of(4));
+            m.setConstraint(xs[1], xs[2], Constraint.of(1));
+            m.setConstraint(xs[2], xs[0], Constraint.of(3));
             DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(this.locals, true);
-            n.setConstraint(xs[0], xs[1], ZoneConstraint.of(-2));
-            n.setConstraint(xs[0], xs[2], ZoneConstraint.of(-3));
-            n.setConstraint(xs[1], xs[0], ZoneConstraint.of(5));
-            n.setConstraint(xs[1], xs[2], ZoneConstraint.of(2));
-            n.setConstraint(xs[2], xs[0], ZoneConstraint.of(6));
-            n.setConstraint(xs[2], xs[1], ZoneConstraint.of(1));
+            n.setConstraint(xs[0], xs[1], Constraint.of(-2));
+            n.setConstraint(xs[0], xs[2], Constraint.of(-3));
+            n.setConstraint(xs[1], xs[0], Constraint.of(5));
+            n.setConstraint(xs[1], xs[2], Constraint.of(2));
+            n.setConstraint(xs[2], xs[0], Constraint.of(6));
+            n.setConstraint(xs[2], xs[1], Constraint.of(1));
             m.intersection(n);
-            assertAll(() -> assertEquals(ZoneConstraint.of(-2),
+            assertAll(() -> assertEquals(Constraint.of(-2),
                                          m.getConstraint(xs[0], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(-3),
+                      () -> assertEquals(Constraint.of(-3),
                                          m.getConstraint(xs[0], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(4),
+                      () -> assertEquals(Constraint.of(4),
                                          m.getConstraint(xs[1], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(1),
+                      () -> assertEquals(Constraint.of(1),
                                          m.getConstraint(xs[1], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(3),
+                      () -> assertEquals(Constraint.of(3),
                                          m.getConstraint(xs[2], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(1),
+                      () -> assertEquals(Constraint.of(1),
                                          m.getConstraint(xs[2], xs[1])));
         }
     }
@@ -244,11 +244,11 @@ public class DifferenceBoundedMatrixTest {
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(4));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[1], xs[0], Constraint.of(4));
+            m.setConstraint(xs[1], xs[2], Constraint.of(1));
+            m.setConstraint(xs[2], xs[0], Constraint.of(3));
             assertAll(() -> assertTrue(m.computeClosure()),
                       () -> assertTrue(m.isFeasible()));
         }
@@ -265,11 +265,11 @@ public class DifferenceBoundedMatrixTest {
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(4));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[1], xs[0], Constraint.of(4));
+            m.setConstraint(xs[1], xs[2], Constraint.of(1));
+            m.setConstraint(xs[2], xs[0], Constraint.of(3));
             DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(this.locals, true);
             assertAll(() -> assertTrue(m.isSubset(n)),
                       () -> assertFalse(n.isSubset(m)));
@@ -277,27 +277,27 @@ public class DifferenceBoundedMatrixTest {
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(4));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[1], xs[0], Constraint.of(4));
+            m.setConstraint(xs[1], xs[2], Constraint.of(1));
+            m.setConstraint(xs[2], xs[0], Constraint.of(3));
             assertTrue(m.isSubset(m));
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-2));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(4));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-2));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[1], xs[0], Constraint.of(4));
+            m.setConstraint(xs[1], xs[2], Constraint.of(1));
+            m.setConstraint(xs[2], xs[0], Constraint.of(3));
             DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(this.locals, true);
-            n.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            n.setConstraint(xs[0], xs[2], ZoneConstraint.of(0));
-            n.setConstraint(xs[1], xs[0], ZoneConstraint.of(4));
-            n.setConstraint(xs[1], xs[2], ZoneConstraint.of(2));
-            n.setConstraint(xs[2], xs[0], ZoneConstraint.of(6));
+            n.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            n.setConstraint(xs[0], xs[2], Constraint.of(0));
+            n.setConstraint(xs[1], xs[0], Constraint.of(4));
+            n.setConstraint(xs[1], xs[2], Constraint.of(2));
+            n.setConstraint(xs[2], xs[0], Constraint.of(6));
             assertAll(() -> assertTrue(m.isSubset(n)),
                       () -> assertFalse(n.isSubset(m)));
         }
@@ -310,9 +310,9 @@ public class DifferenceBoundedMatrixTest {
             assertTrue(m.computeClosure());
             checkMatrixCondition((s, t) -> {
                     if (s.equals(t)) {
-                        assertEquals(ZoneConstraint.of(0), m.getConstraint(s, t));
+                        assertEquals(Constraint.of(0), m.getConstraint(s, t));
                     } else {
-                        assertEquals(ZoneConstraint.TOP(), m.getConstraint(s, t));
+                        assertEquals(Constraint.TOP(), m.getConstraint(s, t));
                     }
                 });
         }
@@ -321,72 +321,72 @@ public class DifferenceBoundedMatrixTest {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, false);
             assertFalse(m.computeClosure());
             checkMatrixCondition((s, t) -> {
-                    assertEquals(ZoneConstraint.BOT(), m.getConstraint(s, t));
+                    assertEquals(Constraint.BOT(), m.getConstraint(s, t));
                 });
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(5));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[1], xs[0], Constraint.of(5));
+            m.setConstraint(xs[1], xs[2], Constraint.of(1));
+            m.setConstraint(xs[2], xs[0], Constraint.of(3));
             assertAll(() -> assertTrue(m.computeClosure()),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[0], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[1], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[2], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(-1),
+                      () -> assertEquals(Constraint.of(-1),
                                          m.getConstraint(xs[0], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(-1),
+                      () -> assertEquals(Constraint.of(-1),
                                          m.getConstraint(xs[0], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(4),
+                      () -> assertEquals(Constraint.of(4),
                                          m.getConstraint(xs[1], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(1),
+                      () -> assertEquals(Constraint.of(1),
                                          m.getConstraint(xs[1], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(3),
+                      () -> assertEquals(Constraint.of(3),
                                          m.getConstraint(xs[2], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(2),
+                      () -> assertEquals(Constraint.of(2),
                                          m.getConstraint(xs[2], xs[1])));
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(0));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[1], xs[0], Constraint.of(0));
+            m.setConstraint(xs[1], xs[2], Constraint.of(1));
+            m.setConstraint(xs[2], xs[0], Constraint.of(3));
             assertAll(() -> assertFalse(m.computeClosure()),
-                      () -> assertEquals(ZoneConstraint.BOT(),
+                      () -> assertEquals(Constraint.BOT(),
                                          m.getConstraint(xs[0], xs[0])),
-                      () -> assertEquals(ZoneConstraint.BOT(),
+                      () -> assertEquals(Constraint.BOT(),
                                          m.getConstraint(xs[1], xs[1])),
-                      () -> assertEquals(ZoneConstraint.BOT(),
+                      () -> assertEquals(Constraint.BOT(),
                                          m.getConstraint(xs[2], xs[2])),
-                      () -> assertEquals(ZoneConstraint.BOT(),
+                      () -> assertEquals(Constraint.BOT(),
                                          m.getConstraint(xs[0], xs[1])),
-                      () -> assertEquals(ZoneConstraint.BOT(),
+                      () -> assertEquals(Constraint.BOT(),
                                          m.getConstraint(xs[0], xs[2])),
-                      () -> assertEquals(ZoneConstraint.BOT(),
+                      () -> assertEquals(Constraint.BOT(),
                                          m.getConstraint(xs[1], xs[0])),
-                      () -> assertEquals(ZoneConstraint.BOT(),
+                      () -> assertEquals(Constraint.BOT(),
                                          m.getConstraint(xs[1], xs[2])),
-                      () -> assertEquals(ZoneConstraint.BOT(),
+                      () -> assertEquals(Constraint.BOT(),
                                          m.getConstraint(xs[2], xs[0])),
-                      () -> assertEquals(ZoneConstraint.BOT(),
+                      () -> assertEquals(Constraint.BOT(),
                                          m.getConstraint(xs[2], xs[1])));
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(+2));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(-3));
-            m.setConstraint(xs[2], xs[1], ZoneConstraint.of(+2));
+            m.setConstraint(xs[0], xs[1], Constraint.of(+2));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[1], xs[2], Constraint.of(-3));
+            m.setConstraint(xs[2], xs[1], Constraint.of(+2));
             assertFalse(m.computeClosure());
         }
 
@@ -402,44 +402,44 @@ public class DifferenceBoundedMatrixTest {
 
             // Figure 3 from https://doi.org/10.1109/REAL.1997.641265
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
-            m.setConstraint(xs[0], xs[3], ZoneConstraint.of(5));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(3));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(10));
-            m.setConstraint(xs[1], xs[3], ZoneConstraint.of(2));
-            m.setConstraint(xs[2], xs[1], ZoneConstraint.of(-4));
-            m.setConstraint(xs[3], xs[2], ZoneConstraint.of(2));
+            m.setConstraint(xs[0], xs[3], Constraint.of(5));
+            m.setConstraint(xs[1], xs[0], Constraint.of(3));
+            m.setConstraint(xs[1], xs[2], Constraint.of(10));
+            m.setConstraint(xs[1], xs[3], Constraint.of(2));
+            m.setConstraint(xs[2], xs[1], Constraint.of(-4));
+            m.setConstraint(xs[3], xs[2], Constraint.of(2));
             assertAll(() -> assertTrue(m.computeClosure()),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[0], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(3),
+                      () -> assertEquals(Constraint.of(3),
                                          m.getConstraint(xs[0], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(7),
+                      () -> assertEquals(Constraint.of(7),
                                          m.getConstraint(xs[0], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(5),
+                      () -> assertEquals(Constraint.of(5),
                                          m.getConstraint(xs[0], xs[3])),
-                      () -> assertEquals(ZoneConstraint.of(3),
+                      () -> assertEquals(Constraint.of(3),
                                          m.getConstraint(xs[1], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[1], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(4),
+                      () -> assertEquals(Constraint.of(4),
                                          m.getConstraint(xs[1], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(2),
+                      () -> assertEquals(Constraint.of(2),
                                          m.getConstraint(xs[1], xs[3])),
-                      () -> assertEquals(ZoneConstraint.of(-1),
+                      () -> assertEquals(Constraint.of(-1),
                                          m.getConstraint(xs[2], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(-4),
+                      () -> assertEquals(Constraint.of(-4),
                                          m.getConstraint(xs[2], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[2], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(-2),
+                      () -> assertEquals(Constraint.of(-2),
                                          m.getConstraint(xs[2], xs[3])),
-                      () -> assertEquals(ZoneConstraint.of(1),
+                      () -> assertEquals(Constraint.of(1),
                                          m.getConstraint(xs[3], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(-2),
+                      () -> assertEquals(Constraint.of(-2),
                                          m.getConstraint(xs[3], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(2),
+                      () -> assertEquals(Constraint.of(2),
                                          m.getConstraint(xs[3], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[3], xs[3])));
         }
     }
@@ -451,9 +451,9 @@ public class DifferenceBoundedMatrixTest {
             assertTrue(m.computeClosure());
             checkMatrixCondition((s, t) -> {
                     if (s.equals(t)) {
-                        assertEquals(ZoneConstraint.of(0), m.getConstraint(s, t));
+                        assertEquals(Constraint.of(0), m.getConstraint(s, t));
                     } else {
-                        assertEquals(ZoneConstraint.TOP(), m.getConstraint(s, t));
+                        assertEquals(Constraint.TOP(), m.getConstraint(s, t));
                     }
                 });
         }
@@ -462,35 +462,35 @@ public class DifferenceBoundedMatrixTest {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, false);
             assertFalse(m.computeClosure());
             checkMatrixCondition((s, t) -> {
-                    assertEquals(ZoneConstraint.BOT(), m.getConstraint(s, t));
+                    assertEquals(Constraint.BOT(), m.getConstraint(s, t));
                 });
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(5));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[1], xs[0], Constraint.of(5));
+            m.setConstraint(xs[1], xs[2], Constraint.of(1));
+            m.setConstraint(xs[2], xs[0], Constraint.of(3));
             assertAll(() -> assertTrue(m.computeReducedClosure()),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[0], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[1], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[2], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(-1),
+                      () -> assertEquals(Constraint.of(-1),
                                          m.getConstraint(xs[0], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(-1),
+                      () -> assertEquals(Constraint.of(-1),
                                          m.getConstraint(xs[0], xs[2])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[1], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(1),
+                      () -> assertEquals(Constraint.of(1),
                                          m.getConstraint(xs[1], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(3),
+                      () -> assertEquals(Constraint.of(3),
                                          m.getConstraint(xs[2], xs[0])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[2], xs[1])));
         }
 
@@ -506,44 +506,44 @@ public class DifferenceBoundedMatrixTest {
 
             // Figure 3 from https://doi.org/10.1109/REAL.1997.641265
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
-            m.setConstraint(xs[0], xs[3], ZoneConstraint.of(5));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(3));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(10));
-            m.setConstraint(xs[1], xs[3], ZoneConstraint.of(2));
-            m.setConstraint(xs[2], xs[1], ZoneConstraint.of(-4));
-            m.setConstraint(xs[3], xs[2], ZoneConstraint.of(2));
+            m.setConstraint(xs[0], xs[3], Constraint.of(5));
+            m.setConstraint(xs[1], xs[0], Constraint.of(3));
+            m.setConstraint(xs[1], xs[2], Constraint.of(10));
+            m.setConstraint(xs[1], xs[3], Constraint.of(2));
+            m.setConstraint(xs[2], xs[1], Constraint.of(-4));
+            m.setConstraint(xs[3], xs[2], Constraint.of(2));
             assertAll(() -> assertTrue(m.computeReducedClosure()),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[0], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(3),
+                      () -> assertEquals(Constraint.of(3),
                                          m.getConstraint(xs[0], xs[1])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[0], xs[2])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[0], xs[3])),
-                      () -> assertEquals(ZoneConstraint.of(3),
+                      () -> assertEquals(Constraint.of(3),
                                          m.getConstraint(xs[1], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[1], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(4),
+                      () -> assertEquals(Constraint.of(4),
                                          m.getConstraint(xs[1], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(2),
+                      () -> assertEquals(Constraint.of(2),
                                          m.getConstraint(xs[1], xs[3])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[2], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(-4),
+                      () -> assertEquals(Constraint.of(-4),
                                          m.getConstraint(xs[2], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[2], xs[2])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[2], xs[3])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[3], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(-2),
+                      () -> assertEquals(Constraint.of(-2),
                                          m.getConstraint(xs[3], xs[1])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[3], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[3], xs[3])));
         }
     }
@@ -558,36 +558,36 @@ public class DifferenceBoundedMatrixTest {
         };
         Set<Local> locals = Stream.of(xs).collect(Collectors.toSet());
         DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
-        m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-        m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-        m.setConstraint(xs[1], xs[0], ZoneConstraint.of(4));
-        m.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
-        m.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
-        m.setConstraint(xs[3], xs[0], ZoneConstraint.of(2));
+        m.setConstraint(xs[0], xs[1], Constraint.of(-1));
+        m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+        m.setConstraint(xs[1], xs[0], Constraint.of(4));
+        m.setConstraint(xs[1], xs[2], Constraint.of(1));
+        m.setConstraint(xs[2], xs[0], Constraint.of(3));
+        m.setConstraint(xs[3], xs[0], Constraint.of(2));
         m.w0zReduction();
-        assertAll(() -> assertEquals(ZoneConstraint.of(-1),
+        assertAll(() -> assertEquals(Constraint.of(-1),
                                      m.getConstraint(xs[0], xs[1])),
-                  () -> assertEquals(ZoneConstraint.of(-1),
+                  () -> assertEquals(Constraint.of(-1),
                                      m.getConstraint(xs[0], xs[2])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      m.getConstraint(xs[0], xs[3])),
-                  () -> assertEquals(ZoneConstraint.of(4),
+                  () -> assertEquals(Constraint.of(4),
                                      m.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(ZoneConstraint.of(1),
+                  () -> assertEquals(Constraint.of(1),
                                      m.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      m.getConstraint(xs[1], xs[3])),
-                  () -> assertEquals(ZoneConstraint.of(3),
+                  () -> assertEquals(Constraint.of(3),
                                      m.getConstraint(xs[2], xs[0])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      m.getConstraint(xs[2], xs[1])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      m.getConstraint(xs[2], xs[3])),
-                  () -> assertEquals(ZoneConstraint.of(2),
+                  () -> assertEquals(Constraint.of(2),
                                      m.getConstraint(xs[3], xs[0])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      m.getConstraint(xs[3], xs[1])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      m.getConstraint(xs[3], xs[2])));
     }
 
@@ -599,9 +599,9 @@ public class DifferenceBoundedMatrixTest {
             DifferenceBoundedMatrix c = DifferenceBoundedMatrix.widen(m, n);
             checkMatrixCondition((s, t) -> {
                     if (s.equals(t)) {
-                        assertEquals(ZoneConstraint.of(0), c.getConstraint(s, t));
+                        assertEquals(Constraint.of(0), c.getConstraint(s, t));
                     } else {
-                        assertEquals(ZoneConstraint.TOP(), c.getConstraint(s, t));
+                        assertEquals(Constraint.TOP(), c.getConstraint(s, t));
                     }
                 });
         }
@@ -612,44 +612,44 @@ public class DifferenceBoundedMatrixTest {
             DifferenceBoundedMatrix c = DifferenceBoundedMatrix.widen(m, n);
             checkMatrixCondition((s, t) -> {
                     if (s.equals(t)) {
-                        assertEquals(ZoneConstraint.of(0), c.getConstraint(s, t));
+                        assertEquals(Constraint.of(0), c.getConstraint(s, t));
                     } else {
-                        assertEquals(ZoneConstraint.TOP(), c.getConstraint(s, t));
+                        assertEquals(Constraint.TOP(), c.getConstraint(s, t));
                     }
                 });
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-2));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(0));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(4));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(2));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-2));
+            m.setConstraint(xs[0], xs[2], Constraint.of(0));
+            m.setConstraint(xs[1], xs[0], Constraint.of(4));
+            m.setConstraint(xs[1], xs[2], Constraint.of(2));
+            m.setConstraint(xs[2], xs[0], Constraint.of(3));
             DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(this.locals, true);
-            n.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            n.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            n.setConstraint(xs[1], xs[0], ZoneConstraint.of(4));
-            n.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
-            n.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
+            n.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            n.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            n.setConstraint(xs[1], xs[0], Constraint.of(4));
+            n.setConstraint(xs[1], xs[2], Constraint.of(1));
+            n.setConstraint(xs[2], xs[0], Constraint.of(3));
             DifferenceBoundedMatrix c = DifferenceBoundedMatrix.widen(m, n);
-            assertAll(() -> assertEquals(ZoneConstraint.of(0),
+            assertAll(() -> assertEquals(Constraint.of(0),
                                          c.getConstraint(xs[0], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          c.getConstraint(xs[1], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          c.getConstraint(xs[2], xs[2])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          c.getConstraint(xs[0], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          c.getConstraint(xs[0], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(4),
+                      () -> assertEquals(Constraint.of(4),
                                          c.getConstraint(xs[1], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(2),
+                      () -> assertEquals(Constraint.of(2),
                                          c.getConstraint(xs[1], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(3),
+                      () -> assertEquals(Constraint.of(3),
                                          c.getConstraint(xs[2], xs[0])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          c.getConstraint(xs[2], xs[1])));
         }
     }
@@ -658,59 +658,59 @@ public class DifferenceBoundedMatrixTest {
     void testForget() {
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(4));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[1], xs[0], Constraint.of(4));
+            m.setConstraint(xs[1], xs[2], Constraint.of(1));
+            m.setConstraint(xs[2], xs[0], Constraint.of(3));
             m.computeClosure();
             m.forgetConstraints(xs[1]);
-            assertAll(() -> assertEquals(ZoneConstraint.of(0),
+            assertAll(() -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[0], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[1], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[2], xs[2])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[0], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(-1),
+                      () -> assertEquals(Constraint.of(-1),
                                          m.getConstraint(xs[0], xs[2])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[1], xs[0])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[1], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(3),
+                      () -> assertEquals(Constraint.of(3),
                                          m.getConstraint(xs[2], xs[0])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[2], xs[1])));
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(4));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[1], xs[0], Constraint.of(4));
+            m.setConstraint(xs[1], xs[2], Constraint.of(1));
+            m.setConstraint(xs[2], xs[0], Constraint.of(3));
             m.computeClosure();
             m.forgetConstraints(xs[2]);
-            assertAll(() -> assertEquals(ZoneConstraint.of(0),
+            assertAll(() -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[0], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[1], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[2], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(-1),
+                      () -> assertEquals(Constraint.of(-1),
                                          m.getConstraint(xs[0], xs[1])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[0], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(4),
+                      () -> assertEquals(Constraint.of(4),
                                          m.getConstraint(xs[1], xs[0])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[1], xs[2])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[2], xs[0])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[2], xs[1])));
         }
 
@@ -725,32 +725,32 @@ public class DifferenceBoundedMatrixTest {
             Set<Local> locals = new HashSet<>(5);
             for (Local x : xs) { locals.add(x); }
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(0));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(0));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(0));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(0));
+            m.setConstraint(xs[0], xs[1], Constraint.of(0));
+            m.setConstraint(xs[1], xs[0], Constraint.of(0));
+            m.setConstraint(xs[2], xs[0], Constraint.of(0));
+            m.setConstraint(xs[0], xs[2], Constraint.of(0));
             m.forgetConstraints(xs[3]);
-            assertAll(() -> assertEquals(ZoneConstraint.of(0),
+            assertAll(() -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[0], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[1], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[0], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[2], xs[0])));
-            m.setConstraint(xs[3], xs[4], ZoneConstraint.of(-1));
-            m.setConstraint(xs[4], xs[3], ZoneConstraint.of(+1));
-            assertAll(() -> assertEquals(ZoneConstraint.of(0),
+            m.setConstraint(xs[3], xs[4], Constraint.of(-1));
+            m.setConstraint(xs[4], xs[3], Constraint.of(+1));
+            assertAll(() -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[0], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[1], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[0], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(0),
+                      () -> assertEquals(Constraint.of(0),
                                          m.getConstraint(xs[2], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(-1),
+                      () -> assertEquals(Constraint.of(-1),
                                          m.getConstraint(xs[3], xs[4])),
-                      () -> assertEquals(ZoneConstraint.of(+1),
+                      () -> assertEquals(Constraint.of(+1),
                                          m.getConstraint(xs[4], xs[3])));
         }
 
@@ -777,25 +777,25 @@ public class DifferenceBoundedMatrixTest {
             //  [6,  5,  4,  3,  2,  1,  0]]
             IntStream.range(0, N).forEach(i -> {
                     IntStream.range(i, N).forEach(j -> {
-                            m.setConstraint(xs[i], xs[j], ZoneConstraint.of(i - j));
-                            m.setConstraint(xs[j], xs[i], ZoneConstraint.of(j - i));
+                            m.setConstraint(xs[i], xs[j], Constraint.of(i - j));
+                            m.setConstraint(xs[j], xs[i], Constraint.of(j - i));
                         });
                 });
             m.forgetConstraints(xs[4]);
             IntStream.range(0, N).forEach(i -> {
                     IntStream.range(i, N).forEach(j -> {
                             if (i == j) {
-                                assertAll(() -> assertEquals(ZoneConstraint.of(0),
+                                assertAll(() -> assertEquals(Constraint.of(0),
                                                              m.getConstraint(xs[i], xs[j])));
                             } else if (i == 4 || j == 4) {
-                                assertAll(() -> assertEquals(ZoneConstraint.TOP(),
+                                assertAll(() -> assertEquals(Constraint.TOP(),
                                                              m.getConstraint(xs[i], xs[j])),
-                                          () -> assertEquals(ZoneConstraint.TOP(),
+                                          () -> assertEquals(Constraint.TOP(),
                                                              m.getConstraint(xs[j], xs[i])));
                             } else {
-                                assertAll(() -> assertEquals(ZoneConstraint.of(i - j),
+                                assertAll(() -> assertEquals(Constraint.of(i - j),
                                                              m.getConstraint(xs[i], xs[j])),
-                                          () -> assertEquals(ZoneConstraint.of(j - i),
+                                          () -> assertEquals(Constraint.of(j - i),
                                                              m.getConstraint(xs[j], xs[i])));
                             }
                         });
@@ -812,17 +812,17 @@ public class DifferenceBoundedMatrixTest {
             Set<Local> locals = new HashSet<>();
             for (Local x : xs) { locals.add(x); }
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(0));
-            m.setConstraint(xs[2], xs[1], ZoneConstraint.of(0));
-            m.setConstraint(xs[2], xs[3], ZoneConstraint.of(-1));
+            m.setConstraint(xs[1], xs[2], Constraint.of(0));
+            m.setConstraint(xs[2], xs[1], Constraint.of(0));
+            m.setConstraint(xs[2], xs[3], Constraint.of(-1));
             m.forgetConstraints(xs[2]);
-            assertAll(() -> assertEquals(ZoneConstraint.of(-1),
+            assertAll(() -> assertEquals(Constraint.of(-1),
                                          m.getConstraint(xs[1], xs[3])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[1], xs[2])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[2], xs[1])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[2], xs[3])));
         }
     }
@@ -831,24 +831,24 @@ public class DifferenceBoundedMatrixTest {
     void testSimpleForget() {
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-2));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(+1));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(+2));
-            m.setConstraint(xs[2], xs[1], ZoneConstraint.of(+1));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-2));
+            m.setConstraint(xs[1], xs[0], Constraint.of(+1));
+            m.setConstraint(xs[1], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[2], xs[0], Constraint.of(+2));
+            m.setConstraint(xs[2], xs[1], Constraint.of(+1));
             m.forgetConstraintsSimple(xs[2]);
-            assertAll(() -> assertEquals(ZoneConstraint.of(-1),
+            assertAll(() -> assertEquals(Constraint.of(-1),
                                          m.getConstraint(xs[0], xs[1])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[0], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(+1),
+                      () -> assertEquals(Constraint.of(+1),
                                          m.getConstraint(xs[1], xs[0])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[1], xs[2])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[2], xs[0])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[2], xs[1])));
         }
 
@@ -870,25 +870,25 @@ public class DifferenceBoundedMatrixTest {
             //      ...                                  ]
             IntStream.range(0, N).forEach(i -> {
                     IntStream.range(i, N).forEach(j -> {
-                            m.setConstraint(xs[i], xs[j], ZoneConstraint.of(i - j));
-                            m.setConstraint(xs[j], xs[i], ZoneConstraint.of(j - i));
+                            m.setConstraint(xs[i], xs[j], Constraint.of(i - j));
+                            m.setConstraint(xs[j], xs[i], Constraint.of(j - i));
                         });
                 });
             m.forgetConstraintsSimple(xs[4]);
             IntStream.range(0, N).forEach(i -> {
                     IntStream.range(i, N).forEach(j -> {
                             if (i == j) {
-                                assertAll(() -> assertEquals(ZoneConstraint.of(0),
+                                assertAll(() -> assertEquals(Constraint.of(0),
                                                              m.getConstraint(xs[i], xs[j])));
                             } else if (i == 4 || j == 4) {
-                                assertAll(() -> assertEquals(ZoneConstraint.TOP(),
+                                assertAll(() -> assertEquals(Constraint.TOP(),
                                                              m.getConstraint(xs[i], xs[j])),
-                                          () -> assertEquals(ZoneConstraint.TOP(),
+                                          () -> assertEquals(Constraint.TOP(),
                                                              m.getConstraint(xs[j], xs[i])));
                             } else {
-                                assertAll(() -> assertEquals(ZoneConstraint.of(i - j),
+                                assertAll(() -> assertEquals(Constraint.of(i - j),
                                                              m.getConstraint(xs[i], xs[j])),
-                                          () -> assertEquals(ZoneConstraint.of(j - i),
+                                          () -> assertEquals(Constraint.of(j - i),
                                                              m.getConstraint(xs[j], xs[i])));
                             }
                         });
@@ -900,16 +900,16 @@ public class DifferenceBoundedMatrixTest {
     void testProjection() {
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[2], xs[1], ZoneConstraint.of(3));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(2));
+            m.setConstraint(xs[2], xs[1], Constraint.of(3));
+            m.setConstraint(xs[1], xs[2], Constraint.of(2));
             assertEquals(Interval32Box.TOP(), m.projectToInterval(xs[2]));
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[2], xs[1], ZoneConstraint.of(3));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(2));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(5));
+            m.setConstraint(xs[2], xs[1], Constraint.of(3));
+            m.setConstraint(xs[1], xs[0], Constraint.of(2));
+            m.setConstraint(xs[2], xs[0], Constraint.of(5));
             assertAll(() -> assertEquals(new Interval32Box(null, 2),
                                          m.projectToInterval(xs[1])),
                       () -> assertEquals(new Interval32Box(null, 5),
@@ -918,11 +918,11 @@ public class DifferenceBoundedMatrixTest {
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[2], xs[1], ZoneConstraint.of(3));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(2));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(5));
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(3));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-2));
+            m.setConstraint(xs[2], xs[1], Constraint.of(3));
+            m.setConstraint(xs[1], xs[0], Constraint.of(2));
+            m.setConstraint(xs[2], xs[0], Constraint.of(5));
+            m.setConstraint(xs[0], xs[1], Constraint.of(3));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-2));
             assertAll(() -> assertEquals(new Interval32Box(-3, 2),
                                          m.projectToInterval(xs[1])),
                       () -> assertEquals(new Interval32Box(2, 5),
@@ -936,7 +936,7 @@ public class DifferenceBoundedMatrixTest {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, false);
             m.makeInfeasible();
             checkMatrixCondition((s, t) -> {
-                    assertEquals(ZoneConstraint.BOT(), m.getConstraint(s, t));
+                    assertEquals(Constraint.BOT(), m.getConstraint(s, t));
                 });
         }
 
@@ -944,20 +944,20 @@ public class DifferenceBoundedMatrixTest {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
             m.makeInfeasible();
             checkMatrixCondition((s, t) -> {
-                    assertEquals(ZoneConstraint.BOT(), m.getConstraint(s, t));
+                    assertEquals(Constraint.BOT(), m.getConstraint(s, t));
                 });
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(4));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[1], xs[0], Constraint.of(4));
+            m.setConstraint(xs[1], xs[2], Constraint.of(1));
+            m.setConstraint(xs[2], xs[0], Constraint.of(3));
             m.makeInfeasible();
             checkMatrixCondition((s, t) -> {
-                    assertEquals(ZoneConstraint.BOT(), m.getConstraint(s, t));
+                    assertEquals(Constraint.BOT(), m.getConstraint(s, t));
                 });
         }
     }
@@ -984,11 +984,11 @@ public class DifferenceBoundedMatrixTest {
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(4));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[1], xs[0], Constraint.of(4));
+            m.setConstraint(xs[1], xs[2], Constraint.of(1));
+            m.setConstraint(xs[2], xs[0], Constraint.of(3));
             String expected = Stream.of("",
                                         "[[0, -1, -1],",
                                         " [4, 0, 1],",
@@ -1011,11 +1011,11 @@ public class DifferenceBoundedMatrixTest {
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(4));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[1], xs[0], Constraint.of(4));
+            m.setConstraint(xs[1], xs[2], Constraint.of(1));
+            m.setConstraint(xs[2], xs[0], Constraint.of(3));
             String expected = Stream.of("(and (>= x1 1)",
                                         "(>= x2 1)",
                                         "(<= x2 3)",
@@ -1025,11 +1025,11 @@ public class DifferenceBoundedMatrixTest {
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(1));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[1], xs[0], Constraint.of(1));
+            m.setConstraint(xs[1], xs[2], Constraint.of(1));
+            m.setConstraint(xs[2], xs[0], Constraint.of(3));
             String expected = Stream.of("(and (= x1 1)",
                                         "(>= x2 1)",
                                         "(<= x2 3))\n").collect(Collectors.joining(" "));
@@ -1051,11 +1051,11 @@ public class DifferenceBoundedMatrixTest {
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(4));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[1], xs[0], Constraint.of(4));
+            m.setConstraint(xs[1], xs[2], Constraint.of(1));
+            m.setConstraint(xs[2], xs[0], Constraint.of(3));
             String expected = Stream.of("(and (>= x1 1)",
                                         "(>= x2 1)",
                                         "(<= x2 3)",
@@ -1065,11 +1065,11 @@ public class DifferenceBoundedMatrixTest {
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(1));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[1], xs[0], Constraint.of(1));
+            m.setConstraint(xs[1], xs[2], Constraint.of(1));
+            m.setConstraint(xs[2], xs[0], Constraint.of(3));
             String expected = Stream.of("(and (= x1 1)",
                                         "(>= x2 1)",
                                         "(<= x2 3))").collect(Collectors.joining(" "));
@@ -1092,11 +1092,11 @@ public class DifferenceBoundedMatrixTest {
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(4));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[1], xs[0], Constraint.of(4));
+            m.setConstraint(xs[1], xs[2], Constraint.of(1));
+            m.setConstraint(xs[2], xs[0], Constraint.of(3));
             assertAll(() -> assertEquals(Set.of(xs[1], xs[2]), m.getConnectedVariablesOf(xs[1])),
                       () -> assertEquals(Stream.of("(and (<= x1 4)",
                                                    "(<= x1 (+ x2 1))",
@@ -1138,11 +1138,11 @@ public class DifferenceBoundedMatrixTest {
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(4));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(1));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[1], xs[0], Constraint.of(4));
+            m.setConstraint(xs[1], xs[2], Constraint.of(1));
+            m.setConstraint(xs[2], xs[0], Constraint.of(3));
             String expected = Stream.of("(and (>= x1 1)",
                                         "(>= x2 1)",
                                         "(<= x1 4)",
@@ -1161,28 +1161,28 @@ public class DifferenceBoundedMatrixTest {
     void testAddIncoming() {
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.addIncoming(xs[1], ZoneConstraint.of(3));
+            m.addIncoming(xs[1], Constraint.of(3));
             checkMatrixCondition((s, t) -> {
                     if (s.equals(t)) {
-                        assertEquals(ZoneConstraint.of(0), m.getConstraint(s, t));
+                        assertEquals(Constraint.of(0), m.getConstraint(s, t));
                     } else {
-                        assertEquals(ZoneConstraint.TOP(), m.getConstraint(s, t));
+                        assertEquals(Constraint.TOP(), m.getConstraint(s, t));
                     }
                 });
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(+2));
-            m.setConstraint(xs[2], xs[1], ZoneConstraint.of(+3));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(+3));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-3));
-            m.addIncoming(xs[1], ZoneConstraint.of(2));
-            assertAll(() -> assertEquals(ZoneConstraint.of(0), m.getConstraint(xs[1], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(2), m.getConstraint(xs[1], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(5), m.getConstraint(xs[2], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(3), m.getConstraint(xs[2], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(-3), m.getConstraint(xs[0], xs[2])));
+            m.setConstraint(xs[1], xs[2], Constraint.of(+2));
+            m.setConstraint(xs[2], xs[1], Constraint.of(+3));
+            m.setConstraint(xs[2], xs[0], Constraint.of(+3));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-3));
+            m.addIncoming(xs[1], Constraint.of(2));
+            assertAll(() -> assertEquals(Constraint.of(0), m.getConstraint(xs[1], xs[1])),
+                      () -> assertEquals(Constraint.of(2), m.getConstraint(xs[1], xs[2])),
+                      () -> assertEquals(Constraint.of(5), m.getConstraint(xs[2], xs[1])),
+                      () -> assertEquals(Constraint.of(3), m.getConstraint(xs[2], xs[0])),
+                      () -> assertEquals(Constraint.of(-3), m.getConstraint(xs[0], xs[2])));
         }
     }
 
@@ -1190,28 +1190,28 @@ public class DifferenceBoundedMatrixTest {
     void testAddOutgoing() {
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.addIncoming(xs[1], ZoneConstraint.of(3));
+            m.addIncoming(xs[1], Constraint.of(3));
             checkMatrixCondition((s, t) -> {
                     if (s.equals(t)) {
-                        assertEquals(ZoneConstraint.of(0), m.getConstraint(s, t));
+                        assertEquals(Constraint.of(0), m.getConstraint(s, t));
                     } else {
-                        assertEquals(ZoneConstraint.TOP(), m.getConstraint(s, t));
+                        assertEquals(Constraint.TOP(), m.getConstraint(s, t));
                     }
                 });
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(+2));
-            m.setConstraint(xs[2], xs[1], ZoneConstraint.of(+3));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(+3));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-3));
-            m.addOutgoing(xs[1], ZoneConstraint.of(2));
-            assertAll(() -> assertEquals(ZoneConstraint.of(0), m.getConstraint(xs[1], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(4), m.getConstraint(xs[1], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(3), m.getConstraint(xs[2], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(3), m.getConstraint(xs[2], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(-3), m.getConstraint(xs[0], xs[2])));
+            m.setConstraint(xs[1], xs[2], Constraint.of(+2));
+            m.setConstraint(xs[2], xs[1], Constraint.of(+3));
+            m.setConstraint(xs[2], xs[0], Constraint.of(+3));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-3));
+            m.addOutgoing(xs[1], Constraint.of(2));
+            assertAll(() -> assertEquals(Constraint.of(0), m.getConstraint(xs[1], xs[1])),
+                      () -> assertEquals(Constraint.of(4), m.getConstraint(xs[1], xs[2])),
+                      () -> assertEquals(Constraint.of(3), m.getConstraint(xs[2], xs[1])),
+                      () -> assertEquals(Constraint.of(3), m.getConstraint(xs[2], xs[0])),
+                      () -> assertEquals(Constraint.of(-3), m.getConstraint(xs[0], xs[2])));
         }
     }
 
@@ -1219,28 +1219,28 @@ public class DifferenceBoundedMatrixTest {
     void testSubIncoming() {
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.addIncoming(xs[1], ZoneConstraint.of(3));
+            m.addIncoming(xs[1], Constraint.of(3));
             checkMatrixCondition((s, t) -> {
                     if (s.equals(t)) {
-                        assertEquals(ZoneConstraint.of(0), m.getConstraint(s, t));
+                        assertEquals(Constraint.of(0), m.getConstraint(s, t));
                     } else {
-                        assertEquals(ZoneConstraint.TOP(), m.getConstraint(s, t));
+                        assertEquals(Constraint.TOP(), m.getConstraint(s, t));
                     }
                 });
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(+2));
-            m.setConstraint(xs[2], xs[1], ZoneConstraint.of(+3));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(+3));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-3));
-            m.subIncoming(xs[1], ZoneConstraint.of(2));
-            assertAll(() -> assertEquals(ZoneConstraint.of(0), m.getConstraint(xs[1], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(2), m.getConstraint(xs[1], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(1), m.getConstraint(xs[2], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(3), m.getConstraint(xs[2], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(-3), m.getConstraint(xs[0], xs[2])));
+            m.setConstraint(xs[1], xs[2], Constraint.of(+2));
+            m.setConstraint(xs[2], xs[1], Constraint.of(+3));
+            m.setConstraint(xs[2], xs[0], Constraint.of(+3));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-3));
+            m.subIncoming(xs[1], Constraint.of(2));
+            assertAll(() -> assertEquals(Constraint.of(0), m.getConstraint(xs[1], xs[1])),
+                      () -> assertEquals(Constraint.of(2), m.getConstraint(xs[1], xs[2])),
+                      () -> assertEquals(Constraint.of(1), m.getConstraint(xs[2], xs[1])),
+                      () -> assertEquals(Constraint.of(3), m.getConstraint(xs[2], xs[0])),
+                      () -> assertEquals(Constraint.of(-3), m.getConstraint(xs[0], xs[2])));
         }
     }
 
@@ -1248,28 +1248,28 @@ public class DifferenceBoundedMatrixTest {
     void testSubOutgoing() {
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.addIncoming(xs[1], ZoneConstraint.of(3));
+            m.addIncoming(xs[1], Constraint.of(3));
             checkMatrixCondition((s, t) -> {
                     if (s.equals(t)) {
-                        assertEquals(ZoneConstraint.of(0), m.getConstraint(s, t));
+                        assertEquals(Constraint.of(0), m.getConstraint(s, t));
                     } else {
-                        assertEquals(ZoneConstraint.TOP(), m.getConstraint(s, t));
+                        assertEquals(Constraint.TOP(), m.getConstraint(s, t));
                     }
                 });
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(+2));
-            m.setConstraint(xs[2], xs[1], ZoneConstraint.of(+3));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(+3));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-3));
-            m.subOutgoing(xs[1], ZoneConstraint.of(2));
-            assertAll(() -> assertEquals(ZoneConstraint.of(0), m.getConstraint(xs[1], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(0), m.getConstraint(xs[1], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(3), m.getConstraint(xs[2], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(3), m.getConstraint(xs[2], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(-3), m.getConstraint(xs[0], xs[2])));
+            m.setConstraint(xs[1], xs[2], Constraint.of(+2));
+            m.setConstraint(xs[2], xs[1], Constraint.of(+3));
+            m.setConstraint(xs[2], xs[0], Constraint.of(+3));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-3));
+            m.subOutgoing(xs[1], Constraint.of(2));
+            assertAll(() -> assertEquals(Constraint.of(0), m.getConstraint(xs[1], xs[1])),
+                      () -> assertEquals(Constraint.of(0), m.getConstraint(xs[1], xs[2])),
+                      () -> assertEquals(Constraint.of(3), m.getConstraint(xs[2], xs[1])),
+                      () -> assertEquals(Constraint.of(3), m.getConstraint(xs[2], xs[0])),
+                      () -> assertEquals(Constraint.of(-3), m.getConstraint(xs[0], xs[2])));
         }
     }
 
@@ -1286,67 +1286,67 @@ public class DifferenceBoundedMatrixTest {
         for (Local x : xs) { locals.add(x); }
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(1));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(4));
+            m.setConstraint(xs[0], xs[1], Constraint.of(1));
+            m.setConstraint(xs[0], xs[2], Constraint.of(4));
             // add and close
-            assertAll(() -> assertTrue(m.putIncremental(xs[1], xs[2], ZoneConstraint.of(2))),
-                      () -> assertEquals(ZoneConstraint.of(3),
+            assertAll(() -> assertTrue(m.putIncremental(xs[1], xs[2], Constraint.of(2))),
+                      () -> assertEquals(Constraint.of(3),
                                          m.getConstraint(xs[0], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(2),
+                      () -> assertEquals(Constraint.of(2),
                                          m.getConstraint(xs[1], xs[2])));
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(2));
-            m.setConstraint(xs[1], xs[4], ZoneConstraint.of(15));
-            m.setConstraint(xs[3], xs[4], ZoneConstraint.of(5));
+            m.setConstraint(xs[1], xs[2], Constraint.of(2));
+            m.setConstraint(xs[1], xs[4], Constraint.of(15));
+            m.setConstraint(xs[3], xs[4], Constraint.of(5));
             // add and close
-            assertAll(() -> assertTrue(m.putIncremental(xs[2], xs[3], ZoneConstraint.of(4))),
-                      () -> assertEquals(ZoneConstraint.of(4),
+            assertAll(() -> assertTrue(m.putIncremental(xs[2], xs[3], Constraint.of(4))),
+                      () -> assertEquals(Constraint.of(4),
                                          m.getConstraint(xs[2], xs[3])),
-                      () -> assertEquals(ZoneConstraint.of(6),
+                      () -> assertEquals(Constraint.of(6),
                                          m.getConstraint(xs[1], xs[3])),
-                      () -> assertEquals(ZoneConstraint.of(9),
+                      () -> assertEquals(Constraint.of(9),
                                          m.getConstraint(xs[2], xs[4])),
-                      () -> assertEquals(ZoneConstraint.of(11),
+                      () -> assertEquals(Constraint.of(11),
                                          m.getConstraint(xs[1], xs[4])));
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
-            m.setConstraint(xs[0], xs[4], ZoneConstraint.of(3));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(5));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(2));
-            m.setConstraint(xs[1], xs[3], ZoneConstraint.of(4));
-            m.setConstraint(xs[1], xs[4], ZoneConstraint.of(8));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(3));
-            m.setConstraint(xs[2], xs[3], ZoneConstraint.of(2));
-            m.setConstraint(xs[2], xs[4], ZoneConstraint.of(6));
+            m.setConstraint(xs[0], xs[4], Constraint.of(3));
+            m.setConstraint(xs[1], xs[0], Constraint.of(5));
+            m.setConstraint(xs[1], xs[2], Constraint.of(2));
+            m.setConstraint(xs[1], xs[3], Constraint.of(4));
+            m.setConstraint(xs[1], xs[4], Constraint.of(8));
+            m.setConstraint(xs[2], xs[0], Constraint.of(3));
+            m.setConstraint(xs[2], xs[3], Constraint.of(2));
+            m.setConstraint(xs[2], xs[4], Constraint.of(6));
 
-            assertAll(() -> assertTrue(m.putIncremental(xs[2], xs[0], ZoneConstraint.of(2))),
-                      () -> assertEquals(ZoneConstraint.of(3),
+            assertAll(() -> assertTrue(m.putIncremental(xs[2], xs[0], Constraint.of(2))),
+                      () -> assertEquals(Constraint.of(3),
                                          m.getConstraint(xs[0], xs[4])),
-                      () -> assertEquals(ZoneConstraint.of(4),
+                      () -> assertEquals(Constraint.of(4),
                                          m.getConstraint(xs[1], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(4),
+                      () -> assertEquals(Constraint.of(4),
                                          m.getConstraint(xs[1], xs[3])),
-                      () -> assertEquals(ZoneConstraint.of(7),
+                      () -> assertEquals(Constraint.of(7),
                                          m.getConstraint(xs[1], xs[4])),
-                      () -> assertEquals(ZoneConstraint.of(2),
+                      () -> assertEquals(Constraint.of(2),
                                          m.getConstraint(xs[2], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(2),
+                      () -> assertEquals(Constraint.of(2),
                                          m.getConstraint(xs[2], xs[3])),
-                      () -> assertEquals(ZoneConstraint.of(5),
+                      () -> assertEquals(Constraint.of(5),
                                          m.getConstraint(xs[2], xs[4])));
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(+2));
-            m.setConstraint(xs[1], xs[3], ZoneConstraint.of(-1));
-            m.setConstraint(xs[2], xs[3], ZoneConstraint.of(-3));
-            assertAll(() -> assertFalse(m.putIncremental(xs[3], xs[2], ZoneConstraint.of(2))));
+            m.setConstraint(xs[1], xs[2], Constraint.of(+2));
+            m.setConstraint(xs[1], xs[3], Constraint.of(-1));
+            m.setConstraint(xs[2], xs[3], Constraint.of(-3));
+            assertAll(() -> assertFalse(m.putIncremental(xs[3], xs[2], Constraint.of(2))));
         }
     }
 
@@ -1359,42 +1359,42 @@ public class DifferenceBoundedMatrixTest {
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(+2));
+            m.setConstraint(xs[0], xs[1], Constraint.of(+2));
             assertTrue(m.getConstants().isEmpty());
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(+2));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(-2));
+            m.setConstraint(xs[0], xs[1], Constraint.of(+2));
+            m.setConstraint(xs[1], xs[0], Constraint.of(-2));
             assertAll(() -> assertFalse(m.getConstants().isEmpty()),
                       () -> assertTrue(m.getConstants().contains(xs[1])));
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(+2));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(-2));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(+3));
+            m.setConstraint(xs[0], xs[1], Constraint.of(+2));
+            m.setConstraint(xs[1], xs[0], Constraint.of(-2));
+            m.setConstraint(xs[1], xs[2], Constraint.of(+3));
             assertAll(() -> assertFalse(m.getConstants().isEmpty()),
                       () -> assertTrue(m.getConstants().contains(xs[1])));
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(+2));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(-2));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(+3));
+            m.setConstraint(xs[0], xs[1], Constraint.of(+2));
+            m.setConstraint(xs[1], xs[0], Constraint.of(-2));
+            m.setConstraint(xs[1], xs[0], Constraint.of(+3));
             assertTrue(m.getConstants().isEmpty());
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(+1));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            m.setConstraint(xs[1], xs[0], Constraint.of(+1));
             DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(locals, true);
-            n.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            n.setConstraint(xs[1], xs[0], ZoneConstraint.of(+1));
+            n.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            n.setConstraint(xs[1], xs[0], Constraint.of(+1));
             m.union(n);
             assertAll(() -> assertFalse(m.getConstants().isEmpty()),
                       () -> assertTrue(m.getConstants().contains(xs[1])));
@@ -1402,15 +1402,15 @@ public class DifferenceBoundedMatrixTest {
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(+1));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(+1));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[1], xs[0], Constraint.of(+1));
+            m.setConstraint(xs[2], xs[0], Constraint.of(+1));
             DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(locals, true);
-            n.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            n.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            n.setConstraint(xs[1], xs[0], ZoneConstraint.of(+2));
-            n.setConstraint(xs[2], xs[0], ZoneConstraint.of(+1));
+            n.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            n.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            n.setConstraint(xs[1], xs[0], Constraint.of(+2));
+            n.setConstraint(xs[2], xs[0], Constraint.of(+1));
             m.union(n);
             assertAll(() -> assertFalse(m.getConstants().isEmpty()),
                       () -> assertFalse(m.getConstants().contains(xs[1])),
@@ -1433,81 +1433,81 @@ public class DifferenceBoundedMatrixTest {
         for (Local x : xs) { locals.add(x); }
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-0));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[0], xs[3], ZoneConstraint.of(-2));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(+0));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(+1));
-            m.setConstraint(xs[3], xs[0], ZoneConstraint.of(+2));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-0));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[0], xs[3], Constraint.of(-2));
+            m.setConstraint(xs[1], xs[0], Constraint.of(+0));
+            m.setConstraint(xs[2], xs[0], Constraint.of(+1));
+            m.setConstraint(xs[3], xs[0], Constraint.of(+2));
             m.closeConstants(notConstant);
-            assertAll(() -> assertEquals(ZoneConstraint.of(-0),
+            assertAll(() -> assertEquals(Constraint.of(-0),
                                          m.getConstraint(xs[0], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(-1),
+                      () -> assertEquals(Constraint.of(-1),
                                          m.getConstraint(xs[0], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(-2),
+                      () -> assertEquals(Constraint.of(-2),
                                          m.getConstraint(xs[0], xs[3])),
-                      () -> assertEquals(ZoneConstraint.of(+0),
+                      () -> assertEquals(Constraint.of(+0),
                                          m.getConstraint(xs[1], xs[0])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[1], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(-2),
+                      () -> assertEquals(Constraint.of(-2),
                                          m.getConstraint(xs[1], xs[3])),
-                      () -> assertEquals(ZoneConstraint.of(+1),
+                      () -> assertEquals(Constraint.of(+1),
                                          m.getConstraint(xs[2], xs[0])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[2], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(-1),
+                      () -> assertEquals(Constraint.of(-1),
                                          m.getConstraint(xs[2], xs[3])),
-                      () -> assertEquals(ZoneConstraint.of(+2),
+                      () -> assertEquals(Constraint.of(+2),
                                          m.getConstraint(xs[3], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(+2),
+                      () -> assertEquals(Constraint.of(+2),
                                          m.getConstraint(xs[3], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(+1),
+                      () -> assertEquals(Constraint.of(+1),
                                          m.getConstraint(xs[3], xs[2])));
         }
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-0));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[0], xs[3], ZoneConstraint.of(-2));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(+0));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(+1));
-            m.setConstraint(xs[3], xs[0], ZoneConstraint.of(+2));
-            m.setConstraint(xs[4], xs[0], ZoneConstraint.of(+1));
-            m.setConstraint(xs[4], xs[2], ZoneConstraint.of(+0));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-0));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[0], xs[3], Constraint.of(-2));
+            m.setConstraint(xs[1], xs[0], Constraint.of(+0));
+            m.setConstraint(xs[2], xs[0], Constraint.of(+1));
+            m.setConstraint(xs[3], xs[0], Constraint.of(+2));
+            m.setConstraint(xs[4], xs[0], Constraint.of(+1));
+            m.setConstraint(xs[4], xs[2], Constraint.of(+0));
             m.closeConstants(notConstant);
-            assertAll(() -> assertEquals(ZoneConstraint.of(-0),
+            assertAll(() -> assertEquals(Constraint.of(-0),
                                          m.getConstraint(xs[0], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(-1),
+                      () -> assertEquals(Constraint.of(-1),
                                          m.getConstraint(xs[0], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(-2),
+                      () -> assertEquals(Constraint.of(-2),
                                          m.getConstraint(xs[0], xs[3])),
-                      () -> assertEquals(ZoneConstraint.of(+0),
+                      () -> assertEquals(Constraint.of(+0),
                                          m.getConstraint(xs[1], xs[0])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[1], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(-2),
+                      () -> assertEquals(Constraint.of(-2),
                                          m.getConstraint(xs[1], xs[3])),
-                      () -> assertEquals(ZoneConstraint.of(+1),
+                      () -> assertEquals(Constraint.of(+1),
                                          m.getConstraint(xs[2], xs[0])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[2], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(-1),
+                      () -> assertEquals(Constraint.of(-1),
                                          m.getConstraint(xs[2], xs[3])),
-                      () -> assertEquals(ZoneConstraint.of(+2),
+                      () -> assertEquals(Constraint.of(+2),
                                          m.getConstraint(xs[3], xs[0])),
-                      () -> assertEquals(ZoneConstraint.of(+2),
+                      () -> assertEquals(Constraint.of(+2),
                                          m.getConstraint(xs[3], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(+1),
+                      () -> assertEquals(Constraint.of(+1),
                                          m.getConstraint(xs[3], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(+1),
+                      () -> assertEquals(Constraint.of(+1),
                                          m.getConstraint(xs[4], xs[0])),
-                      () -> assertEquals(ZoneConstraint.TOP(),
+                      () -> assertEquals(Constraint.TOP(),
                                          m.getConstraint(xs[4], xs[1])),
-                      () -> assertEquals(ZoneConstraint.of(+0),
+                      () -> assertEquals(Constraint.of(+0),
                                          m.getConstraint(xs[4], xs[2])),
-                      () -> assertEquals(ZoneConstraint.of(-1),
+                      () -> assertEquals(Constraint.of(-1),
                                          m.getConstraint(xs[4], xs[3])));
         }
     }
@@ -1516,10 +1516,10 @@ public class DifferenceBoundedMatrixTest {
     void testGetConnectedVariables() {
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(0));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(1));
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(0));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(1));
+            m.setConstraint(xs[1], xs[0], Constraint.of(0));
+            m.setConstraint(xs[2], xs[0], Constraint.of(1));
+            m.setConstraint(xs[0], xs[1], Constraint.of(0));
+            m.setConstraint(xs[0], xs[2], Constraint.of(1));
             assertAll(() -> assertEquals(Set.of(), m.getConnectedVariablesOf(xs[0])),
                       () -> assertEquals(Set.of(xs[1]), m.getConnectedVariablesOf(xs[1])),
                       () -> assertEquals(Set.of(xs[2]), m.getConnectedVariablesOf(xs[2])));
@@ -1527,7 +1527,7 @@ public class DifferenceBoundedMatrixTest {
 
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(0));
+            m.setConstraint(xs[1], xs[2], Constraint.of(0));
             assertAll(() -> assertEquals(Set.of(xs[1], xs[2]),
                                          m.getConnectedVariablesOf(xs[1])),
                       () -> assertEquals(Set.of(xs[1], xs[2]), m.getConnectedVariablesOf(xs[2])));
@@ -1543,8 +1543,8 @@ public class DifferenceBoundedMatrixTest {
             };
             locals = Stream.of(xs).collect(Collectors.toSet());
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(0));
-            m.setConstraint(xs[2], xs[3], ZoneConstraint.of(1));
+            m.setConstraint(xs[1], xs[2], Constraint.of(0));
+            m.setConstraint(xs[2], xs[3], Constraint.of(1));
             assertAll(() -> assertEquals(Set.of(xs[1], xs[2], xs[3]),
                                          m.getConnectedVariablesOf(xs[1])),
                       () -> assertEquals(Set.of(xs[1], xs[2], xs[3]),
@@ -1565,16 +1565,16 @@ public class DifferenceBoundedMatrixTest {
             };
             locals = Stream.of(xs).collect(Collectors.toSet());
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
-            m.setConstraint(xs[0], xs[1], ZoneConstraint.of(-1));
-            m.setConstraint(xs[0], xs[2], ZoneConstraint.of(-1));
-            m.setConstraint(xs[0], xs[5], ZoneConstraint.of(-1));
-            m.setConstraint(xs[1], xs[0], ZoneConstraint.of(+4));
-            m.setConstraint(xs[1], xs[2], ZoneConstraint.of(+1));
-            m.setConstraint(xs[2], xs[0], ZoneConstraint.of(+3));
-            m.setConstraint(xs[3], xs[1], ZoneConstraint.of(+1));
-            m.setConstraint(xs[3], xs[2], ZoneConstraint.of(+2));
-            m.setConstraint(xs[3], xs[6], ZoneConstraint.of(+2));
-            m.setConstraint(xs[5], xs[0], ZoneConstraint.of(+1));
+            m.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            m.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[0], xs[5], Constraint.of(-1));
+            m.setConstraint(xs[1], xs[0], Constraint.of(+4));
+            m.setConstraint(xs[1], xs[2], Constraint.of(+1));
+            m.setConstraint(xs[2], xs[0], Constraint.of(+3));
+            m.setConstraint(xs[3], xs[1], Constraint.of(+1));
+            m.setConstraint(xs[3], xs[2], Constraint.of(+2));
+            m.setConstraint(xs[3], xs[6], Constraint.of(+2));
+            m.setConstraint(xs[5], xs[0], Constraint.of(+1));
             assertAll(() -> assertEquals(Set.of(xs[1], xs[2], xs[3], xs[6]),
                                          m.getConnectedVariablesOf(xs[1])),
                       () -> assertEquals(Set.of(xs[1], xs[2], xs[3], xs[6]),

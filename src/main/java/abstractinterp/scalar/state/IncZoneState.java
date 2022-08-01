@@ -96,7 +96,7 @@ public class IncZoneState implements State {
 
     public void add(Local source,
                     Local target,
-                    ZoneConstraint constraint) {
+                    Constraint constraint) {
         this.add(source, target, constraint, this);
     }
 
@@ -113,7 +113,7 @@ public class IncZoneState implements State {
      */
     public void add(Local source,
                     Local target,
-                    ZoneConstraint constraint,
+                    Constraint constraint,
                     IncZoneState inState) {
         LOGGER.trace("Introducing new Constraint: {} - {} ≤ {}", source, target, constraint);
         this.matrix.putIncremental(source, target, constraint, inState.matrix);
@@ -121,7 +121,7 @@ public class IncZoneState implements State {
 
     protected void addWithoutClosure(Local source,
                                      Local target,
-                                     ZoneConstraint constraint,
+                                     Constraint constraint,
                                      IncZoneState inState) {
         LOGGER.trace("Introducing new Constraint: {} - {} ≤ {}", source, target, constraint);
         this.matrix.putConstraint(source, target, constraint, inState.matrix);
@@ -139,11 +139,11 @@ public class IncZoneState implements State {
                        IncZoneState inState) {
         this.add(source,
                  target,
-                 ZoneConstraint.of(box.upperBound()),
+                 Constraint.of(box.upperBound()),
                  inState);
         this.add(target,
                  source,
-                 ZoneConstraint.of(box.lowerBound().map(b -> b * -1)),
+                 Constraint.of(box.lowerBound().map(b -> b * -1)),
                  inState);
     }
 
@@ -260,24 +260,24 @@ public class IncZoneState implements State {
         switch (operator) {
         case ADDITION:
             if (lVar.equals(left)) {
-                ZoneConstraint c = ZoneConstraint.of(right.value);
+                Constraint c = Constraint.of(right.value);
                 this.matrix.addOutgoing(lVar, c, inState.matrix);
                 this.matrix.subIncoming(lVar, c, inState.matrix);
             } else {
                 this.forget(lVar);
-                this.add(lVar, left, ZoneConstraint.of(right.value));
-                this.add(left, lVar, ZoneConstraint.of(right.value * -1));
+                this.add(lVar, left, Constraint.of(right.value));
+                this.add(left, lVar, Constraint.of(right.value * -1));
             }
             break;
         case SUBTRACTION:
             if (lVar.equals(left)) {
-                ZoneConstraint c = ZoneConstraint.of(right.value * -1);
+                Constraint c = Constraint.of(right.value * -1);
                 this.matrix.addOutgoing(lVar, c, inState.matrix);
                 this.matrix.subIncoming(lVar, c, inState.matrix);
             } else {
                 this.forget(lVar);
-                this.add(lVar, left, ZoneConstraint.of(right.value * -1));
-                this.add(left, lVar, ZoneConstraint.of(right.value));
+                this.add(lVar, left, Constraint.of(right.value * -1));
+                this.add(left, lVar, Constraint.of(right.value));
             }
             break;
         case MULTIPLICATION:
@@ -308,13 +308,13 @@ public class IncZoneState implements State {
         switch (operator) {
         case ADDITION:
             if (lVar.equals(right)) {
-                ZoneConstraint c = ZoneConstraint.of(left.value);
+                Constraint c = Constraint.of(left.value);
                 this.matrix.addOutgoing(lVar, c, inState.matrix);
                 this.matrix.subIncoming(lVar, c, inState.matrix);
             } else {
                 this.forget(lVar);
-                this.add(lVar, right, ZoneConstraint.of(left.value));
-                this.add(right, lVar, ZoneConstraint.of(left.value * -1));
+                this.add(lVar, right, Constraint.of(left.value));
+                this.add(right, lVar, Constraint.of(left.value * -1));
             }
             break;
         case SUBTRACTION:
@@ -402,8 +402,8 @@ public class IncZoneState implements State {
 
     public void updateState(Local lVar, IncZoneState inState, Local l) {
         this.forget(lVar);
-        this.add(lVar, l, ZoneConstraint.of(0));
-        this.add(l, lVar, ZoneConstraint.of(0));
+        this.add(lVar, l, Constraint.of(0));
+        this.add(l, lVar, Constraint.of(0));
     }
 
     @Override
@@ -436,8 +436,8 @@ public class IncZoneState implements State {
     }
 
     protected boolean isConstant(Local lVar, IncZoneState inState) {
-        ZoneConstraint upper = this.matrix.getConstraint(lVar, ZERO);
-        ZoneConstraint lower = this.matrix.getConstraint(ZERO, lVar);
+        Constraint upper = this.matrix.getConstraint(lVar, ZERO);
+        Constraint lower = this.matrix.getConstraint(ZERO, lVar);
         Interval32Box interval = Interval32Box.of(lower.bound().map(b -> b * -1),
                                                   upper.bound());
         // Testing whether the value is a "singleton" in the interval sense is
@@ -482,20 +482,20 @@ public class IncZoneState implements State {
                               PredicateType type) {
         switch (type) {
         case Le:
-            this.add(left, ZERO, ZoneConstraint.of(right.value), inState);
+            this.add(left, ZERO, Constraint.of(right.value), inState);
             break;
         case Lt:
-            this.add(left, ZERO, ZoneConstraint.of(right.value - 1), inState);
+            this.add(left, ZERO, Constraint.of(right.value - 1), inState);
             break;
         case Eq:
-            this.add(left, ZERO, ZoneConstraint.of(right.value), inState);
-            this.add(ZERO, left, ZoneConstraint.of(right.value * -1), inState);
+            this.add(left, ZERO, Constraint.of(right.value), inState);
+            this.add(ZERO, left, Constraint.of(right.value * -1), inState);
             break;
         case Ge:
-            this.add(ZERO, left, ZoneConstraint.of(right.value * -1), inState);
+            this.add(ZERO, left, Constraint.of(right.value * -1), inState);
             break;
         case Gt:
-            this.add(ZERO, left, ZoneConstraint.of((right.value * - 1) - 1), inState);
+            this.add(ZERO, left, Constraint.of((right.value * - 1) - 1), inState);
             break;
         case Ne:
             break;
@@ -512,20 +512,20 @@ public class IncZoneState implements State {
                               PredicateType type) {
         switch (type) {
         case Le:
-            this.add(ZERO, right, ZoneConstraint.of(left.value * -1), inState);
+            this.add(ZERO, right, Constraint.of(left.value * -1), inState);
             break;
         case Lt:
-            this.add(ZERO, right, ZoneConstraint.of((left.value * -1) - 1), inState);
+            this.add(ZERO, right, Constraint.of((left.value * -1) - 1), inState);
             break;
         case Eq:
-            this.add(ZERO, right, ZoneConstraint.of(left.value * -1), inState);
-            this.add(right, ZERO, ZoneConstraint.of(left.value), inState);
+            this.add(ZERO, right, Constraint.of(left.value * -1), inState);
+            this.add(right, ZERO, Constraint.of(left.value), inState);
             break;
         case Ge:
-            this.add(right, ZERO, ZoneConstraint.of(left.value), inState);
+            this.add(right, ZERO, Constraint.of(left.value), inState);
             break;
         case Gt:
-            this.add(right, ZERO, ZoneConstraint.of(left.value - 1), inState);
+            this.add(right, ZERO, Constraint.of(left.value - 1), inState);
             break;
         case Ne:
             break;
@@ -542,20 +542,20 @@ public class IncZoneState implements State {
                               PredicateType type) {
         switch (type) {
         case Le:
-            this.add(left, right, ZoneConstraint.of(0), inState);
+            this.add(left, right, Constraint.of(0), inState);
             break;
         case Lt:
-            this.add(left, right, ZoneConstraint.of(-1), inState);
+            this.add(left, right, Constraint.of(-1), inState);
             break;
         case Eq:
-            this.add(left, right, ZoneConstraint.of(0), inState);
-            this.add(right, left, ZoneConstraint.of(0), inState);
+            this.add(left, right, Constraint.of(0), inState);
+            this.add(right, left, Constraint.of(0), inState);
             break;
         case Ge:
-            this.add(right, left, ZoneConstraint.of(0), inState);
+            this.add(right, left, Constraint.of(0), inState);
             break;
         case Gt:
-            this.add(right, left, ZoneConstraint.of(-1), inState);
+            this.add(right, left, Constraint.of(-1), inState);
         case Ne:
             break;
         case Invalid:

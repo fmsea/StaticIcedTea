@@ -2,8 +2,8 @@ package abstractinterp.scalar.state;
 
 import java.util.Optional;
 
-class TopZoneConstraint extends ZoneConstraint {
-    public TopZoneConstraint() {
+class TopConstraint extends Constraint {
+    public TopConstraint() {
         super(Optional.empty(), false);
     }
 
@@ -12,7 +12,7 @@ class TopZoneConstraint extends ZoneConstraint {
         return "⟙";
     }
 
-    private ZoneConstraint combine(ZoneConstraint c) {
+    private Constraint combine(Constraint c) {
         if (c.isBottom()) {
             return c;
         } else {
@@ -21,22 +21,22 @@ class TopZoneConstraint extends ZoneConstraint {
     }
 
     @Override
-    public ZoneConstraint add(ZoneConstraint c) {
+    public Constraint add(Constraint c) {
         return this.combine(c);
     }
 
     @Override
-    public ZoneConstraint subtract(ZoneConstraint c) {
+    public Constraint subtract(Constraint c) {
         return this.combine(c);
     }
 
     @Override
-    public ZoneConstraint multiply(ZoneConstraint c) {
+    public Constraint multiply(Constraint c) {
         return this.combine(c);
     }
 
     @Override
-    public ZoneConstraint divide(ZoneConstraint c) {
+    public Constraint divide(Constraint c) {
         return this.combine(c);
     }
 

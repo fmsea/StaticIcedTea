@@ -50,17 +50,17 @@ public class ZoneStateTest {
     @DisplayName("test add when matrix is top")
     void testAdd01() {
         ZoneState state = new ZoneState(matrix);
-        state.add(xs[1], xs[2], ZoneConstraint.of(1));
-        assertEquals(ZoneConstraint.of(1), matrix.getConstraint(xs[1], xs[2]));
+        state.add(xs[1], xs[2], Constraint.of(1));
+        assertEquals(Constraint.of(1), matrix.getConstraint(xs[1], xs[2]));
     }
 
     @Test
     @DisplayName("test add when matrix contains existing constraint")
     void testAdd02() {
-        this.matrix.putConstraint(xs[1], xs[2], ZoneConstraint.of(2));
+        this.matrix.putConstraint(xs[1], xs[2], Constraint.of(2));
         ZoneState state = new ZoneState(matrix);
-        state.add(xs[1], xs[2], ZoneConstraint.of(3));
-        assertEquals(ZoneConstraint.of(2), matrix.getConstraint(xs[1], xs[2]));
+        state.add(xs[1], xs[2], Constraint.of(3));
+        assertEquals(Constraint.of(2), matrix.getConstraint(xs[1], xs[2]));
     }
 
     @Test
@@ -70,29 +70,29 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(2), PredicateType.Le)),
-                  () -> assertEquals(ZoneConstraint.of(2), matrix.getConstraint(xs[1], xs[0])));
+                  () -> assertEquals(Constraint.of(2), matrix.getConstraint(xs[1], xs[0])));
     }
 
     @Test
     @DisplayName("test update condition with more precise constraint (local ≤ constant)")
     void testUpdateCondLe02() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[0], ZoneConstraint.of(1));
+        in.add(xs[1], xs[0], Constraint.of(1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(2), PredicateType.Le)),
-                  () -> assertEquals(ZoneConstraint.of(1), matrix.getConstraint(xs[1], xs[0])));
+                  () -> assertEquals(Constraint.of(1), matrix.getConstraint(xs[1], xs[0])));
     }
 
     @Test
     @DisplayName("test update condition with less precise constraint (local ≤ constant)")
     void testUpdateCondLe03() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[0], ZoneConstraint.of(1));
+        in.add(xs[1], xs[0], Constraint.of(1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(0), PredicateType.Le)),
-                  () -> assertEquals(ZoneConstraint.of(0), matrix.getConstraint(xs[1], xs[0])));
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[1], xs[0])));
     }
 
     @Test
@@ -102,29 +102,29 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(2), xs[1], PredicateType.Le)),
-                  () -> assertEquals(ZoneConstraint.of(-2), matrix.getConstraint(xs[0], xs[1])));
+                  () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[0], xs[1])));
     }
 
     @Test
     @DisplayName("test update condition with more precise constraint (constant ≤ local)")
     void testUpdateCondLe12() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[0], xs[1], ZoneConstraint.of(-1));
+        in.add(xs[0], xs[1], Constraint.of(-1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(0), xs[1], PredicateType.Le)),
-                  () -> assertEquals(ZoneConstraint.of(-1), matrix.getConstraint(xs[0], xs[1])));
+                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[0], xs[1])));
     }
 
     @Test
     @DisplayName("test update condition with less precise constraint (constant ≤ local)")
     void testUpdateCondLe13() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[0], xs[1], ZoneConstraint.of(0));
+        in.add(xs[0], xs[1], Constraint.of(0));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(1), xs[1], PredicateType.Le)),
-                  () -> assertEquals(ZoneConstraint.of(-1), matrix.getConstraint(xs[0], xs[1])));
+                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[0], xs[1])));
     }
 
     @Test
@@ -134,29 +134,29 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Le)),
-                  () -> assertEquals(ZoneConstraint.of(0), matrix.getConstraint(xs[1], xs[2])));
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[1], xs[2])));
     }
 
     @Test
     @DisplayName("test update condition with more precise constraint (local ≤ local)")
     void testUpdateCondLe32() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(-1));
+        in.add(xs[1], xs[2], Constraint.of(-1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Le)),
-                  () -> assertEquals(ZoneConstraint.of(-1), matrix.getConstraint(xs[1], xs[2])));
+                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[1], xs[2])));
     }
 
     @Test
     @DisplayName("test update condition with less precise constraint (local ≤ local)")
     void testUpdateCondLe33() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(1));
+        in.add(xs[1], xs[2], Constraint.of(1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Le)),
-                  () -> assertEquals(ZoneConstraint.of(0), matrix.getConstraint(xs[1], xs[2])));
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[1], xs[2])));
     }
 
     @Test
@@ -166,29 +166,29 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(2), PredicateType.Lt)),
-                  () -> assertEquals(ZoneConstraint.of(1), matrix.getConstraint(xs[1], xs[0])));
+                  () -> assertEquals(Constraint.of(1), matrix.getConstraint(xs[1], xs[0])));
     }
 
     @Test
     @DisplayName("test update condition with more precise constraint (local < constant)")
     void testUpdateCondLt02() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[0], ZoneConstraint.of(0));
+        in.add(xs[1], xs[0], Constraint.of(0));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(2), PredicateType.Lt)),
-                  () -> assertEquals(ZoneConstraint.of(0), matrix.getConstraint(xs[1], xs[0])));
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[1], xs[0])));
     }
 
     @Test
     @DisplayName("test update condition with less precise constraint (local < constant)")
     void testUpdateCondLt03() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[0], ZoneConstraint.of(2));
+        in.add(xs[1], xs[0], Constraint.of(2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(1), PredicateType.Lt)),
-                  () -> assertEquals(ZoneConstraint.of(0), matrix.getConstraint(xs[1], xs[0])));
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[1], xs[0])));
     }
 
     @Test
@@ -198,29 +198,29 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(2), xs[1], PredicateType.Lt)),
-                  () -> assertEquals(ZoneConstraint.of(-3), matrix.getConstraint(xs[0], xs[1])));
+                  () -> assertEquals(Constraint.of(-3), matrix.getConstraint(xs[0], xs[1])));
     }
 
     @Test
     @DisplayName("test update condition with more precise constraint (constant < local)")
     void testUpdateCondLt12() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[0], xs[1], ZoneConstraint.of(-2));
+        in.add(xs[0], xs[1], Constraint.of(-2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(-1), xs[1], PredicateType.Lt)),
-                  () -> assertEquals(ZoneConstraint.of(-2), matrix.getConstraint(xs[0], xs[1])));
+                  () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[0], xs[1])));
     }
 
     @Test
     @DisplayName("test update condition with less precise constraint (constant < local)")
     void testUpdateCondLt13() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[0], xs[1], ZoneConstraint.of(0));
+        in.add(xs[0], xs[1], Constraint.of(0));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(0), xs[1], PredicateType.Lt)),
-                  () -> assertEquals(ZoneConstraint.of(-1), matrix.getConstraint(xs[0], xs[1])));
+                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[0], xs[1])));
     }
 
     @Test
@@ -230,29 +230,29 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Lt)),
-                  () -> assertEquals(ZoneConstraint.of(-1), matrix.getConstraint(xs[1], xs[2])));
+                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[1], xs[2])));
     }
 
     @Test
     @DisplayName("test update condition with more precise constraint (local < local)")
     void testUpdateCondLt32() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(-2));
+        in.add(xs[1], xs[2], Constraint.of(-2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Lt)),
-                  () -> assertEquals(ZoneConstraint.of(-2), matrix.getConstraint(xs[1], xs[2])));
+                  () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[1], xs[2])));
     }
 
     @Test
     @DisplayName("test update condition with less precise constraint (local < local)")
     void testUpdateCondLt33() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(0));
+        in.add(xs[1], xs[2], Constraint.of(0));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Lt)),
-                  () -> assertEquals(ZoneConstraint.of(-1), matrix.getConstraint(xs[1], xs[2])));
+                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[1], xs[2])));
     }
 
     @Test
@@ -262,32 +262,32 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(2), PredicateType.Eq)),
-                  () -> assertEquals(ZoneConstraint.of(2), matrix.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(ZoneConstraint.of(-2), matrix.getConstraint(xs[0], xs[1])));
+                  () -> assertEquals(Constraint.of(2), matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[0], xs[1])));
     }
 
     @Test
     @DisplayName("test update condition with more precise constraint (local = constant)")
     void testUpdateCondEq02() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[0], ZoneConstraint.of(1));
+        in.add(xs[1], xs[0], Constraint.of(1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(1), PredicateType.Eq)),
-                  () -> assertEquals(ZoneConstraint.of(1), matrix.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(ZoneConstraint.of(-1), matrix.getConstraint(xs[0], xs[1])));
+                  () -> assertEquals(Constraint.of(1), matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[0], xs[1])));
     }
 
     @Test
     @DisplayName("test update condition with less precise constraint (local = constant)")
     void testUpdateCondEq03() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[0], ZoneConstraint.of(2));
+        in.add(xs[1], xs[0], Constraint.of(2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(1), PredicateType.Eq)),
-                  () -> assertEquals(ZoneConstraint.of(+1), matrix.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(ZoneConstraint.of(-1), matrix.getConstraint(xs[0], xs[1])));
+                  () -> assertEquals(Constraint.of(+1), matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[0], xs[1])));
     }
 
     @Test
@@ -297,32 +297,32 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(2), xs[1], PredicateType.Eq)),
-                  () -> assertEquals(ZoneConstraint.of(-2), matrix.getConstraint(xs[0], xs[1])),
-                  () -> assertEquals(ZoneConstraint.of(+2), matrix.getConstraint(xs[1], xs[0])));
+                  () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Constraint.of(+2), matrix.getConstraint(xs[1], xs[0])));
     }
 
     @Test
     @DisplayName("test update condition with more precise constraint (constant = local)")
     void testUpdateCondEq12() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[0], ZoneConstraint.of(+3));
+        in.add(xs[1], xs[0], Constraint.of(+3));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(3), xs[1], PredicateType.Eq)),
-                  () -> assertEquals(ZoneConstraint.of(-3), matrix.getConstraint(xs[0], xs[1])),
-                  () -> assertEquals(ZoneConstraint.of(+3), matrix.getConstraint(xs[1], xs[0])));
+                  () -> assertEquals(Constraint.of(-3), matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Constraint.of(+3), matrix.getConstraint(xs[1], xs[0])));
     }
 
     @Test
     @DisplayName("test update condition with less precise constraint (constant = local)")
     void testUpdateCondEq13() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(+1));
+        in.add(xs[1], xs[2], Constraint.of(+1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(0), xs[1], PredicateType.Eq)),
-                  () -> assertEquals(ZoneConstraint.of(0), matrix.getConstraint(xs[0], xs[1])),
-                  () -> assertEquals(ZoneConstraint.of(0), matrix.getConstraint(xs[1], xs[0])));
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[1], xs[0])));
     }
 
     @Test
@@ -332,16 +332,16 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Eq)),
-                  () -> assertEquals(ZoneConstraint.of(0), matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.of(0), matrix.getConstraint(xs[2], xs[1])));
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[1], xs[2])),
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[2], xs[1])));
     }
 
     @Test
     @DisplayName("test update condition with more precise constraint (local = local)")
     void testUpdateCondEq32() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(-1));
-        in.add(xs[2], xs[1], ZoneConstraint.of(+1));
+        in.add(xs[1], xs[2], Constraint.of(-1));
+        in.add(xs[2], xs[1], Constraint.of(+1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertFalse(out.updateCond(in, xs[1], xs[2], PredicateType.Eq)));
@@ -351,8 +351,8 @@ public class ZoneStateTest {
     @DisplayName("test update condition with less precise constraint (local = local)")
     void testUpdateCondEq33() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(3));
-        in.add(xs[2], xs[1], ZoneConstraint.of(-3));
+        in.add(xs[1], xs[2], Constraint.of(3));
+        in.add(xs[2], xs[1], Constraint.of(-3));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertFalse(out.updateCond(in, xs[1], xs[2], PredicateType.Eq)));
@@ -365,29 +365,29 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(2), PredicateType.Ge)),
-                  () -> assertEquals(ZoneConstraint.of(-2), matrix.getConstraint(xs[0], xs[1])));
+                  () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[0], xs[1])));
     }
 
     @Test
     @DisplayName("test update condition with more precise constraint (local ≥ constant)")
     void testUpdateCondGe02() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[0], xs[1], ZoneConstraint.of(-1));
+        in.add(xs[0], xs[1], Constraint.of(-1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(2), PredicateType.Ge)),
-                  () -> assertEquals(ZoneConstraint.of(-2), matrix.getConstraint(xs[0], xs[1])));
+                  () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[0], xs[1])));
     }
 
     @Test
     @DisplayName("test update condition with less precise constraint (local ≥ constant)")
     void testUpdateCondGe03() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[0], xs[1], ZoneConstraint.of(1));
+        in.add(xs[0], xs[1], Constraint.of(1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(0), PredicateType.Ge)),
-                  () -> assertEquals(ZoneConstraint.of(0), matrix.getConstraint(xs[0], xs[1])));
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[0], xs[1])));
     }
 
     @Test
@@ -397,29 +397,29 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(2), xs[1], PredicateType.Ge)),
-                  () -> assertEquals(ZoneConstraint.of(2), matrix.getConstraint(xs[1], xs[0])));
+                  () -> assertEquals(Constraint.of(2), matrix.getConstraint(xs[1], xs[0])));
     }
 
     @Test
     @DisplayName("test update condition with more precise constraint (constant ≥ local)")
     void testUpdateCondGe12() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[0], ZoneConstraint.of(1));
+        in.add(xs[1], xs[0], Constraint.of(1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(2), xs[1], PredicateType.Ge)),
-                  () -> assertEquals(ZoneConstraint.of(1), matrix.getConstraint(xs[1], xs[0])));
+                  () -> assertEquals(Constraint.of(1), matrix.getConstraint(xs[1], xs[0])));
     }
 
     @Test
     @DisplayName("test update condition with less precise constraint (constant ≥ local)")
     void testUpdateCondGe13() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[0], ZoneConstraint.of(2));
+        in.add(xs[1], xs[0], Constraint.of(2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(1), xs[1], PredicateType.Ge)),
-                  () -> assertEquals(ZoneConstraint.of(1), matrix.getConstraint(xs[1], xs[0])));
+                  () -> assertEquals(Constraint.of(1), matrix.getConstraint(xs[1], xs[0])));
     }
 
     @Test
@@ -429,29 +429,29 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Ge)),
-                  () -> assertEquals(ZoneConstraint.of(0), matrix.getConstraint(xs[2], xs[1])));
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[2], xs[1])));
     }
 
     @Test
     @DisplayName("test update condition with more precise constraint (local ≥ local)")
     void testUpdateCondGe32() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[2], xs[1], ZoneConstraint.of(-1));
+        in.add(xs[2], xs[1], Constraint.of(-1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Ge)),
-                  () -> assertEquals(ZoneConstraint.of(-1), matrix.getConstraint(xs[2], xs[1])));
+                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[2], xs[1])));
     }
 
     @Test
     @DisplayName("test update condition with less precise constraint (local ≥ local)")
     void testUpdateCondGe33() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[2], xs[1], ZoneConstraint.of(1));
+        in.add(xs[2], xs[1], Constraint.of(1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Ge)),
-                  () -> assertEquals(ZoneConstraint.of(0), matrix.getConstraint(xs[2], xs[1])));
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[2], xs[1])));
     }
 
     @Test
@@ -461,29 +461,29 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(2), PredicateType.Gt)),
-                  () -> assertEquals(ZoneConstraint.of(-3), matrix.getConstraint(xs[0], xs[1])));
+                  () -> assertEquals(Constraint.of(-3), matrix.getConstraint(xs[0], xs[1])));
     }
 
     @Test
     @DisplayName("test update condition with more precise constraint (local > constant)")
     void testUpdateCondGt02() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[0], xs[1], ZoneConstraint.of(-2));
+        in.add(xs[0], xs[1], Constraint.of(-2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(0), PredicateType.Gt)),
-                  () -> assertEquals(ZoneConstraint.of(-2), matrix.getConstraint(xs[0], xs[1])));
+                  () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[0], xs[1])));
     }
 
     @Test
     @DisplayName("test update condition with less precise constraint (local > constant)")
     void testUpdateCondGt03() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[0], xs[1], ZoneConstraint.of(2));
+        in.add(xs[0], xs[1], Constraint.of(2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(-1), PredicateType.Gt)),
-                  () -> assertEquals(ZoneConstraint.of(0), matrix.getConstraint(xs[0], xs[1])));
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[0], xs[1])));
     }
 
     @Test
@@ -493,29 +493,29 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(2), xs[1], PredicateType.Gt)),
-                  () -> assertEquals(ZoneConstraint.of(1), matrix.getConstraint(xs[1], xs[0])));
+                  () -> assertEquals(Constraint.of(1), matrix.getConstraint(xs[1], xs[0])));
     }
 
     @Test
     @DisplayName("test update condition with more precise constraint (constant > local)")
     void testUpdateCondGt12() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[0], ZoneConstraint.of(0));
+        in.add(xs[1], xs[0], Constraint.of(0));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(2), xs[1], PredicateType.Gt)),
-                  () -> assertEquals(ZoneConstraint.of(0), matrix.getConstraint(xs[1], xs[0])));
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[1], xs[0])));
     }
 
     @Test
     @DisplayName("test update condition with less precise constraint (constant > local)")
     void testUpdateCondGt13() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[0], ZoneConstraint.of(4));
+        in.add(xs[1], xs[0], Constraint.of(4));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(2), xs[1], PredicateType.Gt)),
-                  () -> assertEquals(ZoneConstraint.of(1), matrix.getConstraint(xs[1], xs[0])));
+                  () -> assertEquals(Constraint.of(1), matrix.getConstraint(xs[1], xs[0])));
     }
 
     @Test
@@ -525,29 +525,29 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Gt)),
-                  () -> assertEquals(ZoneConstraint.of(-1), matrix.getConstraint(xs[2], xs[1])));
+                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[2], xs[1])));
     }
 
     @Test
     @DisplayName("test update condition with more precise constraint (local > local)")
     void testUpdateCondGt32() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[2], xs[1], ZoneConstraint.of(-2));
+        in.add(xs[2], xs[1], Constraint.of(-2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Gt)),
-                  () -> assertEquals(ZoneConstraint.of(-2), matrix.getConstraint(xs[2], xs[1])));
+                  () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[2], xs[1])));
     }
 
     @Test
     @DisplayName("test update condition with less precise constraint (local > local)")
     void testUpdateCondGt33() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[2], xs[1], ZoneConstraint.of(0));
+        in.add(xs[2], xs[1], Constraint.of(0));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Gt)),
-                  () -> assertEquals(ZoneConstraint.of(-1), matrix.getConstraint(xs[2], xs[1])));
+                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[2], xs[1])));
     }
 
     @Test
@@ -557,9 +557,9 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3));
-        assertAll(() -> assertEquals(ZoneConstraint.of(+3),
+        assertAll(() -> assertEquals(Constraint.of(+3),
                                      matrix.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(ZoneConstraint.of(-3),
+                  () -> assertEquals(Constraint.of(-3),
                                      matrix.getConstraint(xs[0], xs[1])));
     }
 
@@ -567,14 +567,14 @@ public class ZoneStateTest {
     @DisplayName("test update state with bound matrix (l = c)")
     void testUpdateState02() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[0], ZoneConstraint.of(2));
-        in.add(xs[0], xs[1], ZoneConstraint.of(-2));
+        in.add(xs[1], xs[0], Constraint.of(2));
+        in.add(xs[0], xs[1], Constraint.of(-2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3));
-        assertAll(() -> assertEquals(ZoneConstraint.of(+3),
+        assertAll(() -> assertEquals(Constraint.of(+3),
                                      matrix.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(ZoneConstraint.of(-3),
+                  () -> assertEquals(Constraint.of(-3),
                                      matrix.getConstraint(xs[0], xs[1])));
     }
 
@@ -585,9 +585,9 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2]);
-        assertAll(() -> assertEquals(ZoneConstraint.of(0),
+        assertAll(() -> assertEquals(Constraint.of(0),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.of(0),
+                  () -> assertEquals(Constraint.of(0),
                                      matrix.getConstraint(xs[2], xs[1])));
     }
 
@@ -595,14 +595,14 @@ public class ZoneStateTest {
     @DisplayName("test update state with bound matrix (l1 = l2)")
     void testUpdateState12() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(2));
-        in.add(xs[2], xs[1], ZoneConstraint.of(-2));
+        in.add(xs[1], xs[2], Constraint.of(2));
+        in.add(xs[2], xs[1], Constraint.of(-2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2]);
-        assertAll(() -> assertEquals(ZoneConstraint.of(0),
+        assertAll(() -> assertEquals(Constraint.of(0),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.of(0),
+                  () -> assertEquals(Constraint.of(0),
                                      matrix.getConstraint(xs[2], xs[1])));
     }
 
@@ -613,9 +613,9 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], IntConstant.v(3), BinaryOperatorType.ADDITION);
-        assertAll(() -> assertEquals(ZoneConstraint.of(+3),
+        assertAll(() -> assertEquals(Constraint.of(+3),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.of(-3),
+                  () -> assertEquals(Constraint.of(-3),
                                      matrix.getConstraint(xs[2], xs[1])));
     }
 
@@ -623,14 +623,14 @@ public class ZoneStateTest {
     @DisplayName("test update state with bound matrix (l1 = l2 ★ c)")
     void testUpdateState002() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(+2));
-        in.add(xs[2], xs[1], ZoneConstraint.of(-2));
+        in.add(xs[1], xs[2], Constraint.of(+2));
+        in.add(xs[2], xs[1], Constraint.of(-2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], IntConstant.v(3), BinaryOperatorType.ADDITION);
-        assertAll(() -> assertEquals(ZoneConstraint.of(+3),
+        assertAll(() -> assertEquals(Constraint.of(+3),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.of(-3),
+                  () -> assertEquals(Constraint.of(-3),
                                      matrix.getConstraint(xs[2], xs[1])));
     }
 
@@ -648,17 +648,17 @@ public class ZoneStateTest {
     @DisplayName("test update state, update value, with bound matrix (l1 = l1 ★ c)")
     void testUpdateState004() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(+2));
-        in.add(xs[2], xs[1], ZoneConstraint.of(-2));
-        in.add(xs[0], xs[1], ZoneConstraint.of(-3));
+        in.add(xs[1], xs[2], Constraint.of(+2));
+        in.add(xs[2], xs[1], Constraint.of(-2));
+        in.add(xs[0], xs[1], Constraint.of(-3));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], IntConstant.v(3), BinaryOperatorType.ADDITION);
-        assertAll(() -> assertEquals(ZoneConstraint.of(+5),
+        assertAll(() -> assertEquals(Constraint.of(+5),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.of(-5),
+                  () -> assertEquals(Constraint.of(-5),
                                      matrix.getConstraint(xs[2], xs[1])),
-                  () -> assertEquals(ZoneConstraint.of(-6),
+                  () -> assertEquals(Constraint.of(-6),
                                      matrix.getConstraint(xs[0], xs[1])));
     }
 
@@ -669,9 +669,9 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], IntConstant.v(3), BinaryOperatorType.SUBTRACTION);
-        assertAll(() -> assertEquals(ZoneConstraint.of(-3),
+        assertAll(() -> assertEquals(Constraint.of(-3),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.of(+3),
+                  () -> assertEquals(Constraint.of(+3),
                                      matrix.getConstraint(xs[2], xs[1])));
     }
 
@@ -679,14 +679,14 @@ public class ZoneStateTest {
     @DisplayName("test update state with bound matrix (l1 = l2 ★ c)")
     void testUpdateState012() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(+2));
-        in.add(xs[2], xs[1], ZoneConstraint.of(-2));
+        in.add(xs[1], xs[2], Constraint.of(+2));
+        in.add(xs[2], xs[1], Constraint.of(-2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], IntConstant.v(3), BinaryOperatorType.SUBTRACTION);
-        assertAll(() -> assertEquals(ZoneConstraint.of(-3),
+        assertAll(() -> assertEquals(Constraint.of(-3),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.of(+3),
+                  () -> assertEquals(Constraint.of(+3),
                                      matrix.getConstraint(xs[2], xs[1])));
     }
 
@@ -704,17 +704,17 @@ public class ZoneStateTest {
     @DisplayName("test update state, update value, with bound matrix (l1 = l1 ★ c)")
     void testUpdateState014() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(+2));
-        in.add(xs[2], xs[1], ZoneConstraint.of(-2));
-        in.add(xs[0], xs[1], ZoneConstraint.of(-3));
+        in.add(xs[1], xs[2], Constraint.of(+2));
+        in.add(xs[2], xs[1], Constraint.of(-2));
+        in.add(xs[0], xs[1], Constraint.of(-3));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], IntConstant.v(3), BinaryOperatorType.SUBTRACTION);
-        assertAll(() -> assertEquals(ZoneConstraint.of(-1),
+        assertAll(() -> assertEquals(Constraint.of(-1),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.of(1),
+                  () -> assertEquals(Constraint.of(1),
                                      matrix.getConstraint(xs[2], xs[1])),
-                  () -> assertEquals(ZoneConstraint.of(0),
+                  () -> assertEquals(Constraint.of(0),
                                      matrix.getConstraint(xs[0], xs[1])));
     }
 
@@ -732,14 +732,14 @@ public class ZoneStateTest {
     @DisplayName("test update state with bound matrix (l1 = l2 ★ c)")
     void testUpdateState022() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[0], xs[2], ZoneConstraint.of(-2));
-        in.add(xs[2], xs[0], ZoneConstraint.of(+2));
+        in.add(xs[0], xs[2], Constraint.of(-2));
+        in.add(xs[2], xs[0], Constraint.of(+2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], IntConstant.v(3), BinaryOperatorType.MULTIPLICATION);
-        assertAll(() -> assertEquals(ZoneConstraint.of(+6),
+        assertAll(() -> assertEquals(Constraint.of(+6),
                                      matrix.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(ZoneConstraint.of(-6),
+                  () -> assertEquals(Constraint.of(-6),
                                      matrix.getConstraint(xs[0], xs[1])));
     }
 
@@ -757,19 +757,19 @@ public class ZoneStateTest {
     @DisplayName("test update state, update value, with bound matrix (l1 = l1 ★ c)")
     void testUpdateState024() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(+2));
-        in.add(xs[2], xs[1], ZoneConstraint.of(-2));
-        in.add(xs[0], xs[1], ZoneConstraint.of(-3));
+        in.add(xs[1], xs[2], Constraint.of(+2));
+        in.add(xs[2], xs[1], Constraint.of(-2));
+        in.add(xs[0], xs[1], Constraint.of(-3));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], IntConstant.v(3), BinaryOperatorType.MULTIPLICATION);
-        assertAll(() -> assertEquals(ZoneConstraint.TOP(),
+        assertAll(() -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[2], xs[1])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[0], xs[1])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[0])));
     }
 
@@ -787,14 +787,14 @@ public class ZoneStateTest {
     @DisplayName("test update state with bound matrix (l1 = l2 ★ c)")
     void testUpdateState032() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[2], xs[0], ZoneConstraint.of(+2));
-        in.add(xs[0], xs[2], ZoneConstraint.of(-2));
+        in.add(xs[2], xs[0], Constraint.of(+2));
+        in.add(xs[0], xs[2], Constraint.of(-2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], IntConstant.v(3), BinaryOperatorType.DIVISION);
-        assertAll(() -> assertEquals(ZoneConstraint.of(0),
+        assertAll(() -> assertEquals(Constraint.of(0),
                                      matrix.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(ZoneConstraint.of(0),
+                  () -> assertEquals(Constraint.of(0),
                                      matrix.getConstraint(xs[0], xs[1])));
     }
 
@@ -812,19 +812,19 @@ public class ZoneStateTest {
     @DisplayName("test update state, update value, with bound matrix (l1 = l1 ★ c)")
     void testUpdateState034() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(+2));
-        in.add(xs[2], xs[1], ZoneConstraint.of(-2));
-        in.add(xs[0], xs[1], ZoneConstraint.of(-3));
+        in.add(xs[1], xs[2], Constraint.of(+2));
+        in.add(xs[2], xs[1], Constraint.of(-2));
+        in.add(xs[0], xs[1], Constraint.of(-3));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], IntConstant.v(3), BinaryOperatorType.DIVISION);
-        assertAll(() -> assertEquals(ZoneConstraint.TOP(),
+        assertAll(() -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[2], xs[1])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[0], xs[1])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[0])));
     }
 
@@ -835,9 +835,9 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[2], BinaryOperatorType.ADDITION);
-        assertAll(() -> assertEquals(ZoneConstraint.of(+3),
+        assertAll(() -> assertEquals(Constraint.of(+3),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.of(-3),
+                  () -> assertEquals(Constraint.of(-3),
                                      matrix.getConstraint(xs[2], xs[1])));
     }
 
@@ -845,14 +845,14 @@ public class ZoneStateTest {
     @DisplayName("test update state with bound matrix (l1 = c ★ l2)")
     void testUpdateState102() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(+2));
-        in.add(xs[2], xs[1], ZoneConstraint.of(-2));
+        in.add(xs[1], xs[2], Constraint.of(+2));
+        in.add(xs[2], xs[1], Constraint.of(-2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[2], BinaryOperatorType.ADDITION);
-        assertAll(() -> assertEquals(ZoneConstraint.of(+3),
+        assertAll(() -> assertEquals(Constraint.of(+3),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.of(-3),
+                  () -> assertEquals(Constraint.of(-3),
                                      matrix.getConstraint(xs[2], xs[1])));
     }
 
@@ -870,17 +870,17 @@ public class ZoneStateTest {
     @DisplayName("test update state, update value, with bound matrix (l1 = c ★ l1)")
     void testUpdateState104() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(+2));
-        in.add(xs[2], xs[1], ZoneConstraint.of(-2));
-        in.add(xs[0], xs[1], ZoneConstraint.of(-3));
+        in.add(xs[1], xs[2], Constraint.of(+2));
+        in.add(xs[2], xs[1], Constraint.of(-2));
+        in.add(xs[0], xs[1], Constraint.of(-3));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[1], BinaryOperatorType.ADDITION);
-        assertAll(() -> assertEquals(ZoneConstraint.of(+5),
+        assertAll(() -> assertEquals(Constraint.of(+5),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.of(-5),
+                  () -> assertEquals(Constraint.of(-5),
                                      matrix.getConstraint(xs[2], xs[1])),
-                  () -> assertEquals(ZoneConstraint.of(-6),
+                  () -> assertEquals(Constraint.of(-6),
                                      matrix.getConstraint(xs[0], xs[1])));
     }
 
@@ -891,9 +891,9 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[2], BinaryOperatorType.SUBTRACTION);
-        assertAll(() -> assertEquals(ZoneConstraint.TOP(),
+        assertAll(() -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[0], xs[1])));
     }
 
@@ -901,18 +901,18 @@ public class ZoneStateTest {
     @DisplayName("test update state with bound matrix (l1 = c ★ l2)")
     void testUpdateState112() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[0], xs[2], ZoneConstraint.of(-2));
-        in.add(xs[2], xs[0], ZoneConstraint.of(+2));
+        in.add(xs[0], xs[2], Constraint.of(-2));
+        in.add(xs[2], xs[0], Constraint.of(+2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[2], BinaryOperatorType.SUBTRACTION);
-        assertAll(() -> assertEquals(ZoneConstraint.TOP(),
+        assertAll(() -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[2], xs[1])),
-                  () -> assertEquals(ZoneConstraint.of(+1),
+                  () -> assertEquals(Constraint.of(+1),
                                      matrix.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(ZoneConstraint.of(-1),
+                  () -> assertEquals(Constraint.of(-1),
                                      matrix.getConstraint(xs[0], xs[1])));
     }
 
@@ -930,20 +930,20 @@ public class ZoneStateTest {
     @DisplayName("test update state, update value, with bound matrix (l1 = c ★ l1)")
     void testUpdateState114() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(+2));
-        in.add(xs[2], xs[1], ZoneConstraint.of(-2));
-        in.add(xs[0], xs[1], ZoneConstraint.of(-3));
-        in.add(xs[1], xs[0], ZoneConstraint.of(+3));
+        in.add(xs[1], xs[2], Constraint.of(+2));
+        in.add(xs[2], xs[1], Constraint.of(-2));
+        in.add(xs[0], xs[1], Constraint.of(-3));
+        in.add(xs[1], xs[0], Constraint.of(+3));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[1], BinaryOperatorType.SUBTRACTION);
-        assertAll(() -> assertEquals(ZoneConstraint.TOP(),
+        assertAll(() -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[2], xs[1])),
-                  () -> assertEquals(ZoneConstraint.of(0),
+                  () -> assertEquals(Constraint.of(0),
                                      matrix.getConstraint(xs[0], xs[1])),
-                  () -> assertEquals(ZoneConstraint.of(0),
+                  () -> assertEquals(Constraint.of(0),
                                      matrix.getConstraint(xs[1], xs[0])));
     }
 
@@ -961,14 +961,14 @@ public class ZoneStateTest {
     @DisplayName("test update state with bound matrix (l1 = c ★ l2)")
     void testUpdateState122() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[0], xs[2], ZoneConstraint.of(-2));
-        in.add(xs[2], xs[0], ZoneConstraint.of(+2));
+        in.add(xs[0], xs[2], Constraint.of(-2));
+        in.add(xs[2], xs[0], Constraint.of(+2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[2], BinaryOperatorType.MULTIPLICATION);
-        assertAll(() -> assertEquals(ZoneConstraint.of(+6),
+        assertAll(() -> assertEquals(Constraint.of(+6),
                                      matrix.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(ZoneConstraint.of(-6),
+                  () -> assertEquals(Constraint.of(-6),
                                      matrix.getConstraint(xs[0], xs[1])));
     }
 
@@ -986,19 +986,19 @@ public class ZoneStateTest {
     @DisplayName("test update state, update value, with bound matrix (l1 = c ★ l1)")
     void testUpdateState124() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(+2));
-        in.add(xs[2], xs[1], ZoneConstraint.of(-2));
-        in.add(xs[0], xs[1], ZoneConstraint.of(-3));
+        in.add(xs[1], xs[2], Constraint.of(+2));
+        in.add(xs[2], xs[1], Constraint.of(-2));
+        in.add(xs[0], xs[1], Constraint.of(-3));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[1], BinaryOperatorType.MULTIPLICATION);
-        assertAll(() -> assertEquals(ZoneConstraint.TOP(),
+        assertAll(() -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[2], xs[1])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[0], xs[1])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[0])));
     }
 
@@ -1016,14 +1016,14 @@ public class ZoneStateTest {
     @DisplayName("test update state with bound matrix (l1 = c ★ l2)")
     void testUpdateState132() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[2], xs[0], ZoneConstraint.of(+2));
-        in.add(xs[0], xs[2], ZoneConstraint.of(-2));
+        in.add(xs[2], xs[0], Constraint.of(+2));
+        in.add(xs[0], xs[2], Constraint.of(-2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[2], BinaryOperatorType.DIVISION);
-        assertAll(() -> assertEquals(ZoneConstraint.of(1),
+        assertAll(() -> assertEquals(Constraint.of(1),
                                      matrix.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(ZoneConstraint.of(-1),
+                  () -> assertEquals(Constraint.of(-1),
                                      matrix.getConstraint(xs[0], xs[1])));
     }
 
@@ -1041,19 +1041,19 @@ public class ZoneStateTest {
     @DisplayName("test update state, update value, with bound matrix (l1 = c ★ l1)")
     void testUpdateState134() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(+2));
-        in.add(xs[2], xs[1], ZoneConstraint.of(-2));
-        in.add(xs[0], xs[1], ZoneConstraint.of(-3));
+        in.add(xs[1], xs[2], Constraint.of(+2));
+        in.add(xs[2], xs[1], Constraint.of(-2));
+        in.add(xs[0], xs[1], Constraint.of(-3));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[1], BinaryOperatorType.DIVISION);
-        assertAll(() -> assertEquals(ZoneConstraint.TOP(),
+        assertAll(() -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[2], xs[1])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[0], xs[1])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[0])));
     }
 
@@ -1064,9 +1064,9 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], xs[3], BinaryOperatorType.ADDITION);
-        assertAll(() -> assertEquals(ZoneConstraint.TOP(),
+        assertAll(() -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[0], xs[1])));
     }
 
@@ -1074,16 +1074,16 @@ public class ZoneStateTest {
     @DisplayName("test update state with bound matrix (l1 = l2 ★ l3)")
     void testUpdateState202() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[2], xs[0], ZoneConstraint.of(+2));
-        in.add(xs[0], xs[2], ZoneConstraint.of(-2));
-        in.add(xs[3], xs[0], ZoneConstraint.of(+3));
-        in.add(xs[0], xs[3], ZoneConstraint.of(-3));
+        in.add(xs[2], xs[0], Constraint.of(+2));
+        in.add(xs[0], xs[2], Constraint.of(-2));
+        in.add(xs[3], xs[0], Constraint.of(+3));
+        in.add(xs[0], xs[3], Constraint.of(-3));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], xs[3], BinaryOperatorType.ADDITION);
-        assertAll(() -> assertEquals(ZoneConstraint.of(+5),
+        assertAll(() -> assertEquals(Constraint.of(+5),
                                      matrix.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(ZoneConstraint.of(-5),
+                  () -> assertEquals(Constraint.of(-5),
                                      matrix.getConstraint(xs[0], xs[1])));
     }
 
@@ -1101,16 +1101,16 @@ public class ZoneStateTest {
     @DisplayName("test update state, update value, with bound matrix (l1 = l1 ★ l2)")
     void testUpdateState204() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[2], xs[0], ZoneConstraint.of(+2));
-        in.add(xs[0], xs[2], ZoneConstraint.of(-2));
-        in.add(xs[1], xs[0], ZoneConstraint.of(+3));
-        in.add(xs[0], xs[1], ZoneConstraint.of(-3));
+        in.add(xs[2], xs[0], Constraint.of(+2));
+        in.add(xs[0], xs[2], Constraint.of(-2));
+        in.add(xs[1], xs[0], Constraint.of(+3));
+        in.add(xs[0], xs[1], Constraint.of(-3));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], xs[2], BinaryOperatorType.ADDITION);
-        assertAll(() -> assertEquals(ZoneConstraint.of(+5),
+        assertAll(() -> assertEquals(Constraint.of(+5),
                                      matrix.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(ZoneConstraint.of(-5),
+                  () -> assertEquals(Constraint.of(-5),
                                      matrix.getConstraint(xs[0], xs[1])));
     }
 
@@ -1121,9 +1121,9 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], xs[3], BinaryOperatorType.SUBTRACTION);
-        assertAll(() -> assertEquals(ZoneConstraint.TOP(),
+        assertAll(() -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[0], xs[1])));
     }
 
@@ -1131,16 +1131,16 @@ public class ZoneStateTest {
     @DisplayName("test update state with bound matrix (l1 = l2 ★ l3)")
     void testUpdateState212() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[0], xs[2], ZoneConstraint.of(-2));
-        in.add(xs[2], xs[0], ZoneConstraint.of(+2));
-        in.add(xs[3], xs[0], ZoneConstraint.of(+4));
-        in.add(xs[0], xs[3], ZoneConstraint.of(-4));
+        in.add(xs[0], xs[2], Constraint.of(-2));
+        in.add(xs[2], xs[0], Constraint.of(+2));
+        in.add(xs[3], xs[0], Constraint.of(+4));
+        in.add(xs[0], xs[3], Constraint.of(-4));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], xs[3], BinaryOperatorType.SUBTRACTION);
-        assertAll(() -> assertEquals(ZoneConstraint.of(-2),
+        assertAll(() -> assertEquals(Constraint.of(-2),
                                      matrix.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(ZoneConstraint.of(+2),
+                  () -> assertEquals(Constraint.of(+2),
                                      matrix.getConstraint(xs[0], xs[1])));
     }
 
@@ -1158,26 +1158,26 @@ public class ZoneStateTest {
     @DisplayName("test update state, update value, with bound matrix (l1 = l1 ★ l2)")
     void testUpdateState214() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(+2));
-        in.add(xs[2], xs[1], ZoneConstraint.of(-2));
-        in.add(xs[0], xs[1], ZoneConstraint.of(-3));
-        in.add(xs[1], xs[0], ZoneConstraint.of(+4));
-        in.add(xs[0], xs[2], ZoneConstraint.of(-1));
-        in.add(xs[2], xs[0], ZoneConstraint.of(+2));
+        in.add(xs[1], xs[2], Constraint.of(+2));
+        in.add(xs[2], xs[1], Constraint.of(-2));
+        in.add(xs[0], xs[1], Constraint.of(-3));
+        in.add(xs[1], xs[0], Constraint.of(+4));
+        in.add(xs[0], xs[2], Constraint.of(-1));
+        in.add(xs[2], xs[0], Constraint.of(+2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], xs[2], BinaryOperatorType.SUBTRACTION);
-        assertAll(() -> assertEquals(ZoneConstraint.TOP(),
+        assertAll(() -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[2], xs[1])),
-                  () -> assertEquals(ZoneConstraint.of(+2),
+                  () -> assertEquals(Constraint.of(+2),
                                      matrix.getConstraint(xs[2], xs[0])),
-                  () -> assertEquals(ZoneConstraint.of(-1),
+                  () -> assertEquals(Constraint.of(-1),
                                      matrix.getConstraint(xs[0], xs[2])),
-                  () -> assertEquals(ZoneConstraint.of(-1),
+                  () -> assertEquals(Constraint.of(-1),
                                      matrix.getConstraint(xs[0], xs[1])),
-                  () -> assertEquals(ZoneConstraint.of(+3),
+                  () -> assertEquals(Constraint.of(+3),
                                      matrix.getConstraint(xs[1], xs[0])));
     }
 
@@ -1195,16 +1195,16 @@ public class ZoneStateTest {
     @DisplayName("test update state with bound matrix (l1 = l2 ★ l3)")
     void testUpdateState222() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[0], xs[2], ZoneConstraint.of(-2));
-        in.add(xs[2], xs[0], ZoneConstraint.of(+2));
-        in.add(xs[0], xs[3], ZoneConstraint.of(-3));
-        in.add(xs[3], xs[0], ZoneConstraint.of(+3));
+        in.add(xs[0], xs[2], Constraint.of(-2));
+        in.add(xs[2], xs[0], Constraint.of(+2));
+        in.add(xs[0], xs[3], Constraint.of(-3));
+        in.add(xs[3], xs[0], Constraint.of(+3));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], xs[3], BinaryOperatorType.MULTIPLICATION);
-        assertAll(() -> assertEquals(ZoneConstraint.of(+6),
+        assertAll(() -> assertEquals(Constraint.of(+6),
                                      matrix.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(ZoneConstraint.of(-6),
+                  () -> assertEquals(Constraint.of(-6),
                                      matrix.getConstraint(xs[0], xs[1])));
     }
 
@@ -1222,26 +1222,26 @@ public class ZoneStateTest {
     @DisplayName("test update state, update value, with bound matrix (l1 = l1 ★ l2)")
     void testUpdateState224() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(-1));
-        in.add(xs[2], xs[1], ZoneConstraint.of(+1));
-        in.add(xs[0], xs[1], ZoneConstraint.of(-3));
-        in.add(xs[1], xs[0], ZoneConstraint.of(+3));
-        in.add(xs[0], xs[2], ZoneConstraint.of(-4));
-        in.add(xs[2], xs[0], ZoneConstraint.of(+4));
+        in.add(xs[1], xs[2], Constraint.of(-1));
+        in.add(xs[2], xs[1], Constraint.of(+1));
+        in.add(xs[0], xs[1], Constraint.of(-3));
+        in.add(xs[1], xs[0], Constraint.of(+3));
+        in.add(xs[0], xs[2], Constraint.of(-4));
+        in.add(xs[2], xs[0], Constraint.of(+4));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], xs[2], BinaryOperatorType.MULTIPLICATION);
-        assertAll(() -> assertEquals(ZoneConstraint.TOP(),
+        assertAll(() -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[2], xs[1])),
-                  () -> assertEquals(ZoneConstraint.of(-4),
+                  () -> assertEquals(Constraint.of(-4),
                                      matrix.getConstraint(xs[0], xs[2])),
-                  () -> assertEquals(ZoneConstraint.of(+4),
+                  () -> assertEquals(Constraint.of(+4),
                                      matrix.getConstraint(xs[2], xs[0])),
-                  () -> assertEquals(ZoneConstraint.of(-12),
+                  () -> assertEquals(Constraint.of(-12),
                                      matrix.getConstraint(xs[0], xs[1])),
-                  () -> assertEquals(ZoneConstraint.of(+12),
+                  () -> assertEquals(Constraint.of(+12),
                                      matrix.getConstraint(xs[1], xs[0])));
     }
 
@@ -1259,16 +1259,16 @@ public class ZoneStateTest {
     @DisplayName("test update state with bound matrix (l1 = l2 ★ l3)")
     void testUpdateState232() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[2], xs[0], ZoneConstraint.of(+2));
-        in.add(xs[0], xs[2], ZoneConstraint.of(-2));
-        in.add(xs[3], xs[0], ZoneConstraint.of(-3));
-        in.add(xs[0], xs[3], ZoneConstraint.of(+3));
+        in.add(xs[2], xs[0], Constraint.of(+2));
+        in.add(xs[0], xs[2], Constraint.of(-2));
+        in.add(xs[3], xs[0], Constraint.of(-3));
+        in.add(xs[0], xs[3], Constraint.of(+3));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], xs[3], BinaryOperatorType.DIVISION);
-        assertAll(() -> assertEquals(ZoneConstraint.of(0),
+        assertAll(() -> assertEquals(Constraint.of(0),
                                      matrix.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(ZoneConstraint.of(0),
+                  () -> assertEquals(Constraint.of(0),
                                      matrix.getConstraint(xs[0], xs[1])));
     }
 
@@ -1286,26 +1286,26 @@ public class ZoneStateTest {
     @DisplayName("test update state, update value, with bound matrix (l1 = l1 ★ l2)")
     void testUpdateState234() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(+2));
-        in.add(xs[2], xs[1], ZoneConstraint.of(-2));
-        in.add(xs[0], xs[1], ZoneConstraint.of(-3));
-        in.add(xs[1], xs[0], ZoneConstraint.of(+3));
-        in.add(xs[0], xs[2], ZoneConstraint.of(-1));
-        in.add(xs[2], xs[0], ZoneConstraint.of(+1));
+        in.add(xs[1], xs[2], Constraint.of(+2));
+        in.add(xs[2], xs[1], Constraint.of(-2));
+        in.add(xs[0], xs[1], Constraint.of(-3));
+        in.add(xs[1], xs[0], Constraint.of(+3));
+        in.add(xs[0], xs[2], Constraint.of(-1));
+        in.add(xs[2], xs[0], Constraint.of(+1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], xs[2], BinaryOperatorType.DIVISION);
-        assertAll(() -> assertEquals(ZoneConstraint.TOP(),
+        assertAll(() -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[2], xs[1])),
-                  () -> assertEquals(ZoneConstraint.of(-1),
+                  () -> assertEquals(Constraint.of(-1),
                                      matrix.getConstraint(xs[0], xs[2])),
-                  () -> assertEquals(ZoneConstraint.of(+1),
+                  () -> assertEquals(Constraint.of(+1),
                                      matrix.getConstraint(xs[2], xs[0])),
-                  () -> assertEquals(ZoneConstraint.of(-3),
+                  () -> assertEquals(Constraint.of(-3),
                                      matrix.getConstraint(xs[0], xs[1])),
-                  () -> assertEquals(ZoneConstraint.of(+3),
+                  () -> assertEquals(Constraint.of(+3),
                                      matrix.getConstraint(xs[1], xs[0])));
     }
 
@@ -1313,26 +1313,26 @@ public class ZoneStateTest {
     @DisplayName("test update state, forgets value if unknown binary operator")
     void testUpdateState300() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(+2));
-        in.add(xs[2], xs[1], ZoneConstraint.of(-2));
-        in.add(xs[0], xs[1], ZoneConstraint.of(-3));
-        in.add(xs[1], xs[0], ZoneConstraint.of(+3));
-        in.add(xs[0], xs[2], ZoneConstraint.of(-1));
-        in.add(xs[2], xs[0], ZoneConstraint.of(+1));
+        in.add(xs[1], xs[2], Constraint.of(+2));
+        in.add(xs[2], xs[1], Constraint.of(-2));
+        in.add(xs[0], xs[1], Constraint.of(-3));
+        in.add(xs[1], xs[0], Constraint.of(+3));
+        in.add(xs[0], xs[2], Constraint.of(-1));
+        in.add(xs[2], xs[0], Constraint.of(+1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[0], IntConstant.v(3), BinaryOperatorType.MODULUS);
-        assertAll(() -> assertEquals(ZoneConstraint.TOP(),
+        assertAll(() -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[0], xs[1])),
-                  () -> assertEquals(ZoneConstraint.of(-1),
+                  () -> assertEquals(Constraint.of(-1),
                                      matrix.getConstraint(xs[0], xs[2])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.of(+1),
+                  () -> assertEquals(Constraint.of(+1),
                                      matrix.getConstraint(xs[2], xs[0])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[2], xs[1])));
     }
 
@@ -1340,26 +1340,26 @@ public class ZoneStateTest {
     @DisplayName("test update state, forgets value if unknown binary operator")
     void testUpdateState301() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(+2));
-        in.add(xs[2], xs[1], ZoneConstraint.of(-2));
-        in.add(xs[0], xs[1], ZoneConstraint.of(-3));
-        in.add(xs[1], xs[0], ZoneConstraint.of(+3));
-        in.add(xs[0], xs[2], ZoneConstraint.of(-1));
-        in.add(xs[2], xs[0], ZoneConstraint.of(+1));
+        in.add(xs[1], xs[2], Constraint.of(+2));
+        in.add(xs[2], xs[1], Constraint.of(-2));
+        in.add(xs[0], xs[1], Constraint.of(-3));
+        in.add(xs[1], xs[0], Constraint.of(+3));
+        in.add(xs[0], xs[2], Constraint.of(-1));
+        in.add(xs[2], xs[0], Constraint.of(+1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[2], BinaryOperatorType.MODULUS);
-        assertAll(() -> assertEquals(ZoneConstraint.TOP(),
+        assertAll(() -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[0], xs[1])),
-                  () -> assertEquals(ZoneConstraint.of(-1),
+                  () -> assertEquals(Constraint.of(-1),
                                      matrix.getConstraint(xs[0], xs[2])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.of(+1),
+                  () -> assertEquals(Constraint.of(+1),
                                      matrix.getConstraint(xs[2], xs[0])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[2], xs[1])));
     }
 
@@ -1367,26 +1367,26 @@ public class ZoneStateTest {
     @DisplayName("test update state, forgets value if unknown binary operator")
     void testUpdateState303() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], ZoneConstraint.of(+2));
-        in.add(xs[2], xs[1], ZoneConstraint.of(-2));
-        in.add(xs[0], xs[1], ZoneConstraint.of(-3));
-        in.add(xs[1], xs[0], ZoneConstraint.of(+3));
-        in.add(xs[0], xs[2], ZoneConstraint.of(-1));
-        in.add(xs[2], xs[0], ZoneConstraint.of(+1));
+        in.add(xs[1], xs[2], Constraint.of(+2));
+        in.add(xs[2], xs[1], Constraint.of(-2));
+        in.add(xs[0], xs[1], Constraint.of(-3));
+        in.add(xs[1], xs[0], Constraint.of(+3));
+        in.add(xs[0], xs[2], Constraint.of(-1));
+        in.add(xs[2], xs[0], Constraint.of(+1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[3], xs[2], BinaryOperatorType.MODULUS);
-        assertAll(() -> assertEquals(ZoneConstraint.TOP(),
+        assertAll(() -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[0], xs[1])),
-                  () -> assertEquals(ZoneConstraint.of(-1),
+                  () -> assertEquals(Constraint.of(-1),
                                      matrix.getConstraint(xs[0], xs[2])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(ZoneConstraint.of(+1),
+                  () -> assertEquals(Constraint.of(+1),
                                      matrix.getConstraint(xs[2], xs[0])),
-                  () -> assertEquals(ZoneConstraint.TOP(),
+                  () -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[2], xs[1])));
     }
 }

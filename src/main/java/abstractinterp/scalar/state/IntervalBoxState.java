@@ -315,11 +315,11 @@ public class IntervalBoxState implements State {
                                                     .collect(Collectors.toSet()));
         this.state.forEach((l, i) -> {
                 if (i.isBottom()) {
-                    graph.setConstraint(l, l, ZoneConstraint.BOT());
+                    graph.setConstraint(l, l, Constraint.BOT());
                 } else if (i.isTop()) {
                 } else {
-                    graph.setConstraint(l, Variable.ZERO, ZoneConstraint.of(i.upperBound(), i.isBottom()));
-                    graph.setConstraint(Variable.ZERO, l, ZoneConstraint.of(i.lowerBound().map(b -> b * -1), i.isBottom()));
+                    graph.setConstraint(l, Variable.ZERO, Constraint.of(i.upperBound(), i.isBottom()));
+                    graph.setConstraint(Variable.ZERO, l, Constraint.of(i.lowerBound().map(b -> b * -1), i.isBottom()));
                 }
             });
         return graph;

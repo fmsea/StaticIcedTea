@@ -6,7 +6,7 @@ import net.jqwik.api.Property;
 public class DifferenceBoundedMatrixProperties {
 
     @Property
-    boolean testCompareToTop(@ForAll ZoneConstraint c) {
-        return ZoneConstraint.compare(c, ZoneConstraint.TOP()) == -1;
+    boolean testCompareToTop(@ForAll Constraint c) {
+        return Constraint.compare(c, Constraint.TOP()) == -1;
     }
 }

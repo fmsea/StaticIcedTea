@@ -9,12 +9,12 @@ import net.jqwik.api.providers.TypeUsage;
 import java.util.Collections;
 import java.util.Set;
 
-import abstractinterp.scalar.state.ZoneConstraint;
+import abstractinterp.scalar.state.Constraint;
 
-public class ZoneConstraintProvider implements ArbitraryProvider {
+public class ConstraintProvider implements ArbitraryProvider {
     @Override
     public boolean canProvideFor(TypeUsage targetType) {
-        return targetType.isOfType(ZoneConstraint.class);
+        return targetType.isOfType(Constraint.class);
     }
 
     @Override
@@ -22,6 +22,6 @@ public class ZoneConstraintProvider implements ArbitraryProvider {
         Arbitrary<Integer> bounds = Arbitraries.integers().between(Integer.MIN_VALUE,
                                                                    Integer.MAX_VALUE);
 
-        return Collections.singleton(bounds.map(b -> ZoneConstraint.of(b)));
+        return Collections.singleton(bounds.map(b -> Constraint.of(b)));
     }
 }
