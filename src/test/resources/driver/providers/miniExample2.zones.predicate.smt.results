@@ -1,0 +1,33 @@
+3 i2 = 0:<miniExample2: int example(int)>
+i2
+sat
+sat
+4 i3 = 0:<miniExample2: int example(int)>
+i3
+sat
+sat
+5 if i3 >= i0 goto return i2:<miniExample2: int example(int)>
+i0
+sat
+unsat
+i3
+sat
+unsat
+i0f
+sat
+unsat
+i3f
+sat
+unsat
+6 $i1 = i0 * i3:<miniExample2: int example(int)>
+$i1
+unsat
+sat
+7 i2 = i2 + $i1:<miniExample2: int example(int)>
+i2
+unsat
+sat
+8 i3 = i3 + 1:<miniExample2: int example(int)>
+i3
+sat
+unsat

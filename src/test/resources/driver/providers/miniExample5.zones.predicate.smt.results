@@ -1,0 +1,32 @@
+3 if i0 < 0 goto $r0 = new java.lang.RuntimeException:<miniExample5: int example(int)>
+i0
+sat
+sat
+i0f
+sat
+sat
+4 i2 = 0:<miniExample5: int example(int)>
+i2
+sat
+sat
+5 if i2 >= i0 goto $i1 = i2 - i0:<miniExample5: int example(int)>
+i0
+sat
+unsat
+i2
+sat
+unsat
+i0f
+sat
+unsat
+i2f
+sat
+unsat
+6 i2 = i2 + 1:<miniExample5: int example(int)>
+i2
+sat
+unsat
+8 $i1 = i2 - i0:<miniExample5: int example(int)>
+$i1
+unsat
+sat

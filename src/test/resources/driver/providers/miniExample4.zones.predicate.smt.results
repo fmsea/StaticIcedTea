@@ -1,0 +1,41 @@
+3 i2 = 0:<miniExample4: int example(int)>
+i2
+sat
+sat
+4 i3 = 1:<miniExample4: int example(int)>
+i3
+sat
+unsat
+5 i4 = 2:<miniExample4: int example(int)>
+i4
+sat
+unsat
+6 if i4 >= i0 goto return i3:<miniExample4: int example(int)>
+i0
+sat
+unsat
+i4
+sat
+unsat
+i0f
+sat
+unsat
+i4f
+sat
+unsat
+7 i1 = i2 + i3:<miniExample4: int example(int)>
+i1
+sat
+sat
+8 i2 = i3:<miniExample4: int example(int)>
+i2
+sat
+unsat
+9 i3 = i1:<miniExample4: int example(int)>
+i3
+sat
+unsat
+10 i4 = i4 + 1:<miniExample4: int example(int)>
+i4
+sat
+unsat
