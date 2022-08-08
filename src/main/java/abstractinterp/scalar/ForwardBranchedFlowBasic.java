@@ -2,7 +2,7 @@ package abstractinterp.scalar;
 
 import soot.Unit;
 import soot.UnitBox;
-import soot.Value;
+import soot.Local;
 import soot.toolkits.graph.DirectedGraph;
 import soot.toolkits.graph.UnitGraph;
 import soot.util.Chain;
@@ -37,7 +37,7 @@ public abstract class ForwardBranchedFlowBasic<N extends Unit, A> {
 
     /** Tracking for reporting **/
     protected Set<Unit> outputStmt;
-    protected Map<Unit, Set<Value>> changedVariables;
+    protected Map<Unit, Set<Local>> changedVariables;
 
     /**
      * Constructor - can start with the results of a previous analysis.
@@ -61,7 +61,7 @@ public abstract class ForwardBranchedFlowBasic<N extends Unit, A> {
      *
      * @return map of output statements with changed variables
      */
-    public Map<Unit, Set<Value>> getChangedVariables() {
+    public Map<Unit, Set<Local>> getChangedVariables() {
         return this.changedVariables;
     }
 

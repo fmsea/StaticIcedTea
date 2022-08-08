@@ -177,8 +177,8 @@ public class IntegerAnalysis<S extends State> implements Analysis {
         StringBuilder sb = new StringBuilder();
         String methodSignature = this.b.getMethod().getSignature();
         Set<Unit> outputStmt = this.analysis.getOutputStatements();
-        Map<Unit, Set<Value>> variables = this.getChangedVariables();
         Chain<Local> locals = this.b.getLocals();
+        Map<Unit, Set<Local>> variables = this.getChangedVariables();
         int stmtCount = 0;
         for (Unit u : this.g.getBody().getUnits()) {
             stmtCount++;
@@ -237,7 +237,7 @@ public class IntegerAnalysis<S extends State> implements Analysis {
         }
     }
 
-    protected Map<Unit, Set<Value>> getChangedVariables() {
+    protected Map<Unit, Set<Local>> getChangedVariables() {
         return this.analysis.getChangedVariables();
     }
 

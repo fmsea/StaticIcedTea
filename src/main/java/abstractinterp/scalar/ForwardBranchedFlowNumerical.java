@@ -108,8 +108,8 @@ public class ForwardBranchedFlowNumerical<S extends State>
             Value lhs = stmt.getLeftOp();
             if (lhs instanceof Local && isIntType(lhs)) {
                 this.outputStmt.add(s);
-                Set<Value> track = new HashSet<>();
-                track.add(lhs);
+                Set<Local> track = new HashSet<>();
+                track.add((Local)lhs);
                 this.changedVariables.put(s, track);
                 Local lVar = (Local) lhs;
                 Value rhs = stmt.getRightOp();
@@ -136,7 +136,7 @@ public class ForwardBranchedFlowNumerical<S extends State>
             Value left = condExpr.getOp1();
             Value right = condExpr.getOp2();
             this.outputStmt.add(s);
-            Set<Value> track = new HashSet<>();
+            Set<Local> track = new HashSet<>();
             this.changedVariables.put(s, track);
             PredicateType type = PredicateType.fromJimple(condExpr);
 
@@ -147,10 +147,10 @@ public class ForwardBranchedFlowNumerical<S extends State>
             ifStmtFall.updateCond(in, left, right, type);
 
             if (left instanceof JimpleLocal) {
-                track.add(left);
+                track.add((Local)left);
             }
             if (right instanceof JimpleLocal) {
-                track.add(right);
+                track.add((Local)right);
             }
         } else if (s instanceof IdentityStmt) {
             // skip
