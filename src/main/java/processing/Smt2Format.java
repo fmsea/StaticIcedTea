@@ -85,34 +85,8 @@ public class Smt2Format {
     }
 
     public static void SMT2Format(Reader reader1, Reader reader2, Writer writer) throws IOException {
-        Map<String, List<SmtIdentifierExpression>> file1Map = Smt2Reader.parse(reader1);
-        Map<String, List<SmtIdentifierExpression>> file2Map = Smt2Reader.parse(reader2);
-        Set<String> keys = new TreeSet<>();
-        keys.addAll(file1Map.keySet());
-        keys.addAll(file2Map.keySet());
-        for (String key : keys) {
-            writer.write("(echo \"");
-            writer.write(key.replaceAll("\"", "\"\""));
-            writer.write("\")\n");
-            List<SmtIdentifierExpression> exprs1 = file1Map.get(key);
-            List<SmtIdentifierExpression> exprs2 = file2Map.get(key);
-            if (exprs1 == null && exprs2 == null) {
-                // nothing to do, carry on?
-            } else if (exprs1 == null && exprs2 != null) {
-                writer.write(formatConstraints(Collections.emptyList(), exprs2));
-            } else if (exprs2 == null && exprs1 != null) {
-                writer.write(formatConstraints(exprs1, Collections.emptyList()));
-            } else {
-                writer.write(formatConstraints(exprs1, exprs2));
-            }
-        }
-        writer.flush();
-        writer.close();
-    }
-
-    public static void SMT2FormatFull(Reader reader1, Reader reader2, Writer writer) throws IOException {
-        AnalysisFullSMTReport report1 = Smt2Reader.parseFullReport(reader1);
-        AnalysisFullSMTReport report2 = Smt2Reader.parseFullReport(reader2);
+        AnalysisSMTReport report1 = Smt2Reader.parse(reader1);
+        AnalysisSMTReport report2 = Smt2Reader.parse(reader2);
         Set<String> allVariables = new HashSet<>();
         allVariables.addAll(report1.variables());
         allVariables.addAll(report2.variables());
@@ -183,46 +157,46 @@ public class Smt2Format {
         }
     }
 
-    private static String formatConstraints(List<SmtIdentifierExpression> exprs1, List<SmtIdentifierExpression> exprs2) {
-        StringBuilder sb = new StringBuilder();
-        Collections.sort(exprs1, (a, b) -> a.identifier.compareTo(b.identifier));
-        Collections.sort(exprs2, (a, b) -> a.identifier.compareTo(b.identifier));
-        BiFunction<Integer, List<SmtIdentifierExpression>, SmtIdentifierExpression> getExpr = (index, exprs) -> {
-            if (index >= exprs.size()) {
-                return new SmtIdentifierExpression("empty", new HashSet<String>(), "(= 0 0)");
-            } else {
-                return exprs.get(index);
-            }
-        };
-        int len = Math.max(exprs1.size(), exprs2.size());
-        for (int i = 0; i < len; i++) {
-            SmtIdentifierExpression expr1 = getExpr.apply(i, exprs1);
-            SmtIdentifierExpression expr2 = getExpr.apply(i, exprs2);
-            sb.append(Smt2Format.formatConstraint(expr1, expr2));
-        }
-        return sb.toString();
-    }
+    // private static String formatConstraints(List<SmtTypedExpression> exprs1, List<SmtTypedExpression> exprs2) {
+    //     StringBuilder sb = new StringBuilder();
+    //     // Collections.sort(exprs1, (a, b) -> a.identifier.compareTo(b.identifier));
+    //     // Collections.sort(exprs2, (a, b) -> a.identifier.compareTo(b.identifier));
+    //     BiFunction<Integer, List<SmtTypedExpression>, SmtTypedExpression> getExpr = (index, exprs) -> {
+    //         if (index >= exprs.size()) {
+    //             return new SmtTypedExpression("empty", new HashSet<String>(), "(= 0 0)");
+    //         } else {
+    //             return exprs.get(index);
+    //         }
+    //     };
+    //     int len = Math.max(exprs1.size(), exprs2.size());
+    //     for (int i = 0; i < len; i++) {
+    //         SmtTypedExpression expr1 = getExpr.apply(i, exprs1);
+    //         SmtTypedExpression expr2 = getExpr.apply(i, exprs2);
+    //         sb.append(Smt2Format.formatConstraint(expr1, expr2));
+    //     }
+    //     return sb.toString();
+    // }
 
-    protected static String formatConstraint(SmtIdentifierExpression expr1, SmtIdentifierExpression expr2) {
-        LOGGER.debug("formatting constraint {} <=> {}", expr1, expr2);
-        StringBuilder sb = new StringBuilder();
-        // local
-        sb.append("(echo \"");
-        sb.append(getIdentifier(expr1.identifier, expr2.identifier));
-        sb.append("\")\n");
-        // expression
-        Set<String> vars = new TreeSet<>();
-        // UNION identifiers
-        vars.addAll(expr1.identifiers);
-        vars.addAll(expr2.identifiers);
-        String forward = Smt2Format.formatImplies(vars, expr1.expression, expr2.expression);
-        String backward = Smt2Format.formatImplies(vars, expr2.expression, expr1.expression);
-        sb.append(forward);
-        sb.append(backward);
+    // protected static String formatConstraint(SmtTypedExpression expr1, SmtTypedExpression expr2) {
+    //     LOGGER.debug("formatting constraint {} <=> {}", expr1, expr2);
+    //     StringBuilder sb = new StringBuilder();
+    //     // local
+    //     sb.append("(echo \"");
+    //     sb.append(getIdentifier(expr1.identifier, expr2.identifier));
+    //     sb.append("\")\n");
+    //     // expression
+    //     Set<String> vars = new TreeSet<>();
+    //     // UNION identifiers
+    //     vars.addAll(expr1.identifiers);
+    //     vars.addAll(expr2.identifiers);
+    //     String forward = Smt2Format.formatImplies(vars, expr1.expression, expr2.expression);
+    //     String backward = Smt2Format.formatImplies(vars, expr2.expression, expr1.expression);
+    //     sb.append(forward);
+    //     sb.append(backward);
 
-        LOGGER.debug("forward: {} -> backward {}", forward, backward);
-        return sb.toString();
-    }
+    //     LOGGER.debug("forward: {} -> backward {}", forward, backward);
+    //     return sb.toString();
+    // }
 
     protected static String formatImplies(Set<String> vars, String from, String to) {
         StringBuilder sb = new StringBuilder();
@@ -230,11 +204,11 @@ public class Smt2Format {
         sb.append("(assert ");
         if (vars.size() > 0) {
             sb.append("(forall (");
-            for (String var : vars) {
-                sb.append("(");
-                sb.append(var);
-                sb.append(" Int)");
-            }
+            vars.stream().sorted().forEach(var -> {
+                    sb.append("(");
+                    sb.append(var);
+                    sb.append(" Int)");
+                });
             sb.append(")\n");
         }
         sb.append("(=> ");

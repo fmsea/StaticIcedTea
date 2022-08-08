@@ -41,13 +41,13 @@ public class Smt2FormatMin extends Smt2Format {
                                      Reader fullR,
                                      Reader changedR,
                                      Writer writer) throws IOException {
-        AnalysisFullSMTReport leftReport = Smt2Reader.parseFullReport(fullL);
-        AnalysisFullSMTReport rightReport = Smt2Reader.parseFullReport(fullR);
-        Map<String, List<SmtIdentifierExpression>> changedLeft = Smt2Reader.parse(changedL);
-        Map<String, List<SmtIdentifierExpression>> changedRight = Smt2Reader.parse(changedR);
+        AnalysisSMTReport leftReport = Smt2Reader.parse(fullL);
+        AnalysisSMTReport rightReport = Smt2Reader.parse(fullR);
+        AnalysisSMTReport changedLeft = Smt2Reader.parse(changedL);
+        AnalysisSMTReport changedRight = Smt2Reader.parse(changedR);
         Set<String> statements = new HashSet<>();
-        statements.addAll(changedLeft.keySet());
-        statements.addAll(changedRight.keySet());
+        statements.addAll(changedLeft.statements());
+        statements.addAll(changedRight.statements());
         List<String> sortedStatements = sortStatements(statements);
         for (String statement : sortedStatements) {
             writer.write("(echo \"");
@@ -61,30 +61,24 @@ public class Smt2FormatMin extends Smt2Format {
                 .map(SmtExpressionReader::parse);
             Optional<SmtExpression> rightBranch = rightReport.getBranchOut(statement)
                 .map(SmtExpressionReader::parse);
-            Map<String, Set<Local>> localsMap = new HashMap<>();
-            List<SmtIdentifierExpression> leftExprs = changedLeft.getOrDefault(statement, List.of());
-            List<SmtIdentifierExpression> rightExprs = changedRight.getOrDefault(statement, List.of());
-            Stream.concat(leftExprs.stream(), rightExprs.stream()).forEach(expr -> {
-                    Set<Local> exprLocals = expr.identifiers.stream().map(i -> Locals.get(i)).collect(Collectors.toSet());
-                    if (localsMap.containsKey(expr.identifier)) {
-                        Set<Local> locals = localsMap.get(expr.identifier);
-                        locals.addAll(exprLocals);
-                    } else {
-                        localsMap.put(expr.identifier, exprLocals);
-                    }
-                });
-            Set<SmtIdentifier> exprs = new TreeSet<>();
-            exprs.addAll(leftExprs.stream().map(SmtIdentifier::from).collect(Collectors.toList()));
-            exprs.addAll(rightExprs.stream().map(SmtIdentifier::from).collect(Collectors.toList()));
-            for (SmtIdentifier expr : exprs.stream().sorted().collect(Collectors.toList())) {
-                writer.write(String.format("(echo \"%s\")\n", expr.toString()));
-                if (expr.branchOut) {
-                    Set<Local> locals = localsMap.getOrDefault(expr.identifier + "f", Set.of());
-                    writer.write(formatSmtImplies(leftBranch, rightBranch, locals));
-                } else {
-                    Set<Local> locals = localsMap.getOrDefault(expr.identifier.toString(), Set.of());
-                    writer.write(formatSmtImplies(leftFall, rightFall, locals));
-                }
+            Set<Local> fallLocals = new HashSet<>();
+            Set<Local> branchLocals = new HashSet<>();
+            changedLeft.getFallVariables(statement).map(vars -> vars.stream().map(v -> Locals.get(v)).collect(Collectors.toSet()))
+                .ifPresent(vars -> fallLocals.addAll(vars));
+            changedRight.getFallVariables(statement).map(vars -> vars.stream().map(v -> Locals.get(v)).collect(Collectors.toSet()))
+                .ifPresent(vars -> fallLocals.addAll(vars));
+            changedLeft.getBranchVariables(statement) .map(vars -> vars.stream().map(v -> Locals.get(v)).collect(Collectors.toSet()))
+                .ifPresent(vars -> branchLocals.addAll(vars));
+            changedRight.getBranchVariables(statement).map(vars -> vars.stream().map(v -> Locals.get(v)).collect(Collectors.toSet()))
+                .ifPresent(vars -> branchLocals.addAll(vars));
+            if (leftFall.isPresent() || rightFall.isPresent()) {
+                writer.write("(echo \"fall through\")\n");
+                writer.write(formatSmtImplies(leftFall, rightFall, fallLocals));
+            }
+
+            if (leftBranch.isPresent() || rightBranch.isPresent()) {
+                writer.write("(echo \"branch out\")\n");
+                writer.write(formatSmtImplies(leftBranch, rightBranch, branchLocals));
             }
         }
         writer.flush();

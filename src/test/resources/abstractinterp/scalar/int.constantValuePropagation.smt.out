@@ -1,2 +1,3 @@
+l0	l1
 2 l1 = 6:<constant_testSootClass: int constant_test(int)>
-l1->(= l1 6)
+fall	(= l1 6)

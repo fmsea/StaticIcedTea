@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,15 +22,19 @@ import processing.util.FlowSet;
 public class Smt2Reader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Smt2Reader.class);
+    private static final Pattern IDENTIFIER = Pattern.compile("^[$A-Za-z][A-Za-z0-9]+$");
+    private static final Pattern STATEMENT_LINE = Pattern.compile("^[0-9]+.*");
+    private static final Pattern SMT_TOKENS = Pattern.compile("[ ()>=<+-]");
+    private static final Pattern TAB = Pattern.compile("\t");
 
     public static Set<String> getIdentifiers(String smt) {
         Set<String> identifiers = new HashSet<>();
-        String[] tokens = smt.split("[ ()>=<+-]");
+        String[] tokens = SMT_TOKENS.split(smt);
         for (int i = 0; i < tokens.length; i++) {
             String token = tokens[i].trim();
             if (token.isEmpty()) {
                 continue;
-            } else if (token.matches("^[$A-Za-z][A-Za-z0-9]+$") &&
+            } else if (IDENTIFIER.matcher(token).matches() &&
                        !(token.equals("or") ||
                          token.equals("and") ||
                          token.equals("true") ||
@@ -42,30 +47,26 @@ public class Smt2Reader {
         return identifiers;
     }
 
-    public static Optional<SmtIdentifierExpression> parseExpression(String smtWithIdentifier) {
-        if (smtWithIdentifier.indexOf("->") < 0) {
-            return Optional.empty();
-        }
-        String[] varFormula = smtWithIdentifier.split("->");
-        assert varFormula.length == 2;
-        String identifier = varFormula[0];
-        String formula = varFormula[1];
-        Set<String> identifiers = getIdentifiers(formula);
-        return Optional.of(new SmtIdentifierExpression(identifier, identifiers, formula));
-    }
-
-    public static AnalysisFullSMTReport parseFullReport(Reader reader) {
+    public static AnalysisSMTReport parse(Reader reader) {
         Set<String> statements = new HashSet<>();
         Set<String> variables = new HashSet<>();
         Map<String, String> fallThroughExprs = new HashMap<>();
         Map<String, String> branchOutExprs = new HashMap<>();
+        Map<String, Set<String>> fallVariables = new HashMap<>();
+        Map<String, Set<String>> branchVariables = new HashMap<>();
         BiConsumer<String, String> closeExpression = (statement, expression) -> {
             if (expression.startsWith("fall\t")) {
                 // "fall\t" is 5 characters
-                fallThroughExprs.put(statement, expression.substring(5).trim());
+                String smtExpression = expression.substring(5).trim();
+                Set<String> vars = getIdentifiers(smtExpression);
+                fallThroughExprs.put(statement, smtExpression);
+                fallVariables.put(statement, vars);
             } else if (expression.startsWith("branch\t")) {
                 // "branch\t" is 7 characters
-                branchOutExprs.put(statement, expression.substring(7).trim());
+                String smtExpression = expression.substring(7).trim();
+                Set<String> vars = getIdentifiers(smtExpression);
+                branchOutExprs.put(statement, smtExpression);
+                branchVariables.put(statement, vars);
             }
         };
         try (Scanner scanner = new Scanner(reader)) {
@@ -77,7 +78,7 @@ public class Smt2Reader {
             while (scanner.hasNext()) {
                 String line = scanner.nextLine();
                 LOGGER.debug("full parsing: {}", line);
-                if (line.matches("^[0-9]+.*")) {
+                if (STATEMENT_LINE.matcher(line).matches()) {
                     // close out current expression
                     if (expr.length() > 0) {
                         closeExpression.accept(currentStatement, expr.toString());
@@ -104,60 +105,18 @@ public class Smt2Reader {
             }
             closeExpression.accept(currentStatement, expr.toString());
         }
-        return new AnalysisFullSMTReport(statements,
-                                         variables,
-                                         fallThroughExprs,
-                                         branchOutExprs);
+        return new AnalysisSMTReport(statements,
+                                     variables,
+                                     fallThroughExprs,
+                                     fallVariables,
+                                     branchOutExprs,
+                                     branchVariables);
     }
 
     private static Set<String> parseVariables(String variablesLine) {
         Set<String> variables = new HashSet<>();
-        Stream.of(variablesLine.trim().split("\t")).forEach(v -> variables.add(v));
+        Stream.of(TAB.split(variablesLine.trim())).forEach(v -> variables.add(v));
         return variables;
-    }
-
-    public static Map<String, List<SmtIdentifierExpression>> parse(Reader reader) {
-        try (Scanner scanner = new Scanner(reader)) {
-            Map<String, List<SmtIdentifierExpression>> map = new HashMap<>();
-            List<SmtIdentifierExpression> expressions = null;
-            StringBuilder expr = new StringBuilder();
-            while (scanner.hasNext()) {
-                String line = scanner.nextLine().trim();
-                LOGGER.debug(line);
-                if (line.matches("^[0-9]+.*")) {
-                    // close out current expression
-                    if (expr.length() > 0) {
-                        Optional<SmtIdentifierExpression> smtExpr = parseExpression(expr.toString());
-                        if (smtExpr.isPresent()) {
-                            expressions.add(smtExpr.get());
-                        }
-                        expr = new StringBuilder();
-                    }
-                    // reset for next series of statements
-                    expressions = new ArrayList<>();
-                    map.put(line, expressions);
-                } else if (line.contains("->")) {
-                    // clear any current expression
-                    if (expr.length() > 0) {
-                        Optional<SmtIdentifierExpression> smtExpr = parseExpression(expr.toString());
-                        if (smtExpr.isPresent()) {
-                            expressions.add(smtExpr.get());
-                        }
-                        expr = new StringBuilder();
-                    }
-                    expr.append(line);
-                } else {
-                    expr.append(" ");
-                    expr.append(line);
-                }
-            }
-            // close out last expression
-            Optional<SmtIdentifierExpression> smtExpr = parseExpression(expr.toString());
-            if (smtExpr.isPresent()) {
-                expressions.add(smtExpr.get());
-            }
-            return map;
-        }
     }
 
     public static Map<String, FlowSet<String>> parseExtraIdentifiers(Reader reader) {
@@ -166,7 +125,7 @@ public class Smt2Reader {
             while (scanner.hasNext()) {
                 String line = scanner.nextLine().trim();
                 LOGGER.debug("line from extra identifiers file: {}", line);
-                String[] elements = line.split("\t");
+                String[] elements = TAB.split(line);
                 FlowSet<String> identifiers = statements.getOrDefault(elements[0], new FlowSet<>());
                 for (int i = 2; i < elements.length; i++) {
                     if ("fall".equals(elements[1])) {
@@ -183,18 +142,13 @@ public class Smt2Reader {
     }
 
     public static Map<String, FlowSet<String>> getIdentifiersPerStatement(Reader reader) {
-        Map<String, List<SmtIdentifierExpression>> smtExpressions = parse(reader);
+        AnalysisSMTReport report = parse(reader);
         Map<String, FlowSet<String>> result = new HashMap<>();
-        for (String statement : smtExpressions.keySet()) {
+        for (String statement : report.statements()) {
             FlowSet<String> identifiers = new FlowSet<>();
             result.put(statement, identifiers);
-            for (SmtIdentifierExpression expr : smtExpressions.get(statement)) {
-                if (expr.isBranchOut()) {
-                    identifiers.addAllBranchOut(expr.identifiers);
-                } else {
-                    identifiers.addAllFallThrough(expr.identifiers);
-                }
-            }
+            report.getFallVariables(statement).ifPresent(vars -> identifiers.addAllFallThrough(vars));
+            report.getBranchVariables(statement).ifPresent(vars -> identifiers.addAllBranchOut(vars));
         }
         return result;
     }

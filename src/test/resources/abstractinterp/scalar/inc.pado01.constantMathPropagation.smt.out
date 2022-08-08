@@ -18,7 +18,3 @@ sat
 fall through
 sat
 sat
-6 return:<z3ConstantMathSootClass: void z3ConstantMath()>
-fall through
-sat
-sat

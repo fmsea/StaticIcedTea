@@ -1,7 +1,4 @@
 $i0	$i3	i1	i2	r0
-1 r0 := @this: miniExample6:<miniExample6: void example()>
-fall	true
-
 2 i1 = 0:<miniExample6: void example()>
 fall	(= i1 0)
 
@@ -17,33 +14,9 @@ fall	(and (= $i3 1) (= i1 0) (= i2 1))
 branch	(and (= i1 0) (= i2 1))
 
 6 if i1 != i2 goto $i3 = virtualinvoke r0.<miniExample6: int random()>():<miniExample6: void example()>
-fall	false
-
 branch	(and (= $i3 1) (= i1 0) (= i2 1))
 
 7 $i0 = virtualinvoke r0.<miniExample6: int random()>():<miniExample6: void example()>
-fall	false
-
 8 if 1 != $i0 goto i1 = i2 + 1:<miniExample6: void example()>
-fall	false
-
-branch	false
-
 9 i2 = i1 + 1:<miniExample6: void example()>
-fall	false
-
-10 goto [?= $i3 = virtualinvoke r0.<miniExample6: int random()>()]:<miniExample6: void example()>
-fall	false
-
-branch	false
-
 11 i1 = i2 + 1:<miniExample6: void example()>
-fall	false
-
-12 goto [?= $i3 = virtualinvoke r0.<miniExample6: int random()>()]:<miniExample6: void example()>
-fall	false
-
-branch	false
-
-13 return:<miniExample6: void example()>
-fall	false

@@ -1,10 +1,3 @@
 l0	l1
-1 l0 := @parameter0: int:<constant_testSootClass: int constant_test(int)>
-fall	true
-
 2 l1 = 6:<constant_testSootClass: int constant_test(int)>
 fall	(= l1 6)
-
-3 return l1:<constant_testSootClass: int constant_test(int)>
-fall	false
-

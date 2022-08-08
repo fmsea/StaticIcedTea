@@ -11,8 +11,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import soot.Body;
@@ -132,92 +134,11 @@ public class IntegerAnalysis<S extends State> implements Analysis {
     }
 
     public String generateSMTReportFull() {
-        StringBuilder sb = new StringBuilder();
-        Set<String> locals = new TreeSet<>();
-        locals.addAll(this.locals.stream().map(l -> l.toString()).collect(Collectors.toSet()));
-        for (String l : locals) {
-            sb.append(l);
-            sb.append("\t");
-        }
-        // remove last tab
-        sb.deleteCharAt(sb.length() - 1);
-        sb.append("\n");
-
-        String methodSignature = this.b.getMethod().getSignature();
-        int stmtCount = 0;
-        for (Unit u : this.g.getBody().getUnits()) {
-            stmtCount++;
-            sb.append(stmtCount);
-            sb.append(" ");
-            sb.append(u);
-            sb.append(":");
-            sb.append(methodSignature);
-            sb.append('\n');
-            State state = analysis.getFallFlowAfter(u);
-            String fallSmtExpr = state.toSMT(this.solver);
-            if (!fallSmtExpr.isEmpty()) {
-                sb.append("fall\t");
-                sb.append(fallSmtExpr);
-                sb.append("\n");
-            }
-            List<S> branches = analysis.getBranchFlowAfter(u);
-            for (S branch : branches) {
-                String branchSmtExpr = branch.toSMT(this.solver);
-                if (!branchSmtExpr.isEmpty()) {
-                    sb.append("branch\t");
-                    sb.append(branchSmtExpr);
-                    sb.append("\n");
-                }
-            }
-        }
-        return sb.toString();
+        return generateOutput((state, _locals) -> state.toSMT(this.solver));
     }
 
     public String generateSMTReport() {
-        StringBuilder sb = new StringBuilder();
-        String methodSignature = this.b.getMethod().getSignature();
-        Set<Unit> outputStmt = this.analysis.getOutputStatements();
-        Chain<Local> locals = this.b.getLocals();
-        Map<Unit, Set<Local>> variables = this.getChangedVariables();
-        int stmtCount = 0;
-        for (Unit u : this.g.getBody().getUnits()) {
-            stmtCount++;
-            if (outputStmt.contains(u) && variables.get(u).size() > 0) {
-                S state = analysis.getFallFlowAfter(u);
-                sb.append(stmtCount);
-                sb.append(" ");
-                sb.append(u);
-                sb.append(":");
-                sb.append(methodSignature);
-                sb.append('\n');
-                if (state.isFeasible()) {
-                    for (Local l : locals) {
-                        if (variables.get(u).contains(l)) {
-                            sb.append(l.toString());
-                            sb.append("->");
-                            sb.append(state.toSMT(l, this.solver));
-                            sb.append('\n');
-                        }
-                    }
-                }
-                List<S> branches = analysis.getBranchFlowAfter(u);
-                if (!branches.isEmpty()) {
-                    for (S branch : branches) {
-                        if (branch.isFeasible()) {
-                            for (Local l : locals) {
-                                if (variables.get(u).contains(l)) {
-                                    sb.append(l.toString());
-                                    sb.append("f->");
-                                    sb.append(branch.toSMT(l, this.solver));
-                                    sb.append('\n');
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return sb.toString();
+        return generateOutput((state, locals) -> locals.map(ls -> state.toSMT(ls, this.solver)).orElse("true"));
     }
 
     public void generateGraphOutputs(Path output) {
@@ -235,6 +156,56 @@ public class IntegerAnalysis<S extends State> implements Analysis {
                 branch.toGraph().toDot(branchOutput);
             }
         }
+    }
+
+    private String generateOutput(BiFunction<State, Optional<Set<Local>>, String> stateFormatter) {
+        StringBuilder sb = new StringBuilder();
+        Set<String> locals = new TreeSet<>();
+        locals.addAll(this.locals.stream().map(l -> l.toString()).collect(Collectors.toSet()));
+        for (String l : locals) {
+            sb.append(l);
+            sb.append("\t");
+        }
+        // remove last tab
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append("\n");
+
+        Set<Unit> outputStmt = this.analysis.getOutputStatements();
+        Map<Unit, Set<Local>> variables = this.getChangedVariables();
+        String methodSignature = this.b.getMethod().getSignature();
+        int stmtCount = 0;
+        for (Unit u : this.g.getBody().getUnits()) {
+            stmtCount++;
+            if (outputStmt.contains(u) && variables.get(u).size() > 0) {
+                sb.append(stmtCount);
+                sb.append(" ");
+                sb.append(u);
+                sb.append(":");
+                sb.append(methodSignature);
+                sb.append('\n');
+                State state = analysis.getFallFlowAfter(u);
+                if (state.isFeasible()) {
+                    String fallSmtExpr = stateFormatter.apply(state, Optional.ofNullable(variables.get(u)));
+                    if (!fallSmtExpr.isEmpty()) {
+                        sb.append("fall\t");
+                        sb.append(fallSmtExpr);
+                        sb.append("\n");
+                    }
+                }
+                List<S> branches = analysis.getBranchFlowAfter(u);
+                for (S branch : branches) {
+                    if (branch.isFeasible()) {
+                        String branchSmtExpr = stateFormatter.apply(branch, Optional.ofNullable(variables.get(u)));
+                        if (!branchSmtExpr.isEmpty()) {
+                            sb.append("branch\t");
+                            sb.append(branchSmtExpr);
+                            sb.append("\n");
+                        }
+                    }
+                }
+            }
+        }
+        return sb.toString();
     }
 
     protected Map<Unit, Set<Local>> getChangedVariables() {

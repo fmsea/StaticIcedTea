@@ -1,10 +1,4 @@
 $i1	i0	i2	i3	r0
-1 r0 := @this: miniExample2:<miniExample2: int example(int)>
-fall	true
-
-2 i0 := @parameter0: int:<miniExample2: int example(int)>
-fall	true
-
 3 i2 = 0:<miniExample2: int example(int)>
 fall	(= i2 0)
 
@@ -24,11 +18,3 @@ fall	(and (>= i0 1) (>= i3 0))
 
 8 i3 = i3 + 1:<miniExample2: int example(int)>
 fall	(and (>= i0 1) (>= i3 1))
-
-9 goto [?= (branch)]:<miniExample2: int example(int)>
-fall	false
-
-branch	(and (>= i0 1) (>= i3 1))
-
-10 return i2:<miniExample2: int example(int)>
-fall	false

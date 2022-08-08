@@ -18,7 +18,9 @@ import soot.Scene;
 import soot.Body;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -74,9 +76,9 @@ public class ZoneIntervalComparativeTest extends AbstractNumericalTest {
         zoneAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.constantValuePropagation.smt.out");
-        Assertions.assertTrue(runComparison(zoneAnalysis.generateSMTReportFull(),
-                                            intervalAnalysis.generateSMTReportFull(),
-                                            expected));
+        assertTrue(runComparison(zoneAnalysis.generateSMTReportFull(),
+                                 intervalAnalysis.generateSMTReportFull(),
+                                 expected));
     }
 
     @Test
@@ -89,9 +91,9 @@ public class ZoneIntervalComparativeTest extends AbstractNumericalTest {
         zoneAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.constantMathPropagation.smt.out");
-        Assertions.assertTrue(runComparison(zoneAnalysis.generateSMTReportFull(),
-                                            intervalAnalysis.generateSMTReportFull(),
-                                            expected));
+        assertTrue(runComparison(zoneAnalysis.generateSMTReportFull(),
+                                 intervalAnalysis.generateSMTReportFull(),
+                                 expected));
     }
 
     @Test
@@ -104,9 +106,9 @@ public class ZoneIntervalComparativeTest extends AbstractNumericalTest {
         zoneAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.branching.smt.out");
-        Assertions.assertTrue(runComparison(zoneAnalysis.generateSMTReportFull(),
-                                            intervalAnalysis.generateSMTReportFull(),
-                                            expected));
+        assertTrue(runComparison(zoneAnalysis.generateSMTReportFull(),
+                                 intervalAnalysis.generateSMTReportFull(),
+                                 expected));
     }
 
     @Test
@@ -119,9 +121,9 @@ public class ZoneIntervalComparativeTest extends AbstractNumericalTest {
         zoneAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.looping.smt.out");
-        Assertions.assertTrue(runComparison(zoneAnalysis.generateSMTReportFull(),
-                                            intervalAnalysis.generateSMTReportFull(),
-                                            expected));
+        assertTrue(runComparison(zoneAnalysis.generateSMTReportFull(),
+                                 intervalAnalysis.generateSMTReportFull(),
+                                 expected));
     }
 
     @Test
@@ -134,9 +136,9 @@ public class ZoneIntervalComparativeTest extends AbstractNumericalTest {
         zoneAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.example5.smt.out");
-        Assertions.assertTrue(runComparison(zoneAnalysis.generateSMTReportFull(),
-                                            intervalAnalysis.generateSMTReportFull(),
-                                            expected));
+        assertTrue(runComparison(zoneAnalysis.generateSMTReportFull(),
+                                 intervalAnalysis.generateSMTReportFull(),
+                                 expected));
     }
 
     @Test
@@ -149,9 +151,9 @@ public class ZoneIntervalComparativeTest extends AbstractNumericalTest {
         zoneAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.nonsenseExample.smt.out");
-        Assertions.assertTrue(runComparison(zoneAnalysis.generateSMTReportFull(),
-                                            intervalAnalysis.generateSMTReportFull(),
-                                            expected));
+        assertTrue(runComparison(zoneAnalysis.generateSMTReportFull(),
+                                 intervalAnalysis.generateSMTReportFull(),
+                                 expected));
     }
 
     @Test
@@ -164,9 +166,9 @@ public class ZoneIntervalComparativeTest extends AbstractNumericalTest {
         zoneAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.neqLoop.smt.out");
-        Assertions.assertTrue(runComparison(zoneAnalysis.generateSMTReportFull(),
-                                            intervalAnalysis.generateSMTReportFull(),
-                                            expected));
+        assertTrue(runComparison(zoneAnalysis.generateSMTReportFull(),
+                                 intervalAnalysis.generateSMTReportFull(),
+                                 expected));
     }
 
     @Test
@@ -179,9 +181,9 @@ public class ZoneIntervalComparativeTest extends AbstractNumericalTest {
         zoneAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.getArrowSubset.smt.out");
-        Assertions.assertTrue(runComparison(zoneAnalysis.generateSMTReportFull(),
-                                            intervalAnalysis.generateSMTReportFull(),
-                                            expected));
+        assertTrue(runComparison(zoneAnalysis.generateSMTReportFull(),
+                                 intervalAnalysis.generateSMTReportFull(),
+                                 expected));
     }
 
     @Test
@@ -194,9 +196,9 @@ public class ZoneIntervalComparativeTest extends AbstractNumericalTest {
         zoneAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.intervalComparison.smt.out");
-        Assertions.assertTrue(runComparison(zoneAnalysis.generateSMTReportFull(),
-                                            intervalAnalysis.generateSMTReportFull(),
-                                            expected));
+        assertTrue(runComparison(zoneAnalysis.generateSMTReportFull(),
+                                 intervalAnalysis.generateSMTReportFull(),
+                                 expected));
     }
 
     @Test
@@ -209,9 +211,9 @@ public class ZoneIntervalComparativeTest extends AbstractNumericalTest {
         zoneAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.fibonacci.smt.out");
-        Assertions.assertTrue(runComparison(zoneAnalysis.generateSMTReportFull(),
-                                            intervalAnalysis.generateSMTReportFull(),
-                                            expected));
+        assertTrue(runComparison(zoneAnalysis.generateSMTReportFull(),
+                                 intervalAnalysis.generateSMTReportFull(),
+                                 expected));
     }
 
     private boolean runComparison(String left, String right, String oracle) {
@@ -219,7 +221,7 @@ public class ZoneIntervalComparativeTest extends AbstractNumericalTest {
         Reader rightReader = new StringReader(right);
         try {
             Writer writer = new FileWriter(this.z3TestFile.toFile());
-            Smt2Format.SMT2FormatFull(leftReader, rightReader, writer);
+            Smt2Format.SMT2Format(leftReader, rightReader, writer);
             Process z3 = Runtime.getRuntime().exec(new String[] {"z3",
                                                                  "-smt2",
                                                                  this.z3TestFile.toString()});
@@ -228,7 +230,7 @@ public class ZoneIntervalComparativeTest extends AbstractNumericalTest {
                                                                      StandardCharsets.UTF_8))
                 .lines()
                 .collect(Collectors.joining("\n"));
-            Assertions.assertEquals(oracle, output);
+            assertEquals(oracle, output);
             return true;
         } catch (IOException ex) {
             ex.printStackTrace(System.err);

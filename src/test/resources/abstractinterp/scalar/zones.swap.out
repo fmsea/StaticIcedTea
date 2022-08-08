@@ -1,7 +1,4 @@
 i0	i1	i2
-1 i0 := @parameter0: int:<test.Example: int swap(int)>
-fall	true
-
 2 if i1 <= i0 goto return i0:<test.Example: int swap(int)>
 fall	(<= i0 (+ i1 (- 1)))
 
@@ -15,6 +12,3 @@ fall	(and (= i0 (+ i1 0)) (<= i0 (+ i2 (- 1))))
 
 5 i0 = i2:<test.Example: int swap(int)>
 fall	(and (<= i1 (+ i0 (- 1))) (= i0 (+ i2 0)))
-
-6 return i0:<test.Example: int swap(int)>
-fall	false

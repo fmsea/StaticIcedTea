@@ -1,22 +1,4 @@
-i0	$i1	i2	r0	i3	i4	i5	i6
-1 r0 := @this: miniExample3:<miniExample3: int example(int)>
-fall	(and (or (> i0 0) (= i0 0) (< i0 0))
-     (or (> $i1 0) (= $i1 0) (< $i1 0))
-     (or (> i2 0) (= i2 0) (< i2 0))
-     (or (> i3 0) (= i3 0) (< i3 0))
-     (or (> i4 0) (= i4 0) (< i4 0))
-     (or (> i5 0) (= i5 0) (< i5 0))
-     (or (> i6 0) (= i6 0) (< i6 0)))
-
-2 i0 := @parameter0: int:<miniExample3: int example(int)>
-fall	(and (or (> i0 0) (= i0 0) (< i0 0))
-     (or (> $i1 0) (= $i1 0) (< $i1 0))
-     (or (> i2 0) (= i2 0) (< i2 0))
-     (or (> i3 0) (= i3 0) (< i3 0))
-     (or (> i4 0) (= i4 0) (< i4 0))
-     (or (> i5 0) (= i5 0) (< i5 0))
-     (or (> i6 0) (= i6 0) (< i6 0)))
-
+$i1	i0	i2	i3	i4	i5	i6	r0
 3 i3 = 0:<miniExample3: int example(int)>
 fall	(and (or (> i0 0) (= i0 0) (< i0 0))
      (or (> $i1 0) (= $i1 0) (< $i1 0))
@@ -99,11 +81,3 @@ fall	(and (> i0 0) (> $i1 0) (> i2 0) (> i3 0) (> i4 0) (> i5 0) (> i6 0))
 
 13 i6 = i6 + 1:<miniExample3: int example(int)>
 fall	(and (> i0 0) (> $i1 0) (> i2 0) (> i3 0) (> i4 0) (> i5 0) (> i6 0))
-
-14 goto [?= (branch)]:<miniExample3: int example(int)>
-fall	false
-
-branch	(and (> i0 0) (> $i1 0) (> i2 0) (> i3 0) (> i4 0) (> i5 0) (> i6 0))
-
-15 return i5:<miniExample3: int example(int)>
-fall	false

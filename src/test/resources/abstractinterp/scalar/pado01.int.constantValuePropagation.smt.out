@@ -2,7 +2,3 @@
 fall through
 sat
 sat
-2 return l1:<z3_constant_testSootClass: int z3_constant_test()>
-fall through
-sat
-sat

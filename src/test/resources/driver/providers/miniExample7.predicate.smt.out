@@ -1,14 +1,4 @@
-b0	i1	$r0	$r1	$r2	$r3	r4	i2
-1 r4 := @this: miniExample7:<miniExample7: void example(int)>
-fall	(and (or (> b0 0) (= b0 0) (< b0 0))
-     (or (> i1 0) (= i1 0) (< i1 0))
-     (or (> i2 0) (= i2 0) (< i2 0)))
-
-2 i1 := @parameter0: int:<miniExample7: void example(int)>
-fall	(and (or (> b0 0) (= b0 0) (< b0 0))
-     (or (> i1 0) (= i1 0) (< i1 0))
-     (or (> i2 0) (= i2 0) (< i2 0)))
-
+$r0	$r1	$r2	$r3	b0	i1	i2	r4
 3 b0 = 0:<miniExample7: void example(int)>
 fall	(and (= b0 0) (or (> i1 0) (= i1 0) (< i1 0)) (or (> i2 0) (= i2 0) (< i2 0)))
 
@@ -16,23 +6,6 @@ fall	(and (= b0 0) (or (> i1 0) (= i1 0) (< i1 0)) (or (> i2 0) (= i2 0) (< i2 0
 fall	(and (= b0 0) (> i1 0) (or (> i2 0) (= i2 0) (< i2 0)))
 
 branch	(and (= b0 0) (or (= i1 0) (< i1 0)) (or (> i2 0) (= i2 0) (< i2 0)))
-
-5 $r3 = <java.lang.System: java.io.PrintStream err>:<miniExample7: void example(int)>
-fall	(and (= b0 0) (> i1 0) (or (> i2 0) (= i2 0) (< i2 0)))
-
-6 virtualinvoke $r3.<java.io.PrintStream: void println(java.lang.String)>("true"):<miniExample7: void example(int)>
-fall	(and (= b0 0) (> i1 0) (or (> i2 0) (= i2 0) (< i2 0)))
-
-7 goto [?= i2 = 0]:<miniExample7: void example(int)>
-fall	false
-
-branch	(and (= b0 0) (> i1 0) (or (> i2 0) (= i2 0) (< i2 0)))
-
-8 $r0 = <java.lang.System: java.io.PrintStream err>:<miniExample7: void example(int)>
-fall	(and (= b0 0) (or (= i1 0) (< i1 0)) (or (> i2 0) (= i2 0) (< i2 0)))
-
-9 virtualinvoke $r0.<java.io.PrintStream: void println(java.lang.String)>("false"):<miniExample7: void example(int)>
-fall	(and (= b0 0) (or (= i1 0) (< i1 0)) (or (> i2 0) (= i2 0) (< i2 0)))
 
 10 i2 = 0:<miniExample7: void example(int)>
 fall	(and (= b0 0) (or (> i1 0) (= i1 0) (< i1 0)) (= i2 0))
@@ -47,25 +20,5 @@ fall	(and (= b0 0) (> i1 0) (= i2 0))
 
 branch	(and (= b0 0) (> i1 0) (> i2 0))
 
-13 $r2 = <java.lang.System: java.io.PrintStream err>:<miniExample7: void example(int)>
-fall	(and (= b0 0) (> i1 0) (= i2 0))
-
-14 virtualinvoke $r2.<java.io.PrintStream: void println(java.lang.String)>("inner true?"):<miniExample7: void example(int)>
-fall	(and (= b0 0) (> i1 0) (= i2 0))
-
-15 $r1 = <java.lang.System: java.io.PrintStream err>:<miniExample7: void example(int)>
-fall	(and (= b0 0) (> i1 0) (or (> i2 0) (= i2 0)))
-
-16 virtualinvoke $r1.<java.io.PrintStream: void println(java.lang.String)>("post loop"):<miniExample7: void example(int)>
-fall	(and (= b0 0) (> i1 0) (or (> i2 0) (= i2 0)))
-
 17 i2 = i2 + 1:<miniExample7: void example(int)>
 fall	(and (= b0 0) (> i1 0) (> i2 0))
-
-18 goto [?= (branch)]:<miniExample7: void example(int)>
-fall	false
-
-branch	(and (= b0 0) (> i1 0) (> i2 0))
-
-19 return:<miniExample7: void example(int)>
-fall	false

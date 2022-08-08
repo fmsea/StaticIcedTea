@@ -11,18 +11,7 @@ fall	(and (= u0 120) (= x0 60) (= y0 (- 60)))
 4 if u0 > 120 goto r0 = 1:<test.transverse: int zero()>
 fall	(and (= u0 120) (= x0 60) (= y0 (- 60)))
 
-branch	false
-
 5 r0 = neg 1:<test.transverse: int zero()>
 fall	(and (= r0 (- 1)) (= u0 120) (= x0 60) (= y0 (- 60)))
 
-6 goto [?= return r0]:<test.transverse: int zero()>
-fall	false
-
-branch	(and (= r0 (- 1)) (= u0 120) (= x0 60) (= y0 (- 60)))
-
 7 r0 = 1:<test.transverse: int zero()>
-fall	false
-
-8 return r0:<test.transverse: int zero()>
-fall	false

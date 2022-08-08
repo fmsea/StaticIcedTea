@@ -79,135 +79,55 @@ public class Smt2ReaderTest {
     }
 
     @Test
-    void testParseExpression() {
-
-        {
-            assertThrows(AssertionError.class, () -> {
-                    Smt2Reader.parseExpression("->");
-                });
-        }
-
-        {
-            Optional<SmtIdentifierExpression> result = Smt2Reader.parseExpression("");
-            assertAll("Empty expression is parsed as empty",
-                      () -> assertFalse(result.isPresent()));
-        }
-
-        {
-            String varFormula = "i0->(= i0 0)";
-            SmtIdentifierExpression result = Smt2Reader.parseExpression(varFormula).get();
-            assertAll("Expression Parsed Correctly",
-                      () -> assertEquals("i0", result.identifier),
-                      () -> assertTrue(result.identifiers.contains("i0")),
-                      () -> assertEquals("(= i0 0)", result.expression));
-        }
-
-        {
-            String varFormula = "b2->(and (< b2 5) (> b2 0) (>= b2 i4))";
-            SmtIdentifierExpression result = Smt2Reader.parseExpression(varFormula).get();
-            assertAll("Expression Parsed Correctly",
-                      () -> assertEquals("b2", result.identifier),
-                      () -> assertTrue(result.identifiers.contains("b2")),
-                      () -> assertTrue(result.identifiers.contains("i4")),
-                      () -> assertFalse(result.identifiers.contains("and")),
-                      () -> assertEquals("(and (< b2 5) (> b2 0) (>= b2 i4))",
-                                         result.expression));
-        }
-
-        {
-            String varFormula = "b2f->(and (< b2 5) (> b2 0) (>= b2 i4))";
-            SmtIdentifierExpression result = Smt2Reader.parseExpression(varFormula).get();
-            assertAll("Expression Parsed Correctly",
-                      () -> assertEquals("b2f", result.identifier),
-                      () -> assertFalse(result.identifiers.contains("b2f")),
-                      () -> assertTrue(result.identifiers.contains("b2")),
-                      () -> assertTrue(result.identifiers.contains("i4")),
-                      () -> assertFalse(result.identifiers.contains("and")),
-                      () -> assertEquals("(and (< b2 5) (> b2 0) (>= b2 i4))",
-                                         result.expression));
-        }
-    }
-
-    @Test
     void testParseAnalysisOutput() {
         {
-            Reader r1 = new StringReader("6 i1 = 0:<test.BallonFactory>\n" +
-                                         "i1->(= i1 0)\n" +
+            Reader r1 = new StringReader("b2\ti1\n" +
+                                         "6 i1 = 0:<test.BallonFactory>\n" +
+                                         "fall\t(= i1 0)\n" +
                                          "7 b2 = 2:<test.BallonFactory>\n" +
-                                         "b2->(and (< b2 5) (> b2 0) (>= b2 2))\n");
-            Map<String, List<SmtIdentifierExpression>> result = Smt2Reader.parse(r1);
+                                         "fall\t(and (< b2 5) (> b2 0) (>= b2 2))\n");
+            AnalysisSMTReport result = Smt2Reader.parse(r1);
             assertAll("analysis output was parsed correctly",
-                      () -> assertEquals(2, result.keySet().size()),
-                      () -> assertTrue(result.containsKey("6 i1 = 0:<test.BallonFactory>")),
-                      () -> assertEquals(1, result.get("6 i1 = 0:<test.BallonFactory>").size()),
-                      () -> assertEquals("(= i1 0)", result.get("6 i1 = 0:<test.BallonFactory>").get(0).expression),
-                      () -> assertTrue(result.containsKey("7 b2 = 2:<test.BallonFactory>")),
-                      () -> assertEquals(1, result.get("7 b2 = 2:<test.BallonFactory>").size()),
-                      () -> assertEquals("(and (< b2 5) (> b2 0) (>= b2 2))",
-                                         result.get("7 b2 = 2:<test.BallonFactory>").get(0).expression));
+                      () -> assertEquals(2, result.statements().size()),
+                      () -> assertTrue(result.statements().contains("6 i1 = 0:<test.BallonFactory>")),
+                      () -> assertEquals(Optional.of("(= i1 0)"), result.getFallThrough("6 i1 = 0:<test.BallonFactory>")),
+                      () -> assertTrue(result.statements().contains("7 b2 = 2:<test.BallonFactory>")),
+                      () -> assertEquals(Optional.of("(and (< b2 5) (> b2 0) (>= b2 2))"),
+                                         result.getFallThrough("7 b2 = 2:<test.BallonFactory>")));
         }
 
         {
-            Reader r1 = new StringReader("6 i1 = 0:<test.BallonFactory>\n" +
-                                         "i1->(= i1 0)\n" +
-                                         "i1f->(or (<= i1 0) (> i1 0))\n" +
+            Reader r1 = new StringReader("b2\ti1\n" +
+                                         "6 i1 = 0:<test.BallonFactory>\n" +
+                                         "fall\t(= i1 0)\n" +
+                                         "branch\t(or (<= i1 0) (> i1 0))\n" +
                                          "7 b2 = 2:<test.BallonFactory>\n" +
-                                         "b2->(and (< b2 5)\n" +
-                                         "         (> b2 0)\n" +
-                                         "         (>= b2 2))\n");
-            Map<String, List<SmtIdentifierExpression>> result = Smt2Reader.parse(r1);
+                                         "fall\t(and (< b2 5)\n" +
+                                         "\t(> b2 0)\n" +
+                                         "\t(>= b2 2))\n");
+            AnalysisSMTReport result = Smt2Reader.parse(r1);
             assertAll("analysis output was parsed correctly",
-                      () -> assertEquals(2, result.keySet().size()),
-                      () -> assertTrue(result.containsKey("6 i1 = 0:<test.BallonFactory>")),
-                      () -> assertEquals(2, result.get("6 i1 = 0:<test.BallonFactory>").size()),
-                      () -> assertTrue(result.containsKey("7 b2 = 2:<test.BallonFactory>")),
-                      () -> assertEquals(1, result.get("7 b2 = 2:<test.BallonFactory>").size()),
-                      () -> assertEquals("(and (< b2 5) (> b2 0) (>= b2 2))",
-                                         result.get("7 b2 = 2:<test.BallonFactory>").get(0).expression));
+                      () -> assertEquals(2, result.statements().size()),
+                      () -> assertTrue(result.statements().contains("6 i1 = 0:<test.BallonFactory>")),
+                      () -> assertEquals(Optional.of("(= i1 0)"),
+                                         result.getFallThrough("6 i1 = 0:<test.BallonFactory>")),
+                      () -> assertEquals(Optional.of("(or (<= i1 0) (> i1 0))"),
+                                         result.getBranchOut("6 i1 = 0:<test.BallonFactory>")),
+                      () -> assertTrue(result.statements().contains("7 b2 = 2:<test.BallonFactory>")),
+                      () -> assertEquals(Optional.of("(and (< b2 5)\n\t(> b2 0)\n\t(>= b2 2))"),
+                                         result.getFallThrough("7 b2 = 2:<test.BallonFactory>")));
         }
 
-        {
-            Reader r1 = new StringReader("6 i1 = 0:<test.BallonFactory>\n" +
-                                         "i1->(= i1 0)\n" +
-                                         "i1f->(or (<= i1 0) (> i1 0))\n" +
-                                         "b2->(or (<= b2 0) (> b2 0))\n" +
-                                         "b6->(and (<= b6 (+ i1 3))\n" +
-                                         "         (<= b6 (+ b2 4)))\n" +
-                                         "7 b2 = 2:<test.BallonFactory>\n" +
-                                         "b2->(and (< b2 5)\n" +
-                                         "         (> b2 0)\n" +
-                                         "         (>= b2 i4))\n");
-            Map<String, List<SmtIdentifierExpression>> result = Smt2Reader.parse(r1);
-            assertAll("analysis output was parsed correctly",
-                      () -> assertEquals(2, result.keySet().size()),
-                      () -> assertTrue(result.containsKey("6 i1 = 0:<test.BallonFactory>")),
-                      () -> assertEquals(4, result.get("6 i1 = 0:<test.BallonFactory>").size()),
-                      () -> assertEquals("(= i1 0)", result.get("6 i1 = 0:<test.BallonFactory>").get(0).expression),
-                      () -> assertEquals("(or (<= i1 0) (> i1 0))",
-                                         result.get("6 i1 = 0:<test.BallonFactory>").get(1).expression),
-                      () -> assertEquals("(or (<= b2 0) (> b2 0))",
-                                         result.get("6 i1 = 0:<test.BallonFactory>").get(2).expression),
-                      () -> assertEquals("(and (<= b6 (+ i1 3)) (<= b6 (+ b2 4)))",
-                                         result.get("6 i1 = 0:<test.BallonFactory>").get(3).expression),
-                      () -> assertTrue(result.get("6 i1 = 0:<test.BallonFactory>").get(3).identifiers.contains("b2")),
-                      () -> assertTrue(result.get("6 i1 = 0:<test.BallonFactory>").get(3).identifiers.contains("b6")),
-                      () -> assertTrue(result.get("6 i1 = 0:<test.BallonFactory>").get(3).identifiers.contains("i1")),
-                      () -> assertTrue(result.containsKey("7 b2 = 2:<test.BallonFactory>")),
-                      () -> assertEquals(1, result.get("7 b2 = 2:<test.BallonFactory>").size()),
-                      () -> assertTrue(result.get("7 b2 = 2:<test.BallonFactory>").get(0).identifiers.contains("b2")),
-                      () -> assertTrue(result.get("7 b2 = 2:<test.BallonFactory>").get(0).identifiers.contains("i4")),
-                      () -> assertEquals("(and (< b2 5) (> b2 0) (>= b2 i4))",
-                                         result.get("7 b2 = 2:<test.BallonFactory>").get(0).expression));
-        }
     }
 
     @Test
     void testGetIdentifiersPerStatement() {
         {
-            Reader r1 = new StringReader("6 i1 = 0:<test.BallonFactory>\n" +
-                                         "i1->(= i1 0)\n" +
+            Reader r1 = new StringReader("b2\ti1\n" +
+                                         "6 i1 = 0:<test.BallonFactory>\n" +
+                                         "fall\t(= i1 0)\n" +
                                          "7 b2 = 2:<test.BallonFactory>\n" +
-                                         "b2->(and (< b2 5) (> b2 0) (>= b2 2))\n");
+                                         "fall\t(and (< b2 5) (> b2 0) (>= b2 2))\n");
             Map<String, FlowSet<String>> result = Smt2Reader.getIdentifiersPerStatement(r1);
             assertAll(() -> assertTrue(result.containsKey("6 i1 = 0:<test.BallonFactory>")),
                       () -> assertTrue(result.containsKey("7 b2 = 2:<test.BallonFactory>")),
@@ -218,44 +138,20 @@ public class Smt2ReaderTest {
         }
 
         {
-            Reader r1 = new StringReader("6 i1 = 0:<test.BallonFactory>\n" +
-                                         "i1->(= i1 0)\n" +
-                                         "i1f->(or (<= i1 0) (> i1 0))\n" +
+            Reader r1 = new StringReader("b2\ti1\n" +
+                                         "6 i1 = 0:<test.BallonFactory>\n" +
+                                         "fall\t(= i1 0)\n" +
+                                         "branch\t(or (<= i1 0) (> i1 0))\n" +
                                          "7 b2 = 2:<test.BallonFactory>\n" +
-                                         "b2->(and (< b2 5)\n" +
-                                         "         (> b2 0)\n" +
-                                         "         (>= b2 2))\n");
+                                         "fall\t(and (< b2 5)\n" +
+                                         "           (> b2 0)\n" +
+                                         "           (>= b2 2))\n");
             Map<String, FlowSet<String>> result = Smt2Reader.getIdentifiersPerStatement(r1);
             assertAll(() -> assertTrue(result.containsKey("6 i1 = 0:<test.BallonFactory>")),
                       () -> assertTrue(result.containsKey("7 b2 = 2:<test.BallonFactory>")),
                       () -> assertTrue(result.get("6 i1 = 0:<test.BallonFactory>").getFallThrough().contains("i1")),
                       () -> assertTrue(result.get("6 i1 = 0:<test.BallonFactory>").getBranchOut().contains("i1")),
                       () -> assertTrue(result.get("7 b2 = 2:<test.BallonFactory>").getFallThrough().contains("b2")),
-                      () -> assertTrue(result.get("7 b2 = 2:<test.BallonFactory>").getBranchOut().isEmpty()));
-        }
-
-        {
-            Reader r1 = new StringReader("6 i1 = 0:<test.BallonFactory>\n" +
-                                         "i1->(= i1 0)\n" +
-                                         "i1f->(or (<= i1 0) (> i1 0))\n" +
-                                         "b2->(or (<= b2 0) (> b2 0))\n" +
-                                         "b6->(and (<= b6 (+ i1 3))\n" +
-                                         "         (<= b6 (+ b2 4)))\n" +
-                                         "7 b2 = 2:<test.BallonFactory>\n" +
-                                         "b2->(and (< b2 5)\n" +
-                                         "         (> b2 0)\n" +
-                                         "         (>= b2 i4))\n");
-            Map<String, FlowSet<String>> result = Smt2Reader.getIdentifiersPerStatement(r1);
-            assertAll(() -> assertTrue(result.containsKey("6 i1 = 0:<test.BallonFactory>")),
-                      () -> assertTrue(result.containsKey("7 b2 = 2:<test.BallonFactory>")),
-                      () -> assertTrue(result.get("6 i1 = 0:<test.BallonFactory>").getFallThrough().contains("i1")),
-                      () -> assertTrue(result.get("6 i1 = 0:<test.BallonFactory>").getFallThrough().contains("b2")),
-                      () -> assertTrue(result.get("6 i1 = 0:<test.BallonFactory>").getFallThrough().contains("b6")),
-                      () -> assertTrue(result.get("6 i1 = 0:<test.BallonFactory>").getBranchOut().contains("i1")),
-                      () -> assertFalse(result.get("6 i1 = 0:<test.BallonFactory>").getBranchOut().contains("b2")),
-                      () -> assertFalse(result.get("6 i1 = 0:<test.BallonFactory>").getBranchOut().contains("b6")),
-                      () -> assertTrue(result.get("7 b2 = 2:<test.BallonFactory>").getFallThrough().contains("b2")),
-                      () -> assertTrue(result.get("7 b2 = 2:<test.BallonFactory>").getFallThrough().contains("i4")),
                       () -> assertTrue(result.get("7 b2 = 2:<test.BallonFactory>").getBranchOut().isEmpty()));
         }
     }
@@ -287,7 +183,7 @@ public class Smt2ReaderTest {
     void testParseFullReport() {
         {
             Reader r1 = new StringReader("");
-            AnalysisFullSMTReport report = Smt2Reader.parseFullReport(r1);
+            AnalysisSMTReport report = Smt2Reader.parse(r1);
             assertEquals("", report.toString());
         }
 
@@ -306,7 +202,7 @@ public class Smt2ReaderTest {
                                                  "fall	(and (>= $z0 0) (< $z0 0) (>= b0 0) (< b0 0))",
                                                  "").collect(Collectors.joining("\n"));
             Reader r1 = new StringReader(inputAnalysisText);
-            AnalysisFullSMTReport report = Smt2Reader.parseFullReport(r1);
+            AnalysisSMTReport report = Smt2Reader.parse(r1);
             assertAll(() -> assertTrue(report.variables().contains("$z0")),
                       () -> assertTrue(report.variables().contains("b0")),
                       () -> assertTrue(report.statements().contains("1 b0 := @parameter0: byte:<test.Base64: boolean isPad(byte)>")),
@@ -318,6 +214,7 @@ public class Smt2ReaderTest {
                       () -> assertTrue(report.getFallThrough("1 b0 := @parameter0: byte:<test.Base64: boolean isPad(byte)>").isEmpty()),
                       () -> assertTrue(report.getBranchOut("1 b0 := @parameter0: byte:<test.Base64: boolean isPad(byte)>").isEmpty()),
                       () -> assertTrue(report.getFallThrough("2 if b0 != 61 goto $z0 = 0:<test.Base64: boolean isPad(byte)>").isPresent()),
+                      () -> assertEquals(Set.of("b0"), report.getFallVariables("2 if b0 != 61 goto $z0 = 0:<test.Base64: boolean isPad(byte)>").get()),
                       () -> assertEquals("(= b0 61)",
                                          report.getFallThrough("2 if b0 != 61 goto $z0 = 0:<test.Base64: boolean isPad(byte)>").get()),
                       () -> assertTrue(report.getBranchOut("2 if b0 != 61 goto $z0 = 0:<test.Base64: boolean isPad(byte)>").isEmpty()),
@@ -330,6 +227,7 @@ public class Smt2ReaderTest {
                       () -> assertEquals("(and (= $z0 1)\n\t(= b0 61))",
                                          report.getBranchOut("4 goto [?= return $z0]:<test.Base64: boolean isPad(byte)>").get()),
                       () -> assertTrue(report.getFallThrough("5 $z0 = 0:<test.Base64: boolean isPad(byte)>").isPresent()),
+                      () -> assertEquals(Set.of("$z0"), report.getFallVariables("5 $z0 = 0:<test.Base64: boolean isPad(byte)>").get()),
                       () -> assertEquals("(= $z0 0)",
                                          report.getFallThrough("5 $z0 = 0:<test.Base64: boolean isPad(byte)>").get()),
                       () -> assertTrue(report.getBranchOut("5 $z0 = 0:<test.Base64: boolean isPad(byte)>").isEmpty()),

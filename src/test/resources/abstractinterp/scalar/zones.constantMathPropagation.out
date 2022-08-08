@@ -13,7 +13,3 @@ fall	(and (= l0 3) (= l1 9) (= l2 6) (= l3 (- 6)))
 
 5 l0 = l3 / l2:<moreConstantMathSootClass: void moreConstantMath()>
 fall	(and (= l0 (- 1)) (= l1 9) (= l2 6) (= l3 (- 6)))
-
-6 return:<moreConstantMathSootClass: void moreConstantMath()>
-fall	false
-

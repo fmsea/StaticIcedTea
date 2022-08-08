@@ -1,7 +1,4 @@
 i0	i1	i2	i3	i4
-1 i0 := @parameter0: int:<test.Fibonacci: int fibonacci(int)>
-fall	true
-
 2 i2 = 0:<test.Fibonacci: int fibonacci(int)>
 fall	(= i2 0)
 
@@ -27,11 +24,3 @@ fall	(and (>= i1 1) (>= i2 1) (>= i4 2) (<= i4 (+ i0 (- 1))) (= i1 (+ i3 0)))
 
 9 i4 = i4 + 1:<test.Fibonacci: int fibonacci(int)>
 fall	(and (>= i1 1) (>= i2 1) (>= i4 3) (<= i4 (+ i0 0)) (= i1 (+ i3 0)))
-
-10 goto [?= (branch)]:<test.Fibonacci: int fibonacci(int)>
-fall	false
-
-branch	(and (>= i1 1) (>= i2 1) (>= i4 3) (<= i4 (+ i0 0)) (= i1 (+ i3 0)))
-
-11 return i3:<test.Fibonacci: int fibonacci(int)>
-fall	false

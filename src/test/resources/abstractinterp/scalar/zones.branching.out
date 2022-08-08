@@ -9,15 +9,8 @@ fall	(and (= l0 4) (= l1 0))
 fall	(and (= l0 4) (= l1 0) (= l2 0))
 
 4 if l0 >= 3 goto l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>
-fall	false
-
 branch	(and (= l0 4) (= l1 0) (= l2 0))
 
 5 l3 = l1 / l2:<anotherSimpleIfSootClass: void anotherSimpleIf()>
-fall	false
-
 6 l3 = 6:<anotherSimpleIfSootClass: void anotherSimpleIf()>
 fall	(and (= l0 4) (= l1 0) (= l2 0) (= l3 6))
-
-7 return:<anotherSimpleIfSootClass: void anotherSimpleIf()>
-fall	false

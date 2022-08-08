@@ -1,21 +1,16 @@
+$r0	$r1	$r2	$r3	b0	i1	i2	r4
 3 b0 = 0:<miniExample7: void example(int)>
-b0->(= b0 0)
+fall	(= b0 0)
 4 if b0 >= i1 goto $r0 = <java.lang.System: java.io.PrintStream err>:<miniExample7: void example(int)>
-b0->(= b0 0)
-i1->(> i1 0)
-b0f->(= b0 0)
-i1f->(or (= i1 0) (< i1 0))
+fall	(and (= b0 0) (> i1 0))
+branch	(and (= b0 0) (or (= i1 0) (< i1 0)))
 10 i2 = 0:<miniExample7: void example(int)>
-i2->(= i2 0)
+fall	(= i2 0)
 11 if i2 >= i1 goto return:<miniExample7: void example(int)>
-i1->(> i1 0)
-i2->(or (> i2 0) (= i2 0))
-i1f->(or (> i1 0) (= i1 0) (< i1 0))
-i2f->(or (> i2 0) (= i2 0))
+fall	(and (> i1 0) (or (> i2 0) (= i2 0)))
+branch	(and (or (> i1 0) (= i1 0) (< i1 0)) (or (> i2 0) (= i2 0)))
 12 if b0 != i2 goto $r1 = <java.lang.System: java.io.PrintStream err>:<miniExample7: void example(int)>
-b0->(= b0 0)
-i2->(= i2 0)
-b0f->(= b0 0)
-i2f->(> i2 0)
+fall	(and (= b0 0) (= i2 0))
+branch	(and (= b0 0) (> i2 0))
 17 i2 = i2 + 1:<miniExample7: void example(int)>
-i2->(> i2 0)
+fall	(> i2 0)

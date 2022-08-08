@@ -1,10 +1,4 @@
 $i1	$r0	i0	i2	r1
-1 r1 := @this: miniExample5:<miniExample5: int example(int)>
-fall	true
-
-2 i0 := @parameter0: int:<miniExample5: int example(int)>
-fall	true
-
 3 if i0 < 0 goto $r0 = new java.lang.RuntimeException:<miniExample5: int example(int)>
 fall	(>= i0 0)
 
@@ -21,23 +15,6 @@ branch	(and (>= i0 0) (>= i2 0))
 6 i2 = i2 + 1:<miniExample5: int example(int)>
 fall	(and (>= i0 1) (>= i2 1))
 
-7 goto [?= (branch)]:<miniExample5: int example(int)>
-fall	false
-
-branch	(and (>= i0 1) (>= i2 1))
-
 8 $i1 = i2 - i0:<miniExample5: int example(int)>
 fall	(and (>= i0 0) (>= i2 0))
-
-9 return $i1:<miniExample5: int example(int)>
-fall	false
-
-10 $r0 = new java.lang.RuntimeException:<miniExample5: int example(int)>
-fall	(<= i0 (- 1))
-
-11 specialinvoke $r0.<java.lang.RuntimeException: void <init>(java.lang.String)>("invalid value of n"):<miniExample5: int example(int)>
-fall	(<= i0 (- 1))
-
-12 throw $r0:<miniExample5: int example(int)>
-fall	false
 

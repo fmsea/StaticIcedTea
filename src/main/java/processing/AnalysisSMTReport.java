@@ -7,20 +7,26 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public class AnalysisFullSMTReport {
+public class AnalysisSMTReport {
     private Set<String> variables;
     private Set<String> statements;
     private Map<String, String> fallThroughSmtExpressions;
+    private Map<String, Set<String>> fallVariables;
     private Map<String, String> branchOutSmtExpressions;
+    private Map<String, Set<String>> branchVariables;
 
-    public AnalysisFullSMTReport(Set<String> statements,
-                                 Set<String> variables,
-                                 Map<String, String> fallThroughExprs,
-                                 Map<String, String> branchOutExprs) {
+    public AnalysisSMTReport(Set<String> statements,
+                             Set<String> variables,
+                             Map<String, String> fallThroughExprs,
+                             Map<String, Set<String>> fallVariables,
+                             Map<String, String> branchOutExprs,
+                             Map<String, Set<String>> branchVariables) {
         this.statements = statements;
         this.variables = variables;
         this.fallThroughSmtExpressions = fallThroughExprs;
+        this.fallVariables = fallVariables;
         this.branchOutSmtExpressions = branchOutExprs;
+        this.branchVariables = branchVariables;
     }
 
     public Set<String> variables() {
@@ -37,6 +43,14 @@ public class AnalysisFullSMTReport {
 
     public Optional<String> getBranchOut(String statement) {
         return Optional.ofNullable(this.branchOutSmtExpressions.get(statement));
+    }
+
+    public Optional<Set<String>> getFallVariables(String statement) {
+        return Optional.ofNullable(this.fallVariables.get(statement));
+    }
+
+    public Optional<Set<String>> getBranchVariables(String statement) {
+        return Optional.ofNullable(this.branchVariables.get(statement));
     }
 
     @Override

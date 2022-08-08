@@ -1,51 +1,33 @@
 3 b0 = 0:<miniExample7: void example(int)>
-b0
+fall through
 sat
 sat
 4 if b0 >= i1 goto $r0 = <java.lang.System: java.io.PrintStream err>:<miniExample7: void example(int)>
-b0
+fall through
 sat
 sat
-i1
-sat
-sat
-b0f
-sat
-sat
-i1f
+branch out
 sat
 sat
 10 i2 = 0:<miniExample7: void example(int)>
-i2
+fall through
 sat
 sat
 11 if i2 >= i1 goto return:<miniExample7: void example(int)>
-i1
+fall through
 sat
 unsat
-i2
-sat
-unsat
-i1f
-sat
-unsat
-i2f
+branch out
 sat
 unsat
 12 if b0 != i2 goto $r1 = <java.lang.System: java.io.PrintStream err>:<miniExample7: void example(int)>
-b0
+fall through
 sat
 sat
-i2
-sat
-sat
-b0f
-sat
-sat
-i2f
+branch out
 unsat
 unsat
 17 i2 = i2 + 1:<miniExample7: void example(int)>
-i2
+fall through
 sat
 unsat

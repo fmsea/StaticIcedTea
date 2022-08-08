@@ -1,16 +1,4 @@
-i0	i1	$i2	r0	b3
-1 r0 := @this: miniExample1:<miniExample1: int example(int)>
-fall	(and (or (> i0 0) (= i0 0) (< i0 0))
-     (or (> i1 0) (= i1 0) (< i1 0))
-     (or (> $i2 0) (= $i2 0) (< $i2 0))
-     (or (> b3 0) (= b3 0) (< b3 0)))
-
-2 i0 := @parameter0: int:<miniExample1: int example(int)>
-fall	(and (or (> i0 0) (= i0 0) (< i0 0))
-     (or (> i1 0) (= i1 0) (< i1 0))
-     (or (> $i2 0) (= $i2 0) (< $i2 0))
-     (or (> b3 0) (= b3 0) (< b3 0)))
-
+$i2	b3	i0	i1	r0
 3 i1 = neg i0:<miniExample1: int example(int)>
 fall	(and (or (> i0 0) (= i0 0) (< i0 0))
      (or (> i1 0) (= i1 0) (< i1 0))
@@ -40,19 +28,8 @@ fall	(and (or (> i0 0) (= i0 0) (< i0 0))
      (or (> $i2 0) (= $i2 0) (< $i2 0))
      (> b3 0))
 
-7 goto [?= return b3]:<miniExample1: int example(int)>
-fall	false
-
-branch	(and (or (> i0 0) (= i0 0) (< i0 0))
-     (or (> i1 0) (= i1 0) (< i1 0))
-     (or (> $i2 0) (= $i2 0) (< $i2 0))
-     (> b3 0))
-
 8 b3 = -1:<miniExample1: int example(int)>
 fall	(and (or (> i0 0) (= i0 0) (< i0 0))
      (or (> i1 0) (= i1 0) (< i1 0))
      (> $i2 0)
      (< b3 0))
-
-9 return b3:<miniExample1: int example(int)>
-fall	false

@@ -654,10 +654,16 @@ public class DifferenceBoundedMatrix {
     }
 
     public String toSMT(Local source, SolverWrapper solver) {
+        return this.toSMT(Set.of(source), solver);
+    }
+
+    public String toSMT(Set<Local> sources, SolverWrapper solver) {
         if (!this.computeReducedClosure()) {
             return "false";
         } else {
-            return this.toBinop(this.getConnectedVariablesOf(source)).stream()
+            Set<Local> connectedVariables = sources.stream().flatMap(source -> this.getConnectedVariablesOf(source).stream())
+                .collect(Collectors.toSet());
+            return this.toBinop(connectedVariables).stream()
                 .sorted((a, b) -> a.toString().compareTo(b.toString()))
                 .reduce((a, b) -> Grimp.v().newAndExpr(a, b))
                 .map(expr -> solver.smt2(expr))

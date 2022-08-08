@@ -17,18 +17,7 @@ sat
 fall through
 sat
 sat
-5 goto [?= (branch)]:<z3_simple_loopSootClass: void z3_simple_loop()>
-fall through
-sat
-sat
-branch out
-sat
-sat
 6 l3 = l0 + l1:<z3_simple_loopSootClass: void z3_simple_loop()>
-fall through
-sat
-sat
-7 return:<z3_simple_loopSootClass: void z3_simple_loop()>
 fall through
 sat
 sat

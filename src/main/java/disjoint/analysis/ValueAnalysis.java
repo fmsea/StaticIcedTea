@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import soot.ByteType;
 import soot.IntType;
@@ -118,7 +119,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
      * only of those variables
      * that have been changed after the state
      */
-    protected Map<Unit,Set<Value>> changedVariables;
+    protected Map<Unit,Set<Local>> changedVariables;
 
     /*
      * analysis execution time
@@ -217,7 +218,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
         Chain<Local> locals = b.getLocals();
         AbstractState.setLocals(locals);
         outputStmt = new HashSet<Unit>();
-        changedVariables = new HashMap<Unit, Set<Value>>();
+        changedVariables = new HashMap<>();
 
 
 
@@ -240,10 +241,10 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 
     public String generateFullSMT() {
         StringBuilder sb = new StringBuilder();
-        for (Local l : b.getLocals()) {
-            sb.append(l.toString());
-            sb.append("\t");
-        }
+        b.getLocals().stream().sorted((a, b) -> a.toString().compareTo(b.toString())).forEach(l -> {
+                sb.append(l.toString());
+                sb.append("\t");
+            });
         // remove last tab
         sb.deleteCharAt(sb.length() - 1);
         sb.append("\n");
@@ -252,26 +253,34 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
         int stmtCount = 0;
         for (Unit unit : this.b.getUnits()) {
             stmtCount++;
-            sb.append(stmtCount);
-            sb.append(" ");
-            sb.append(unit);
-            sb.append(":");
-            sb.append(methodSignature);
-            sb.append("\n");
-            AbstractState fall = getFallFlowAfter(unit);
-            String fallExpr = formatState(fall);
-            if (!fallExpr.isEmpty()) {
-                sb.append("fall\t");
-                sb.append(fallExpr);
+            if (outputStmt.contains(unit)) {
+                sb.append(stmtCount);
+                sb.append(" ");
+                sb.append(unit);
+                sb.append(":");
+                sb.append(methodSignature);
                 sb.append("\n");
-            }
-            List<AbstractState> branches = getBranchFlowAfter(unit);
-            if (!branches.isEmpty()) {
+                AbstractState fall = getFallFlowAfter(unit);
+                if (!fall.getStates().isEmpty() && fall.isFeasible()) {
+                    String fallExpr = formatState(fall);
+                    sb.append("fall\t");
+                    if (!fallExpr.isEmpty()) {
+                        sb.append(fallExpr);
+                    } else {
+                        sb.append("true");
+                    }
+                    sb.append("\n");
+                }
+                List<AbstractState> branches = getBranchFlowAfter(unit);
                 for (AbstractState branch : branches) {
-                    String branchExpr = formatState(branch);
-                    if (!branchExpr.isEmpty()) {
+                    if (!branch.getStates().isEmpty() && branch.isFeasible()) {
+                        String branchExpr = formatState(branch);
                         sb.append("branch\t");
-                        sb.append(branchExpr);
+                        if (!branchExpr.isEmpty()) {
+                            sb.append(branchExpr);
+                        } else {
+                            sb.append("true");
+                        }
                         sb.append("\n");
                     }
                 }
@@ -288,10 +297,10 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 
     public String generateSymbolicSMT() {
         StringBuilder sb = new StringBuilder();
-        for (Local l : b.getLocals()) {
-            sb.append(l.toString());
-            sb.append("\t");
-        }
+        b.getLocals().stream().sorted((a, b) -> a.toString().compareTo(b.toString())).forEach(l -> {
+                sb.append(l.toString());
+                sb.append("\t");
+            });
         // remove last tab
         sb.deleteCharAt(sb.length() - 1);
         sb.append("\n");
@@ -299,34 +308,38 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
         int stmtCount = 0;
         for (Unit unit : this.b.getUnits()) {
             stmtCount++;
-            sb.append(stmtCount);
-            sb.append(" ");
-            sb.append(unit);
-            sb.append(":");
-            sb.append(methodSignature);
-            sb.append("\n");
-            AbstractState fall = getFallFlowAfter(unit);
-            Optional<SymbolicState> symbState = fall.getStates().stream()
-                .filter(s -> s instanceof SymbolicState)
-                .map(s -> (SymbolicState)s)
-                .findFirst();
-            symbState.ifPresentOrElse(state -> {
-                    sb.append("fall\t");
-                    sb.append(state.toSMT(this.solver));
-                    sb.append("\n");
-                }, () -> sb.append("fall\ttrue\n"));
-            List<AbstractState> branches = getBranchFlowAfter(unit);
-            if (!branches.isEmpty()) {
-                for (AbstractState branch : branches) {
-                    Optional<SymbolicState> symbBranch = branch.getStates().stream()
+            if (outputStmt.contains(unit)) {
+                sb.append(stmtCount);
+                sb.append(" ");
+                sb.append(unit);
+                sb.append(":");
+                sb.append(methodSignature);
+                sb.append("\n");
+                AbstractState fall = getFallFlowAfter(unit);
+                if (!fall.getStates().isEmpty() && fall.isFeasible()) {
+                    Optional<SymbolicState> symbState = fall.getStates().stream()
                         .filter(s -> s instanceof SymbolicState)
                         .map(s -> (SymbolicState)s)
                         .findFirst();
-                    symbBranch.ifPresent(state -> {
-                            sb.append("branch\t");
+                    symbState.ifPresentOrElse(state -> {
+                            sb.append("fall\t");
                             sb.append(state.toSMT(this.solver));
                             sb.append("\n");
-                        });
+                        }, () -> sb.append("fall\ttrue\n"));
+                }
+                List<AbstractState> branches = getBranchFlowAfter(unit);
+                for (AbstractState branch : branches) {
+                    if (!branch.getStates().isEmpty() && branch.isFeasible()) {
+                        Optional<SymbolicState> symbBranch = branch.getStates().stream()
+                            .filter(s -> s instanceof SymbolicState)
+                            .map(s -> (SymbolicState)s)
+                            .findFirst();
+                        symbBranch.ifPresent(state -> {
+                                sb.append("branch\t");
+                                sb.append(state.toSMT(this.solver));
+                                sb.append("\n");
+                            });
+                    }
                 }
             }
         }
@@ -361,8 +374,14 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 
     public String generateReport() {
         StringBuilder sb = new StringBuilder();
-        Chain<Local> locals = b.getLocals();
         //printing the result
+        b.getLocals().stream().sorted((a, b) -> a.toString().compareTo(b.toString())).forEach(l -> {
+                sb.append(l.toString());
+                sb.append("\t");
+            });
+        // remove last tab
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append("\n");
         Iterator<Unit> iter = b.getUnits().iterator();
         int stmtCount = 0;
         while(iter.hasNext()){
@@ -379,48 +398,30 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
                 sb.append("\n");
                 AbstractState fall = getFallFlowAfter(u);
                 if(!fall.getStates().isEmpty() && fall.isFeasible()){
-                    for(Local l : locals){
-                        if(changedVariables.get(u).contains(l)){
-                            Set<BinopExpr> varPerState = evaluateStates(fall, l);
-                            Expr state = null;
-                            for(Expr be : varPerState){
-                                if(state == null){
-                                    state = be;
-                                } else {
-                                    state = new GAndExpr(state, be);
-                                }
-                            }
-                            sb.append(l);
-                            sb.append("->");
-                            sb.append(solver.smt2((BinopExpr)state));
-                            sb.append("\n");
-                        }
-                    }
+                    Optional<Set<Local>> vars = Optional.ofNullable(changedVariables.get(u));
+                    sb.append("fall\t");
+                    sb.append(vars.flatMap(vs -> vs.stream()
+                                           .sorted((a, b) -> a.toString().compareTo(b.toString()))
+                                           .flatMap(v -> evaluateStates(fall, v).stream())
+                                           .reduce((a, b) -> Grimp.v().newAndExpr(a, b)))
+                              .map(expr -> solver.smt2(expr))
+                              .orElse("true"));
+                    sb.append("\n");
                 }
                 //for other branch outcome if one exists
                 List<AbstractState> branches = getBranchFlowAfter(u);
                 if(!branches.isEmpty()){
                     for(AbstractState branch : branches){
                         if(!branch.getStates().isEmpty() && branch.isFeasible()){
-                            for(Local l : locals){
-                                if(changedVariables.get(u).contains(l)){
-                                    Set<BinopExpr> varPerState = evaluateStates(branch, l);
-                                    Expr state = null;
-                                    for(Expr be : varPerState){
-                                        if(state == null){
-                                            state = be;
-                                        } else {
-                                            state = new GAndExpr(state, be);
-                                        }
-                                    }
-                                    //branched flow will be marked with "f" after the var name
-                                    //while fall through will have just the var name
-                                    sb.append(l);
-                                    sb.append("f->");
-                                    sb.append(solver.smt2((BinopExpr)state));
-                                    sb.append("\n");
-                                }
-                            }
+                            Optional<Set<Local>> vars = Optional.ofNullable(changedVariables.get(u));
+                            sb.append("branch\t");
+                            sb.append(vars.flatMap(vs -> vs.stream()
+                                                   .sorted((a, b) -> a.toString().compareTo(b.toString()))
+                                                   .flatMap(v -> evaluateStates(branch, v).stream())
+                                                   .reduce((a, b) -> Grimp.v().newAndExpr(a, b)))
+                                      .map(expr -> solver.smt2(expr))
+                                      .orElse("true"));
+                            sb.append("\n");
                         }
 
                     }
@@ -482,7 +483,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
             //add it to the tracked states
             outputStmt.add(s);
             //create the set of variables to be tracked
-            Set<Value> track = new HashSet<Value>();
+            Set<Local> track = new HashSet<>();
             changedVariables.put(s, track);
             //precondition of the IfStmt
             Set<Expr> precond = new HashSet<Expr>();
@@ -517,13 +518,13 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
                 updateStateCond(lhs,symbState, condExpr, ifStmtTrue, s);//s is only used for the symbolic state
                 updateStateCond(lhs, symbNotState,negate(condExpr), ifStmtFalse, s);
                 condExpr = null; //so no need to update the symbolic state twice
-                track.add(lhs);
+                track.add((Local)lhs);
             }
             //make sure rhs is not a constant
             if(rhs instanceof JimpleLocal){
                 updateStateCond(rhs, symbState, condExpr, ifStmtTrue, s);
                 updateStateCond(rhs, symbNotState, negate(condExpr), ifStmtFalse,s );
-                track.add(rhs);
+                track.add((Local)rhs);
             }
             //created the negated one
         } // end if this is an integer conditional stmt
@@ -632,9 +633,9 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
             //output state for this statement
             outputStmt.add(s);
             //create the set of variables to be tracked
-            Set<Value> track = new HashSet<Value>();
+            Set<Local> track = new HashSet<Local>();
             changedVariables.put(s, track);
-            track.add(lhs);
+            track.add((Local)lhs);
             //identify rhs
             Set<BinopExpr> precond = new HashSet<BinopExpr>();
             //create a temp local variable since in a loop

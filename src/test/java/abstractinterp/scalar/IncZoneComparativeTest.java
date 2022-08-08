@@ -18,7 +18,9 @@ import soot.Scene;
 import soot.Body;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -74,9 +76,9 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.constantValuePropagation.smt.out");
-        Assertions.assertTrue(runComparison(analysis1.generateSMTReportFull(),
-                                            analysis2.generateSMTReportFull(),
-                                            expected));
+        assertTrue(runComparison(analysis1.generateSMTReportFull(),
+                                 analysis2.generateSMTReportFull(),
+                                 expected));
     }
 
     @Test
@@ -89,9 +91,9 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.constantMathPropagation.smt.out");
-        Assertions.assertTrue(runComparison(analysis1.generateSMTReportFull(),
-                                            analysis2.generateSMTReportFull(),
-                                            expected));
+        assertTrue(runComparison(analysis1.generateSMTReportFull(),
+                                 analysis2.generateSMTReportFull(),
+                                 expected));
     }
 
     @Test
@@ -104,9 +106,9 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.branching.smt.out");
-        Assertions.assertTrue(runComparison(analysis1.generateSMTReportFull(),
-                                            analysis2.generateSMTReportFull(),
-                                            expected));
+        assertTrue(runComparison(analysis1.generateSMTReportFull(),
+                                 analysis2.generateSMTReportFull(),
+                                 expected));
     }
 
     @Test
@@ -119,9 +121,9 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.looping.smt.out");
-        Assertions.assertTrue(runComparison(analysis1.generateSMTReportFull(),
-                                            analysis2.generateSMTReportFull(),
-                                            expected));
+        assertTrue(runComparison(analysis1.generateSMTReportFull(),
+                                 analysis2.generateSMTReportFull(),
+                                 expected));
     }
 
     @Test
@@ -134,9 +136,9 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.example5.smt.out");
-        Assertions.assertTrue(runComparison(analysis1.generateSMTReportFull(),
-                                            analysis2.generateSMTReportFull(),
-                                            expected));
+        assertTrue(runComparison(analysis1.generateSMTReportFull(),
+                                 analysis2.generateSMTReportFull(),
+                                 expected));
     }
 
     @Test
@@ -149,9 +151,9 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.nonsenseExample.smt.out");
-        Assertions.assertTrue(runComparison(analysis1.generateSMTReportFull(),
-                                            analysis2.generateSMTReportFull(),
-                                            expected));
+        assertTrue(runComparison(analysis1.generateSMTReportFull(),
+                                 analysis2.generateSMTReportFull(),
+                                 expected));
     }
 
     @Test
@@ -164,9 +166,9 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.neqLoop.smt.out");
-        Assertions.assertTrue(runComparison(analysis1.generateSMTReportFull(),
-                                            analysis2.generateSMTReportFull(),
-                                            expected));
+        assertTrue(runComparison(analysis1.generateSMTReportFull(),
+                                 analysis2.generateSMTReportFull(),
+                                 expected));
     }
 
     @Test
@@ -179,9 +181,9 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.getArrowSubset.smt.out");
-        Assertions.assertTrue(runComparison(analysis1.generateSMTReportFull(),
-                                            analysis2.generateSMTReportFull(),
-                                            expected));
+        assertTrue(runComparison(analysis1.generateSMTReportFull(),
+                                 analysis2.generateSMTReportFull(),
+                                 expected));
     }
 
     @Test
@@ -194,9 +196,9 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.intervalComparison.smt.out");
-        Assertions.assertTrue(runComparison(analysis1.generateSMTReportFull(),
-                                            analysis2.generateSMTReportFull(),
-                                            expected));
+        assertTrue(runComparison(analysis1.generateSMTReportFull(),
+                                 analysis2.generateSMTReportFull(),
+                                 expected));
     }
 
     @Test
@@ -209,9 +211,9 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.fibonacci.smt.out");
-        Assertions.assertTrue(runComparison(analysis1.generateSMTReportFull(),
-                                            analysis2.generateSMTReportFull(),
-                                            expected));
+        assertTrue(runComparison(analysis1.generateSMTReportFull(),
+                                 analysis2.generateSMTReportFull(),
+                                 expected));
     }
 
     private boolean runComparison(String left, String right, String oracle) {
@@ -219,16 +221,16 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         Reader rightReader = new StringReader(right);
         try {
             Writer writer = new FileWriter(this.z3TestFile.toFile());
-            Smt2Format.SMT2FormatFull(leftReader, rightReader, writer);
+            Smt2Format.SMT2Format(leftReader, rightReader, writer);
             Process z3 = Runtime.getRuntime().exec(new String[] {"z3",
                                                                  "-smt2",
                                                                  this.z3TestFile.toString()});
             z3.waitFor(60l, TimeUnit.SECONDS);
             String output = new BufferedReader(new InputStreamReader(z3.getInputStream(),
                                                                      StandardCharsets.UTF_8))
-                    .lines()
-                    .collect(Collectors.joining("\n"));
-            Assertions.assertEquals(oracle, output);
+                .lines()
+                .collect(Collectors.joining("\n"));
+            assertEquals(oracle, output);
             return true;
         } catch (IOException ex) {
             ex.printStackTrace(System.err);

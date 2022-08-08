@@ -31,6 +31,7 @@ public interface State {
     public Optional<BinopExpr> toBinop();
     public String toSMT(SolverWrapper solver);
     public String toSMT(Local l, SolverWrapper solver);
+    public String toSMT(Set<Local> locals, SolverWrapper solver);
     public GraphProjection toGraph();
     public void updateTop(Local local);
     public boolean updateCond(State inState, Value left, Value right, PredicateType type);

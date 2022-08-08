@@ -1,25 +1,24 @@
+$i1	i0	i2	i3	i4	i5	i6	r0
 3 i3 = 0:<miniExample3: int example(int)>
-i3->(= i3 0)
+fall	(= i3 0)
 4 i4 = 1:<miniExample3: int example(int)>
-i4->(> i4 0)
+fall	(> i4 0)
 5 i5 = 1:<miniExample3: int example(int)>
-i5->(> i5 0)
+fall	(> i5 0)
 6 i6 = 3:<miniExample3: int example(int)>
-i6->(> i6 0)
+fall	(> i6 0)
 7 if i6 >= i0 goto return i5:<miniExample3: int example(int)>
-i0->(> i0 0)
-i6->(> i6 0)
-i0f->(or (> i0 0) (= i0 0) (< i0 0))
-i6f->(> i6 0)
+fall	(and (> i0 0) (> i6 0))
+branch	(and (or (> i0 0) (= i0 0) (< i0 0)) (> i6 0))
 8 $i1 = i5 + i4:<miniExample3: int example(int)>
-$i1->(> $i1 0)
+fall	(> $i1 0)
 9 i2 = $i1 + i3:<miniExample3: int example(int)>
-i2->(> i2 0)
+fall	(> i2 0)
 10 i3 = i4:<miniExample3: int example(int)>
-i3->(> i3 0)
+fall	(> i3 0)
 11 i4 = i5:<miniExample3: int example(int)>
-i4->(> i4 0)
+fall	(> i4 0)
 12 i5 = i2:<miniExample3: int example(int)>
-i5->(> i5 0)
+fall	(> i5 0)
 13 i6 = i6 + 1:<miniExample3: int example(int)>
-i6->(> i6 0)
+fall	(> i6 0)

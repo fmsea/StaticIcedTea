@@ -1,2 +1,3 @@
+l1
 1 l1 = 6:<z3_constant_testSootClass: int z3_constant_test()>
-l1->(= l1 6)
+fall	(= l1 6)

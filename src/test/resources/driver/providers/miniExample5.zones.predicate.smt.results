@@ -1,32 +1,26 @@
 3 if i0 < 0 goto $r0 = new java.lang.RuntimeException:<miniExample5: int example(int)>
-i0
+fall through
 sat
 sat
-i0f
+branch out
 sat
 sat
 4 i2 = 0:<miniExample5: int example(int)>
-i2
+fall through
 sat
 sat
 5 if i2 >= i0 goto $i1 = i2 - i0:<miniExample5: int example(int)>
-i0
+fall through
 sat
 unsat
-i2
-sat
-unsat
-i0f
-sat
-unsat
-i2f
+branch out
 sat
 unsat
 6 i2 = i2 + 1:<miniExample5: int example(int)>
-i2
+fall through
 sat
 unsat
 8 $i1 = i2 - i0:<miniExample5: int example(int)>
-$i1
+fall through
 unsat
 sat

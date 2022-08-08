@@ -1,7 +1,4 @@
 $i0	i1
-1 $i0 := @parameter0: int:<test.Factorial: int factorial(int)>
-fall	true
-
 2 $i0 = 1:<test.Factorial: int factorial(int)>
 fall	(= $i0 1)
 
@@ -15,11 +12,3 @@ fall	(= $i0 1)
 
 5 $i0 = $i0 - 1:<test.Factorial: int factorial(int)>
 fall	(= $i0 0)
-
-6 goto [?= (branch)]:<test.Factorial: int factorial(int)>
-fall	false
-
-branch	(= $i0 0)
-
-7 return i1:<test.Factorial: int factorial(int)>
-fall	false

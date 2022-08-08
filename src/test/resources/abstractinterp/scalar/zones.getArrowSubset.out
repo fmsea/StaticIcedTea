@@ -13,6 +13,3 @@ fall	(and (= $b25 (- 60)) (= b0 0) (= b1 50) (= b2 60))
 
 5 $i26 = $b25 / 2:<test.ballonFactory: void getArrow()>
 fall	(and (= $b25 (- 60)) (= $i26 (- 30)) (= b0 0) (= b1 50) (= b2 60))
-
-6 return:<test.ballonFactory: void getArrow()>
-fall	false

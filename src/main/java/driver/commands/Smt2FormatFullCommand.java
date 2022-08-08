@@ -37,7 +37,7 @@ public class Smt2FormatFullCommand implements Callable<Integer> {
         try (Reader fh1 = new FileReader(analysisOne);
              Reader fh2 = new FileReader(analysisTwo);
              Writer out = new FileWriter(outputFile)) {
-            Smt2Format.SMT2FormatFull(fh1, fh2, out);
+            Smt2Format.SMT2Format(fh1, fh2, out);
             return 0;
         } catch (IOException ex) {
             log.error("Unable to format analysis: {}", ex.toString());

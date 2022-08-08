@@ -23,12 +23,6 @@ class SmtIdentifierTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideConversionArguments")
-    void testFromExpression(SmtIdentifierExpression expr, SmtIdentifier expected) {
-        assertEquals(expected, SmtIdentifier.from(expr));
-    }
-
-    @ParameterizedTest
     @MethodSource("provideComparisons")
     void testCompareTo(SmtIdentifier a, SmtIdentifier b, int expected) {
         assertEquals(expected, a.compareTo(b));
@@ -50,17 +44,6 @@ class SmtIdentifierTest {
                                              new SmtIdentifier(Locals.get("i0"), true)),
                          Arguments.arguments(new SmtIdentifier(Locals.get("$z0"), true),
                                              new SmtIdentifier(Locals.get("$z0"), false)));
-    }
-
-    private static Stream<Arguments> provideConversionArguments() {
-        return Stream.of(Arguments.arguments(new SmtIdentifierExpression("i0",
-                                                                         Set.of("i0"),
-                                                                         "(= i0 0)"),
-                                             new SmtIdentifier(Locals.get("i0"))),
-                         Arguments.arguments(new SmtIdentifierExpression("i1f",
-                                                                         Set.of("i1"),
-                                                                         "true"),
-                                             new SmtIdentifier(Locals.get("i1"), true)));
     }
 
     private static Stream<Arguments> provideComparisons() {

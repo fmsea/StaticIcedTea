@@ -56,13 +56,4 @@ class SmtIdentifier implements Comparable<SmtIdentifier> {
         }
         return 0;
     }
-
-    public static SmtIdentifier from(SmtIdentifierExpression expr) {
-        if (expr.isBranchOut()) {
-            return new SmtIdentifier(Locals.get(expr.identifier.substring(0, expr.identifier.length() - 1)),
-                                     true);
-        } else {
-            return new SmtIdentifier(Locals.get(expr.identifier));
-        }
-    }
 }

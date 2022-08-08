@@ -9,13 +9,6 @@ sat
 branch out
 sat
 sat
-3 goto [?= return w0]:<test.ints: int compareIntervals()>
-fall through
-sat
-sat
-branch out
-sat
-sat
 4 if x0 >= 0 goto w0 = x0 + u0:<test.ints: int compareIntervals()>
 fall through
 sat
@@ -23,18 +16,7 @@ sat
 branch out
 sat
 sat
-5 goto [?= return w0]:<test.ints: int compareIntervals()>
-fall through
-sat
-sat
-branch out
-sat
-sat
 6 w0 = x0 + u0:<test.ints: int compareIntervals()>
-fall through
-sat
-sat
-7 return w0:<test.ints: int compareIntervals()>
 fall through
 sat
 sat

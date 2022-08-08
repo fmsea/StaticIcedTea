@@ -1,10 +1,8 @@
+b2	b6	i1
 6 i1 = 0:<test.BallonFactory>
-i1->(= i1 0)
-i1f->(or (<= i1 0) (> i1 0))
-b2->(or (<= b2 0) (> b2 0))
-b6->(and (<= b6 (+ i1 3))
-         (<= b6 (+ b2 4)))
+fall	(and (= i1 0) (or (<= b2 0) (> b2 0)) (<= b6 (+ i1 3)) (<= b6 (+ b2 4)))
+branch	(and (or (<= i1 0) (> i1 0))
 7 b2 = 2:<test.BallonFactory>
-b2->(and (< b2 5)
-         (> b2 0)
-         (>= b2 i4))
+fall	(and (< b2 5)
+             (> b2 0)
+             (>= b2 i4))

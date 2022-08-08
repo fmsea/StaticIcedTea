@@ -1,5 +1,5 @@
 (echo "6 i1 = 0:<test.BallonFactory: java.util.ArrayList getLines(java.awt.FontMetrics,java.lang.String,double,int)>")
-(echo "i1")
+(echo "fall through")
 (push)
 (assert (forall ((i1 Int))
 (=> (= i1 0) (= i1 0))))

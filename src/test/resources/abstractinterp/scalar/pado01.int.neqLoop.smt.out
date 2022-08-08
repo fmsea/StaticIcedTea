@@ -13,14 +13,3 @@ sat
 fall through
 sat
 sat
-4 goto [?= (branch)]:<test.neqBranch: void neq()>
-fall through
-sat
-sat
-branch out
-sat
-sat
-5 return:<test.neqBranch: void neq()>
-fall through
-sat
-sat

@@ -419,6 +419,10 @@ public class MinZoneState implements State {
         return this.matrix.toSMT(l, solver);
     }
 
+    public String toSMT(Set<Local> locals, SolverWrapper solver) {
+        return this.matrix.toSMT(locals, solver);
+    }
+
     public GraphProjection toGraph() {
         return this.matrix.toGraph();
     }

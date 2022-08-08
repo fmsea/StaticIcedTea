@@ -1,7 +1,4 @@
 $i1	i0	i2	i3	i4	i5	i6
-1 i0 := @parameter0: int:<test.Tribonacci: int tribonacci(int)>
-fall	true
-
 2 i3 = 0:<test.Tribonacci: int tribonacci(int)>
 fall	(= i3 0)
 
@@ -66,17 +63,3 @@ fall	(and (>= $i1 2)
      (>= i6 4)
      (<= i6 (+ i0 0))
      (= i2 (+ i5 0)))
-
-13 goto [?= (branch)]:<test.Tribonacci: int tribonacci(int)>
-fall	false
-
-branch	(and (>= $i1 2)
-     (>= i2 2)
-     (>= i3 1)
-     (>= i4 1)
-     (>= i6 4)
-     (<= i6 (+ i0 0))
-     (= i2 (+ i5 0)))
-
-14 return i5:<test.Tribonacci: int tribonacci(int)>
-fall	false
