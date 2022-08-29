@@ -315,6 +315,14 @@ public class IntervalBoxState implements State {
         }
     }
 
+    public String toReachableSMT(Local source, SolverWrapper solver) {
+        return this.toSMT(source, solver);
+    }
+
+    public String toReachableSMT(Set<Local> sources, SolverWrapper solver) {
+        return this.toSMT(sources, solver);
+    }
+
     private Optional<BinopExpr> combineExprs(Stream<Local> locals) {
         return locals.filter(l -> !this.state.get(l).isTop())
             .map(l -> this.state.get(l).toGrimpExpr(l))
@@ -337,6 +345,10 @@ public class IntervalBoxState implements State {
     }
 
     public Set<Local> getConnectedVariablesOf(Local id) {
+        return Set.of(id);
+    }
+
+    public Set<Local> getReachableVariablesOf(Local id) {
         return Set.of(id);
     }
 

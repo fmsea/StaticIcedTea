@@ -35,5 +35,37 @@ public class ValueToMapTest {
             Local i1 = Locals.get("i1");
             assertEquals(Set.of(i0, i1), ValueToMap.getLocals(Grimp.v().newAddExpr(i0, i1)));
         }
+
+        {
+            Local i0 = Locals.get("i0");
+            Local i1 = Locals.get("i1");
+            assertEquals(Set.of(i0, i1),
+                         ValueToMap.getLocals(Grimp.v().newLeExpr(i0, Grimp.v().newAddExpr(i1, IntConstant.v(3)))));
+        }
+    }
+
+    @Test
+    void testValueToMapGetRightLocals() {
+        {
+            assertEquals(Set.of(), ValueToMap.getRightLocals(IntConstant.v(0)));
+        }
+
+        {
+            Local i0 = Locals.get("i0");
+            assertEquals(Set.of(), ValueToMap.getRightLocals(i0));
+        }
+
+        {
+            Local i0 = Locals.get("i0");
+            Local i1 = Locals.get("i1");
+            assertEquals(Set.of(i1), ValueToMap.getRightLocals(Grimp.v().newAddExpr(i0, i1)));
+        }
+
+        {
+            Local i0 = Locals.get("i0");
+            Local i1 = Locals.get("i1");
+            assertEquals(Set.of(i1),
+                         ValueToMap.getRightLocals(Grimp.v().newLeExpr(i0, Grimp.v().newAddExpr(i1, IntConstant.v(3)))));
+        }
     }
 }

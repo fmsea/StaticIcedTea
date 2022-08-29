@@ -1117,6 +1117,241 @@ public class DifferenceBoundedMatrixTest {
     }
 
     @Test
+    void testReachableQueries() {
+        {
+            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, false);
+            assertEquals(Set.of(xs[1]), m.getReachableVariablesOf(xs[1]));
+        }
+
+        {
+            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            assertAll(() -> assertEquals(Set.of(xs[1]), m.getReachableVariablesOf(xs[1])),
+                      () -> assertEquals(Set.of(xs[2]), m.getReachableVariablesOf(xs[2])));
+        }
+
+        {
+            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            m.setConstraint(xs[1], xs[2], Constraint.of(-2));
+            m.computeClosure();
+            assertAll(() -> assertEquals(Set.of(xs[1], xs[2]),
+                                         m.getReachableVariablesOf(xs[1])),
+                      () -> assertEquals(Set.of(xs[2]), m.getReachableVariablesOf(xs[2])));
+        }
+
+        {
+            this.xs = new Local[] {
+                Variable.ZERO,
+                Jimple.v().newLocal("x1", IntType.v()),
+                Jimple.v().newLocal("x2", IntType.v()),
+                Jimple.v().newLocal("x3", IntType.v()),
+            };
+            this.locals = Stream.of(this.xs).collect(Collectors.toSet());
+            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            m.setConstraint(xs[1], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[3], xs[2], Constraint.of(+3));
+            m.computeClosure();
+            assertAll(() -> assertEquals(Set.of(xs[1], xs[2]),
+                                         m.getReachableVariablesOf(xs[1])),
+                      () -> assertEquals(Set.of(xs[2]), m.getReachableVariablesOf(xs[2])),
+                      () -> assertEquals(Set.of(xs[2], xs[3]), m.getReachableVariablesOf(xs[3])));
+        }
+
+        {
+            this.xs = new Local[] {
+                Variable.ZERO,
+                Jimple.v().newLocal("x1", IntType.v()),
+                Jimple.v().newLocal("x2", IntType.v()),
+                Jimple.v().newLocal("x3", IntType.v()),
+                Jimple.v().newLocal("x4", IntType.v()),
+            };
+            this.locals = Stream.of(this.xs).collect(Collectors.toSet());
+            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            m.setConstraint(xs[1], xs[2], Constraint.of(0));
+            m.setConstraint(xs[1], xs[3], Constraint.of(0));
+            m.setConstraint(xs[1], xs[4], Constraint.of(0));
+            m.setConstraint(xs[4], xs[1], Constraint.of(0));
+            m.computeClosure();
+            assertAll(() -> assertEquals(Set.of(xs[1], xs[2], xs[3], xs[4]), m.getReachableVariablesOf(xs[1])),
+                      () -> assertEquals(Set.of(xs[2]), m.getReachableVariablesOf(xs[2])),
+                      () -> assertEquals(Set.of(xs[3]), m.getReachableVariablesOf(xs[3])),
+                      () -> assertEquals(Set.of(xs[1], xs[2], xs[3], xs[4]), m.getReachableVariablesOf(xs[4])));
+        }
+
+        {
+            this.xs = new Local[] {
+                Variable.ZERO,
+                Jimple.v().newLocal("x1", IntType.v()),
+                Jimple.v().newLocal("x2", IntType.v()),
+                Jimple.v().newLocal("x3", IntType.v()),
+                Jimple.v().newLocal("x4", IntType.v()),
+                Jimple.v().newLocal("x5", IntType.v()),
+                Jimple.v().newLocal("x6", IntType.v()),
+            };
+            this.locals = Stream.of(this.xs).collect(Collectors.toSet());
+            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            m.setConstraint(xs[2], xs[1], Constraint.of(0));
+            m.setConstraint(xs[2], xs[3], Constraint.of(0));
+            m.setConstraint(xs[2], xs[4], Constraint.of(0));
+            m.setConstraint(xs[3], xs[2], Constraint.of(0));
+            m.setConstraint(xs[4], xs[6], Constraint.of(0));
+            m.setConstraint(xs[5], xs[4], Constraint.of(0));
+            m.computeClosure();
+            assertAll(() -> assertEquals(Set.of(xs[1]), m.getReachableVariablesOf(xs[1])),
+                      () -> assertEquals(Set.of(xs[6]), m.getReachableVariablesOf(xs[6])),
+                      () -> assertEquals(Set.of(xs[1], xs[2], xs[3], xs[4], xs[6]),
+                                         m.getReachableVariablesOf(xs[2])),
+                      () -> assertEquals(Set.of(xs[1], xs[2], xs[3], xs[4], xs[6]),
+                                         m.getReachableVariablesOf(xs[3])),
+                      () -> assertEquals(Set.of(xs[4], xs[6]),
+                                         m.getReachableVariablesOf(xs[4])),
+                      () -> assertEquals(Set.of(xs[4], xs[5], xs[6]),
+                                         m.getReachableVariablesOf(xs[5])));
+        }
+    }
+
+    @Test
+    void testReachableSMTExpressions() {
+        {
+            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, false);
+            assertEquals("false", m.toReachableSMT(xs[1], this.solver));
+        }
+
+        {
+            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            assertAll(() -> assertEquals("true", m.toReachableSMT(xs[1], this.solver)),
+                      () -> assertEquals("true", m.toReachableSMT(xs[2], this.solver)));
+        }
+
+        {
+            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            m.setConstraint(xs[1], xs[2], Constraint.of(-2));
+            m.computeClosure();
+            assertAll(() -> assertEquals("(<= x1 (+ x2 (- 2)))",
+                                         m.toReachableSMT(xs[1], this.solver)),
+                      () -> assertEquals("true", m.toReachableSMT(xs[2], this.solver)));
+        }
+
+        {
+            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            m.setConstraint(xs[1], xs[2], Constraint.of(0));
+            m.setConstraint(xs[2], xs[1], Constraint.of(0));
+            m.computeClosure();
+            assertAll(() -> assertEquals("(and (<= x1 (+ x2 0)) (<= x2 (+ x1 0)))",
+                                         m.toReachableSMT(xs[1], this.solver)),
+                      () -> assertEquals("(and (<= x1 (+ x2 0)) (<= x2 (+ x1 0)))",
+                                         m.toReachableSMT(xs[2], this.solver)));
+        }
+
+        {
+            this.xs = new Local[] {
+                Variable.ZERO,
+                Jimple.v().newLocal("x1", IntType.v()),
+                Jimple.v().newLocal("x2", IntType.v()),
+                Jimple.v().newLocal("x3", IntType.v()),
+            };
+            this.locals = Stream.of(this.xs).collect(Collectors.toSet());
+            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            m.setConstraint(xs[1], xs[2], Constraint.of(-1));
+            m.setConstraint(xs[3], xs[2], Constraint.of(+3));
+            m.computeClosure();
+            assertAll(() -> assertEquals("(<= x1 (+ x2 (- 1)))", m.toReachableSMT(xs[1], this.solver)),
+                      () -> assertEquals("true", m.toReachableSMT(xs[2], this.solver)),
+                      () -> assertEquals("(<= x3 (+ x2 3))", m.toReachableSMT(xs[3], this.solver)));
+        }
+
+        {
+            this.xs = new Local[] {
+                Variable.ZERO,
+                Jimple.v().newLocal("x1", IntType.v()),
+                Jimple.v().newLocal("x2", IntType.v()),
+                Jimple.v().newLocal("x3", IntType.v()),
+                Jimple.v().newLocal("x4", IntType.v()),
+            };
+            this.locals = Stream.of(this.xs).collect(Collectors.toSet());
+            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            m.setConstraint(xs[1], xs[2], Constraint.of(0));
+            m.setConstraint(xs[1], xs[3], Constraint.of(0));
+            m.setConstraint(xs[1], xs[4], Constraint.of(0));
+            m.setConstraint(xs[4], xs[1], Constraint.of(0));
+            m.computeClosure();
+            assertAll(() -> assertEquals(Stream.of("(and (<= x1 (+ x2 0))",
+                                                   "     (<= x1 (+ x3 0))",
+                                                   "     (<= x1 (+ x4 0))",
+                                                   "     (<= x4 (+ x1 0))",
+                                                   "     (<= x4 (+ x2 0))",
+                                                   "     (<= x4 (+ x3 0)))").collect(Collectors.joining("\n")),
+                                         m.toReachableSMT(xs[1], this.solver)),
+                      () -> assertEquals("true", m.toReachableSMT(xs[2], this.solver)),
+                      () -> assertEquals("true", m.toReachableSMT(xs[3], this.solver)),
+                      () -> assertEquals("true", m.toReachableSMT(Set.of(xs[2], xs[3]), this.solver)),
+                      () -> assertEquals(Stream.of("(and (<= x1 (+ x2 0))",
+                                                   "     (<= x1 (+ x3 0))",
+                                                   "     (<= x1 (+ x4 0))",
+                                                   "     (<= x4 (+ x1 0))",
+                                                   "     (<= x4 (+ x2 0))",
+                                                   "     (<= x4 (+ x3 0)))").collect(Collectors.joining("\n")),
+                                         m.toReachableSMT(xs[4], this.solver)));
+        }
+
+        {
+            this.xs = new Local[] {
+                Variable.ZERO,
+                Jimple.v().newLocal("x1", IntType.v()),
+                Jimple.v().newLocal("x2", IntType.v()),
+                Jimple.v().newLocal("x3", IntType.v()),
+                Jimple.v().newLocal("x4", IntType.v()),
+                Jimple.v().newLocal("x5", IntType.v()),
+                Jimple.v().newLocal("x6", IntType.v()),
+            };
+            this.locals = Stream.of(this.xs).collect(Collectors.toSet());
+            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            m.setConstraint(xs[2], xs[1], Constraint.of(0));
+            m.setConstraint(xs[2], xs[3], Constraint.of(0));
+            m.setConstraint(xs[2], xs[4], Constraint.of(0));
+            m.setConstraint(xs[3], xs[2], Constraint.of(0));
+            m.setConstraint(xs[4], xs[6], Constraint.of(0));
+            m.setConstraint(xs[5], xs[4], Constraint.of(0));
+            m.computeClosure();
+            assertAll(() -> assertEquals("true", m.toReachableSMT(xs[1], this.solver)),
+                      () -> assertEquals("true", m.toReachableSMT(xs[6], this.solver)),
+                      () -> assertEquals(Stream.of("(and (<= x2 (+ x1 0))",
+                                                   "     (<= x2 (+ x3 0))",
+                                                   "     (<= x2 (+ x4 0))",
+                                                   "     (<= x2 (+ x6 0))",
+                                                   "     (<= x3 (+ x1 0))",
+                                                   "     (<= x3 (+ x2 0))",
+                                                   "     (<= x3 (+ x4 0))",
+                                                   "     (<= x3 (+ x6 0))",
+                                                   "     (<= x4 (+ x6 0)))").collect(Collectors.joining("\n")),
+                                         m.toReachableSMT(xs[2], this.solver)),
+                      () -> assertEquals(Stream.of("(and (<= x2 (+ x1 0))",
+                                                   "     (<= x2 (+ x3 0))",
+                                                   "     (<= x2 (+ x4 0))",
+                                                   "     (<= x2 (+ x6 0))",
+                                                   "     (<= x3 (+ x1 0))",
+                                                   "     (<= x3 (+ x2 0))",
+                                                   "     (<= x3 (+ x4 0))",
+                                                   "     (<= x3 (+ x6 0))",
+                                                   "     (<= x4 (+ x6 0)))").collect(Collectors.joining("\n")),
+                                         m.toReachableSMT(xs[3], this.solver)),
+                      () -> assertEquals("(<= x4 (+ x6 0))",
+                                         m.toReachableSMT(xs[4], this.solver)),
+                      () -> assertEquals("(and (<= x4 (+ x6 0)) (<= x5 (+ x4 0)) (<= x5 (+ x6 0)))",
+                                         m.toReachableSMT(xs[5], this.solver)),
+                      () -> assertEquals(Stream.of("(and (<= x2 (+ x1 0))",
+                                                   "     (<= x2 (+ x3 0))",
+                                                   "     (<= x2 (+ x4 0))",
+                                                   "     (<= x2 (+ x6 0))",
+                                                   "     (<= x3 (+ x1 0))",
+                                                   "     (<= x3 (+ x2 0))",
+                                                   "     (<= x3 (+ x4 0))",
+                                                   "     (<= x3 (+ x6 0))",
+                                                   "     (<= x4 (+ x6 0)))").collect(Collectors.joining("\n")),
+                                         m.toReachableSMT(Set.of(xs[2], xs[4]), this.solver)));
+        }
+    }
+
+    @Test
     void testLocalsToSMT() {
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, false);

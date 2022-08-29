@@ -66,6 +66,10 @@ public class PredicateAnalysisRunner implements Runnable {
                                        String.format("%s_%d.changed.out",
                                                      className,
                                                      methodId)).toFile();
+                File reachable = Path.of(this.outputResultsPath.toString(),
+                                         String.format("%s_%d.reachable.out",
+                                                       className,
+                                                       methodId)).toFile();
                 File fullSmt = Path.of(this.outputResultsPath.toString(),
                                        String.format("%s_%d.smt.out",
                                                      className,
@@ -78,9 +82,13 @@ public class PredicateAnalysisRunner implements Runnable {
                 File dir = this.outputResultsPath.toFile();
                 dir.mkdirs();
 
-                try (FileWriter fw = new FileWriter(changed)) {
-                    fw.write(this.analysis.generateReport());
-                    fw.flush();
+                try (FileWriter fw1 = new FileWriter(changed);
+                     FileWriter fw2 = new FileWriter(reachable)) {
+                    String report = this.analysis.generateReport();
+                    fw1.write(report);
+                    fw1.flush();
+                    fw2.write(report);
+                    fw2.flush();
                 } catch (IOException ex) {
                     LOGGER.error("Unable to write changed output file: {}", ex.getMessage());
                 }

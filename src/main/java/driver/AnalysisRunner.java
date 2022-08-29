@@ -61,6 +61,8 @@ public abstract class AnalysisRunner<S extends State>  implements Runnable {
     protected void report() {
         File changed = Path.of(this.outputResultsPath.toString(),
                                String.format("%s_%d.changed.out", this.className, this.methodId)).toFile();
+        File reachable = Path.of(this.outputResultsPath.toString(),
+                                 String.format("%s_%d.reachable.out", this.className, this.methodId)).toFile();
         File fullSmt = Path.of(this.outputResultsPath.toString(),
                                String.format("%s_%d.smt.out", this.className, this.methodId)).toFile();
         File dir = this.outputResultsPath.toFile();
@@ -71,6 +73,13 @@ public abstract class AnalysisRunner<S extends State>  implements Runnable {
             fw.flush();
         } catch (IOException ex) {
             LOGGER.error("Unable to write changed output file: {}", ex.getMessage());
+        }
+
+        try (FileWriter fw = new FileWriter(reachable)) {
+            fw.write(this.analysis.generateReachableSMTReport());
+            fw.flush();
+        } catch (IOException ex) {
+            LOGGER.error("Unable to write reachable output file: {}", ex.getMessage());
         }
 
         try (FileWriter fw = new FileWriter(fullSmt)) {

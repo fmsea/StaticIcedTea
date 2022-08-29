@@ -27,6 +27,25 @@ public abstract class SmtExpression {
 
     public abstract Optional<Value> getValue(Set<Local> variables);
 
+    /** Return Value which is reachable from the local `id`.
+     *
+     * This should mimic getValue, except instead of "contains", we are looking
+     * to see if `source` is in the first location of the BinOp expression, for
+     * example.
+     *
+     * If the expression does not contain reachable expressions, the result is
+     * empty.
+     */
+    public Optional<Value> getReachableValue(Local source) {
+        return this.getReachableValue(Set.of(source));
+    }
+
+    /** Return value which is reachable from the local sources.
+     *
+     * This is essentially a union of expressions over the singular version.
+     */
+    public abstract Optional<Value> getReachableValue(Set<Local> sources);
+
     public Set<Local> getLocals() {
         return ValueToMap.getLocals(this.getValue());
     }
@@ -50,6 +69,14 @@ public abstract class SmtExpression {
         return this.getValue(variables).map(v -> this.solver.smt2(v));
     }
 
+    public Optional<String> toReachableSmt2(Local id) {
+        return this.toReachableSmt2(Set.of(id));
+    }
+
+    public Optional<String> toReachableSmt2(Set<Local> sources) {
+        return this.getReachableValue(sources).map(v -> this.solver.smt2(v));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o instanceof SmtExpression) {
@@ -64,6 +91,8 @@ public abstract class SmtExpression {
     }
 
     public abstract Map<Local, Set<Local>> getConnectedVariables();
+
+    public abstract Map<Local, Set<Local>> getReachableVariables();
 
     public boolean contains(Local identifier) {
         return ValueToMap.getLocals(this.getValue()).contains(identifier);

@@ -22,11 +22,19 @@ public class TrueSmtExpression extends SmtExpression {
         return Map.of();
     }
 
+    public Map<Local, Set<Local>> getReachableVariables() {
+        return Map.of();
+    }
+
     public Optional<Value> getValue(Local id) {
         return Optional.empty();
     }
 
     public Optional<Value> getValue(Set<Local> variables) {
+        return Optional.empty();
+    }
+
+    public Optional<Value> getReachableValue(Set<Local> sources) {
         return Optional.empty();
     }
 

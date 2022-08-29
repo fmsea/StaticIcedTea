@@ -26,4 +26,15 @@ public class ValueToMap {
             return Set.of();
         }
     }
+
+    /** Get locals which are "pointed to"/"reachable" from the left?
+     */
+    public static Set<Local> getRightLocals(Value expr) {
+        if (expr instanceof BinopExpr) {
+            BinopExpr e = (BinopExpr)expr;
+            return getLocals(e.getOp2());
+        } else {
+            return Set.of();
+        }
+    }
 }

@@ -27,7 +27,15 @@ public class Number extends SmtExpression {
         return Optional.empty();
     }
 
+    public Optional<Value> getReachableValue(Set<Local> sources) {
+        return Optional.empty();
+    }
+
     public Map<Local, Set<Local>> getConnectedVariables() {
+        return Map.of();
+    }
+
+    public Map<Local, Set<Local>> getReachableVariables() {
         return Map.of();
     }
 

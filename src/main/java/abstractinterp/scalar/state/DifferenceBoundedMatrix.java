@@ -664,6 +664,25 @@ public class DifferenceBoundedMatrix {
             Set<Local> connectedVariables = sources.stream().flatMap(source -> this.getConnectedVariablesOf(source).stream())
                 .collect(Collectors.toSet());
             return this.toBinop(connectedVariables).stream()
+                .collect(Collectors.toSet()).stream()
+                .sorted((a, b) -> a.toString().compareTo(b.toString()))
+                .reduce((a, b) -> Grimp.v().newAndExpr(a, b))
+                .map(expr -> solver.smt2(expr))
+                .orElse("true");
+        }
+    }
+
+    public String toReachableSMT(Local source, SolverWrapper solver) {
+        return this.toReachableSMT(Set.of(source), solver);
+    }
+
+    public String toReachableSMT(Set<Local> sources, SolverWrapper solver) {
+        if (!this.w0zReduction()) {
+            return "false";
+        } else {
+            return sources.stream().flatMap(source -> this.getReachableVariablesOf(source).stream())
+                .collect(Collectors.toSet()).stream()
+                .flatMap(vars -> this.toReachableBinop(vars).stream())
                 .sorted((a, b) -> a.toString().compareTo(b.toString()))
                 .reduce((a, b) -> Grimp.v().newAndExpr(a, b))
                 .map(expr -> solver.smt2(expr))
@@ -705,6 +724,41 @@ public class DifferenceBoundedMatrix {
 
             if (!this.matrix[k][i].isTop()) {
                 BinopExpr expr = this.toGrimpExpr(source, t, this.matrix[k][i]);
+                if (!isMember.test(expr)) {
+                    exprs.add(expr);
+                }
+            }
+        }
+        return exprs;
+    }
+
+    private Set<BinopExpr> toReachableBinop(Set<Local> sources) {
+        Set<BinopExpr> exprs = Set.of();
+        for (Local source : sources) {
+            exprs = this.toReachableBinop(source, exprs);
+        }
+        return exprs;
+    }
+
+    private Set<BinopExpr> toReachableBinop(Local source) {
+        return this.toReachableBinop(source, Set.of());
+    }
+
+    private Set<BinopExpr> toReachableBinop(Local source, Set<BinopExpr> acc) {
+        Set<BinopExpr> exprs = new HashSet<>();
+        exprs.addAll(acc);
+        Predicate isMember = expr -> exprs.stream()
+            .map(e -> e.toString())
+            .collect(Collectors.toSet())
+            .contains(expr.toString());
+        int s = this.localToIndices.get(source);
+        for (int i = 0; i < N; i++) {
+            if (i == s) {
+                continue;
+            }
+            Local target = this.indicesToLocals.get(i);
+            if (!this.matrix[s][i].isTop()) {
+                BinopExpr expr = this.toGrimpExpr(source, target, this.matrix[s][i]);
                 if (!isMember.test(expr)) {
                     exprs.add(expr);
                 }
@@ -796,6 +850,17 @@ public class DifferenceBoundedMatrix {
                         });
             }
             return Set.copyOf(connected);
+        }
+    }
+
+    public Set<Local> getReachableVariablesOf(Local id) {
+        if (id.equals(Variable.ZERO)) {
+            return Set.of();
+        } else if (!this.w0zReduction()) {
+            return Set.of(id);
+        } else {
+            return Stream.concat(Stream.of(id), this.successorsOf(id))
+                .collect(Collectors.toSet());
         }
     }
 

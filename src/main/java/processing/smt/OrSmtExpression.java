@@ -38,6 +38,10 @@ public class OrSmtExpression extends ConnectiveSmtExpression {
         return this.getValue(variables, OrSmtExpression::combinator);
     }
 
+    public Optional<Value> getReachableValue(Set<Local> sources) {
+        return this.getReachableValue(sources, OrSmtExpression::combinator);
+    }
+
     public String toSmt2() {
         return this.toSmt2(OrSmtExpression::combinator);
     }

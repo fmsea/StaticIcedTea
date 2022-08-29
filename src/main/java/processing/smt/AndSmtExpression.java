@@ -41,6 +41,10 @@ public class AndSmtExpression extends ConnectiveSmtExpression {
         return this.getValue(variables, AndSmtExpression::combinator);
     }
 
+    public Optional<Value> getReachableValue(Set<Local> sources) {
+        return this.getReachableValue(sources, AndSmtExpression::combinator);
+    }
+
     public String toSmt2() {
         return this.toSmt2(AndSmtExpression::combinator);
     }

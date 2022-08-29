@@ -427,6 +427,14 @@ public class IncZoneState implements State {
         return this.matrix.toSMT(locals, solver);
     }
 
+    public String toReachableSMT(Local source, SolverWrapper solver) {
+        return this.matrix.toReachableSMT(source, solver);
+    }
+
+    public String toReachableSMT(Set<Local> sources, SolverWrapper solver) {
+        return this.matrix.toReachableSMT(sources, solver);
+    }
+
     public GraphProjection toGraph() {
         return this.matrix.toGraph();
     }
@@ -579,6 +587,10 @@ public class IncZoneState implements State {
 
     public Set<Local> getConnectedVariablesOf(Local source) {
         return this.matrix.getConnectedVariablesOf(source);
+    }
+
+    public Set<Local> getReachableVariablesOf(Local source) {
+        return this.matrix.getReachableVariablesOf(source);
     }
 
     @Override

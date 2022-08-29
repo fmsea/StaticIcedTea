@@ -141,6 +141,10 @@ public class IntegerAnalysis<S extends State> implements Analysis {
         return generateOutput((state, locals) -> locals.map(ls -> state.toSMT(ls, this.solver)).orElse("true"));
     }
 
+    public String generateReachableSMTReport() {
+        return generateOutput((state, locals) -> locals.map(ls -> state.toReachableSMT(ls, this.solver)).orElse("true"));
+    }
+
     public void generateGraphOutputs(Path output) {
         File outputDir = output.toFile();
         outputDir.mkdirs();

@@ -25,6 +25,10 @@ public class NotSmtExpression extends SmtExpression {
         return this.expr.getConnectedVariables();
     }
 
+    public Map<Local, Set<Local>> getReachableVariables() {
+        return this.expr.getReachableVariables();
+    }
+
     public Optional<Value> getValue(Local id) {
         return this.expr.getValue(id)
             .map(v -> Grimp.v().newNeExpr(v, IntConstant.v(1)));
@@ -32,6 +36,11 @@ public class NotSmtExpression extends SmtExpression {
 
     public Optional<Value> getValue(Set<Local> variables) {
         return this.expr.getValue(variables)
+            .map(v -> Grimp.v().newNeExpr(v, IntConstant.v(1)));
+    }
+
+    public Optional<Value> getReachableValue(Set<Local> sources) {
+        return this.expr.getReachableValue(sources)
             .map(v -> Grimp.v().newNeExpr(v, IntConstant.v(1)));
     }
 

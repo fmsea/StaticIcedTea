@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
@@ -17,9 +18,12 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 import soot.Local;
 import soot.Value;
 
+import processing.Locals;
 import processing.providers.SmtExpressionProvider;
 import processing.providers.SmtExpressionIdentityProvider;
 import processing.providers.SmtExpressionConnectedProvider;
+import processing.providers.SmtExpressionReachableIdentityProvider;
+import processing.providers.SmtExpressionReachableProvider;
 
 public class SmtExpressionTest {
 
@@ -41,6 +45,23 @@ public class SmtExpressionTest {
     }
 
     @ParameterizedTest
+    @ArgumentsSource(SmtExpressionReachableIdentityProvider.class)
+    void testGetReachableVariables(String smtExpression,
+                                   Map<Local, Set<Local>> expected) {
+        SmtExpression expr = SmtExpressionReader.parse(smtExpression);
+        Map<Local, Set<Local>> reachableVariables = expr.getReachableVariables();
+        Stream<Executable> assertions0 = reachableVariables.keySet().stream().map(k -> () -> assertTrue(expected.containsKey(k)));
+        Stream<Executable> assertions1 = expected.keySet().stream().map(k -> () -> assertTrue(reachableVariables.containsKey(k)));
+        Stream<Executable> assertions2 = reachableVariables.entrySet().stream().map(kv -> () -> assertEquals(expected.getOrDefault(kv.getKey(), Set.of()), kv.getValue()));
+        Stream<Executable> assertions3 = expected.entrySet().stream().map(kv -> () -> assertEquals(kv.getValue(), reachableVariables.getOrDefault(kv.getKey(), Set.of())));
+        Stream<Executable> assertions = Stream.of(assertions0,
+                                                  assertions1,
+                                                  assertions2,
+                                                  assertions3).flatMap(s -> s.map(v -> v));
+        assertAll(assertions);
+    }
+
+    @ParameterizedTest
     @ArgumentsSource(SmtExpressionConnectedProvider.class)
     void testGetValueById(String smtExpression, Local id, Optional<Value> expected) {
         try {
@@ -59,6 +80,18 @@ public class SmtExpressionTest {
             SmtExpression expr = new SmtExpressionReader(smtExpression).getSmtExpression();
             assertEquals(expected.map(e -> e.toString()),
                          expr.getValue(variables).map(e -> e.toString()));
+        } catch (Exception ex) {
+            ex.printStackTrace(System.err);
+        }
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(SmtExpressionReachableProvider.class)
+    void testGetReachableValueById(String smtExpression, Local id, Optional<Value> expected) {
+        try {
+            SmtExpression expr = SmtExpressionReader.parse(smtExpression);
+            assertEquals(expected.map(e -> e.toString()),
+                         expr.getReachableValue(id).map(e -> e.toString()));
         } catch (Exception ex) {
             ex.printStackTrace(System.err);
         }

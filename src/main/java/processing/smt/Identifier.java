@@ -35,8 +35,20 @@ public class Identifier extends SmtExpression {
         }
     }
 
+    public Optional<Value> getReachableValue(Set<Local> sources) {
+        if (sources.contains(this.identifier)) {
+            return Optional.of(this.identifier);
+        } else {
+            return Optional.empty();
+        }
+    }
+
     public Map<Local, Set<Local>> getConnectedVariables() {
         return Map.of(this.identifier, Set.of());
+    }
+
+    public Map<Local, Set<Local>> getReachableVariables() {
+        return Map.of(this.identifier, Set.of(this.identifier));
     }
 
     public String toSmt2() {
