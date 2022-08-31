@@ -23,6 +23,24 @@ A better user experience can be achieved using [direnv][direnv] and
 [Lorri][lorri] to automatically enter the project environment when entering the
 project.  However, IDE/editor integration requires extra work.
 
+### Guix ###
+
+Similarly, using [Guix][guix] or [GuixSD][guix], the required dependencies
+are handled.  Simply enter a shell environment for the project:
+
+```bash
+guix time-machine -C ./channels.scm -- shell -m manifest.scm
+```
+
+Using the above ensures that each developers environment is using the same
+version of the entire dependency tree on any machine at any time.
+
+Again, adding [direnv][direnv] makes this automatic.  Though, you may need to
+patch the `use_guix` function for caching and channel loading.
+
+Currently, this does not extend to the JAR dependencies inside the project.
+However, those are handled via [Maven][maven].
+
 ### Non-Nix ###
 
 Download the Z3 sources and build the project for your machine.
@@ -87,6 +105,36 @@ Maven can generate project files for IDE's:
   mvn idea:idea
   ```
 
+## R2/Borah Deployments using Guix ##
+
+If using [Guix][guix] as described above, we can create "packs" which can be
+uploaded to R2 or Borah and used without needing to setup the dependencies on
+either of these clusters.
+
+Create the pack using the following command:
+
+```bash
+guix time-machine -C channels.scm -- pack -RR -S /bin=bin -S /etc=etc -m manifest.scm
+```
+
+The resulting archive can then be uploaded to R2/Borah via scp.
+
+Finally, unpack the tarball into your home directory and source the profile:
+
+```bash
+tar -zxf ${archive}.tar.gz
+source ./etc/profile
+```
+
+Test that it works by using something like the following:
+
+```bash
+./bin/java -version
+```
+
+> Unfortunately, this does not work since Borah does not support user
+> namespaces.
+
 ## References ##
 
 [nix]: https://nixos.org/
@@ -96,3 +144,5 @@ Maven can generate project files for IDE's:
 [direnv]: https://direnv.net/
 
 [lorri]: https://github.com/nix-community/lorri
+
+[guix]: https://guix.gnu.org/
