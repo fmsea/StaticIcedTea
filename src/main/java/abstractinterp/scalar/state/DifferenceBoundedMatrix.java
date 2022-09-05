@@ -285,8 +285,11 @@ public class DifferenceBoundedMatrix {
         for (Local l : worklist) {
             int c = this.localToIndices.get(l);
             for (int i = 0; i < N; i++) {
-                this.putConstraint(i, c, Constraint.add(this.matrix[i][si],
-                                                        this.matrix[si][c]));
+                Constraint longPath = Constraint.add(this.matrix[i][si],
+                                                     this.matrix[si][c]);
+                if (Constraint.compare(this.matrix[i][c], longPath) > 0) {
+                    this.setConstraint(i, c, longPath);
+                }
             }
         }
 
@@ -690,6 +693,50 @@ public class DifferenceBoundedMatrix {
         }
     }
 
+    public String toChangedVariablesSMT(Set<Local> locals, SolverWrapper solver) {
+        if (!this.w0zReduction()) {
+            return "false";
+        } else {
+            return this.toChangedVariablesSMTFromSubgraph(this.getChangedVariablesSubgraph(locals), solver);
+        }
+    }
+
+    private String toChangedVariablesSMTFromSubgraph(Set<Local> variables, SolverWrapper solver) {
+        // If we are here, we assume the state is feasible.
+        Set<Optional<BinopExpr>> exprs = new HashSet<>();
+        Predicate isMember = expr -> exprs.stream()
+            .filter(o -> o.isPresent())
+            .map(o -> o.get())
+            .map(e -> e.toString())
+            .collect(Collectors.toSet())
+            .contains(expr.toString());
+        variables.forEach(v -> {
+                exprs.add(toBinop(Variable.ZERO, v));
+                exprs.add(toBinop(v, Variable.ZERO));
+            });
+        variables.forEach(s -> {
+                variables.forEach(t -> {
+                        if (!s.equals(t)) {
+                            Optional<BinopExpr> forward = toBinop(s, t);
+                            Optional<BinopExpr> backward = toBinop(t, s);
+                            if (forward.map(expr -> !isMember.test(expr)).orElse(false)) {
+                                exprs.add(forward);
+                            }
+                            if (backward.map(expr -> !isMember.test(expr)).orElse(false)) {
+                                exprs.add(backward);
+                            }
+                        }
+                    });
+            });
+        return exprs.stream()
+            .filter(o -> o.isPresent())
+            .map(o -> o.get())
+            .sorted((a, b) -> a.toString().compareTo(b.toString()))
+            .reduce((a, b) -> Grimp.v().newAndExpr(a, b))
+            .map(expr -> solver.smt2(expr))
+            .orElse("true");
+    }
+
     private Set<BinopExpr> toBinop(Set<Local> sources) {
         Set<BinopExpr> exprs = Set.of();
         for (Local source : sources) {
@@ -853,6 +900,55 @@ public class DifferenceBoundedMatrix {
         }
     }
 
+    public static Set<Local> getChangedVariables(DifferenceBoundedMatrix current,
+                                                 DifferenceBoundedMatrix previous) {
+        return current.getChangedVariables(previous);
+    }
+
+    public Set<Local> getChangedVariables(DifferenceBoundedMatrix previous) {
+        Set<Local> changedVariables = new HashSet<>();
+        for (int i = 1; i < N; i++) {
+            if (Constraint.compare(this.matrix[i][0], previous.matrix[i][0]) != 0 ||
+                Constraint.compare(this.matrix[0][i], previous.matrix[0][i]) != 0) {
+                changedVariables.add(this.indicesToLocals.get(i));
+            }
+        }
+
+        for (int i = 1; i < N; i++) {
+            for (int j = 1; j < N; j++) {
+                Constraint currentForward = this.matrix[i][j];
+                Constraint previousForward = previous.matrix[i][j];
+                Constraint currentBackward = this.matrix[j][i];
+                Constraint previousBackward = previous.matrix[j][i];
+                int forward = Constraint.compare(currentForward, previousForward);
+                int backward = Constraint.compare(currentBackward, previousBackward);
+                Constraint forwardThroughZero = Constraint.add(this.matrix[i][0], this.matrix[0][j]);
+                Constraint backwardThroughZero = Constraint.add(this.matrix[j][0], this.matrix[0][i]);
+                if (forward != 0 &&
+                    Constraint.compare(this.matrix[i][j], forwardThroughZero) < 0) {
+                    changedVariables.add(this.indicesToLocals.get(i));
+                }
+
+                if (backward != 0 &&
+                    Constraint.compare(this.matrix[j][i], backwardThroughZero) < 0) {
+                    changedVariables.add(this.indicesToLocals.get(j));
+                }
+            }
+        }
+
+        return changedVariables;
+    }
+
+    public Set<Local> getChangedVariablesSubgraph(Set<Local> locals) {
+        if (!this.w0zReduction()) {
+            return locals;
+        } else {
+            return locals.stream()
+                .flatMap(s -> neighborsOf(s))
+                .collect(Collectors.toSet());
+        }
+    }
+
     public Set<Local> getReachableVariablesOf(Local id) {
         if (id.equals(Variable.ZERO)) {
             return Set.of();
@@ -862,6 +958,11 @@ public class DifferenceBoundedMatrix {
             return Stream.concat(Stream.of(id), this.successorsOf(id))
                 .collect(Collectors.toSet());
         }
+    }
+
+    private Stream<Local> neighborsOf(Local s) {
+        return Stream.concat(this.predecessorsOf(s),
+                             this.successorsOf(s));
     }
 
     private Stream<Local> predecessorsOf(Local t) {

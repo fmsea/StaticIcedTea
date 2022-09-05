@@ -32,7 +32,6 @@ public class IntervalBoxState implements State {
     private Map<Local, Interval32Box> state;
 
     public IntervalBoxState(Set<Local> keys, boolean top) {
-
         state = new HashMap<Local, Interval32Box>();
         if (top) {
             for (Local l : keys) {
@@ -323,6 +322,16 @@ public class IntervalBoxState implements State {
         return this.toSMT(sources, solver);
     }
 
+    public String toChangedVariablesSMT(Set<Local> locals, SolverWrapper solver) {
+        if (this.isFeasible()) {
+            return this.combineExprs(this.getChangedVariablesSubgraph(locals).stream())
+                .map(expr -> solver.smt2(expr))
+                .orElse("true");
+        } else {
+            return "false";
+        }
+    }
+
     private Optional<BinopExpr> combineExprs(Stream<Local> locals) {
         return locals.filter(l -> !this.state.get(l).isTop())
             .map(l -> this.state.get(l).toGrimpExpr(l))
@@ -344,12 +353,34 @@ public class IntervalBoxState implements State {
         return graph;
     }
 
+    public Set<Local> getChangedVariables(State previous) {
+        if (previous instanceof IntervalBoxState) {
+            return this.getChangedVariables((IntervalBoxState) previous);
+        } else {
+            throw new RuntimeException("invalid type for getChangedVariables");
+        }
+    }
+
+    public Set<Local> getChangedVariables(IntervalBoxState previous) {
+        Set<Local> vars = new HashSet<>();
+        for (Local key : this.state.keySet()) {
+            if (!this.state.get(key).equals(previous.state.get(key))) {
+                vars.add(key);
+            }
+        }
+        return vars;
+    }
+
     public Set<Local> getConnectedVariablesOf(Local id) {
         return Set.of(id);
     }
 
     public Set<Local> getReachableVariablesOf(Local id) {
         return Set.of(id);
+    }
+
+    public Set<Local> getChangedVariablesSubgraph(Set<Local> locals) {
+        return Set.copyOf(locals);
     }
 
     @Override

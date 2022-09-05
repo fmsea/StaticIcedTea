@@ -34,11 +34,14 @@ public interface State {
     public String toSMT(Set<Local> locals, SolverWrapper solver);
     public String toReachableSMT(Local source, SolverWrapper solver);
     public String toReachableSMT(Set<Local> sources, SolverWrapper solver);
+    public String toChangedVariablesSMT(Set<Local> locals, SolverWrapper solver);
     public GraphProjection toGraph();
     public void updateTop(Local local);
     public boolean updateCond(State inState, Value left, Value right, PredicateType type);
     public void forget(Local local);
     public void makeInfeasible();
+    public Set<Local> getChangedVariables(State previous);
     public Set<Local> getConnectedVariablesOf(Local local);
     public Set<Local> getReachableVariablesOf(Local local);
+    public Set<Local> getChangedVariablesSubgraph(Set<Local> locals);
 }

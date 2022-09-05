@@ -31,6 +31,7 @@ import soot.toolkits.graph.UnitGraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import abstractinterp.scalar.util.Pair;
 import abstractinterp.scalar.state.State;
 import abstractinterp.scalar.state.factory.StateFactory;
 import solver.SolverWrapper;
@@ -138,11 +139,29 @@ public class IntegerAnalysis<S extends State> implements Analysis {
     }
 
     public String generateSMTReport() {
-        return generateOutput((state, locals) -> locals.map(ls -> state.toSMT(ls, this.solver)).orElse("true"));
+        return generateOutput((state, pair) -> pair.fst().map(ls -> state.toSMT(ls, this.solver)).orElse("true"));
     }
 
     public String generateReachableSMTReport() {
-        return generateOutput((state, locals) -> locals.map(ls -> state.toReachableSMT(ls, this.solver)).orElse("true"));
+        return generateOutput((state, pair) -> pair.fst().map(ls -> state.toReachableSMT(ls, this.solver)).orElse("true"));
+    }
+
+    public String generateChangedVariablesSMTReport() {
+        return generateOutput((state, pair) -> pair.fst().map(ls -> state.toChangedVariablesSMT(ls, this.solver)).orElse("true"));
+    }
+
+    public String generateChangedVariablesMinSMTReport() {
+        return generateOutput((state, locals) -> {
+                String smt = locals.snd()
+                    .map(ls -> state.toChangedVariablesSMT(ls, this.solver))
+                    .orElse("true");
+                if (smt.equals("true")) {
+                    smt = locals.fst()
+                        .map(ls -> state.toChangedVariablesSMT(ls, this.solver))
+                        .orElse("true");
+                }
+                return smt;
+            });
     }
 
     public void generateGraphOutputs(Path output) {
@@ -162,7 +181,7 @@ public class IntegerAnalysis<S extends State> implements Analysis {
         }
     }
 
-    private String generateOutput(BiFunction<State, Optional<Set<Local>>, String> stateFormatter) {
+    private String generateOutput(BiFunction<State, Pair<Optional<Set<Local>>, Optional<Set<Local>>>, String> stateFormatter) {
         StringBuilder sb = new StringBuilder();
         Set<String> locals = new TreeSet<>();
         locals.addAll(this.locals.stream().map(l -> l.toString()).collect(Collectors.toSet()));
@@ -189,7 +208,8 @@ public class IntegerAnalysis<S extends State> implements Analysis {
                 sb.append('\n');
                 State state = analysis.getFallFlowAfter(u);
                 if (state.isFeasible()) {
-                    String fallSmtExpr = stateFormatter.apply(state, Optional.ofNullable(variables.get(u)));
+                    String fallSmtExpr = stateFormatter.apply(state, Pair.of(Optional.ofNullable(variables.get(u)),
+                                                                             this.analysis.getFallMinChangedVariables(u)));
                     if (!fallSmtExpr.isEmpty()) {
                         sb.append("fall\t");
                         sb.append(fallSmtExpr);
@@ -199,7 +219,9 @@ public class IntegerAnalysis<S extends State> implements Analysis {
                 List<S> branches = analysis.getBranchFlowAfter(u);
                 for (S branch : branches) {
                     if (branch.isFeasible()) {
-                        String branchSmtExpr = stateFormatter.apply(branch, Optional.ofNullable(variables.get(u)));
+                        String branchSmtExpr = stateFormatter.apply(branch,
+                                                                    Pair.of(Optional.ofNullable(variables.get(u)),
+                                                                            this.analysis.getBranchMinChangedVariables(u)));
                         if (!branchSmtExpr.isEmpty()) {
                             sb.append("branch\t");
                             sb.append(branchSmtExpr);

@@ -55,11 +55,19 @@ public class Smt2FormatMin extends Smt2Format {
             writer.write("\")\n");
             Optional<SmtExpression> leftFall = leftReport.getFallThrough(statement)
                 .map(SmtExpressionReader::parse);
+            Optional<SmtExpression> leftFallChanged = changedLeft.getFallThrough(statement)
+                .map(SmtExpressionReader::parse);
             Optional<SmtExpression> rightFall = rightReport.getFallThrough(statement)
+                .map(SmtExpressionReader::parse);
+            Optional<SmtExpression> rightFallChanged = changedRight.getFallThrough(statement)
                 .map(SmtExpressionReader::parse);
             Optional<SmtExpression> leftBranch = leftReport.getBranchOut(statement)
                 .map(SmtExpressionReader::parse);
+            Optional<SmtExpression> leftBranchChanged = changedLeft.getBranchOut(statement)
+                .map(SmtExpressionReader::parse);
             Optional<SmtExpression> rightBranch = rightReport.getBranchOut(statement)
+                .map(SmtExpressionReader::parse);
+            Optional<SmtExpression> rightBranchChanged = changedRight.getBranchOut(statement)
                 .map(SmtExpressionReader::parse);
             Set<Local> fallLocals = new HashSet<>();
             Set<Local> branchLocals = new HashSet<>();
@@ -73,24 +81,52 @@ public class Smt2FormatMin extends Smt2Format {
                 .ifPresent(vars -> branchLocals.addAll(vars));
             if (leftFall.isPresent() || rightFall.isPresent()) {
                 writer.write("(echo \"fall through\")\n");
-                writer.write(formatSmtImplies(leftFall, rightFall, fallLocals));
+                writer.write(formatSmtImplies(leftFall,
+                                              leftFallChanged,
+                                              rightFall,
+                                              rightFallChanged,
+                                              fallLocals));
             }
 
             if (leftBranch.isPresent() || rightBranch.isPresent()) {
                 writer.write("(echo \"branch out\")\n");
-                writer.write(formatSmtImplies(leftBranch, rightBranch, branchLocals));
+                writer.write(formatSmtImplies(leftBranch,
+                                              leftBranchChanged,
+                                              rightBranch,
+                                              rightBranchChanged,
+                                              branchLocals));
             }
         }
         writer.flush();
         writer.close();
     }
 
-    private static String formatSmtImplies(Optional<SmtExpression> leftExpr,
-                                           Optional<SmtExpression> rightExpr,
+    private static String formatSmtImplies(Optional<SmtExpression> leftFull,
+                                           Optional<SmtExpression> leftChanged,
+                                           Optional<SmtExpression> rightFull,
+                                           Optional<SmtExpression> rightChanged,
                                            Set<Local> locals) {
         StringBuilder sb = new StringBuilder();
-        String left = leftExpr.flatMap(expr -> expr.toSmt2(locals)).orElse("true");
-        String right = rightExpr.flatMap(expr -> expr.toSmt2(locals)).orElse("true");
+        String left;
+        String right;
+        // left process
+        //
+        // For now, it's likely sufficient to simply check if the statement
+        // contains all variables, and if not, simply query the full expression
+        // because it should be unlikely that zones doesn't have a variable
+        // that the other does.
+        if (leftChanged.map(e -> e.containsAll(locals)).orElse(false)) {
+            left = leftChanged.flatMap(expr -> expr.toSmt2(locals)).orElse("true");
+        } else {
+            left = leftFull.flatMap(expr -> expr.toSmt2(locals)).orElse("true");
+        }
+
+        // right process
+        if (rightChanged.map(e -> e.containsAll(locals)).orElse(false)) {
+            right = rightChanged.flatMap(expr -> expr.toSmt2(locals)).orElse("true");
+        } else {
+            right = rightFull.flatMap(expr -> expr.toSmt2(locals)).orElse("true");
+        }
         Set<String> variables = locals.stream().map(l -> l.toString()).collect(Collectors.toSet());
         sb.append(formatImplies(variables, left, right));
         sb.append(formatImplies(variables, right, left));

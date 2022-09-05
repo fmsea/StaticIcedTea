@@ -103,4 +103,9 @@ public class BinopSmtExpression extends SmtExpression {
         SolverWrapper solver = SolverFactory.getSolver();
         return solver.smt2(this.expression);
     }
+
+    public boolean containsAll(Set<Local> variables) {
+        return ValueToMap.getLocals(this.expression)
+            .containsAll(variables);
+    }
 }

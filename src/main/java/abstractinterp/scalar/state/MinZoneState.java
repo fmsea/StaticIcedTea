@@ -431,6 +431,10 @@ public class MinZoneState implements State {
         return this.matrix.toReachableSMT(sources, solver);
     }
 
+    public String toChangedVariablesSMT(Set<Local> locals, SolverWrapper solver) {
+        return this.matrix.toChangedVariablesSMT(locals, solver);
+    }
+
     public GraphProjection toGraph() {
         return this.matrix.toGraph();
     }
@@ -571,6 +575,22 @@ public class MinZoneState implements State {
 
     public Set<Local> getReachableVariablesOf(Local source) {
         return this.matrix.getReachableVariablesOf(source);
+    }
+
+    public Set<Local> getChangedVariables(State previous) {
+        if (previous instanceof MinZoneState) {
+            return this.getChangedVariables((MinZoneState) previous);
+        } else {
+            throw new RuntimeException("invalid type for getChangedVariables");
+        }
+    }
+
+    public Set<Local> getChangedVariables(MinZoneState previous) {
+        return this.matrix.getChangedVariables(previous.matrix);
+    }
+
+    public Set<Local> getChangedVariablesSubgraph(Set<Local> locals) {
+        return this.matrix.getChangedVariablesSubgraph(locals);
     }
 
     @Override

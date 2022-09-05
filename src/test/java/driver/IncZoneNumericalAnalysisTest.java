@@ -5,6 +5,7 @@ import java.nio.file.Paths;
 import java.nio.file.Path;
 import java.nio.file.Path;
 import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -25,9 +26,11 @@ public class IncZoneNumericalAnalysisTest extends NumericalAnalysisTest {
     void testAnalysis(String name,
                       String source,
                       String expectedChangedOutput,
+                      String expectedSubgraphOutput,
+                      String expectedMinSubgraphOutput,
                       String expectedFullSmtOutput) throws Exception {
         Path clazz = Compiler.compileSource(name, source);
-        Process analysis = Runtime.getRuntime().exec(new String [] {
+        ProcessBuilder pb = new ProcessBuilder(new String [] {
                 "java",
                 "-classpath",
                 System.getProperty("java.class.path"),
@@ -40,16 +43,27 @@ public class IncZoneNumericalAnalysisTest extends NumericalAnalysisTest {
                 name,
                 "1",
             });
+        Map<String, String> envVars = pb.environment();
+        envVars.put("DFA_EXPORT_GRAPH_STATES", "true");
+        Process analysis = pb.start();
         analysis.waitFor(60l, TimeUnit.SECONDS);
         try {
             Path changedOutputPath = Paths.get(this.testOutputDir.toString(),
                                                String.format("%s_1.changed.out", name));
+            Path subgraphOutputPath = Paths.get(this.testOutputDir.toString(),
+                                                String.format("%s_1.subgraph.out", name));
+            Path minSubgraphOutputPath = Paths.get(this.testOutputDir.toString(),
+                                                   String.format("%s_1.subgraph-min.out", name));
             Path fullSmtOutputPath = Paths.get(this.testOutputDir.toString(),
                                                String.format("%s_1.smt.out", name));
             String changedOutput = Files.readString(changedOutputPath);
+            String subgraphOutput = Files.readString(subgraphOutputPath);
+            String minSubgraphOutput = Files.readString(minSubgraphOutputPath);
             String fullSmtOutput = Files.readString(fullSmtOutputPath);
-            assertAll(() -> assertEquals(expectedChangedOutput, changedOutput.trim()),
-                      () -> assertEquals(expectedFullSmtOutput, fullSmtOutput.trim()));
+            assertAll(() -> assertEquals(expectedChangedOutput, changedOutput.trim(), "Changed Report Not Equal"),
+                      () -> assertEquals(expectedSubgraphOutput, subgraphOutput.trim(), "Subgraph Report Not Equal"),
+                      () -> assertEquals(expectedMinSubgraphOutput, minSubgraphOutput.trim(), "Minimum Subgraph Report Not Equal"),
+                      () -> assertEquals(expectedFullSmtOutput, fullSmtOutput.trim(), "Full Report Not Equal"));
         } catch (IOException ex) {
             System.err.println("Unable to assert interval analysis");
             System.err.println(ex.getMessage());

@@ -49,18 +49,29 @@ public class ZoneStateTest {
     @Test
     @DisplayName("test add when matrix is top")
     void testAdd01() {
-        ZoneState state = new ZoneState(matrix);
-        state.add(xs[1], xs[2], Constraint.of(1));
-        assertEquals(Constraint.of(1), matrix.getConstraint(xs[1], xs[2]));
+        ZoneState in = new ZoneState(this.locals, true);
+        ZoneState out = new ZoneState(matrix);
+        out.add(xs[1], xs[2], Constraint.of(1));
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(Constraint.of(1), matrix.getConstraint(xs[1], xs[2])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), matrix.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
     @DisplayName("test add when matrix contains existing constraint")
     void testAdd02() {
-        this.matrix.putConstraint(xs[1], xs[2], Constraint.of(2));
-        ZoneState state = new ZoneState(matrix);
-        state.add(xs[1], xs[2], Constraint.of(3));
-        assertEquals(Constraint.of(2), matrix.getConstraint(xs[1], xs[2]));
+        ZoneState in = new ZoneState(this.locals, true);
+        in.add(xs[1], xs[2], Constraint.of(2));
+        ZoneState out = new ZoneState(matrix);
+        in.copyTo(out);
+        out.add(xs[1], xs[2], Constraint.of(3));
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(Constraint.of(2), matrix.getConstraint(xs[1], xs[2])),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), matrix.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -69,8 +80,13 @@ public class ZoneStateTest {
         ZoneState in = new ZoneState(this.locals, true);
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(2), PredicateType.Le)),
-                  () -> assertEquals(Constraint.of(2), matrix.getConstraint(xs[1], xs[0])));
+        Boolean result = out.updateCond(in, xs[1], IntConstant.v(2), PredicateType.Le);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(2), matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -80,8 +96,13 @@ public class ZoneStateTest {
         in.add(xs[1], xs[0], Constraint.of(1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(2), PredicateType.Le)),
-                  () -> assertEquals(Constraint.of(1), matrix.getConstraint(xs[1], xs[0])));
+        Boolean result = out.updateCond(in, xs[1], IntConstant.v(2), PredicateType.Le);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(1), matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -91,8 +112,13 @@ public class ZoneStateTest {
         in.add(xs[1], xs[0], Constraint.of(1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(0), PredicateType.Le)),
-                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[1], xs[0])));
+        Boolean result = out.updateCond(in, xs[1], IntConstant.v(0), PredicateType.Le);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -101,8 +127,13 @@ public class ZoneStateTest {
         ZoneState in = new ZoneState(this.locals, true);
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(2), xs[1], PredicateType.Le)),
-                  () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[0], xs[1])));
+        Boolean result = out.updateCond(in, IntConstant.v(2), xs[1], PredicateType.Le);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -112,8 +143,13 @@ public class ZoneStateTest {
         in.add(xs[0], xs[1], Constraint.of(-1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(0), xs[1], PredicateType.Le)),
-                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[0], xs[1])));
+        Boolean result = (out.updateCond(in, IntConstant.v(0), xs[1], PredicateType.Le));
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -123,8 +159,13 @@ public class ZoneStateTest {
         in.add(xs[0], xs[1], Constraint.of(0));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(1), xs[1], PredicateType.Le)),
-                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[0], xs[1])));
+        Boolean result = out.updateCond(in, IntConstant.v(1), xs[1], PredicateType.Le);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -133,8 +174,13 @@ public class ZoneStateTest {
         ZoneState in = new ZoneState(this.locals, true);
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Le)),
-                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[1], xs[2])));
+        Boolean result = out.updateCond(in, xs[1], xs[2], PredicateType.Le);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[1], xs[2])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -144,8 +190,13 @@ public class ZoneStateTest {
         in.add(xs[1], xs[2], Constraint.of(-1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Le)),
-                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[1], xs[2])));
+        Boolean result = out.updateCond(in, xs[1], xs[2], PredicateType.Le);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[1], xs[2])),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -155,8 +206,13 @@ public class ZoneStateTest {
         in.add(xs[1], xs[2], Constraint.of(1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Le)),
-                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[1], xs[2])));
+        Boolean result = out.updateCond(in, xs[1], xs[2], PredicateType.Le);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[1], xs[2])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -165,8 +221,13 @@ public class ZoneStateTest {
         ZoneState in = new ZoneState(this.locals, true);
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(2), PredicateType.Lt)),
-                  () -> assertEquals(Constraint.of(1), matrix.getConstraint(xs[1], xs[0])));
+        Boolean result = out.updateCond(in, xs[1], IntConstant.v(2), PredicateType.Lt);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(1), matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -176,8 +237,13 @@ public class ZoneStateTest {
         in.add(xs[1], xs[0], Constraint.of(0));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(2), PredicateType.Lt)),
-                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[1], xs[0])));
+        Boolean result = out.updateCond(in, xs[1], IntConstant.v(2), PredicateType.Lt);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -187,8 +253,13 @@ public class ZoneStateTest {
         in.add(xs[1], xs[0], Constraint.of(2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(1), PredicateType.Lt)),
-                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[1], xs[0])));
+        Boolean result = out.updateCond(in, xs[1], IntConstant.v(1), PredicateType.Lt);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -197,8 +268,13 @@ public class ZoneStateTest {
         ZoneState in = new ZoneState(this.locals, true);
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(2), xs[1], PredicateType.Lt)),
-                  () -> assertEquals(Constraint.of(-3), matrix.getConstraint(xs[0], xs[1])));
+        Boolean result = out.updateCond(in, IntConstant.v(2), xs[1], PredicateType.Lt);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(-3), matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -208,8 +284,13 @@ public class ZoneStateTest {
         in.add(xs[0], xs[1], Constraint.of(-2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(-1), xs[1], PredicateType.Lt)),
-                  () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[0], xs[1])));
+        Boolean result = out.updateCond(in, IntConstant.v(-1), xs[1], PredicateType.Lt);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -219,8 +300,13 @@ public class ZoneStateTest {
         in.add(xs[0], xs[1], Constraint.of(0));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(0), xs[1], PredicateType.Lt)),
-                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[0], xs[1])));
+        Boolean result = out.updateCond(in, IntConstant.v(0), xs[1], PredicateType.Lt);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -229,8 +315,13 @@ public class ZoneStateTest {
         ZoneState in = new ZoneState(this.locals, true);
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Lt)),
-                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[1], xs[2])));
+        Boolean result = out.updateCond(in, xs[1], xs[2], PredicateType.Lt);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[1], xs[2])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -240,8 +331,13 @@ public class ZoneStateTest {
         in.add(xs[1], xs[2], Constraint.of(-2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Lt)),
-                  () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[1], xs[2])));
+        Boolean result = out.updateCond(in, xs[1], xs[2], PredicateType.Lt);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[1], xs[2])),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -251,8 +347,13 @@ public class ZoneStateTest {
         in.add(xs[1], xs[2], Constraint.of(0));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Lt)),
-                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[1], xs[2])));
+        Boolean result = out.updateCond(in, xs[1], xs[2], PredicateType.Lt);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[1], xs[2])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -261,33 +362,49 @@ public class ZoneStateTest {
         ZoneState in = new ZoneState(this.locals, true);
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(2), PredicateType.Eq)),
+        Boolean result = out.updateCond(in, xs[1], IntConstant.v(2), PredicateType.Eq);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
                   () -> assertEquals(Constraint.of(2), matrix.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[0], xs[1])));
+                  () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
     @DisplayName("test update condition with more precise constraint (local = constant)")
     void testUpdateCondEq02() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[0], Constraint.of(1));
+        in.add(xs[1], xs[0], Constraint.of(+1));
+        in.add(xs[0], xs[1], Constraint.of(-1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(1), PredicateType.Eq)),
+        Boolean result = out.updateCond(in, xs[1], IntConstant.v(1), PredicateType.Eq);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
                   () -> assertEquals(Constraint.of(1), matrix.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[0], xs[1])));
+                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
     @DisplayName("test update condition with less precise constraint (local = constant)")
     void testUpdateCondEq03() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[0], Constraint.of(2));
+        in.add(xs[1], xs[0], Constraint.of(+2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(1), PredicateType.Eq)),
+        Boolean result = out.updateCond(in, xs[1], IntConstant.v(1), PredicateType.Eq);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
                   () -> assertEquals(Constraint.of(+1), matrix.getConstraint(xs[1], xs[0])),
-                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[0], xs[1])));
+                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -296,33 +413,49 @@ public class ZoneStateTest {
         ZoneState in = new ZoneState(this.locals, true);
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(2), xs[1], PredicateType.Eq)),
+        Boolean result = out.updateCond(in, IntConstant.v(2), xs[1], PredicateType.Eq);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
                   () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[0], xs[1])),
-                  () -> assertEquals(Constraint.of(+2), matrix.getConstraint(xs[1], xs[0])));
+                  () -> assertEquals(Constraint.of(+2), matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
     @DisplayName("test update condition with more precise constraint (constant = local)")
     void testUpdateCondEq12() {
         ZoneState in = new ZoneState(this.locals, true);
+        in.add(xs[0], xs[1], Constraint.of(-3));
         in.add(xs[1], xs[0], Constraint.of(+3));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(3), xs[1], PredicateType.Eq)),
+        Boolean result = out.updateCond(in, IntConstant.v(3), xs[1], PredicateType.Eq);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
                   () -> assertEquals(Constraint.of(-3), matrix.getConstraint(xs[0], xs[1])),
-                  () -> assertEquals(Constraint.of(+3), matrix.getConstraint(xs[1], xs[0])));
+                  () -> assertEquals(Constraint.of(+3), matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
     @DisplayName("test update condition with less precise constraint (constant = local)")
     void testUpdateCondEq13() {
         ZoneState in = new ZoneState(this.locals, true);
-        in.add(xs[1], xs[2], Constraint.of(+1));
+        in.add(xs[0], xs[1], Constraint.of(+1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(0), xs[1], PredicateType.Eq)),
+        Boolean result = out.updateCond(in, IntConstant.v(0), xs[1], PredicateType.Eq);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
                   () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[0], xs[1])),
-                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[1], xs[0])));
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -331,9 +464,14 @@ public class ZoneStateTest {
         ZoneState in = new ZoneState(this.locals, true);
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Eq)),
+        Boolean result = out.updateCond(in, xs[1], xs[2], PredicateType.Eq);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
                   () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[2], xs[1])));
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[2], xs[1])),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), vars),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -344,7 +482,8 @@ public class ZoneStateTest {
         in.add(xs[2], xs[1], Constraint.of(+1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertFalse(out.updateCond(in, xs[1], xs[2], PredicateType.Eq)));
+        assertAll(() -> assertFalse(out.updateCond(in, xs[1], xs[2], PredicateType.Eq)),
+                  () -> assertFalse(matrix.computeClosure()));
     }
 
     @Test
@@ -355,7 +494,8 @@ public class ZoneStateTest {
         in.add(xs[2], xs[1], Constraint.of(-3));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertFalse(out.updateCond(in, xs[1], xs[2], PredicateType.Eq)));
+        assertAll(() -> assertFalse(out.updateCond(in, xs[1], xs[2], PredicateType.Eq)),
+                  () -> assertFalse(matrix.computeClosure()));
     }
 
     @Test
@@ -364,8 +504,13 @@ public class ZoneStateTest {
         ZoneState in = new ZoneState(this.locals, true);
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(2), PredicateType.Ge)),
-                  () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[0], xs[1])));
+        Boolean result = out.updateCond(in, xs[1], IntConstant.v(2), PredicateType.Ge);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -375,8 +520,13 @@ public class ZoneStateTest {
         in.add(xs[0], xs[1], Constraint.of(-1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(2), PredicateType.Ge)),
-                  () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[0], xs[1])));
+        Boolean result = out.updateCond(in, xs[1], IntConstant.v(0), PredicateType.Ge);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -386,8 +536,13 @@ public class ZoneStateTest {
         in.add(xs[0], xs[1], Constraint.of(1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(0), PredicateType.Ge)),
-                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[0], xs[1])));
+        Boolean result = out.updateCond(in, xs[1], IntConstant.v(0), PredicateType.Ge);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -396,8 +551,13 @@ public class ZoneStateTest {
         ZoneState in = new ZoneState(this.locals, true);
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(2), xs[1], PredicateType.Ge)),
-                  () -> assertEquals(Constraint.of(2), matrix.getConstraint(xs[1], xs[0])));
+        Boolean result = out.updateCond(in, IntConstant.v(2), xs[1], PredicateType.Ge);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(2), matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -407,8 +567,13 @@ public class ZoneStateTest {
         in.add(xs[1], xs[0], Constraint.of(1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(2), xs[1], PredicateType.Ge)),
-                  () -> assertEquals(Constraint.of(1), matrix.getConstraint(xs[1], xs[0])));
+        Boolean result = out.updateCond(in, IntConstant.v(2), xs[1], PredicateType.Ge);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(1), matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -418,8 +583,13 @@ public class ZoneStateTest {
         in.add(xs[1], xs[0], Constraint.of(2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(1), xs[1], PredicateType.Ge)),
-                  () -> assertEquals(Constraint.of(1), matrix.getConstraint(xs[1], xs[0])));
+        Boolean result = out.updateCond(in, IntConstant.v(1), xs[1], PredicateType.Ge);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(1), matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -428,8 +598,13 @@ public class ZoneStateTest {
         ZoneState in = new ZoneState(this.locals, true);
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Ge)),
-                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[2], xs[1])));
+        Boolean result = out.updateCond(in, xs[1], xs[2], PredicateType.Ge);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[2], xs[1])),
+                  () -> assertEquals(Set.of(xs[2]), vars),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -439,8 +614,13 @@ public class ZoneStateTest {
         in.add(xs[2], xs[1], Constraint.of(-1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Ge)),
-                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[2], xs[1])));
+        Boolean result = out.updateCond(in, xs[1], xs[2], PredicateType.Ge);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[2], xs[1])),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -450,8 +630,13 @@ public class ZoneStateTest {
         in.add(xs[2], xs[1], Constraint.of(1));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Ge)),
-                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[2], xs[1])));
+        Boolean result = out.updateCond(in, xs[1], xs[2], PredicateType.Ge);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[2], xs[1])),
+                  () -> assertEquals(Set.of(xs[2]), vars),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -460,8 +645,13 @@ public class ZoneStateTest {
         ZoneState in = new ZoneState(this.locals, true);
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(2), PredicateType.Gt)),
-                  () -> assertEquals(Constraint.of(-3), matrix.getConstraint(xs[0], xs[1])));
+        Boolean result = out.updateCond(in, xs[1], IntConstant.v(2), PredicateType.Gt);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(-3), matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -471,8 +661,13 @@ public class ZoneStateTest {
         in.add(xs[0], xs[1], Constraint.of(-2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(0), PredicateType.Gt)),
-                  () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[0], xs[1])));
+        Boolean result = out.updateCond(in, xs[1], IntConstant.v(0), PredicateType.Gt);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -482,8 +677,13 @@ public class ZoneStateTest {
         in.add(xs[0], xs[1], Constraint.of(2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], IntConstant.v(-1), PredicateType.Gt)),
-                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[0], xs[1])));
+        Boolean result = out.updateCond(in, xs[1], IntConstant.v(-1), PredicateType.Gt);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -492,8 +692,13 @@ public class ZoneStateTest {
         ZoneState in = new ZoneState(this.locals, true);
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(2), xs[1], PredicateType.Gt)),
-                  () -> assertEquals(Constraint.of(1), matrix.getConstraint(xs[1], xs[0])));
+        Boolean result = out.updateCond(in, IntConstant.v(2), xs[1], PredicateType.Gt);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(1), matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -503,8 +708,13 @@ public class ZoneStateTest {
         in.add(xs[1], xs[0], Constraint.of(0));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(2), xs[1], PredicateType.Gt)),
-                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[1], xs[0])));
+        Boolean result = out.updateCond(in, IntConstant.v(2), xs[1], PredicateType.Gt);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(0), matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -514,8 +724,13 @@ public class ZoneStateTest {
         in.add(xs[1], xs[0], Constraint.of(4));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, IntConstant.v(2), xs[1], PredicateType.Gt)),
-                  () -> assertEquals(Constraint.of(1), matrix.getConstraint(xs[1], xs[0])));
+        Boolean result = out.updateCond(in, IntConstant.v(2), xs[1], PredicateType.Gt);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(1), matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -524,8 +739,13 @@ public class ZoneStateTest {
         ZoneState in = new ZoneState(this.locals, true);
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Gt)),
-                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[2], xs[1])));
+        Boolean result = out.updateCond(in, xs[1], xs[2], PredicateType.Gt);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[2], xs[1])),
+                  () -> assertEquals(Set.of(xs[2]), vars),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -535,8 +755,13 @@ public class ZoneStateTest {
         in.add(xs[2], xs[1], Constraint.of(-2));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Gt)),
-                  () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[2], xs[1])));
+        Boolean result = out.updateCond(in, xs[1], xs[2], PredicateType.Gt);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(-2), matrix.getConstraint(xs[2], xs[1])),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -546,8 +771,13 @@ public class ZoneStateTest {
         in.add(xs[2], xs[1], Constraint.of(0));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
-        assertAll(() -> assertTrue(out.updateCond(in, xs[1], xs[2], PredicateType.Gt)),
-                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[2], xs[1])));
+        Boolean result = out.updateCond(in, xs[1], xs[2], PredicateType.Gt);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertTrue(result),
+                  () -> assertEquals(Constraint.of(-1), matrix.getConstraint(xs[2], xs[1])),
+                  () -> assertEquals(Set.of(xs[2]), vars),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -557,10 +787,14 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3));
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.of(+3),
                                      matrix.getConstraint(xs[1], xs[0])),
                   () -> assertEquals(Constraint.of(-3),
-                                     matrix.getConstraint(xs[0], xs[1])));
+                                     matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -572,10 +806,14 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3));
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.of(+3),
                                      matrix.getConstraint(xs[1], xs[0])),
                   () -> assertEquals(Constraint.of(-3),
-                                     matrix.getConstraint(xs[0], xs[1])));
+                                     matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -585,10 +823,14 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2]);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.of(0),
                                      matrix.getConstraint(xs[1], xs[2])),
                   () -> assertEquals(Constraint.of(0),
-                                     matrix.getConstraint(xs[2], xs[1])));
+                                     matrix.getConstraint(xs[2], xs[1])),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), vars),
+                  () -> assertEquals(Set.of(xs[1], xs[2]),  out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -600,10 +842,14 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2]);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.of(0),
                                      matrix.getConstraint(xs[1], xs[2])),
                   () -> assertEquals(Constraint.of(0),
-                                     matrix.getConstraint(xs[2], xs[1])));
+                                     matrix.getConstraint(xs[2], xs[1])),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), vars),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -613,10 +859,14 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], IntConstant.v(3), BinaryOperatorType.ADDITION);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.of(+3),
                                      matrix.getConstraint(xs[1], xs[2])),
                   () -> assertEquals(Constraint.of(-3),
-                                     matrix.getConstraint(xs[2], xs[1])));
+                                     matrix.getConstraint(xs[2], xs[1])),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), vars),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -628,10 +878,14 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], IntConstant.v(3), BinaryOperatorType.ADDITION);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.of(+3),
                                      matrix.getConstraint(xs[1], xs[2])),
                   () -> assertEquals(Constraint.of(-3),
-                                     matrix.getConstraint(xs[2], xs[1])));
+                                     matrix.getConstraint(xs[2], xs[1])),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), vars),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -641,7 +895,11 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], IntConstant.v(3), BinaryOperatorType.ADDITION);
-        assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -654,12 +912,16 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], IntConstant.v(3), BinaryOperatorType.ADDITION);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.of(+5),
                                      matrix.getConstraint(xs[1], xs[2])),
                   () -> assertEquals(Constraint.of(-5),
                                      matrix.getConstraint(xs[2], xs[1])),
                   () -> assertEquals(Constraint.of(-6),
-                                     matrix.getConstraint(xs[0], xs[1])));
+                                     matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), vars),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -669,10 +931,14 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], IntConstant.v(3), BinaryOperatorType.SUBTRACTION);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.of(-3),
                                      matrix.getConstraint(xs[1], xs[2])),
                   () -> assertEquals(Constraint.of(+3),
-                                     matrix.getConstraint(xs[2], xs[1])));
+                                     matrix.getConstraint(xs[2], xs[1])),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), vars),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -684,10 +950,14 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], IntConstant.v(3), BinaryOperatorType.SUBTRACTION);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.of(-3),
                                      matrix.getConstraint(xs[1], xs[2])),
                   () -> assertEquals(Constraint.of(+3),
-                                     matrix.getConstraint(xs[2], xs[1])));
+                                     matrix.getConstraint(xs[2], xs[1])),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), vars),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -697,7 +967,11 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], IntConstant.v(3), BinaryOperatorType.SUBTRACTION);
-        assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -710,12 +984,16 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], IntConstant.v(3), BinaryOperatorType.SUBTRACTION);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.of(-1),
                                      matrix.getConstraint(xs[1], xs[2])),
                   () -> assertEquals(Constraint.of(1),
                                      matrix.getConstraint(xs[2], xs[1])),
                   () -> assertEquals(Constraint.of(0),
-                                     matrix.getConstraint(xs[0], xs[1])));
+                                     matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), vars),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -725,7 +1003,11 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], IntConstant.v(3), BinaryOperatorType.MULTIPLICATION);
-        assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -737,10 +1019,14 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], IntConstant.v(3), BinaryOperatorType.MULTIPLICATION);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.of(+6),
                                      matrix.getConstraint(xs[1], xs[0])),
                   () -> assertEquals(Constraint.of(-6),
-                                     matrix.getConstraint(xs[0], xs[1])));
+                                     matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -750,7 +1036,11 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], IntConstant.v(3), BinaryOperatorType.MULTIPLICATION);
-        assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -760,17 +1050,22 @@ public class ZoneStateTest {
         in.add(xs[1], xs[2], Constraint.of(+2));
         in.add(xs[2], xs[1], Constraint.of(-2));
         in.add(xs[0], xs[1], Constraint.of(-3));
+        in.add(xs[1], xs[0], Constraint.of(+3));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], IntConstant.v(3), BinaryOperatorType.MULTIPLICATION);
-        assertAll(() -> assertEquals(Constraint.TOP(),
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(Constraint.of(+8),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(Constraint.TOP(),
+                  () -> assertEquals(Constraint.of(-8),
                                      matrix.getConstraint(xs[2], xs[1])),
-                  () -> assertEquals(Constraint.TOP(),
+                  () -> assertEquals(Constraint.of(-9),
                                      matrix.getConstraint(xs[0], xs[1])),
-                  () -> assertEquals(Constraint.TOP(),
-                                     matrix.getConstraint(xs[1], xs[0])));
+                  () -> assertEquals(Constraint.of(+9),
+                                     matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -780,7 +1075,11 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], IntConstant.v(3), BinaryOperatorType.DIVISION);
-        assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -792,10 +1091,14 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], IntConstant.v(3), BinaryOperatorType.DIVISION);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.of(0),
                                      matrix.getConstraint(xs[1], xs[0])),
                   () -> assertEquals(Constraint.of(0),
-                                     matrix.getConstraint(xs[0], xs[1])));
+                                     matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -805,7 +1108,11 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], IntConstant.v(3), BinaryOperatorType.DIVISION);
-        assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -815,17 +1122,22 @@ public class ZoneStateTest {
         in.add(xs[1], xs[2], Constraint.of(+2));
         in.add(xs[2], xs[1], Constraint.of(-2));
         in.add(xs[0], xs[1], Constraint.of(-3));
+        in.add(xs[1], xs[0], Constraint.of(+3));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], IntConstant.v(3), BinaryOperatorType.DIVISION);
-        assertAll(() -> assertEquals(Constraint.TOP(),
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(Constraint.of(0),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(Constraint.TOP(),
+                  () -> assertEquals(Constraint.of(0),
                                      matrix.getConstraint(xs[2], xs[1])),
-                  () -> assertEquals(Constraint.TOP(),
+                  () -> assertEquals(Constraint.of(-1),
                                      matrix.getConstraint(xs[0], xs[1])),
-                  () -> assertEquals(Constraint.TOP(),
-                                     matrix.getConstraint(xs[1], xs[0])));
+                  () -> assertEquals(Constraint.of(+1),
+                                     matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -835,10 +1147,14 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[2], BinaryOperatorType.ADDITION);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.of(+3),
                                      matrix.getConstraint(xs[1], xs[2])),
                   () -> assertEquals(Constraint.of(-3),
-                                     matrix.getConstraint(xs[2], xs[1])));
+                                     matrix.getConstraint(xs[2], xs[1])),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), vars),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -850,10 +1166,14 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[2], BinaryOperatorType.ADDITION);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.of(+3),
                                      matrix.getConstraint(xs[1], xs[2])),
                   () -> assertEquals(Constraint.of(-3),
-                                     matrix.getConstraint(xs[2], xs[1])));
+                                     matrix.getConstraint(xs[2], xs[1])),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), vars),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -863,7 +1183,11 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[1], BinaryOperatorType.ADDITION);
-        assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -876,12 +1200,16 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[1], BinaryOperatorType.ADDITION);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.of(+5),
                                      matrix.getConstraint(xs[1], xs[2])),
                   () -> assertEquals(Constraint.of(-5),
                                      matrix.getConstraint(xs[2], xs[1])),
                   () -> assertEquals(Constraint.of(-6),
-                                     matrix.getConstraint(xs[0], xs[1])));
+                                     matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), vars),
+                  () -> assertEquals(Set.of(xs[1], xs[2]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -891,10 +1219,14 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[2], BinaryOperatorType.SUBTRACTION);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[0])),
                   () -> assertEquals(Constraint.TOP(),
-                                     matrix.getConstraint(xs[0], xs[1])));
+                                     matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -906,14 +1238,18 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[2], BinaryOperatorType.SUBTRACTION);
-        assertAll(() -> assertEquals(Constraint.TOP(),
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(Constraint.of(-1),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(Constraint.TOP(),
+                  () -> assertEquals(Constraint.of(+1),
                                      matrix.getConstraint(xs[2], xs[1])),
                   () -> assertEquals(Constraint.of(+1),
                                      matrix.getConstraint(xs[1], xs[0])),
                   () -> assertEquals(Constraint.of(-1),
-                                     matrix.getConstraint(xs[0], xs[1])));
+                                     matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -923,7 +1259,11 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[1], BinaryOperatorType.SUBTRACTION);
-        assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -937,14 +1277,18 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[1], BinaryOperatorType.SUBTRACTION);
-        assertAll(() -> assertEquals(Constraint.TOP(),
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(Constraint.of(-1),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(Constraint.TOP(),
+                  () -> assertEquals(Constraint.of(+1),
                                      matrix.getConstraint(xs[2], xs[1])),
                   () -> assertEquals(Constraint.of(0),
                                      matrix.getConstraint(xs[0], xs[1])),
                   () -> assertEquals(Constraint.of(0),
-                                     matrix.getConstraint(xs[1], xs[0])));
+                                     matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -954,7 +1298,11 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[2], BinaryOperatorType.MULTIPLICATION);
-        assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -966,10 +1314,14 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[2], BinaryOperatorType.MULTIPLICATION);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.of(+6),
                                      matrix.getConstraint(xs[1], xs[0])),
                   () -> assertEquals(Constraint.of(-6),
-                                     matrix.getConstraint(xs[0], xs[1])));
+                                     matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -979,7 +1331,11 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[1], BinaryOperatorType.MULTIPLICATION);
-        assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -989,17 +1345,22 @@ public class ZoneStateTest {
         in.add(xs[1], xs[2], Constraint.of(+2));
         in.add(xs[2], xs[1], Constraint.of(-2));
         in.add(xs[0], xs[1], Constraint.of(-3));
+        in.add(xs[1], xs[0], Constraint.of(+3));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[1], BinaryOperatorType.MULTIPLICATION);
-        assertAll(() -> assertEquals(Constraint.TOP(),
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(Constraint.of(+8),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(Constraint.TOP(),
+                  () -> assertEquals(Constraint.of(-8),
                                      matrix.getConstraint(xs[2], xs[1])),
-                  () -> assertEquals(Constraint.TOP(),
+                  () -> assertEquals(Constraint.of(-9),
                                      matrix.getConstraint(xs[0], xs[1])),
-                  () -> assertEquals(Constraint.TOP(),
-                                     matrix.getConstraint(xs[1], xs[0])));
+                  () -> assertEquals(Constraint.of(+9),
+                                     matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -1009,7 +1370,11 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[2], BinaryOperatorType.DIVISION);
-        assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -1021,10 +1386,14 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[2], BinaryOperatorType.DIVISION);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.of(1),
                                      matrix.getConstraint(xs[1], xs[0])),
                   () -> assertEquals(Constraint.of(-1),
-                                     matrix.getConstraint(xs[0], xs[1])));
+                                     matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -1034,7 +1403,11 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[1], BinaryOperatorType.DIVISION);
-        assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -1044,17 +1417,23 @@ public class ZoneStateTest {
         in.add(xs[1], xs[2], Constraint.of(+2));
         in.add(xs[2], xs[1], Constraint.of(-2));
         in.add(xs[0], xs[1], Constraint.of(-3));
+        in.add(xs[1], xs[0], Constraint.of(+3));
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[1], BinaryOperatorType.DIVISION);
-        assertAll(() -> assertEquals(Constraint.TOP(),
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(Constraint.of(0),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(Constraint.TOP(),
+                  () -> assertEquals(Constraint.of(0),
                                      matrix.getConstraint(xs[2], xs[1])),
-                  () -> assertEquals(Constraint.TOP(),
+                  () -> assertEquals(Constraint.of(-1),
                                      matrix.getConstraint(xs[0], xs[1])),
-                  () -> assertEquals(Constraint.TOP(),
-                                     matrix.getConstraint(xs[1], xs[0])));
+                  () -> assertEquals(Constraint.of(+1),
+                                     matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
+
     }
 
     @Test
@@ -1064,10 +1443,14 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], xs[3], BinaryOperatorType.ADDITION);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[0])),
                   () -> assertEquals(Constraint.TOP(),
-                                     matrix.getConstraint(xs[0], xs[1])));
+                                     matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -1081,10 +1464,14 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], xs[3], BinaryOperatorType.ADDITION);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.of(+5),
                                      matrix.getConstraint(xs[1], xs[0])),
                   () -> assertEquals(Constraint.of(-5),
-                                     matrix.getConstraint(xs[0], xs[1])));
+                                     matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -1094,7 +1481,11 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], xs[2], BinaryOperatorType.ADDITION);
-        assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -1108,10 +1499,14 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], xs[2], BinaryOperatorType.ADDITION);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.of(+5),
                                      matrix.getConstraint(xs[1], xs[0])),
                   () -> assertEquals(Constraint.of(-5),
-                                     matrix.getConstraint(xs[0], xs[1])));
+                                     matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -1121,10 +1516,14 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], xs[3], BinaryOperatorType.SUBTRACTION);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[1], xs[0])),
                   () -> assertEquals(Constraint.TOP(),
-                                     matrix.getConstraint(xs[0], xs[1])));
+                                     matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -1138,10 +1537,14 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], xs[3], BinaryOperatorType.SUBTRACTION);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.of(-2),
                                      matrix.getConstraint(xs[1], xs[0])),
                   () -> assertEquals(Constraint.of(+2),
-                                     matrix.getConstraint(xs[0], xs[1])));
+                                     matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -1151,7 +1554,11 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], xs[2], BinaryOperatorType.SUBTRACTION);
-        assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -1167,9 +1574,11 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], xs[2], BinaryOperatorType.SUBTRACTION);
-        assertAll(() -> assertEquals(Constraint.TOP(),
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(Constraint.of(2),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(Constraint.TOP(),
+                  () -> assertEquals(Constraint.of(1),
                                      matrix.getConstraint(xs[2], xs[1])),
                   () -> assertEquals(Constraint.of(+2),
                                      matrix.getConstraint(xs[2], xs[0])),
@@ -1178,7 +1587,9 @@ public class ZoneStateTest {
                   () -> assertEquals(Constraint.of(-1),
                                      matrix.getConstraint(xs[0], xs[1])),
                   () -> assertEquals(Constraint.of(+3),
-                                     matrix.getConstraint(xs[1], xs[0])));
+                                     matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -1188,7 +1599,11 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], xs[3], BinaryOperatorType.MULTIPLICATION);
-        assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -1202,10 +1617,14 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], xs[3], BinaryOperatorType.MULTIPLICATION);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.of(+6),
                                      matrix.getConstraint(xs[1], xs[0])),
                   () -> assertEquals(Constraint.of(-6),
-                                     matrix.getConstraint(xs[0], xs[1])));
+                                     matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -1215,7 +1634,11 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], xs[2], BinaryOperatorType.MULTIPLICATION);
-        assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -1231,9 +1654,11 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], xs[2], BinaryOperatorType.MULTIPLICATION);
-        assertAll(() -> assertEquals(Constraint.TOP(),
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(Constraint.of(+8),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(Constraint.TOP(),
+                  () -> assertEquals(Constraint.of(-8),
                                      matrix.getConstraint(xs[2], xs[1])),
                   () -> assertEquals(Constraint.of(-4),
                                      matrix.getConstraint(xs[0], xs[2])),
@@ -1242,7 +1667,9 @@ public class ZoneStateTest {
                   () -> assertEquals(Constraint.of(-12),
                                      matrix.getConstraint(xs[0], xs[1])),
                   () -> assertEquals(Constraint.of(+12),
-                                     matrix.getConstraint(xs[1], xs[0])));
+                                     matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -1252,7 +1679,11 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], xs[3], BinaryOperatorType.DIVISION);
-        assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -1266,10 +1697,14 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], xs[3], BinaryOperatorType.DIVISION);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.of(0),
                                      matrix.getConstraint(xs[1], xs[0])),
                   () -> assertEquals(Constraint.of(0),
-                                     matrix.getConstraint(xs[0], xs[1])));
+                                     matrix.getConstraint(xs[0], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -1279,7 +1714,11 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], xs[2], BinaryOperatorType.DIVISION);
-        assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -1295,9 +1734,11 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], xs[2], BinaryOperatorType.DIVISION);
-        assertAll(() -> assertEquals(Constraint.TOP(),
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
+        assertAll(() -> assertEquals(Constraint.of(+2),
                                      matrix.getConstraint(xs[1], xs[2])),
-                  () -> assertEquals(Constraint.TOP(),
+                  () -> assertEquals(Constraint.of(-2),
                                      matrix.getConstraint(xs[2], xs[1])),
                   () -> assertEquals(Constraint.of(-1),
                                      matrix.getConstraint(xs[0], xs[2])),
@@ -1306,7 +1747,9 @@ public class ZoneStateTest {
                   () -> assertEquals(Constraint.of(-3),
                                      matrix.getConstraint(xs[0], xs[1])),
                   () -> assertEquals(Constraint.of(+3),
-                                     matrix.getConstraint(xs[1], xs[0])));
+                                     matrix.getConstraint(xs[1], xs[0])),
+                  () -> assertEquals(Set.of(), vars),
+                  () -> assertEquals(Set.of(), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -1322,6 +1765,8 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[0], IntConstant.v(3), BinaryOperatorType.MODULUS);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[0], xs[1])),
                   () -> assertEquals(Constraint.of(-1),
@@ -1333,7 +1778,9 @@ public class ZoneStateTest {
                   () -> assertEquals(Constraint.of(+1),
                                      matrix.getConstraint(xs[2], xs[0])),
                   () -> assertEquals(Constraint.TOP(),
-                                     matrix.getConstraint(xs[2], xs[1])));
+                                     matrix.getConstraint(xs[2], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -1349,6 +1796,8 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[2], BinaryOperatorType.MODULUS);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[0], xs[1])),
                   () -> assertEquals(Constraint.of(-1),
@@ -1360,7 +1809,9 @@ public class ZoneStateTest {
                   () -> assertEquals(Constraint.of(+1),
                                      matrix.getConstraint(xs[2], xs[0])),
                   () -> assertEquals(Constraint.TOP(),
-                                     matrix.getConstraint(xs[2], xs[1])));
+                                     matrix.getConstraint(xs[2], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 
     @Test
@@ -1376,6 +1827,8 @@ public class ZoneStateTest {
         ZoneState out = new ZoneState(matrix);
         in.copyTo(out);
         out.updateState(xs[1], in, xs[3], xs[2], BinaryOperatorType.MODULUS);
+        matrix.computeClosure();
+        Set<Local> vars = out.getChangedVariables(in);
         assertAll(() -> assertEquals(Constraint.TOP(),
                                      matrix.getConstraint(xs[0], xs[1])),
                   () -> assertEquals(Constraint.of(-1),
@@ -1387,6 +1840,8 @@ public class ZoneStateTest {
                   () -> assertEquals(Constraint.of(+1),
                                      matrix.getConstraint(xs[2], xs[0])),
                   () -> assertEquals(Constraint.TOP(),
-                                     matrix.getConstraint(xs[2], xs[1])));
+                                     matrix.getConstraint(xs[2], xs[1])),
+                  () -> assertEquals(Set.of(xs[1]), vars),
+                  () -> assertEquals(Set.of(xs[1]), out.getChangedVariablesSubgraph(vars)));
     }
 }

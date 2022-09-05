@@ -1,0 +1,12 @@
+$i2	b3	i0	i1	r0
+3 i1 = neg i0:<miniExample1: int example(int)>
+fall	true
+4 $i2 = i0 - i1:<miniExample1: int example(int)>
+fall	true
+5 if 120 <= $i2 goto b3 = -1:<miniExample1: int example(int)>
+fall	(<= $i2 119)
+branch	(>= $i2 120)
+6 b3 = 1:<miniExample1: int example(int)>
+fall	(= b3 1)
+8 b3 = -1:<miniExample1: int example(int)>
+fall	(= b3 (- 1))

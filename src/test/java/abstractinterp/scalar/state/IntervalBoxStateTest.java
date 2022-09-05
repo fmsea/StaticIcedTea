@@ -6,12 +6,17 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.HashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import soot.Local;
 import soot.IntType;
 import soot.jimple.BinopExpr;
@@ -264,4 +269,35 @@ public class IntervalBoxStateTest {
             assertTrue(box.toBinop().isEmpty());
         }
     }
+
+    // @ParameterizedTest
+    // @MethodSource("provideChangedVariablesSubgraphs")
+    // void testChangedVariablesSubgraph(IntervalBoxState state,
+    //                                   Set<Local> changedVariables,
+    //                                   String smtFormula) {
+    //     assertAll(() -> assertEquals(changedVariables, state.getChangedVariables()),
+    //               () -> assertEquals(changedVariables, state.getChangedVariablesSubgraph()),
+    //               () -> assertEquals(smtFormula, state.toChangedVariablesSMT(this.solver)));
+    // }
+
+    // static Stream<Arguments> provideChangedVariablesSubgraphs() {
+    //     Local[] xs = new Local[] {
+    //         Jimple.v().newLocal("x0", IntType.v()),
+    //         Jimple.v().newLocal("x1", IntType.v()),
+    //         Jimple.v().newLocal("x2", IntType.v()),
+    //     };
+    //     Set<Local> locals = Stream.of(xs).collect(Collectors.toSet());
+    //     IntervalBoxState[] states = new IntervalBoxState[] {
+    //         new IntervalBoxState(locals, false),
+    //         new IntervalBoxState(locals, true),
+    //         new IntervalBoxState(locals, true),
+    //         new IntervalBoxState(locals, true),
+    //     };
+    //     states[2].update(xs[0], Interval32Box.of(3));
+    //     states[3].updateCond(states[3], xs[1], xs[2], PredicateType.Le);
+    //     return Stream.of(Arguments.arguments(states[0], Set.of(), "false"),
+    //                      Arguments.arguments(states[1], Set.of(), "true"),
+    //                      Arguments.arguments(states[2], Set.of(xs[0]), "(= x0 3)"),
+    //                      Arguments.arguments(states[3], Set.of(xs[1], xs[2]), "true"));
+    // }
 }

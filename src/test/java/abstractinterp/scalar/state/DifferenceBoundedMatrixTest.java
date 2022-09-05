@@ -14,6 +14,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import soot.Local;
 import soot.IntType;
 import soot.jimple.Jimple;
@@ -1821,5 +1824,130 @@ public class DifferenceBoundedMatrixTest {
                       () -> assertEquals(Set.of(xs[5]),
                                          m.getConnectedVariablesOf(xs[5])));
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideGetChangedVariablesSubgraph")
+    void testGetChangedVariablesSubgraph(DifferenceBoundedMatrix m,
+                                         Set<Local> changedVariables,
+                                         Set<Local> subgraph,
+                                         String smtFormula) {
+
+        m.w0zReduction();
+        assertAll(() -> assertEquals(subgraph, m.getChangedVariablesSubgraph(changedVariables)),
+                  () -> assertEquals(smtFormula, m.toChangedVariablesSMT(changedVariables, this.solver)));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideChangedVariableMatrices")
+    void testGetChangedVariables(DifferenceBoundedMatrix in,
+                                 DifferenceBoundedMatrix out,
+                                 Set<Local> expectedVars,
+                                 Set<Local> expectedSubgraph) {
+        out.computeClosure();
+        assertAll(() -> assertEquals(expectedVars, DifferenceBoundedMatrix.getChangedVariables(out, in)),
+                  () -> assertEquals(expectedSubgraph, out.getChangedVariablesSubgraph(expectedVars)));
+    }
+
+    private static Stream<Arguments> provideGetChangedVariablesSubgraph() {
+        Local[] xs = new Local[] {
+            Variable.ZERO,
+            Jimple.v().newLocal("x1", IntType.v()),
+            Jimple.v().newLocal("x2", IntType.v()),
+            Jimple.v().newLocal("x3", IntType.v()),
+            Jimple.v().newLocal("x4", IntType.v()),
+            Jimple.v().newLocal("x5", IntType.v()),
+        };
+        Set<Local> locals = Stream.of(xs).collect(Collectors.toSet());
+        DifferenceBoundedMatrix[] ms = new DifferenceBoundedMatrix[] {
+            new DifferenceBoundedMatrix(locals, false),
+            new DifferenceBoundedMatrix(locals, true),
+            new DifferenceBoundedMatrix(locals, true),
+            new DifferenceBoundedMatrix(locals, true),
+            new DifferenceBoundedMatrix(locals, true),
+        };
+        ms[1].putConstraint(xs[1], xs[2], Constraint.of(0));
+        ms[2].setConstraint(xs[0], xs[1], Constraint.of(1));
+        ms[2].setConstraint(xs[0], xs[2], Constraint.of(2));
+        ms[2].setConstraint(xs[1], xs[0], Constraint.of(3));
+        ms[2].setConstraint(xs[2], xs[0], Constraint.of(5));
+        ms[2].putConstraint(xs[1], xs[2], Constraint.of(0));
+        ms[3].setConstraint(xs[2], xs[3], Constraint.of(0));
+        ms[3].setConstraint(xs[4], xs[2], Constraint.of(0));
+        ms[3].setConstraint(xs[5], xs[3], Constraint.of(0));
+        ms[3].putConstraint(xs[1], xs[2], Constraint.of(0));
+        ms[4].setConstraint(xs[2], xs[3], Constraint.of(0));
+        ms[4].setConstraint(xs[4], xs[2], Constraint.of(0));
+        ms[4].setConstraint(xs[4], xs[3], Constraint.of(0));
+        ms[4].setConstraint(xs[5], xs[3], Constraint.of(0));
+        ms[4].putConstraint(xs[1], xs[2], Constraint.of(0));
+        return Stream.of(Arguments.arguments(ms[0],
+                                             Set.of(),
+                                             Set.of(),
+                                             "false"),
+                         Arguments.arguments(ms[1],
+                                             Set.of(xs[1], xs[2]),
+                                             Set.of(xs[1], xs[2]),
+                                             "(<= x1 (+ x2 0))"),
+                         Arguments.arguments(ms[2],
+                                             Set.of(xs[1], xs[2]),
+                                             Set.of(xs[1], xs[2]),
+                                             "(and (<= x1 3) (<= x1 (+ x2 0)) (>= x1 (- 1)) (<= x2 5) (>= x2 (- 1)))"),
+                         Arguments.arguments(ms[3],
+                                             Set.of(xs[1], xs[2]),
+                                             Set.of(xs[1], xs[2], xs[3], xs[4]),
+                                             Stream.of("(and (<= x1 (+ x2 0))",
+                                                       "     (<= x1 (+ x3 0))",
+                                                       "     (<= x2 (+ x3 0))",
+                                                       "     (<= x4 (+ x2 0))",
+                                                       "     (<= x4 (+ x3 0)))").collect(Collectors.joining("\n"))),
+                         Arguments.arguments(ms[4],
+                                             Set.of(xs[1]),
+                                             Set.of(xs[1], xs[2], xs[3]),
+                                             Stream.of("(and (<= x1 (+ x2 0))",
+                                                       "(<= x1 (+ x3 0))",
+                                                       "(<= x2 (+ x3 0)))").collect(Collectors.joining(" "))));
+    }
+
+    private static Stream<Arguments> provideChangedVariableMatrices() {
+        Local[] xs = new Local[] {
+            Variable.ZERO,
+            Jimple.v().newLocal("x1", IntType.v()),
+            Jimple.v().newLocal("x2", IntType.v()),
+            Jimple.v().newLocal("x3", IntType.v()),
+            Jimple.v().newLocal("x4", IntType.v()),
+            Jimple.v().newLocal("x5", IntType.v()),
+        };
+        Set<Local> locals = Stream.of(xs).collect(Collectors.toSet());
+        DifferenceBoundedMatrix[][] ms = new DifferenceBoundedMatrix[][] {
+            new DifferenceBoundedMatrix[] {
+                new DifferenceBoundedMatrix(locals, true),
+                new DifferenceBoundedMatrix(locals, true),
+            },
+            new DifferenceBoundedMatrix[] {
+                new DifferenceBoundedMatrix(locals, true),
+                new DifferenceBoundedMatrix(locals, true),
+            },
+        };
+        ms[0][0].setConstraint(xs[2], xs[3], Constraint.of(0));
+        ms[0][0].setConstraint(xs[4], xs[2], Constraint.of(0));
+        ms[0][0].setConstraint(xs[4], xs[3], Constraint.of(0));
+        ms[0][0].setConstraint(xs[5], xs[3], Constraint.of(0));
+        ms[0][0].copyTo(ms[0][1]);
+        ms[0][1].setConstraint(xs[1], xs[2], Constraint.of(0));
+        ms[1][0].setConstraint(xs[2], xs[3], Constraint.of(0));
+        ms[1][0].setConstraint(xs[4], xs[2], Constraint.of(0));
+        ms[1][0].setConstraint(xs[4], xs[3], Constraint.of(0));
+        ms[1][0].setConstraint(xs[5], xs[3], Constraint.of(0));
+        ms[1][0].copyTo(ms[1][1]);
+        ms[1][1].setConstraint(xs[2], xs[1], Constraint.of(0));
+        return Stream.of(Arguments.arguments(ms[0][0],
+                                             ms[0][1],
+                                             Set.of(xs[1]),
+                                             Set.of(xs[1], xs[2], xs[3])),
+                         Arguments.arguments(ms[1][0],
+                                             ms[1][1],
+                                             Set.of(xs[2], xs[4]),
+                                             Set.of(xs[1], xs[2], xs[3], xs[4])));
     }
 }

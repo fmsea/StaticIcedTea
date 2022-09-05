@@ -70,6 +70,14 @@ public class PredicateAnalysisRunner implements Runnable {
                                          String.format("%s_%d.reachable.out",
                                                        className,
                                                        methodId)).toFile();
+                File subgraph = Path.of(this.outputResultsPath.toString(),
+                                         String.format("%s_%d.subgraph.out",
+                                                       className,
+                                                       methodId)).toFile();
+                File minSubgraph = Path.of(this.outputResultsPath.toString(),
+                                           String.format("%s_%d.subgraph-min.out",
+                                                         className,
+                                                         methodId)).toFile();
                 File fullSmt = Path.of(this.outputResultsPath.toString(),
                                        String.format("%s_%d.smt.out",
                                                      className,
@@ -83,12 +91,18 @@ public class PredicateAnalysisRunner implements Runnable {
                 dir.mkdirs();
 
                 try (FileWriter fw1 = new FileWriter(changed);
-                     FileWriter fw2 = new FileWriter(reachable)) {
+                     FileWriter fw2 = new FileWriter(reachable);
+                     FileWriter fw3 = new FileWriter(subgraph);
+                     FileWriter fw4 = new FileWriter(minSubgraph)) {
                     String report = this.analysis.generateReport();
                     fw1.write(report);
                     fw1.flush();
                     fw2.write(report);
                     fw2.flush();
+                    fw3.write(report);
+                    fw3.flush();
+                    fw4.write(report);
+                    fw4.flush();
                 } catch (IOException ex) {
                     LOGGER.error("Unable to write changed output file: {}", ex.getMessage());
                 }

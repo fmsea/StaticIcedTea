@@ -47,4 +47,8 @@ public class NotSmtExpression extends SmtExpression {
     public String toSmt2() {
         return String.format("(not %s)", this.expr.toSmt2());
     }
+
+    public boolean containsAll(Set<Local> variables) {
+        return this.expr.containsAll(variables);
+    }
 }

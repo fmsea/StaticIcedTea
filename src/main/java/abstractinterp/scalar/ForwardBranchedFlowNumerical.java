@@ -129,6 +129,10 @@ public class ForwardBranchedFlowNumerical<S extends State>
                     LOGGER.debug("Unhandled assignment expression [lhs={}, rhs={}]", lhs, rhs);
                     ifStmtFall.forget(lVar);
                 }
+                LOGGER.trace("[in state: {}, out state: {}]", in, ifStmtFall);
+                Set<Local> fallChanged = ifStmtFall.getChangedVariables(in);
+                LOGGER.trace("fall changed: {} [unit = {}]", fallChanged, s);
+                this.minChangedVariables.putFall(s, ifStmtFall.getChangedVariables(in));
             }
         } else if (s instanceof IfStmt) {
             IfStmt stmt = (IfStmt)s;
@@ -152,6 +156,12 @@ public class ForwardBranchedFlowNumerical<S extends State>
             if (right instanceof JimpleLocal) {
                 track.add((Local)right);
             }
+            Set<Local> fallChanged = ifStmtFall.getChangedVariables(in);
+            Set<Local> branchChanged = ifStmtBranch.getChangedVariables(in);
+            LOGGER.trace("fall changed: {} [unit = {}]", fallChanged, s);
+            LOGGER.trace("branch changed: {} [unit = {}]", branchChanged, s);
+            this.minChangedVariables.putFall(s, fallChanged);
+            this.minChangedVariables.putBranch(s, branchChanged);
         } else if (s instanceof IdentityStmt) {
             // skip
         }

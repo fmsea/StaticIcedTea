@@ -1,0 +1,24 @@
+$i1	i0	i2	i3	i4	i5	i6	r0
+3 i3 = 0:<miniExample3: int example(int)>
+fall	(= i3 0)
+4 i4 = 1:<miniExample3: int example(int)>
+fall	(= i4 1)
+5 i5 = 1:<miniExample3: int example(int)>
+fall	(= i5 1)
+6 i6 = 3:<miniExample3: int example(int)>
+fall	(= i6 3)
+7 if i6 >= i0 goto return i5:<miniExample3: int example(int)>
+fall	(and (>= i0 4) (>= i6 3))
+branch	(>= i6 3)
+8 $i1 = i5 + i4:<miniExample3: int example(int)>
+fall	(>= $i1 2)
+9 i2 = $i1 + i3:<miniExample3: int example(int)>
+fall	(>= i2 2)
+10 i3 = i4:<miniExample3: int example(int)>
+fall	(>= i3 1)
+11 i4 = i5:<miniExample3: int example(int)>
+fall	(>= i4 1)
+12 i5 = i2:<miniExample3: int example(int)>
+fall	(>= i5 2)
+13 i6 = i6 + 1:<miniExample3: int example(int)>
+fall	(>= i6 4)

@@ -115,15 +115,7 @@ public class ZoneState implements State {
                        Local target,
                        Constraint constraint,
                        ZoneState inState) {
-        boolean added = false;
-        LOGGER.trace("Introducing new Constraint: {} - {} ≤ {}", source, target, constraint);
-        Constraint existing = inState.matrix.getConstraint(source, target);
-        LOGGER.trace("Compare to existing constraint: {} ≤ {}", constraint, existing);
-        if (Constraint.compare(constraint, existing) < 0) {
-            this.matrix.setConstraint(source, target, constraint);
-            added = true;
-        }
-        return added;
+        return this.matrix.putConstraint(source, target, constraint, inState.matrix);
     }
 
     public boolean isFeasible() {
@@ -431,6 +423,10 @@ public class ZoneState implements State {
         return this.matrix.toReachableSMT(sources, solver);
     }
 
+    public String toChangedVariablesSMT(Set<Local> locals, SolverWrapper solver) {
+        return this.matrix.toChangedVariablesSMT(locals, solver);
+    }
+
     public GraphProjection toGraph() {
         return this.matrix.toGraph();
     }
@@ -571,6 +567,22 @@ public class ZoneState implements State {
 
     public Set<Local> getReachableVariablesOf(Local source) {
         return this.matrix.getReachableVariablesOf(source);
+    }
+
+    public Set<Local> getChangedVariables(State previous) {
+        if (previous instanceof ZoneState) {
+            return this.getChangedVariables((ZoneState) previous);
+        } else {
+            throw new RuntimeException("invalid type for getChangedVariables");
+        }
+    }
+
+    public Set<Local> getChangedVariables(ZoneState previous) {
+        return this.matrix.getChangedVariables(previous.matrix);
+    }
+
+    public Set<Local> getChangedVariablesSubgraph(Set<Local> locals) {
+        return this.matrix.getChangedVariablesSubgraph(locals);
     }
 
     @Override

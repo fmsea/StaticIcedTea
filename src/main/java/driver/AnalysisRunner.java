@@ -63,6 +63,10 @@ public abstract class AnalysisRunner<S extends State>  implements Runnable {
                                String.format("%s_%d.changed.out", this.className, this.methodId)).toFile();
         File reachable = Path.of(this.outputResultsPath.toString(),
                                  String.format("%s_%d.reachable.out", this.className, this.methodId)).toFile();
+        File subgraph = Path.of(this.outputResultsPath.toString(),
+                                String.format("%s_%d.subgraph.out", this.className, this.methodId)).toFile();
+        File subgraphMin = Path.of(this.outputResultsPath.toString(),
+                                   String.format("%s_%d.subgraph-min.out", this.className, this.methodId)).toFile();
         File fullSmt = Path.of(this.outputResultsPath.toString(),
                                String.format("%s_%d.smt.out", this.className, this.methodId)).toFile();
         File dir = this.outputResultsPath.toFile();
@@ -80,6 +84,20 @@ public abstract class AnalysisRunner<S extends State>  implements Runnable {
             fw.flush();
         } catch (IOException ex) {
             LOGGER.error("Unable to write reachable output file: {}", ex.getMessage());
+        }
+
+        try (FileWriter fw = new FileWriter(subgraph)) {
+            fw.write(this.analysis.generateChangedVariablesSMTReport());
+            fw.flush();
+        } catch (IOException ex) {
+            LOGGER.error("unable to write subgraph output file: {}", ex.getMessage());
+        }
+
+        try (FileWriter fw = new FileWriter(subgraphMin)) {
+            fw.write(this.analysis.generateChangedVariablesMinSMTReport());
+            fw.flush();
+        } catch (IOException ex) {
+            LOGGER.error("unable to write min subgraph output file: {}", ex.getMessage());
         }
 
         try (FileWriter fw = new FileWriter(fullSmt)) {

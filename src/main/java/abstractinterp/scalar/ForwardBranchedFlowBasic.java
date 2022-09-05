@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -18,6 +19,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
+import abstractinterp.scalar.util.DeltaVMap;
 
 public abstract class ForwardBranchedFlowBasic<N extends Unit, A> {
 
@@ -38,6 +41,7 @@ public abstract class ForwardBranchedFlowBasic<N extends Unit, A> {
     /** Tracking for reporting **/
     protected Set<Unit> outputStmt;
     protected Map<Unit, Set<Local>> changedVariables;
+    protected DeltaVMap<Unit, Set<Local>> minChangedVariables;
 
     /**
      * Constructor - can start with the results of a previous analysis.
@@ -46,6 +50,7 @@ public abstract class ForwardBranchedFlowBasic<N extends Unit, A> {
         this.graph = graph;
         this.outputStmt = new HashSet<>();
         this.changedVariables = new HashMap<>();
+        this.minChangedVariables = new DeltaVMap<>();
         this.LOGGER = LoggerFactory.getLogger("ForwardBranched");
     }
 
@@ -63,6 +68,14 @@ public abstract class ForwardBranchedFlowBasic<N extends Unit, A> {
      */
     public Map<Unit, Set<Local>> getChangedVariables() {
         return this.changedVariables;
+    }
+
+    public Optional<Set<Local>> getFallMinChangedVariables(Unit key) {
+        return this.minChangedVariables.getFallVariables(key).map(s -> Set.copyOf(s));
+    }
+
+    public Optional<Set<Local>> getBranchMinChangedVariables(Unit key) {
+        return this.minChangedVariables.getBranchVariables(key).map(s -> Set.copyOf(s));
     }
 
     public void setOrder(List<N> order) {

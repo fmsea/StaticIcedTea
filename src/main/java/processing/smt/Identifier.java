@@ -62,4 +62,8 @@ public class Identifier extends SmtExpression {
             return Optional.empty();
         }
     }
+
+    public boolean containsAll(Set<Local> variables) {
+        return variables.contains(this.identifier) && variables.size() == 1;
+    }
 }

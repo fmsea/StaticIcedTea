@@ -97,4 +97,6 @@ public abstract class SmtExpression {
     public boolean contains(Local identifier) {
         return ValueToMap.getLocals(this.getValue()).contains(identifier);
     }
+
+    public abstract boolean containsAll(Set<Local> variables);
 }

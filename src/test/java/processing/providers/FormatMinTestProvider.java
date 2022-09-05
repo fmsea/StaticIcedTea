@@ -32,6 +32,16 @@ public class FormatMinTestProvider implements ArgumentsProvider {
                                              getReader("processing/format.min.changed.with-branch.in"),
                                              getReader("processing/format.min.full.with-branch.in"),
                                              getReader("processing/format.min.changed.with-branch.in"),
-                                             getContents("processing/format.min.with-branch.smt.out")));
+                                             getContents("processing/format.min.with-branch.smt.out")),
+                         Arguments.arguments(getReader("processing/format.testclient6.ints.full.in"),
+                                             getReader("processing/format.testclient6.ints.min.in"),
+                                             getReader("processing/format.testclient6.zones.full.in"),
+                                             getReader("processing/format.testclient6.zones.min.in"),
+                                             getContents("processing/format.testclient6.min.out")),
+                         Arguments.arguments(getReader("processing/format.imagedata_10.zones.in"),
+                                             getReader("processing/format.imagedata_10.zones.min.in"),
+                                             getReader("processing/format.imagedata_10.dom2.in"),
+                                             getReader("processing/format.imagedata_10.dom2.min.in"),
+                                             getContents("processing/format.imagedata_10.min.out")));
     }
 }

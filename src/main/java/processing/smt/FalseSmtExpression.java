@@ -41,4 +41,8 @@ public class FalseSmtExpression extends SmtExpression {
     public String toSmt2() {
         return "false";
     }
+
+    public boolean containsAll(Set<Local> variables) {
+        return variables.size() == 0;
+    }
 }

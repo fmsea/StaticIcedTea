@@ -1,0 +1,16 @@
+$b10	$b2	$b6	$i12	$i13	$i14	$i15	$i16	$i17	$i20	$i22	$i24	$i25	$i26	$i27	$i28	$i29	$i30	$i31	$i32	$i33	$i34	$i35	$i4	$i5	$i8	$i9	b11	b3	b7	i0	i1	i18	i19	i21	i23	i36	i37	i38	i39	i40	i41	i42	i43	i44	r0	r1	r2
+54 if i18 != 0 goto i39 = i18:<test.ImageData: int closestMatch(int,byte,byte,byte,int,int,int,byte[],byte[],byte[])>
+fall	(and (<= i0 8)
+     (= i18 0)
+     (>= i39 1)
+     (<= i39 2147483647)
+     (>= i40 0)
+     (<= i40 (+ i1 (- 1)))
+     (= i40 (+ i41 0)))
+
+branch	(and (<= i0 8)
+     (<= i39 2147483647)
+     (>= i40 0)
+     (<= i40 (+ i1 (- 1)))
+     (<= i18 (+ i39 (- 1)))
+     (= i40 (+ i41 0)))

@@ -25,6 +25,8 @@ public class IntervalNumericalAnalysisTest extends NumericalAnalysisTest {
     void testAnalysis(String name,
                       String source,
                       String expectedChangedOutput,
+                      String expectedSubgraphOutput,
+                      String expectedMinSubgraphOutput,
                       String expectedFullSmtOutput) throws Exception {
         Path clazz = Compiler.compileSource(name, source);
         Process analysis = Runtime.getRuntime().exec(new String [] {

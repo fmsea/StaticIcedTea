@@ -133,4 +133,11 @@ public abstract class ConnectiveSmtExpression extends SmtExpression {
         ConditionExpr expr = (ConditionExpr)this.getValue(combinator);
         return this.solver.smt2(expr);
     }
+
+    public boolean containsAll(Set<Local> variables) {
+        return this.expressions.stream()
+            .map(expr -> ValueToMap.getLocals(expr.getValue()))
+            .collect(Collectors.toSet())
+            .containsAll(variables);
+    }
 }

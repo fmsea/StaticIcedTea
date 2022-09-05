@@ -107,11 +107,23 @@ public class ZonePredicateComparativeAnalysisTest extends NumericalAnalysisTest 
                                                                         StandardCharsets.UTF_8))
             .lines()
             .collect(Collectors.joining("\n")).trim();
-        assertAll(() -> assertEquals(Optional.of(dom1ExpectedChanged), readFile(dom1ActualChangedOutput)),
-                  () -> assertEquals(Optional.of(dom1ExpectedFull), readFile(dom1ActualFullSmtOutput)),
-                  () -> assertEquals(Optional.of(dom2ExpectedChanged), readFile(dom2ActualChangedOutput)),
-                  () -> assertEquals(Optional.of(dom2ExpectedFull), readFile(dom2ActualFullSmtOutput)),
-                  () -> assertEquals(Optional.of(expectedFormula), readFile(actualFormulaOutput)),
-                  () -> assertEquals(expectedResults, actualResults));
+        assertAll(() -> assertEquals(Optional.of(dom1ExpectedChanged),
+                                     readFile(dom1ActualChangedOutput),
+                                     "Zones Changed Output is Different"),
+                  () -> assertEquals(Optional.of(dom1ExpectedFull),
+                                     readFile(dom1ActualFullSmtOutput),
+                                     "Zones Full Output is Different"),
+                  () -> assertEquals(Optional.of(dom2ExpectedChanged),
+                                     readFile(dom2ActualChangedOutput),
+                                     "Predicates Changed Output is Different"),
+                  () -> assertEquals(Optional.of(dom2ExpectedFull),
+                                     readFile(dom2ActualFullSmtOutput),
+                                     "Predicates Full Output is Different"),
+                  () -> assertEquals(Optional.of(expectedFormula),
+                                     readFile(actualFormulaOutput),
+                                     "Entailed Formulas Output is Different"),
+                  () -> assertEquals(expectedResults,
+                                     actualResults,
+                                     "Sat/Unsat Results are Different"));
     }
 }

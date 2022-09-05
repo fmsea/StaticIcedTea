@@ -45,4 +45,8 @@ public class TrueSmtExpression extends SmtExpression {
     public Optional<String> toSmt2(Local id) {
         return Optional.empty();
     }
+
+    public boolean containsAll(Set<Local> variables) {
+        return variables.size() == 0;
+    }
 }
