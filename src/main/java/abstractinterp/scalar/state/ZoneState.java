@@ -240,8 +240,8 @@ public class ZoneState implements State {
                             IntConstant right,
                             BinaryOperatorType operator) {
         Consumer<BinaryOperator<Interval32Box>> computeInterval = (binop) -> {
-            this.matrix.computeClosure();
-            Interval32Box leftInterval = this.matrix.projectToInterval(left);
+            inState.matrix.computeClosure();
+            Interval32Box leftInterval = inState.matrix.projectToInterval(left);
             Interval32Box newValue = binop.apply(leftInterval, Interval32Box.of(right.value));
             this.add(lVar, ZERO, Constraint.of(newValue.upperBound()));
             this.add(ZERO, lVar, Constraint.of(newValue.lowerBound().map(b -> b * -1)));
@@ -290,8 +290,8 @@ public class ZoneState implements State {
                             Local right,
                             BinaryOperatorType operator) {
         Consumer<BinaryOperator<Interval32Box>> computeInterval = (binop) -> {
-            this.matrix.computeClosure();
-            Interval32Box rightInterval = this.matrix.projectToInterval(right);
+            inState.matrix.computeClosure();
+            Interval32Box rightInterval = inState.matrix.projectToInterval(right);
             Interval32Box newValue = binop.apply(Interval32Box.of(left.value), rightInterval);
             this.forget(lVar);
             this.add(lVar, ZERO, Constraint.of(newValue.upperBound()));
@@ -331,9 +331,9 @@ public class ZoneState implements State {
                             Local right,
                             BinaryOperatorType operator) {
         Consumer<BinaryOperator<Interval32Box>> computeInterval = (binop) -> {
-            this.matrix.computeClosure();
-            Interval32Box leftInterval = this.matrix.projectToInterval(left);
-            Interval32Box rightInterval = this.matrix.projectToInterval(right);
+            inState.matrix.computeClosure();
+            Interval32Box leftInterval = inState.matrix.projectToInterval(left);
+            Interval32Box rightInterval = inState.matrix.projectToInterval(right);
             Interval32Box newValue = binop.apply(leftInterval, rightInterval);
             this.forget(lVar);
             this.add(lVar, ZERO, Constraint.of(newValue.upperBound()));
