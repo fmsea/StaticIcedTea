@@ -4,6 +4,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
 import java.nio.file.Path;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -55,6 +57,9 @@ public class IntervalNumericalAnalysisTest extends NumericalAnalysisTest {
         } catch (IOException ex) {
             System.err.println("Unable to assert interval analysis");
             System.err.println(ex.getMessage());
+            String error = new BufferedReader(new InputStreamReader(analysis.getErrorStream()))
+                .lines().collect(Collectors.joining("\n"));
+            System.err.println(error);
             assertTrue(false);
         }
     }
