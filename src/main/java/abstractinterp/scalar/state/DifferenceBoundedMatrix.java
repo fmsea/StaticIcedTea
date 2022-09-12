@@ -661,7 +661,7 @@ public class DifferenceBoundedMatrix {
     }
 
     public String toSMT(Set<Local> sources, SolverWrapper solver) {
-        if (!this.computeReducedClosure()) {
+        if (!this.w0zReduction()) {
             return "false";
         } else {
             Set<Local> connectedVariables = sources.stream().flatMap(source -> this.getConnectedVariablesOf(source).stream())
