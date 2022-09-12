@@ -49,6 +49,7 @@ public class Smt2FormatMin extends Smt2Format {
         statements.addAll(changedLeft.statements());
         statements.addAll(changedRight.statements());
         List<String> sortedStatements = sortStatements(statements);
+        writer.write("(set-logic LIA)\n");
         for (String statement : sortedStatements) {
             writer.write("(echo \"");
             writer.write(statement.replaceAll("\"", "\"\""));

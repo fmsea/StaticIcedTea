@@ -1,3 +1,4 @@
+(set-logic LIA)
 (echo "1 b0 := @parameter0: byte:<test.Base64: boolean isPad(byte)>")
 (echo "fall through")
 (push)

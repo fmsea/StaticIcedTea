@@ -1,3 +1,4 @@
+(set-logic LIA)
 (echo "3 i3 = 0:<miniExample3: int example(int)>")
 (echo "fall through")
 (push)

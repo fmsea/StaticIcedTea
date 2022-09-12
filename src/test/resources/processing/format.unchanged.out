@@ -1,3 +1,4 @@
+(set-logic LIA)
 (echo "6 i1 = 0:<test.BallonFactory: java.util.ArrayList getLines(java.awt.FontMetrics,java.lang.String,double,int)>")
 (echo "fall through")
 (push)

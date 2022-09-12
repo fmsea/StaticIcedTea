@@ -94,6 +94,7 @@ public class Smt2Format {
         statements.addAll(report1.statements());
         statements.addAll(report2.statements());
         List<String> sortedStatements = sortStatements(statements);
+        writer.write("(set-logic LIA)\n");
         for (String statement : sortedStatements) {
             writer.write("(echo \"");
             writer.write(statement.replaceAll("\"", "\"\""));

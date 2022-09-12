@@ -1,3 +1,4 @@
+(set-logic LIA)
 (echo "3 if i0 < 0 goto $r0 = new java.lang.RuntimeException:<miniExample5: int example(int)>")
 (echo "fall through")
 (push)

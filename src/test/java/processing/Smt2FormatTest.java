@@ -22,7 +22,7 @@ public class Smt2FormatTest extends FormatTest {
         Writer w1 = new StringWriter();
         try {
             Smt2Format.SMT2Format(r1, r2, w1);
-            assertEquals("", w1.toString());
+            assertEquals("(set-logic LIA)\n", w1.toString());
         } catch (IOException e) {
             e.printStackTrace(System.err);
             assertTrue(false);
