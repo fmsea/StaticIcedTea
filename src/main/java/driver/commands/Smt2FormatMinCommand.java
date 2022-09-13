@@ -1,5 +1,6 @@
 package driver.commands;
 
+import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -45,7 +46,8 @@ public class Smt2FormatMinCommand implements Callable<Integer> {
              Reader oneChanged = new FileReader(analysisOneChanged.toFile());
              Reader twoFull = new FileReader(analysisTwoFull.toFile());
              Reader twoChanged = new FileReader(analysisTwoChanged.toFile());
-             Writer out = new FileWriter(outputFile)) {
+             Writer file = new FileWriter(outputFile);
+             BufferedWriter out = new BufferedWriter(file)) {
             Smt2FormatMin.Smt2FormatMin(oneFull, oneChanged, twoFull, twoChanged, out);
             return 0;
         } catch (IOException ex) {

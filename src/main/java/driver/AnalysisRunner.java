@@ -1,5 +1,6 @@
 package driver;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.FileWriter;
 import java.io.File;
@@ -72,37 +73,42 @@ public abstract class AnalysisRunner<S extends State>  implements Runnable {
         File dir = this.outputResultsPath.toFile();
         dir.mkdirs();
 
-        try (FileWriter fw = new FileWriter(changed)) {
-            fw.write(this.analysis.generateSMTReport());
-            fw.flush();
+        try (FileWriter fw = new FileWriter(changed);
+             BufferedWriter buf = new BufferedWriter(fw)) {
+            buf.write(this.analysis.generateSMTReport());
+            buf.flush();
         } catch (IOException ex) {
             LOGGER.error("Unable to write changed output file: {}", ex.getMessage());
         }
 
-        try (FileWriter fw = new FileWriter(reachable)) {
-            fw.write(this.analysis.generateReachableSMTReport());
-            fw.flush();
+        try (FileWriter fw = new FileWriter(reachable);
+             BufferedWriter buf = new BufferedWriter(fw)) {
+            buf.write(this.analysis.generateReachableSMTReport());
+            buf.flush();
         } catch (IOException ex) {
             LOGGER.error("Unable to write reachable output file: {}", ex.getMessage());
         }
 
-        try (FileWriter fw = new FileWriter(subgraph)) {
-            fw.write(this.analysis.generateChangedVariablesSMTReport());
-            fw.flush();
+        try (FileWriter fw = new FileWriter(subgraph);
+             BufferedWriter buf = new BufferedWriter(fw)) {
+            buf.write(this.analysis.generateChangedVariablesSMTReport());
+            buf.flush();
         } catch (IOException ex) {
             LOGGER.error("unable to write subgraph output file: {}", ex.getMessage());
         }
 
-        try (FileWriter fw = new FileWriter(subgraphMin)) {
-            fw.write(this.analysis.generateChangedVariablesMinSMTReport());
-            fw.flush();
+        try (FileWriter fw = new FileWriter(subgraphMin);
+             BufferedWriter buf = new BufferedWriter(fw)) {
+            buf.write(this.analysis.generateChangedVariablesMinSMTReport());
+            buf.flush();
         } catch (IOException ex) {
             LOGGER.error("unable to write min subgraph output file: {}", ex.getMessage());
         }
 
-        try (FileWriter fw = new FileWriter(fullSmt)) {
-            fw.write(this.analysis.generateSMTReportFull());
-            fw.flush();
+        try (FileWriter fw = new FileWriter(fullSmt);
+             BufferedWriter buf = new BufferedWriter(fw)) {
+            buf.write(this.analysis.generateSMTReportFull());
+            buf.flush();
         } catch (IOException ex) {
             LOGGER.error("Unable to write full SMT output file: {}", ex.getMessage());
         }

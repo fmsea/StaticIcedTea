@@ -1,5 +1,6 @@
 package driver;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -91,18 +92,22 @@ public class PredicateAnalysisRunner implements Runnable {
                 dir.mkdirs();
 
                 try (FileWriter fw1 = new FileWriter(changed);
+                     BufferedWriter buf1 = new BufferedWriter(fw1);
                      FileWriter fw2 = new FileWriter(reachable);
+                     BufferedWriter buf2 = new BufferedWriter(fw2);
                      FileWriter fw3 = new FileWriter(subgraph);
-                     FileWriter fw4 = new FileWriter(minSubgraph)) {
+                     BufferedWriter buf3 = new BufferedWriter(fw3);
+                     FileWriter fw4 = new FileWriter(minSubgraph);
+                     BufferedWriter buf4 = new BufferedWriter(fw4)) {
                     String report = this.analysis.generateReport();
-                    fw1.write(report);
-                    fw1.flush();
-                    fw2.write(report);
-                    fw2.flush();
-                    fw3.write(report);
-                    fw3.flush();
-                    fw4.write(report);
-                    fw4.flush();
+                    buf1.write(report);
+                    buf1.flush();
+                    buf2.write(report);
+                    buf2.flush();
+                    buf3.write(report);
+                    buf3.flush();
+                    buf4.write(report);
+                    buf4.flush();
                 } catch (IOException ex) {
                     LOGGER.error("Unable to write changed output file: {}", ex.getMessage());
                 }
