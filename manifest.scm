@@ -18,7 +18,7 @@
   #:use-module (gnu packages statistics)
   #:export (z3-with-java openjdk11))
 
-(define z3-4.8.10
+(define z3-with-java
   (package
    (inherit z3)
    (name "z3")
@@ -31,13 +31,7 @@
             (file-name (git-file-name name version))
             (sha256
              (base32
-              "1w1ym2l0gipvjx322npw7lhclv8rslq58gnj0d9i96masi3gbycf"))))))
-
-(define z3-with-java
-  (package
-   (inherit z3-4.8.10)
-   ;; (native-inputs (modify-inputs (package-native-inputs z3-4.8.10)
-   ;;                               (append `(,openjdk11 "jdk"))))
+              "1w1ym2l0gipvjx322npw7lhclv8rslq58gnj0d9i96masi3gbycf"))))
    (native-inputs
     `(("which" ,which)
       ("python" ,python-wrapper)
