@@ -201,8 +201,9 @@ public class IntervalBoxState implements State {
      * @return [-x2,-x1]
      */
     public static Interval32Box negate(Interval32Box inBox) {
-        inBox.negate();
-        return Interval32Box.of(inBox);
+        Interval32Box out = Interval32Box.of(inBox);
+        out.negate();
+        return out;
     }
 
     public static Interval32Box constant(int val) {

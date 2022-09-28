@@ -33,8 +33,8 @@ public class IntervalBoxStateProperties {
         assertAll(// memory location test
                   () -> assertTrue(box != negatedBox),
                   // equality test
-                  () -> assertEquals(box.lowerBound(), negatedBox.lowerBound()),
-                  () -> assertEquals(box.upperBound(), negatedBox.upperBound()));
+                  () -> assertEquals(box.lowerBound(), negatedBox.upperBound().map(i -> i * -1)),
+                  () -> assertEquals(box.upperBound(), negatedBox.lowerBound().map(i -> i * -1)));
     }
 
     @Property
