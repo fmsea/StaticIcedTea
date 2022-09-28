@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import soot.Body;
 import soot.Local;
@@ -139,7 +140,13 @@ public class IntegerAnalysis<S extends State> implements Analysis {
     }
 
     public String generateSMTReport() {
-        return generateOutput((state, pair) -> pair.fst().map(ls -> state.toSMT(ls, this.solver)).orElse("true"));
+        return generateOutput((state, pair) -> {
+                Optional<Set<Local>> union = Optional.of(Stream.concat(pair.fst().orElse(Set.of()).stream(),
+                                                                       pair.snd().orElse(Set.of()).stream())
+                                                         .collect(Collectors.toSet()));
+                return union.map(ls -> state.toSMT(ls, this.solver)).orElse("true");
+                // return pair.fst().map(ls -> state.toSMT(ls, this.solver)).orElse("true");
+            });
     }
 
     public String generateReachableSMTReport() {
@@ -147,7 +154,13 @@ public class IntegerAnalysis<S extends State> implements Analysis {
     }
 
     public String generateChangedVariablesSMTReport() {
-        return generateOutput((state, pair) -> pair.fst().map(ls -> state.toChangedVariablesSMT(ls, this.solver)).orElse("true"));
+        return generateOutput((state, pair) -> {
+                Optional<Set<Local>> union = Optional.of(Stream.concat(pair.fst().orElse(Set.of()).stream(),
+                                                                       pair.snd().orElse(Set.of()).stream())
+                                                         .collect(Collectors.toSet()));
+                return union.map(ls -> state.toChangedVariablesSMT(ls, this.solver)).orElse("true");
+                // return pair.fst().map(ls -> state.toChangedVariablesSMT(ls, this.solver)).orElse("true");
+            });
     }
 
     public String generateChangedVariablesMinSMTReport() {

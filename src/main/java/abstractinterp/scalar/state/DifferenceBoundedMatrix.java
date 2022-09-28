@@ -916,6 +916,8 @@ public class DifferenceBoundedMatrix {
 
         for (int i = 1; i < N; i++) {
             for (int j = 1; j < N; j++) {
+                Local s = this.indicesToLocals.get(i);
+                Local t = this.indicesToLocals.get(j);
                 Constraint currentForward = this.matrix[i][j];
                 Constraint previousForward = previous.matrix[i][j];
                 Constraint currentBackward = this.matrix[j][i];
@@ -926,12 +928,16 @@ public class DifferenceBoundedMatrix {
                 Constraint backwardThroughZero = Constraint.add(this.matrix[j][0], this.matrix[0][i]);
                 if (forward != 0 &&
                     Constraint.compare(this.matrix[i][j], forwardThroughZero) < 0) {
-                    changedVariables.add(this.indicesToLocals.get(i));
+                    LOGGER.trace("Local added to changed variable: {} - {} [previous = {}, current = {}]",
+                                 s, t, previous.matrix[i][j], this.matrix[i][j]);
+                    changedVariables.add(s);
                 }
 
                 if (backward != 0 &&
                     Constraint.compare(this.matrix[j][i], backwardThroughZero) < 0) {
-                    changedVariables.add(this.indicesToLocals.get(j));
+                    LOGGER.trace("Local added to changed variable: {} - {} [previous = {}, current = {}]",
+                                 t, s, previous.matrix[j][i], this.matrix[j][i]);
+                    changedVariables.add(t);
                 }
             }
         }

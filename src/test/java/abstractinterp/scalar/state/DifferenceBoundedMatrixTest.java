@@ -1928,19 +1928,42 @@ public class DifferenceBoundedMatrixTest {
                 new DifferenceBoundedMatrix(locals, true),
                 new DifferenceBoundedMatrix(locals, true),
             },
+            new DifferenceBoundedMatrix[] {
+                new DifferenceBoundedMatrix(locals, true),
+                new DifferenceBoundedMatrix(locals, true),
+            },
         };
+        // One
         ms[0][0].setConstraint(xs[2], xs[3], Constraint.of(0));
         ms[0][0].setConstraint(xs[4], xs[2], Constraint.of(0));
         ms[0][0].setConstraint(xs[4], xs[3], Constraint.of(0));
         ms[0][0].setConstraint(xs[5], xs[3], Constraint.of(0));
         ms[0][0].copyTo(ms[0][1]);
         ms[0][1].setConstraint(xs[1], xs[2], Constraint.of(0));
+        // Two
         ms[1][0].setConstraint(xs[2], xs[3], Constraint.of(0));
         ms[1][0].setConstraint(xs[4], xs[2], Constraint.of(0));
         ms[1][0].setConstraint(xs[4], xs[3], Constraint.of(0));
         ms[1][0].setConstraint(xs[5], xs[3], Constraint.of(0));
         ms[1][0].copyTo(ms[1][1]);
         ms[1][1].setConstraint(xs[2], xs[1], Constraint.of(0));
+        // Three
+        ms[2][0].setConstraint(xs[0], xs[1], Constraint.of(-1));
+        ms[2][0].setConstraint(xs[0], xs[2], Constraint.of(-1));
+        ms[2][0].setConstraint(xs[0], xs[3], Constraint.of(-1));
+        ms[2][0].setConstraint(xs[0], xs[4], Constraint.of(-2));
+        ms[2][0].setConstraint(xs[0], xs[5], Constraint.of(-3));
+        ms[2][0].setConstraint(xs[2], xs[3], Constraint.of(0));
+        ms[2][0].setConstraint(xs[3], xs[2], Constraint.of(0));
+        ms[2][0].setConstraint(xs[4], xs[5], Constraint.of(-1));
+        ms[2][1].setConstraint(xs[0], xs[1], Constraint.of(-1));
+        ms[2][1].setConstraint(xs[0], xs[2], Constraint.of(-1));
+        ms[2][1].setConstraint(xs[0], xs[3], Constraint.of(-1));
+        ms[2][1].setConstraint(xs[0], xs[4], Constraint.of(-2));
+        ms[2][1].setConstraint(xs[0], xs[5], Constraint.of(-3));
+        ms[2][1].setConstraint(xs[1], xs[3], Constraint.of(0));
+        ms[2][1].setConstraint(xs[3], xs[1], Constraint.of(0));
+        ms[2][1].setConstraint(xs[4], xs[5], Constraint.of(-1));
         return Stream.of(Arguments.arguments(ms[0][0],
                                              ms[0][1],
                                              Set.of(xs[1]),
@@ -1948,6 +1971,10 @@ public class DifferenceBoundedMatrixTest {
                          Arguments.arguments(ms[1][0],
                                              ms[1][1],
                                              Set.of(xs[2], xs[4]),
-                                             Set.of(xs[1], xs[2], xs[3], xs[4])));
+                                             Set.of(xs[1], xs[2], xs[3], xs[4])),
+                         Arguments.arguments(ms[2][0],
+                                             ms[2][1],
+                                             Set.of(xs[1], xs[3]),
+                                             Set.of(xs[1], xs[3])));
     }
 }

@@ -62,6 +62,8 @@ public class IncZoneNumericalAnalysisTest extends NumericalAnalysisTest {
             String subgraphOutput = Files.readString(subgraphOutputPath);
             String minSubgraphOutput = Files.readString(minSubgraphOutputPath);
             String fullSmtOutput = Files.readString(fullSmtOutputPath);
+            String error = new BufferedReader(new InputStreamReader(analysis.getErrorStream()))
+                .lines().collect(Collectors.joining("\n"));
             assertAll(() -> assertEquals(expectedChangedOutput, changedOutput.trim(), "Changed Report Not Equal"),
                       () -> assertEquals(expectedSubgraphOutput, subgraphOutput.trim(), "Subgraph Report Not Equal"),
                       () -> assertEquals(expectedMinSubgraphOutput, minSubgraphOutput.trim(), "Minimum Subgraph Report Not Equal"),
