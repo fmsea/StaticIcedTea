@@ -140,4 +140,8 @@ public abstract class ConnectiveSmtExpression extends SmtExpression {
             .collect(Collectors.toSet())
             .containsAll(variables);
     }
+
+    public int getPredicateCount() {
+        return this.expressions.size();
+    };
 }

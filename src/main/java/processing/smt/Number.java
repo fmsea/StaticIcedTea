@@ -50,4 +50,8 @@ public class Number extends SmtExpression {
     public boolean containsAll(Set<Local> variables) {
         return variables.size() == 0;
     }
+
+    public int getPredicateCount() {
+        return 0;
+    }
 }

@@ -77,6 +77,8 @@ public abstract class SmtExpression {
         return this.getReachableValue(sources).map(v -> this.solver.smt2(v));
     }
 
+    public abstract int getPredicateCount();
+
     @Override
     public boolean equals(Object o) {
         if (o instanceof SmtExpression) {

@@ -108,4 +108,8 @@ public class BinopSmtExpression extends SmtExpression {
         return ValueToMap.getLocals(this.expression)
             .containsAll(variables);
     }
+
+    public int getPredicateCount() {
+        return 1;
+    }
 }

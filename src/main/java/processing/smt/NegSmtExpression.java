@@ -46,4 +46,8 @@ public class NegSmtExpression extends SmtExpression {
     public boolean containsAll(Set<Local> variables) {
         return this.expr.containsAll(variables);
     }
+
+    public int getPredicateCount() {
+        return this.expr.getPredicateCount();
+    }
 }

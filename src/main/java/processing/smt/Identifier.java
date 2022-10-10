@@ -66,4 +66,8 @@ public class Identifier extends SmtExpression {
     public boolean containsAll(Set<Local> variables) {
         return variables.contains(this.identifier) && variables.size() == 1;
     }
+
+    public int getPredicateCount() {
+        return 0;
+    }
 }
