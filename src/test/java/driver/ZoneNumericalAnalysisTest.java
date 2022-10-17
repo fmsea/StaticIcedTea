@@ -18,12 +18,12 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import util.Compiler;
 
-import driver.providers.ZonesMiniJavaExamplesProvider;
+import driver.providers.MinZonesMiniJavaExamplesProvider;
 
 public class ZoneNumericalAnalysisTest extends NumericalAnalysisTest {
 
     @ParameterizedTest
-    @ArgumentsSource(ZonesMiniJavaExamplesProvider.class)
+    @ArgumentsSource(MinZonesMiniJavaExamplesProvider.class)
     void testAnalysis(String name,
                       String source,
                       String expectedChangedOutput,

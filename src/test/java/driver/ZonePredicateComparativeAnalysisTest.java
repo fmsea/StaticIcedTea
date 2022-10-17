@@ -47,7 +47,7 @@ public class ZonePredicateComparativeAnalysisTest extends NumericalAnalysisTest 
                 "-classpath",
                 System.getProperty("java.class.path"),
                 "driver.Main",
-                "zone-numerical",
+                "inczone-numerical",
                 "--classpath",
                 clazz.getParent().toString(),
                 "--output",

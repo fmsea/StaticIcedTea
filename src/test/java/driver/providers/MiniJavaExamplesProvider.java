@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.ArgumentsProvider;
 
 public abstract class MiniJavaExamplesProvider implements ArgumentsProvider {
 
-    protected Arguments example(String name, String type) throws IOException {
+    protected Arguments example(String name, String type) {
         String source = readResourcesFile("driver/providers/" + name + ".java");
         String expectedChangedOutput = readResourcesFile("driver/providers/" + name + "." + type + ".changed.out");
         String expectedSubgraphOutput = readResourcesFile("driver/providers/" + name + "." + type + ".subgraph.out");
@@ -26,9 +26,14 @@ public abstract class MiniJavaExamplesProvider implements ArgumentsProvider {
                                    expectedFullSmtOutput.trim());
     }
 
-    protected String readResourcesFile(String fileName) throws IOException {
+    protected String readResourcesFile(String fileName) {
+        try {
         ClassLoader loader = getClass().getClassLoader();
         Path resourceFile = Paths.get(loader.getResource(fileName).getFile());
         return Files.readString(resourceFile);
+        } catch (IOException ex) {
+            System.err.println("Unable to read resources files: " + ex.getMessage());
+            return "";
+        }
     }
 }
