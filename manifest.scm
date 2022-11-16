@@ -17,7 +17,7 @@
   #:use-module (gnu packages python-science)
   #:use-module (gnu packages python-xyz)
   #:use-module (gnu packages statistics)
-  #:export (z3-with-java openjdk11))
+  #:export (z3-with-java openjdk11 %dfa-manifest))
 
 (define z3-with-java
   (package
@@ -74,18 +74,21 @@
             (separator #f)
             (files (list "")))))))
 
-(packages->manifest
- (list glibc
-       `(,openjdk11 "jdk")
-       maven
-       bash
-       gnuplot
-       python-wrapper
-       python-matplotlib
-       python-pandas
-       python-scikit-learn
-       python-scipy
-       python-statsmodels
-       python-numpy
-       util-linux
-       z3-with-java))
+(define %dfa-manifest
+  (packages->manifest
+   (list glibc
+         `(,openjdk11 "jdk")
+         maven
+         bash
+         gnuplot
+         python-wrapper
+         python-matplotlib
+         python-pandas
+         python-scikit-learn
+         python-scipy
+         python-statsmodels
+         python-numpy
+         util-linux
+         z3-with-java)))
+
+%dfa-manifest
