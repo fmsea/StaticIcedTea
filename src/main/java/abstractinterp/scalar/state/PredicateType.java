@@ -1,5 +1,7 @@
 package abstractinterp.scalar.state;
 
+import soot.Value;
+import soot.jimple.Jimple;
 import soot.jimple.ConditionExpr;
 import soot.jimple.EqExpr;
 import soot.jimple.NeExpr;
@@ -132,6 +134,26 @@ public enum PredicateType {
             return Lt;
         } else {
             return Invalid;
+        }
+    }
+
+    public static ConditionExpr toJimple(PredicateType t, Value lhs, Value rhs) {
+        switch (t) {
+        case Eq:
+            return Jimple.v().newEqExpr(lhs, rhs);
+        case Ne:
+            return Jimple.v().newNeExpr(lhs, rhs);
+        case Ge:
+            return Jimple.v().newGeExpr(lhs, rhs);
+        case Gt:
+            return Jimple.v().newGtExpr(lhs, rhs);
+        case Le:
+            return Jimple.v().newLeExpr(lhs, rhs);
+        case Lt:
+            return Jimple.v().newLtExpr(lhs, rhs);
+        case Invalid:
+        default:
+            throw new IllegalArgumentException("Cannot create Jimple expression for unsupported Predicate type.");
         }
     }
 
