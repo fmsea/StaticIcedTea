@@ -15,6 +15,7 @@ import soot.Value;
 import soot.grimp.Grimp;
 import soot.jimple.BinopExpr;
 import soot.jimple.IntConstant;
+import soot.jimple.LongConstant;
 import soot.jimple.internal.JNegExpr;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -207,8 +208,12 @@ public class IntervalBoxState implements State {
     }
 
     public static Interval32Box constant(int val) {
-        Interval32Box ret = Interval32Box.of(val, val);
+        Interval32Box ret = Interval32Box.of(val);
         return ret;
+    }
+
+    public static Interval32Box constant(long val) {
+        return Interval32Box.of(val);
     }
 
     public void updateState(Local lVar, State inState, Value left, Value right, BinaryOperatorType operator) {
@@ -233,12 +238,15 @@ public class IntervalBoxState implements State {
         Interval32Box ret = null;
         if (v instanceof IntConstant) {
             ret = constant(((IntConstant) v).value);
+        } else if (v instanceof LongConstant) {
+            LOGGER.debug("Discovered LongConstant: {} v", v);
+            ret = constant(((LongConstant) v).value);
         } else if (v instanceof Local) {
             ret = inState.getValue((Local) v);
         } else {
             ret = Interval32Box.TOP();
         }
-
+        LOGGER.debug("Evaluated value: [v={}]", v);
         return ret;
     }
 

@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 import soot.jimple.ArrayRef;
 import soot.jimple.InstanceFieldRef;
@@ -19,6 +20,7 @@ import soot.jimple.internal.JNegExpr;
 import soot.BooleanType;
 import soot.ByteType;
 import soot.IntType;
+import soot.LongType;
 import soot.Local;
 import soot.ShortType;
 import soot.Type;
@@ -28,14 +30,17 @@ import soot.toolkits.graph.DirectedGraph;
 
 import abstractinterp.scalar.state.State;
 import abstractinterp.scalar.state.factory.StateFactory;
+import abstractinterp.scalar.state.DeferredCmpMap;
 import abstractinterp.scalar.state.BinaryOperatorType;
 import abstractinterp.scalar.state.PredicateType;
+import abstractinterp.scalar.util.Pair;
 
 public class ForwardBranchedFlowNumerical<S extends State>
     extends ForwardBranchedFlowWidening<Unit, S> {
 
     protected Set<Local> variables;
     private StateFactory<S> stateFactory;
+    private DeferredCmpMap deferredComparisons;
 
     public ForwardBranchedFlowNumerical(DirectedGraph<Unit> graph,
                                         List<Unit> order,
@@ -55,6 +60,7 @@ public class ForwardBranchedFlowNumerical<S extends State>
               iters);
         this.variables = locals;
         this.stateFactory = stateFactory;
+        this.deferredComparisons = new DeferredCmpMap();
     }
 
     /** Widen flows
@@ -120,7 +126,12 @@ public class ForwardBranchedFlowNumerical<S extends State>
 
                     LOGGER.debug("assigning {} to {} ({}) {}, using {}",
                                  lVar, left, op, right, in);
-                    ifStmtFall.updateState(lVar, in, left, right, op);
+                    if (op == BinaryOperatorType.CMP) {
+                        // Add lhs, left, and right to DeferredCmpMap.
+                        this.deferredComparisons.put(lVar, left, right);
+                    } else {
+                        ifStmtFall.updateState(lVar, in, left, right, op);
+                    }
                 } else if (rhs instanceof JimpleLocal ||
                            rhs instanceof NumericConstant ||
                            rhs instanceof JNegExpr) {
@@ -137,31 +148,36 @@ public class ForwardBranchedFlowNumerical<S extends State>
         } else if (s instanceof IfStmt) {
             IfStmt stmt = (IfStmt)s;
             ConditionExpr condExpr = (ConditionExpr) stmt.getCondition();
-            Value left = condExpr.getOp1();
-            Value right = condExpr.getOp2();
-            this.outputStmt.add(s);
-            Set<Local> track = new HashSet<>();
-            this.changedVariables.put(s, track);
+            Value lhs = condExpr.getOp1();
+            Value rhs = condExpr.getOp2();
             PredicateType type = PredicateType.fromJimple(condExpr);
 
-            ifStmtBranch.updateCond(in, left, right, type);
-
-            type = type.rotate();
-
-            ifStmtFall.updateCond(in, left, right, type);
-
-            if (left instanceof JimpleLocal) {
-                track.add((Local)left);
+            // If either of the values are in the map, we should use the map to
+            // refine the deferred branch.
+            // Otherwise, proceed as usual.
+            if (lhs instanceof Local &&
+                this.deferredComparisons.contains((Local)lhs)) {
+                this.deferredComparisons.get((Local)lhs).ifPresent(deferred -> {
+                        interpretCondition(s,
+                                           in,
+                                           deferred.fst(),
+                                           deferred.snd(),
+                                           type,
+                                           ifStmtBranch,
+                                           ifStmtFall);
+                    });
+            // This version is not likely given how the code tends to be generated.
+            // } else if (right instanceof Local &&
+            //            this.deferredComparisons.contains((Local) right)) {
+            } else {
+                interpretCondition(s,
+                                   in,
+                                   lhs,
+                                   rhs,
+                                   type,
+                                   ifStmtBranch,
+                                   ifStmtFall);
             }
-            if (right instanceof JimpleLocal) {
-                track.add((Local)right);
-            }
-            Set<Local> fallChanged = ifStmtFall.getChangedVariables(in);
-            Set<Local> branchChanged = ifStmtBranch.getChangedVariables(in);
-            LOGGER.trace("fall changed: {} [unit = {}]", fallChanged, s);
-            LOGGER.trace("branch changed: {} [unit = {}]", branchChanged, s);
-            this.minChangedVariables.putFall(s, fallChanged);
-            this.minChangedVariables.putBranch(s, branchChanged);
         } else if (s instanceof IdentityStmt) {
             // skip
         }
@@ -177,11 +193,37 @@ public class ForwardBranchedFlowNumerical<S extends State>
         }
     }
 
+    private void interpretCondition(Unit s, S in, Value left, Value right, PredicateType type, S branch, S fall) {
+        this.outputStmt.add(s);
+        Set<Local> track = new HashSet<>();
+        this.changedVariables.put(s, track);
+
+        branch.updateCond(in, left, right, type);
+
+        type = type.rotate();
+
+        fall.updateCond(in, left, right, type);
+
+        if (left instanceof JimpleLocal) {
+            track.add((Local)left);
+        }
+        if (right instanceof JimpleLocal) {
+            track.add((Local)right);
+        }
+        Set<Local> fallChanged = fall.getChangedVariables(in);
+        Set<Local> branchChanged = branch.getChangedVariables(in);
+        LOGGER.trace("fall changed: {} [unit = {}]", fallChanged, s);
+        LOGGER.trace("branch changed: {} [unit = {}]", branchChanged, s);
+        this.minChangedVariables.putFall(s, fallChanged);
+        this.minChangedVariables.putBranch(s, branchChanged);
+    }
+
     public static boolean isIntType(Value val) {
         Type t = val.getType();
         return !(val instanceof ArrayRef)
             && !(val instanceof InstanceFieldRef)
             && (t instanceof IntType ||
+                t instanceof LongType ||
                 t instanceof ByteType ||
                 t instanceof ShortType ||
                 t instanceof BooleanType);

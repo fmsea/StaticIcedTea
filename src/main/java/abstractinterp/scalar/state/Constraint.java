@@ -28,6 +28,14 @@ public class Constraint implements Comparable<Constraint> {
         return new Constraint(Optional.of(bound), false);
     }
 
+    public static Constraint of(long bound) {
+        if (bound < Integer.MAX_VALUE && bound > Integer.MIN_VALUE) {
+            return new Constraint(Optional.of(Math.toIntExact(bound)), false);
+        } else {
+            return Constraint.TOP();
+        }
+    }
+
     public static Constraint of(int bound, boolean bottom) {
         return new Constraint(Optional.of(bound), bottom);
     }

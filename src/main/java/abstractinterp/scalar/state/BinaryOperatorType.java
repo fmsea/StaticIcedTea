@@ -3,6 +3,7 @@ package abstractinterp.scalar.state;
 import soot.jimple.AddExpr;
 import soot.jimple.AndExpr;
 import soot.jimple.BinopExpr;
+import soot.jimple.CmpExpr;
 import soot.jimple.DivExpr;
 import soot.jimple.MulExpr;
 import soot.jimple.OrExpr;
@@ -20,6 +21,7 @@ public enum BinaryOperatorType {
     MULTIPLICATION,
     DIVISION,
     MODULUS,
+    CMP,
     BAND,
     BOR,
     BSHL,
@@ -52,6 +54,8 @@ public enum BinaryOperatorType {
             op = BUSHR;
         } else if (expr instanceof XorExpr) {
             op = XOR;
+        } else if (expr instanceof CmpExpr) {
+            op = CMP;
         } else {
             LoggerFactory.getLogger(BinaryOperatorType.class)
                 .error("No conversion for binary operation: {}", expr);

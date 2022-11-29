@@ -88,8 +88,22 @@ public class Interval32Box {
         return new Interval32Box(singleton);
     }
 
+    public static Interval32Box of(long singleton) {
+        return Interval32Box.of(singleton, singleton);
+    }
+
     public static Interval32Box of(int lowerBound, int upperBound) {
         return new Interval32Box(lowerBound, upperBound);
+    }
+
+    public static Interval32Box of(long lowerBound, long upperBound) {
+        Optional<Integer> lower = lowerBound < Integer.MIN_VALUE ?
+            Optional.empty() :
+            Optional.of(Math.toIntExact(lowerBound));
+        Optional<Integer> upper = upperBound > Integer.MAX_VALUE ?
+            Optional.empty() :
+            Optional.of(Math.toIntExact(upperBound));
+        return new Interval32Box(lower, upper);
     }
 
     public static Interval32Box of(Integer lowerBound, Integer upperBound) {

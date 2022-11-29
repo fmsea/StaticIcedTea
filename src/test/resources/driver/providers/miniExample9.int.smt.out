@@ -1,0 +1,32 @@
+$b1	l0	l2	l3	l4	l5	r0
+3 l2 = 0L:<miniExample9: long example(long)>
+fall	(= l2 0)
+
+4 l3 = 1L:<miniExample9: long example(long)>
+fall	(and (= l2 0) (= l3 1))
+
+5 l4 = 0L:<miniExample9: long example(long)>
+fall	(and (= l2 0) (= l3 1) (= l4 0))
+
+6 l5 = 0L:<miniExample9: long example(long)>
+fall	(and (= l2 0) (= l3 1) (= l4 0) (= l5 0))
+
+7 $b1 = l5 cmp l0:<miniExample9: long example(long)>
+fall	(and (>= l2 0) (>= l3 1) (>= l4 0) (>= l5 0))
+
+8 if $b1 >= 0 goto return l4:<miniExample9: long example(long)>
+fall	(and (>= l0 1) (>= l2 0) (>= l3 1) (>= l4 0) (>= l5 0))
+
+branch	(and (>= l2 0) (>= l3 1) (>= l4 0) (>= l5 0))
+
+9 l4 = l3 + l2:<miniExample9: long example(long)>
+fall	(and (>= l0 1) (>= l2 0) (>= l3 1) (>= l4 1) (>= l5 0))
+
+10 l2 = l3:<miniExample9: long example(long)>
+fall	(and (>= l0 1) (>= l2 1) (>= l3 1) (>= l4 1) (>= l5 0))
+
+11 l3 = l4:<miniExample9: long example(long)>
+fall	(and (>= l0 1) (>= l2 1) (>= l3 1) (>= l4 1) (>= l5 0))
+
+12 l5 = l5 + 1L:<miniExample9: long example(long)>
+fall	(and (>= l0 1) (>= l2 1) (>= l3 1) (>= l4 1) (>= l5 1))

@@ -14,6 +14,7 @@ import soot.jimple.EqExpr;
 import soot.jimple.GeExpr;
 import soot.jimple.GtExpr;
 import soot.jimple.IntConstant;
+import soot.jimple.LongConstant;
 import soot.jimple.LeExpr;
 import soot.jimple.LtExpr;
 import soot.jimple.MulExpr;
@@ -196,7 +197,6 @@ public class SolverWrapperZ3 implements SolverWrapper {
                         } else {
                             LOGGER.error("Rhs in ShlExpr is not a number [class={}]", rhsArith.getClass());
                         }
-
                     } else {
                         LOGGER.error("Cannot process rhsBinop [class={}]", rhsBinop.getClass());
                     }
@@ -271,6 +271,12 @@ public class SolverWrapperZ3 implements SolverWrapper {
                 ret = ctx.mkInt(((IntConstant) v).value);
             } catch (Z3Exception e) {
                 LOGGER.error("error in evaluateExpr", e);
+            }
+        } else if (v instanceof LongConstant) {
+            try {
+                ret = ctx.mkInt(((LongConstant) v).value);
+            } catch (Z3Exception e) {
+                LOGGER.error("error in evaluateExpr: {}", e);
             }
         } else if (v instanceof NegExpr) {
             NegExpr expr = (NegExpr)v;

@@ -15,6 +15,7 @@ public class PredicateMiniJavaExamplesProvider extends MiniJavaExamplesProvider 
                          example("miniExample3", "predicate"),
                          example("miniExample4", "predicate"),
                          example("miniExample5", "predicate"),
-                         example("miniExample6", "predicate"));
+                         example("miniExample6", "predicate"),
+                         example("miniExample9", "predicate"));
     }
 }

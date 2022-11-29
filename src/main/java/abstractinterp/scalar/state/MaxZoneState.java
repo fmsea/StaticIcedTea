@@ -17,6 +17,7 @@ import soot.Value;
 import soot.grimp.Grimp;
 import soot.jimple.BinopExpr;
 import soot.jimple.IntConstant;
+import soot.jimple.LongConstant;
 import soot.jimple.internal.JNegExpr;
 
 import abstractinterp.scalar.state.util.GraphProjection;
@@ -185,10 +186,16 @@ public class MaxZoneState implements State {
                             BinaryOperatorType operator) {
         if (left instanceof IntConstant && right instanceof IntConstant) {
             this.updateState(lVar, inState, (IntConstant) left, (IntConstant) right, operator);
+        } else if (left instanceof LongConstant && right instanceof LongConstant) {
+            this.updateState(lVar, inState, (LongConstant) left, (LongConstant) right, operator);
         } else if (left instanceof Local && right instanceof IntConstant) {
             this.updateState(lVar, inState, (Local) left, (IntConstant) right, operator);
+        } else if (left instanceof Local && right instanceof LongConstant) {
+            this.updateState(lVar, inState, (Local) left, (LongConstant) right, operator);
         } else if (left instanceof IntConstant && right instanceof Local) {
             this.updateState(lVar, inState, (IntConstant) left, (Local) right, operator);
+        } else if (left instanceof LongConstant && right instanceof Local) {
+            this.updateState(lVar, inState, (LongConstant) left, (Local) right, operator);
         } else if (left instanceof Local && right instanceof Local) {
             this.updateState(lVar, inState, (Local) left, (Local) right, operator);
         } else {
@@ -219,6 +226,36 @@ public class MaxZoneState implements State {
             break;
         case MODULUS:
             c = IntConstant.v(left.value % right.value);
+            break;
+        default:
+            LOGGER.warn("Encountered unhandled integer binary operator: {}", operator);
+            return;
+        }
+
+        this.updateState(lVar, inState, c);
+    }
+
+    public void updateState(Local lVar,
+                            MaxZoneState inState,
+                            LongConstant left,
+                            LongConstant right,
+                            BinaryOperatorType operator) {
+        LongConstant c;
+        switch (operator) {
+        case ADDITION:
+            c = LongConstant.v(left.value + right.value);
+            break;
+        case SUBTRACTION:
+            c = LongConstant.v(left.value - right.value);
+            break;
+        case MULTIPLICATION:
+            c = LongConstant.v(left.value * right.value);
+            break;
+        case DIVISION:
+            c = LongConstant.v(left.value / right.value);
+            break;
+        case MODULUS:
+            c = LongConstant.v(left.value % right.value);
             break;
         default:
             LOGGER.warn("Encountered unhandled integer binary operator: {}", operator);
@@ -280,6 +317,56 @@ public class MaxZoneState implements State {
 
     public void updateState(Local lVar,
                             MaxZoneState inState,
+                            Local left,
+                            LongConstant right,
+                            BinaryOperatorType operator) {
+        Consumer<BinaryOperator<Interval32Box>> computeInterval = (binop) -> {
+            inState.matrix.computeClosure();
+            Interval32Box leftInterval = inState.matrix.projectToInterval(left);
+            Interval32Box newValue = binop.apply(leftInterval, Interval32Box.of(right.value));
+            this.add(lVar, ZERO, Constraint.of(newValue.upperBound()));
+            this.add(ZERO, lVar, Constraint.of(newValue.lowerBound().map(b -> b * -1)));
+        };
+        switch (operator) {
+        case ADDITION:
+            if (lVar.equals(left)) {
+                Constraint c = Constraint.of(right.value);
+                this.matrix.addOutgoing(lVar, c, inState.matrix);
+                this.matrix.subIncoming(lVar, c, inState.matrix);
+            } else {
+                this.forget(lVar);
+                this.add(lVar, left, Constraint.of(right.value));
+                this.add(left, lVar, Constraint.of(right.value * -1));
+            }
+            break;
+        case SUBTRACTION:
+            if (lVar.equals(left)) {
+                Constraint c = Constraint.of(right.value * -1);
+                this.matrix.addOutgoing(lVar, c, inState.matrix);
+                this.matrix.subIncoming(lVar, c, inState.matrix);
+            } else {
+                this.forget(lVar);
+                this.add(lVar, left, Constraint.of(right.value * -1));
+                this.add(left, lVar, Constraint.of(right.value));
+            }
+            break;
+        case MULTIPLICATION:
+            this.forget(lVar);
+            computeInterval.accept(Interval32Box::multiply);
+            break;
+        case DIVISION:
+            this.forget(lVar);
+            computeInterval.accept(Interval32Box::divide);
+            break;
+        default:
+            LOGGER.warn("unhandled binary operator, transfering ⟙ [{} = {} {} {}]",
+                        lVar, left, right, operator);
+            this.forget(lVar);
+        }
+    }
+
+    public void updateState(Local lVar,
+                            MaxZoneState inState,
                             IntConstant left,
                             Local right,
                             BinaryOperatorType operator) {
@@ -317,6 +404,47 @@ public class MaxZoneState implements State {
             this.forget(lVar);
         }
         this.matrix.computeClosure();
+    }
+
+    public void updateState(Local lVar,
+                            MaxZoneState inState,
+                            LongConstant left,
+                            Local right,
+                            BinaryOperatorType operator) {
+        Consumer<BinaryOperator<Interval32Box>> computeInterval = (binop) -> {
+            inState.matrix.computeClosure();
+            Interval32Box rightInterval = inState.matrix.projectToInterval(right);
+            Interval32Box newValue = binop.apply(Interval32Box.of(left.value), rightInterval);
+            this.forget(lVar);
+            this.add(lVar, ZERO, Constraint.of(newValue.upperBound()));
+            this.add(ZERO, lVar, Constraint.of(newValue.lowerBound().map(b -> b * -1)));
+        };
+        switch (operator) {
+        case ADDITION:
+            if (lVar.equals(right)) {
+                Constraint c = Constraint.of(left.value);
+                this.matrix.addOutgoing(lVar, c, inState.matrix);
+                this.matrix.subIncoming(lVar, c, inState.matrix);
+            } else {
+                this.forget(lVar);
+                this.add(lVar, right, Constraint.of(left.value));
+                this.add(right, lVar, Constraint.of(left.value * -1));
+            }
+            break;
+        case SUBTRACTION:
+            computeInterval.accept(Interval32Box::subtract);
+            break;
+        case MULTIPLICATION:
+            computeInterval.accept(Interval32Box::multiply);
+            break;
+        case DIVISION:
+            computeInterval.accept(Interval32Box::divide);
+            break;
+        default:
+            LOGGER.warn("unhandled binary operator, transfering ⟙ [{} = {} {} {}]",
+                        lVar, left, right, operator);
+            this.forget(lVar);
+        }
     }
 
     public void updateState(Local lVar,
@@ -366,6 +494,10 @@ public class MaxZoneState implements State {
                 IntConstant ic = (IntConstant)v;
                 this.forget(lVar);
                 this.updateState(lVar, inState, IntConstant.v(ic.value * -1));
+            } else if (v instanceof LongConstant) {
+                LongConstant lc = (LongConstant)v;
+                this.forget(lVar);
+                this.updateState(lVar, inState, LongConstant.v(lc.value * -1));
             } else if (v instanceof Local) {
                 Local l = (Local)v;
                 Interval32Box interval = this.matrix.projectToInterval(l);
@@ -376,6 +508,8 @@ public class MaxZoneState implements State {
             }
         } else if (v instanceof IntConstant) {
             this.updateState(lVar, inState, (IntConstant) v);
+        } else if (v instanceof LongConstant) {
+            this.updateState(lVar, inState, (LongConstant) v);
         } else if (v instanceof Local) {
             this.updateState(lVar, inState, (Local) v);
         } else {
@@ -385,6 +519,12 @@ public class MaxZoneState implements State {
     }
 
     public void updateState(Local lVar, MaxZoneState inState, IntConstant c) {
+        this.forget(lVar);
+        this.add(lVar, ZERO, Constraint.of(c.value));
+        this.add(ZERO, lVar, Constraint.of(c.value * -1));
+    }
+
+    public void updateState(Local lVar, MaxZoneState inState, LongConstant c) {
         this.forget(lVar);
         this.add(lVar, ZERO, Constraint.of(c.value));
         this.add(ZERO, lVar, Constraint.of(c.value * -1));
@@ -457,8 +597,12 @@ public class MaxZoneState implements State {
             feasible = updateCond(inState, (Local) left, (Local) right, type);
         } else if (left instanceof Local && right instanceof IntConstant) {
             feasible = updateCond(inState, (Local) left, (IntConstant) right, type);
+        } else if (left instanceof Local && right instanceof LongConstant) {
+            feasible = updateCond(inState, (Local) left, (LongConstant) right, type);
         } else if (left instanceof IntConstant && right instanceof Local) {
             feasible = updateCond(inState, (IntConstant) left, (Local) right, type);
+        } else if (left instanceof LongConstant && right instanceof Local) {
+            feasible = updateCond(inState, (LongConstant) left, (Local) right, type);
         } else {
             LOGGER.warn("missing handler for x-condition: {} {} {}", left, type, right);
             feasible = true;
@@ -497,7 +641,67 @@ public class MaxZoneState implements State {
     }
 
     public boolean updateCond(MaxZoneState inState,
+                              Local left,
+                              LongConstant right,
+                              PredicateType type) {
+        switch (type) {
+        case Le:
+            this.add(left, ZERO, Constraint.of(right.value), inState);
+            break;
+        case Lt:
+            this.add(left, ZERO, Constraint.of(right.value - 1), inState);
+            break;
+        case Eq:
+            this.add(left, ZERO, Constraint.of(right.value), inState);
+            this.add(ZERO, left, Constraint.of(right.value * - 1), inState);
+            break;
+        case Ge:
+            this.add(ZERO, left, Constraint.of(right.value * -1), inState);
+            break;
+        case Gt:
+            this.add(ZERO, left, Constraint.of((right.value * - 1) - 1), inState);
+            break;
+        case Ne:
+            break;
+        case Invalid:
+            this.makeInfeasible();
+            return false;
+        }
+        return this.matrix.computeClosure();
+    }
+
+    public boolean updateCond(MaxZoneState inState,
                               IntConstant left,
+                              Local right,
+                              PredicateType type) {
+        switch (type) {
+        case Le:
+            this.add(ZERO, right, Constraint.of(left.value * -1), inState);
+            break;
+        case Lt:
+            this.add(ZERO, right, Constraint.of((left.value * -1) - 1), inState);
+            break;
+        case Eq:
+            this.add(ZERO, right, Constraint.of(left.value * -1), inState);
+            this.add(right, ZERO, Constraint.of(left.value), inState);
+            break;
+        case Ge:
+            this.add(right, ZERO, Constraint.of(left.value), inState);
+            break;
+        case Gt:
+            this.add(right, ZERO, Constraint.of(left.value - 1), inState);
+            break;
+        case Ne:
+            break;
+        case Invalid:
+            this.makeInfeasible();
+            return false;
+        }
+        return this.matrix.computeClosure();
+    }
+
+    public boolean updateCond(MaxZoneState inState,
+                              LongConstant left,
                               Local right,
                               PredicateType type) {
         switch (type) {

@@ -15,6 +15,7 @@ public class IntMiniJavaExamplesProvider extends MiniJavaExamplesProvider {
                          example("miniExample3", "int"),
                          example("miniExample4", "int"),
                          example("miniExample5", "int"),
-                         example("miniExample6", "int"));
+                         example("miniExample6", "int"),
+                         example("miniExample9", "int"));
     }
 }

@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+    import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import soot.ByteType;
 import soot.IntType;
 import soot.Local;
+import soot.LongType;
 import soot.ShortType;
 import soot.Body;
 import soot.BooleanType;
@@ -30,6 +31,7 @@ import soot.jimple.ArrayRef;
 import soot.jimple.AssignStmt;
 import soot.jimple.BinopExpr;
 import soot.jimple.ConditionExpr;
+import soot.jimple.CmpExpr;
 import soot.jimple.EqExpr;
 import soot.jimple.Expr;
 import soot.jimple.GeExpr;
@@ -37,6 +39,7 @@ import soot.jimple.GtExpr;
 import soot.jimple.IfStmt;
 import soot.jimple.InstanceFieldRef;
 import soot.jimple.IntConstant;
+import soot.jimple.LongConstant;
 import soot.jimple.LeExpr;
 import soot.jimple.LtExpr;
 import soot.jimple.NeExpr;
@@ -68,6 +71,8 @@ import disjoint.driver.StartAnalysis;
 import solver.SolverWrapper;
 import solver.SolverFactory;
 import disjoint.state.*;
+import abstractinterp.scalar.state.DeferredCmpMap;
+import abstractinterp.scalar.state.PredicateType;
 
 /**
  * The core of the analysis and
@@ -82,6 +87,9 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
 
     //only write to the file states of those statements
     protected Set<Unit> outputStmt;
+
+    // map of deferred comparisons, used when long types are compared and need to be later refined.
+    private DeferredCmpMap deferredComparisons;
 
     //in the current implementation would have
     //at most three states:
@@ -219,9 +227,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
         AbstractState.setLocals(locals);
         outputStmt = new HashSet<Unit>();
         changedVariables = new HashMap<>();
-
-
-
+        deferredComparisons = new DeferredCmpMap();
     }
 
 
@@ -450,7 +456,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
         //check only for integers?
         if(in.isFeasible()){
             if (s instanceof AssignStmt) {
-                processAssignStmt((AssignStmt)s,inState, ifStmtFalse);
+                processAssignStmt((AssignStmt)s, inState, ifStmtFalse);
 
             } else if (s instanceof IfStmt) {
                 processIfStmt((IfStmt) s, inState, ifStmtFalse, ifStmtTrue);
@@ -476,11 +482,38 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
     protected void processIfStmt(IfStmt s, AbstractState inState,
             AbstractState ifStmtFalse, AbstractState ifStmtTrue) {
         ConditionExpr condExpr = (ConditionExpr)s.getCondition();
+        PredicateType type = PredicateType.fromJimple(condExpr);
         Value lhs = condExpr.getOp1();
         Value rhs = condExpr.getOp2();
         //make sure this is an integer conditional stmt
-        if(isAnyIntType(lhs)){
-            //add it to the tracked states
+        if (isAnyIntType(lhs)) {
+            if (lhs instanceof Local && this.deferredComparisons.contains((Local)lhs)) {
+                this.deferredComparisons.get((Local) lhs).ifPresentOrElse(p -> {
+                        Value exprLhs = p.fst();
+                        Value exprRhs = p.snd();
+                        processCondition(s,
+                                         PredicateType.toJimple(type, exprLhs, exprRhs),
+                                         inState,
+                                         ifStmtFalse,
+                                         ifStmtTrue,
+                                         exprLhs,
+                                         exprRhs);
+                    }, () -> processCondition(s, condExpr, inState, ifStmtFalse, ifStmtTrue, lhs, rhs));
+            } else {
+                processCondition(s, condExpr, inState, ifStmtFalse, ifStmtTrue, lhs, rhs);
+            }
+        }
+
+    }
+
+    private void processCondition(IfStmt s,
+                                  ConditionExpr condExpr,
+                                  AbstractState inState,
+                                  AbstractState ifStmtFalse,
+                                  AbstractState ifStmtTrue,
+                                  Value left,
+                                  Value right) {
+        //add it to the tracked states
             outputStmt.add(s);
             //create the set of variables to be tracked
             Set<Local> track = new HashSet<>();
@@ -488,8 +521,8 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
             //precondition of the IfStmt
             Set<Expr> precond = new HashSet<Expr>();
             Set<Value> valuesToEval = new HashSet<Value>();//there should be one value only
-            addNotNull(findLocal(lhs), valuesToEval);
-            addNotNull(findLocal(rhs), valuesToEval);
+            addNotNull(findLocal(left), valuesToEval);
+            addNotNull(findLocal(right), valuesToEval);
             //need to make a special case when valuesToEval is empty
             //it means that both sides are concrete values
             //hence no need call for the solver
@@ -512,24 +545,22 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
             }
 
             //at this point we have precondition set
-            //make sure lhs is not a constant
-            if(lhs instanceof JimpleLocal){
-                //find new values for lhs
-                updateStateCond(lhs,symbState, condExpr, ifStmtTrue, s);//s is only used for the symbolic state
-                updateStateCond(lhs, symbNotState,negate(condExpr), ifStmtFalse, s);
+            //make sure left is not a constant
+            if(left instanceof JimpleLocal){
+                //find new values for left
+                updateStateCond(left, symbState, condExpr, ifStmtTrue, s);//s is only used for the symbolic state
+                updateStateCond(left, symbNotState,negate(condExpr), ifStmtFalse, s);
                 condExpr = null; //so no need to update the symbolic state twice
-                track.add((Local)lhs);
+                track.add((Local)left);
             }
-            //make sure rhs is not a constant
-            if(rhs instanceof JimpleLocal){
-                updateStateCond(rhs, symbState, condExpr, ifStmtTrue, s);
-                updateStateCond(rhs, symbNotState, negate(condExpr), ifStmtFalse,s );
-                track.add((Local)rhs);
+            //make sure right is not a constant
+            if(right instanceof JimpleLocal){
+                updateStateCond(right, symbState, condExpr, ifStmtTrue, s);
+                updateStateCond(right, symbNotState, negate(condExpr), ifStmtFalse,s );
+                track.add((Local)right);
             }
-            //created the negated one
-        } // end if this is an integer conditional stmt
-
     }
+
     private BinopExpr negate(ConditionExpr condExpr) {
         BinopExpr ret = null;
         if(condExpr != null){
@@ -650,30 +681,40 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
             } else if (rhs instanceof BinopExpr && !(rhs instanceof AndExpr) &&
                        !(rhs instanceof XorExpr) && !(rhs instanceof OrExpr) &&
                        !(rhs instanceof JUshrExpr)) {
-                //can only handle some non-linear operations
-                //might be different for a different solvers
-                //thus a good place for re-factoring the code
-                //but it would make it more slow since we need
-                //to go back and forth between encodings to
-                //realize that something in the solver is not
-                //supported.
-                //But there is a doubt that some solvers
-                //have such support
+
+                // Interjection: If the BinopExpr operator is CMP, we are going
+                // to defer the refinement.
+
                 BinopExpr bexpr = (BinopExpr) rhs;
                 Value exprLhs = bexpr.getOp1();
                 Value exprRhs = bexpr.getOp2();
-                if(rhs instanceof ShlExpr || rhs instanceof ShrExpr){
-                    //check weather esprRhs is not an constant
-                    //Z3 cannot handle those operation
-                    //perhaps should be outsourced to the solver
-                    if(!(exprRhs instanceof IntConstant)){
-                        //cannot handle it, update it to top
-                        updateStateTop(lhs, outState);
-                        return;
+                if (rhs instanceof CmpExpr) {
+                    // add lhs and rhs to deferred map.
+                    this.deferredComparisons.put((Local)lhs, exprLhs, exprRhs);
+                    return;
+                } else {
+                    //can only handle some non-linear operations
+                    //might be different for a different solvers
+                    //thus a good place for re-factoring the code
+                    //but it would make it more slow since we need
+                    //to go back and forth between encodings to
+                    //realize that something in the solver is not
+                    //supported.
+                    //But there is a doubt that some solvers
+                    //have such support
+                    if(rhs instanceof ShlExpr || rhs instanceof ShrExpr){
+                        //check weather esprRhs is not an constant
+                        //Z3 cannot handle those operation
+                        //perhaps should be outsourced to the solver
+                        if(!(exprRhs instanceof IntConstant)){
+                            //cannot handle it, update it to top
+                            updateStateTop(lhs, outState);
+                            return;
+                        }
                     }
+                    addNotNull(findLocal(exprRhs),valuesToEval);
+                    addNotNull(findLocal(exprLhs),valuesToEval);
                 }
-                addNotNull(findLocal(exprRhs),valuesToEval);
-                addNotNull(findLocal(exprLhs),valuesToEval);
             } else if (rhs instanceof JimpleLocal || //definitely can change it
                        rhs instanceof NumericConstant){
                 addNotNull(findLocal(rhs),valuesToEval);
@@ -1009,6 +1050,7 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
         return (!(val instanceof ArrayRef) &&
                 !(val instanceof InstanceFieldRef) &&
                 (t instanceof IntType ||
+                 t instanceof LongType ||
                  t instanceof ByteType ||
                  t instanceof ShortType ||
                  t instanceof BooleanType));

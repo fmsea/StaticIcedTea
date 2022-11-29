@@ -17,6 +17,7 @@ public class ZonesMiniJavaExamplesProvider extends MiniJavaExamplesProvider {
                          example("miniExample5", "zones"),
                          example("miniExample6", "zones"),
                          example("miniExample7", "zones"),
-                         example("miniExample8", "zones"));
+                         example("miniExample8", "zones"),
+                         example("miniExample9", "zones"));
     }
 }
