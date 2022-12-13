@@ -219,14 +219,7 @@ public class ForwardBranchedFlowNumerical<S extends State>
     }
 
     public static boolean isIntType(Value val) {
-        Type t = val.getType();
-        return !(val instanceof ArrayRef)
-            && !(val instanceof InstanceFieldRef)
-            && (t instanceof IntType ||
-                t instanceof LongType ||
-                t instanceof ByteType ||
-                t instanceof ShortType ||
-                t instanceof BooleanType);
+        return NumericalAnalysisUtil.isIntType(val);
     }
 
     @Override
