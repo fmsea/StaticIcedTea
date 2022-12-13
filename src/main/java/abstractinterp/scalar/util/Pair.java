@@ -4,7 +4,7 @@ public class Pair<S, T> {
     private S fst;
     private T snd;
 
-    private Pair(S fst, T snd) {
+    protected Pair(S fst, T snd) {
         this.fst = fst;
         this.snd = snd;
     }
