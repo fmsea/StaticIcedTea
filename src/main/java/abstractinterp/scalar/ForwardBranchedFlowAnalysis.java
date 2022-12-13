@@ -58,7 +58,7 @@ public abstract class ForwardBranchedFlowAnalysis<N extends Unit, A>
         super.doAnalysis();
     }
 
-    protected boolean isFowrad() {
+    protected boolean isForward() {
         return true;
     }
 
