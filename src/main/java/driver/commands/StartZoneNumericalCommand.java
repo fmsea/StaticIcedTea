@@ -19,7 +19,7 @@ public class StartZoneNumericalCommand implements Callable<Integer> {
             required = true)
     private Path outputResultsPath;
 
-    @Option(names = {"-cp", "--classpath"},
+    @Option(names = {"-cp", "--classpath", "--class-path"},
             description = "Classpath to bytecode to analyze",
             required = true)
     private Path classpath;

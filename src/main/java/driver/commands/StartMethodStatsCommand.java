@@ -13,7 +13,7 @@ import driver.MethodStatsRunner;
          mixinStandardHelpOptions = true,
          description = "Compute statements counts and data about a method")
 public class StartMethodStatsCommand implements Callable<Integer> {
-    @Option(names = {"-cp", "--classpath"},
+    @Option(names = {"-cp", "--classpath", "--class-path"},
             description = "Classpath to bytecode to analyze",
             required = true)
     private Path classpath;
