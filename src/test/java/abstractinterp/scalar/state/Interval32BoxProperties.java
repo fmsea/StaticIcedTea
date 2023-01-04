@@ -1,5 +1,6 @@
 package abstractinterp.scalar.state;
 
+import java.util.Set;
 import java.util.List;
 import net.jqwik.api.Property;
 import net.jqwik.api.ForAll;
@@ -325,5 +326,30 @@ public class Interval32BoxProperties {
         box.lowerBound().map(b -> b * -1);
         box.upperBound().map(b -> b * -1);
         assertAll(() -> assertEquals(orig, box));
+    }
+
+    @Property
+    void intersectionOfIntervalsIsSymmetric(@ForAll Interval32Box a, @ForAll Interval32Box b) {
+        assertEquals(a.intersects(b), b.intersects(a));
+    }
+
+    @Property
+    void interleavingIntervalsIsSymmetric(@ForAll Interval32Box a, @ForAll Interval32Box b) {
+        Set<Interval32Box> forwards = Interval32Box.interleave(a, b);
+        Set<Interval32Box> backwards = Interval32Box.interleave(b, a);
+        assertEquals(forwards, backwards);
+    }
+
+    @Property
+    void interwovenIntervalsAreDisjoint(@ForAll Interval32Box a, @ForAll Interval32Box b) {
+        Set<Interval32Box> woven = Interval32Box.interleave(a, b);
+        woven.stream().forEach(x -> {
+                woven.stream().forEach(y -> {
+                        if (!x.equals(y)) {
+                            assertFalse(x.intersects(y));
+                            assertFalse(y.intersects(x));
+                        }
+                    });
+            });
     }
 }

@@ -2,6 +2,8 @@ package abstractinterp.scalar.state;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
 import soot.IntType;
 import soot.Local;
 import soot.jimple.Jimple;
@@ -11,6 +13,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import solver.SolverWrapper;
 import solver.SolverWrapperZ3;
@@ -1286,5 +1291,152 @@ public class Interval32BoxTest {
                       () -> assertEquals(Interval32Box.of(-1, 1),
                                          Interval32Box.divide(y, x)));
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideIntersectionIntervals")
+    void testIntersection(Interval32Box a, Interval32Box b, Interval32Box expected) {
+        assertEquals(expected, Interval32Box.intersection(a, b));
+    }
+
+    private static Stream<Arguments> provideIntersectionIntervals() {
+        return Stream.of(Arguments.arguments(Interval32Box.TOP(),
+                                             Interval32Box.of(0),
+                                             Interval32Box.of(0)),
+                         Arguments.arguments(Interval32Box.BOT(),
+                                             Interval32Box.of(0),
+                                             Interval32Box.BOT()),
+                         Arguments.arguments(Interval32Box.of(0),
+                                             Interval32Box.of(1),
+                                             Interval32Box.BOT()),
+                         Arguments.arguments(Interval32Box.of(1, 2),
+                                             Interval32Box.of(0, 3),
+                                             Interval32Box.of(1, 2)),
+                         Arguments.arguments(Interval32Box.of(0, 1),
+                                             Interval32Box.of(1, 2),
+                                             Interval32Box.of(1)),
+                         Arguments.arguments(Interval32Box.of(-1, 0),
+                                             Interval32Box.of(-1, 2),
+                                             Interval32Box.of(-1, 0)),
+                         Arguments.arguments(Interval32Box.of(null, 1),
+                                             Interval32Box.of(1, null),
+                                             Interval32Box.of(1)),
+                         Arguments.arguments(Interval32Box.of(1, null),
+                                             Interval32Box.of(null, 0),
+                                             Interval32Box.BOT()),
+                         Arguments.arguments(Interval32Box.of(null, 2),
+                                             Interval32Box.of(-1, null),
+                                             Interval32Box.of(-1, 2)),
+                         Arguments.arguments(Interval32Box.of(null, 1),
+                                             Interval32Box.of(null, 5),
+                                             Interval32Box.of(null, 1)),
+                         Arguments.arguments(Interval32Box.of(-5, null),
+                                             Interval32Box.of(-10, null),
+                                             Interval32Box.of(-5, null)));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideInterleaveIntervals")
+    void testInterleaveIntervals(Interval32Box a, Interval32Box b, Set<Interval32Box> expected) {
+        assertEquals(expected, Interval32Box.interleave(a, b));
+    }
+
+    private static Stream<Arguments> provideInterleaveIntervals() {
+        return Stream.of(Arguments.arguments(Interval32Box.TOP(),
+                                             Interval32Box.TOP(),
+                                             Set.of(Interval32Box.TOP())),
+                         Arguments.arguments(Interval32Box.of(Integer.MIN_VALUE, -1),
+                                             Interval32Box.of(0, Integer.MAX_VALUE),
+                                             Set.of(Interval32Box.of(Integer.MIN_VALUE, -1),
+                                                    Interval32Box.of(0, Integer.MAX_VALUE))),
+                         Arguments.arguments(Interval32Box.TOP(),
+                                             Interval32Box.of(0),
+                                             Set.of(Interval32Box.of(null, -1),
+                                                    Interval32Box.of(0),
+                                                    Interval32Box.of(1, null))),
+                         Arguments.arguments(Interval32Box.of(0),
+                                             Interval32Box.TOP(),
+                                             Set.of(Interval32Box.of(null, -1),
+                                                    Interval32Box.of(0),
+                                                    Interval32Box.of(1, null))),
+                         Arguments.arguments(Interval32Box.of(null, 0),
+                                             Interval32Box.of(0, null),
+                                             Set.of(Interval32Box.of(null, -1),
+                                                    Interval32Box.of(0),
+                                                    Interval32Box.of(1, null))),
+                         Arguments.arguments(Interval32Box.of(null, 0),
+                                             Interval32Box.of(1, null),
+                                             Set.of(Interval32Box.of(null, 0),
+                                                    Interval32Box.of(1, null))),
+                         Arguments.arguments(Interval32Box.of(null, 0),
+                                             Interval32Box.of(0, null),
+                                             Set.of(Interval32Box.of(null, -1),
+                                                    Interval32Box.of(0),
+                                                    Interval32Box.of(1, null))),
+                         Arguments.arguments(Interval32Box.of(0),
+                                             Interval32Box.of(1),
+                                             Set.of(Interval32Box.of(0),
+                                                    Interval32Box.of(1))),
+                         Arguments.arguments(Interval32Box.of(-1, 0),
+                                             Interval32Box.of(0, 1),
+                                             Set.of(Interval32Box.of(-1),
+                                                    Interval32Box.of(0),
+                                                    Interval32Box.of(1))),
+                         Arguments.arguments(Interval32Box.of(-1, 2),
+                                             Interval32Box.of(-1, 1),
+                                             Set.of(Interval32Box.of(-1, 1),
+                                                    Interval32Box.of(2))),
+                         Arguments.arguments(Interval32Box.of(-1, 1),
+                                             Interval32Box.of(-1, 2),
+                                             Set.of(Interval32Box.of(-1, 1),
+                                                    Interval32Box.of(2))),
+                         Arguments.arguments(Interval32Box.of(0),
+                                             Interval32Box.of(0, 1),
+                                             Set.of(Interval32Box.of(0),
+                                                    Interval32Box.of(1))),
+                         Arguments.arguments(Interval32Box.of(0),
+                                             Interval32Box.of(0, 2),
+                                             Set.of(Interval32Box.of(0),
+                                                    Interval32Box.of(1, 2))),
+                         Arguments.arguments(Interval32Box.of(1, 2),
+                                             Interval32Box.of(0, 3),
+                                             Set.of(Interval32Box.of(0),
+                                                    Interval32Box.of(1, 2),
+                                                    Interval32Box.of(3))),
+                         Arguments.arguments(Interval32Box.of(0, 3),
+                                             Interval32Box.of(1, 2),
+                                             Set.of(Interval32Box.of(0),
+                                                    Interval32Box.of(1, 2),
+                                                    Interval32Box.of(3))),
+                         Arguments.arguments(Interval32Box.of(0, 1),
+                                             Interval32Box.of(1, 7),
+                                             Set.of(Interval32Box.of(0),
+                                                    Interval32Box.of(1),
+                                                    Interval32Box.of(2, 7))),
+                         Arguments.arguments(Interval32Box.of(0, 10),
+                                             Interval32Box.of(1, 10),
+                                             Set.of(Interval32Box.of(0),
+                                                    Interval32Box.of(1, 10))),
+                         Arguments.arguments(Interval32Box.of(1, 10),
+                                             Interval32Box.of(0, 10),
+                                             Set.of(Interval32Box.of(0),
+                                                    Interval32Box.of(1, 10))),
+                         Arguments.arguments(Interval32Box.of(0, 135158630),
+                                             Interval32Box.of(0),
+                                             Set.of(Interval32Box.of(0),
+                                                    Interval32Box.of(1, 135158630))),
+                         Arguments.arguments(Interval32Box.of(0),
+                                             Interval32Box.of(0, 135158630),
+                                             Set.of(Interval32Box.of(0),
+                                                    Interval32Box.of(1, 135158630))),
+                         Arguments.arguments(Interval32Box.of(1659486547),
+                                             Interval32Box.of(-2147483640, 1659486547),
+                                             Set.of(Interval32Box.of(-2147483640, 1659486546),
+                                                    Interval32Box.of(1659486547))),
+                         Arguments.arguments(Interval32Box.of(55, 81915457),
+                                             Interval32Box.of(-1, 0),
+                                             Set.of(Interval32Box.of(-1, 0),
+                                                    Interval32Box.of(55, 81915457)))
+                         );
     }
 }

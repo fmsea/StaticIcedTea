@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.stream.Stream;
+import java.util.stream.Collectors;
 import soot.Local;
 import soot.grimp.Grimp;
 import soot.jimple.IntConstant;
@@ -254,6 +256,23 @@ public class Interval32Box implements Comparable<Interval32Box> {
         }
         return subset;
     }
+    public boolean intersects(Interval32Box box) {
+        return !Interval32Box.intersection(this, box).isBottom();
+    }
+
+    public static Interval32Box intersection(Interval32Box a, Interval32Box b) {
+        if (a.isBottom() || b.isBottom()) {
+            return Interval32Box.BOT();
+        } else if (a.isTop()) {
+            return b;
+        } else if (b.isTop()) {
+            return a;
+        } else {
+            Optional<Integer> lower = bounded_maximum(a.lowerBound, b.lowerBound);
+            Optional<Integer> upper = bounded_minimum(a.upperBound, b.upperBound);
+            return Interval32Box.of(lower, upper);
+        }
+    }
 
     public static Interval32Box add(Interval32Box x, Interval32Box y) {
         Interval32Box r = Interval32Box.TOP();
@@ -449,6 +468,64 @@ public class Interval32Box implements Comparable<Interval32Box> {
                 break;
             }
         }
+        return ret;
+    }
+
+    public static Set<Interval32Box> interleave(Interval32Box a, Interval32Box b) {
+        Set<Interval32Box> ret;
+        Interval32Box intersection = Interval32Box.intersection(a, b);
+        if (intersection.isBottom()) {
+            ret = Set.of(a, b);
+        } else if (a.isBounded() && b.isBounded()) {
+            Optional<Integer> l1 = minimum(a.lowerBound, b.lowerBound);
+            Optional<Integer> u1 = maximum(l1, intersection.lowerBound.map(l -> l - 1));
+            Optional<Integer> u2 = maximum(a.upperBound, b.upperBound);
+            Optional<Integer> l2 = minimum(u2, intersection.upperBound.map(u -> u + 1));
+            Interval32Box lower = Interval32Box.of(l1, u1);
+            Interval32Box upper = Interval32Box.of(l2, u2);
+            ret = Stream.of(lower.intersects(intersection) ? Interval32Box.BOT() : lower,
+                            intersection,
+                            upper.intersects(intersection) ? Interval32Box.BOT() : upper)
+                .filter(s -> !s.isBottom())
+                .collect(Collectors.toSet());
+        } else if (!a.isLowerBounded() && a.isUpperBounded() && b.isLowerBounded() && !b.isUpperBounded()) {
+            // (inf, a] & [b, inf)
+            int lower = Math.min(a.upperBound.get(), b.lowerBound.get());
+            int upper = Math.max(a.upperBound.get(), b.lowerBound.get());
+            ret = Set.of(Interval32Box.of(null, lower - 1),
+                          Interval32Box.of(lower, upper),
+                          Interval32Box.of(upper + 1, null));
+        } else if (a.isLowerBounded() && !a.isUpperBounded() && !b.isLowerBounded() && b.isUpperBounded()) {
+            // [a, inf) & (inf, b]
+            int lower = Math.min(b.upperBound.get(), a.lowerBound.get());
+            int upper = Math.max(b.upperBound.get(), a.lowerBound.get());
+            ret = Set.of(Interval32Box.of(null, lower - 1),
+                          Interval32Box.of(lower, upper),
+                          Interval32Box.of(upper + 1, null));
+        } else if (a.isLowerBounded() && !a.isUpperBounded() && b.isLowerBounded() && !b.isUpperBounded()) {
+            // [a, inf) & [b, inf)
+            int lower = Math.min(a.lowerBound.get(), b.lowerBound.get());
+            int upper = Math.max(a.lowerBound.get(), b.lowerBound.get());
+            ret = Set.of(Interval32Box.of(lower, upper),
+                          Interval32Box.of(upper + 1, null));
+        } else if (!a.isLowerBounded() && a.isUpperBounded() && !b.isLowerBounded() && b.isUpperBounded()) {
+            // (inf, a] & (inf, b]
+            int lower = Math.min(a.upperBound.get(), b.upperBound.get());
+            int upper = Math.max(a.upperBound.get(), b.upperBound.get());
+            ret = Set.of(Interval32Box.of(null, lower - 1),
+                          Interval32Box.of(lower, upper));
+        } else if (!a.isBounded() && b.isBounded()) {
+            ret = Set.of(Interval32Box.of(null, b.lowerBound.get() - 1),
+                          b,
+                          Interval32Box.of(b.upperBound.get() + 1, null));
+        } else if (a.isBounded() && !b.isBounded()) {
+            ret = Set.of(Interval32Box.of(null, a.lowerBound.get() - 1),
+                          a,
+                          Interval32Box.of(a.upperBound.get() + 1, null));
+        } else {
+            ret = Set.of(Interval32Box.TOP());
+        }
+        LOGGER.debug("[a={}, b={}, a∩b={}, ret={}", a, b, intersection, ret);
         return ret;
     }
 
