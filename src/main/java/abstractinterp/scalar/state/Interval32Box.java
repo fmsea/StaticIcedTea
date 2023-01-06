@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import solver.SolverWrapper;
 
-public class Interval32Box {
+public class Interval32Box implements Comparable<Interval32Box> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Interval32Box.class);
 
@@ -611,6 +611,10 @@ public class Interval32Box {
                  (this.bottom == box.bottom &&
                   this.lowerBound.equals(box.lowerBound) &&
                   this.upperBound.equals(box.upperBound))));
+    }
+
+    public int compareTo(Interval32Box box) {
+        return this.upperBound.map(tu -> box.upperBound.map(bu -> Integer.compare(tu, bu)).orElse(-1)).orElse(1);
     }
 
     @Override
