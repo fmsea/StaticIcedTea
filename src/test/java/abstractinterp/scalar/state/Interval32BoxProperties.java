@@ -2,6 +2,8 @@ package abstractinterp.scalar.state;
 
 import java.util.Set;
 import java.util.List;
+import java.util.stream.Stream;
+import net.jqwik.api.Example;
 import net.jqwik.api.Property;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.constraints.Negative;
@@ -329,6 +331,47 @@ public class Interval32BoxProperties {
     }
 
     @Property
+    void unionIsSymmetric(@ForAll Interval32Box a, @ForAll Interval32Box b) {
+        assertEquals(Interval32Box.union(a, b),
+                     Interval32Box.union(b, a));
+    }
+
+    @Property
+    void unionIsAssoc(@ForAll List<Interval32Box> intervals) {
+        assertEquals(intervals.stream().reduce(Interval32Box::union),
+                     intervals.stream().sorted().reduce(Interval32Box::union));
+    }
+
+    @Property
+    void unionWithBOTisOther(@ForAll Interval32Box a) {
+        assertAll(() -> assertEquals(a, Interval32Box.union(a, Interval32Box.BOT())),
+                  () -> assertEquals(a, Interval32Box.union(Interval32Box.BOT(), a)));
+    }
+
+    @Property
+    void unionWithTOPIsTOP(@ForAll Interval32Box a) {
+        assertAll(() -> assertEquals(Interval32Box.TOP(), Interval32Box.union(a, Interval32Box.TOP())),
+                  () -> assertEquals(Interval32Box.TOP(), Interval32Box.union(Interval32Box.TOP(), a)));
+    }
+
+    @Property
+    void intervalsUnionedWithTOPisTOP(@ForAll List<Interval32Box> intervals) {
+        assertEquals(Interval32Box.TOP(),
+                     Stream.concat(intervals.stream(),
+                                   Stream.of(Interval32Box.TOP()))
+                     .reduce(Interval32Box::union).get());
+    }
+
+    @Example
+    void integerCoverageUnionsToTOP() {
+        assertEquals(Interval32Box.TOP(),
+                     Stream.of(Interval32Box.of(null, -1),
+                               Interval32Box.of(0),
+                               Interval32Box.of(1, null))
+                     .reduce(Interval32Box::union).get());
+    }
+
+    @Property
     void intersectionOfIntervalsIsSymmetric(@ForAll Interval32Box a, @ForAll Interval32Box b) {
         assertEquals(a.intersects(b), b.intersects(a));
     }
@@ -351,5 +394,12 @@ public class Interval32BoxProperties {
                         }
                     });
             });
+    }
+
+    @Property
+    void intervalsAreSubsetsOfUnion(@ForAll Interval32Box a, @ForAll Interval32Box b) {
+        Interval32Box union = Interval32Box.union(a, b);
+        assertAll(() -> assertTrue(a.isSubset(union)),
+                  () -> assertTrue(b.isSubset(union)));
     }
 }

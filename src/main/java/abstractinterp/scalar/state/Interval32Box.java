@@ -274,6 +274,19 @@ public class Interval32Box implements Comparable<Interval32Box> {
         }
     }
 
+    public static Interval32Box union(Interval32Box a, Interval32Box b) {
+        if (a.isBottom()) {
+            return b;
+        } else if (b.isBottom()) {
+            return a;
+        } else if (a.isTop() || b.isTop()) {
+            return Interval32Box.TOP();
+        } else {
+            return Interval32Box.of(minimum(a.lowerBound, b.lowerBound),
+                                    maximum(a.upperBound, b.upperBound));
+        }
+    }
+
     public static Interval32Box add(Interval32Box x, Interval32Box y) {
         Interval32Box r = Interval32Box.TOP();
         Integer l = null;
