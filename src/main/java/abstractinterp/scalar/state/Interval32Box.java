@@ -462,12 +462,12 @@ public class Interval32Box implements Comparable<Interval32Box> {
             ret.add(Interval32Box.BOT());
             ret.add(Interval32Box.BOT());
         } else {
-            ret.add(Interval32Box.of(negate(minimum(negate(lhs.lowerBound),
-                                                    negate(rhs.lowerBound))),
-                                     minimum(lhs.upperBound, rhs.upperBound)));
-            ret.add(Interval32Box.of(negate(minimum(negate(lhs.lowerBound),
-                                                    negate(rhs.lowerBound))),
-                                     minimum(lhs.upperBound, rhs.upperBound)));
+            ret.add(Interval32Box.of(negate(bounded_minimum(negate(lhs.lowerBound),
+                                                            negate(rhs.lowerBound))),
+                                     bounded_minimum(lhs.upperBound, rhs.upperBound)));
+            ret.add(Interval32Box.of(negate(bounded_minimum(negate(lhs.lowerBound),
+                                                            negate(rhs.lowerBound))),
+                                     bounded_minimum(lhs.upperBound, rhs.upperBound)));
         }
         return ret;
     }
@@ -498,15 +498,15 @@ public class Interval32Box implements Comparable<Interval32Box> {
             ret.add(Interval32Box.of(lhs));
             ret.add(Interval32Box.of(rhs));
         } else {
-            ret.add(Interval32Box.of(negate(minimum(negate(lhs.lowerBound),
-                                                    sub(sub(rhs.upperBound, lhs.lowerBound),
-                                                        rhs.lowerBound))),
-                                     minimum(lhs.upperBound, rhs.upperBound)));
-            ret.add(Interval32Box.of(negate(minimum(negate(rhs.lowerBound),
-                                                    negate(lhs.lowerBound))),
-                                     minimum(rhs.upperBound,
-                                             add(sub(rhs.upperBound, lhs.lowerBound),
-                                                 lhs.upperBound))));
+            ret.add(Interval32Box.of(negate(bounded_minimum(negate(lhs.lowerBound),
+                                                            sub(sub(rhs.upperBound, lhs.lowerBound),
+                                                                rhs.lowerBound))),
+                                     bounded_minimum(lhs.upperBound, rhs.upperBound)));
+            ret.add(Interval32Box.of(negate(bounded_minimum(negate(rhs.lowerBound),
+                                                            negate(lhs.lowerBound))),
+                                     bounded_minimum(rhs.upperBound,
+                                                     add(sub(rhs.upperBound, lhs.lowerBound),
+                                                         lhs.upperBound))));
         }
         return ret;
     }
@@ -527,9 +527,9 @@ public class Interval32Box implements Comparable<Interval32Box> {
             ret.add(Interval32Box.of(lhs));
             ret.add(Interval32Box.of(rhs));
         } else {
-            ret.add(Interval32Box.of(a, minimum(b, sub(d, Optional.of(1)))));
-            ret.add(Interval32Box.of(negate(minimum(negate(c), add(negate(a), Optional.of(-1)))),
-                                     minimum(d, add(d, add(negate(a), b)))));
+            ret.add(Interval32Box.of(a, bounded_minimum(b, sub(d, Optional.of(1)))));
+            ret.add(Interval32Box.of(negate(bounded_minimum(negate(c), add(negate(a), Optional.of(-1)))),
+                                     bounded_minimum(d, add(d, add(negate(a), b)))));
         }
         return ret;
     }
@@ -546,15 +546,15 @@ public class Interval32Box implements Comparable<Interval32Box> {
             ret.add(Interval32Box.of(lhs));
             ret.add(Interval32Box.of(rhs));
         } else {
-            ret.add(Interval32Box.of(negate(minimum(negate(lhs.lowerBound),
-                                                    negate(rhs.lowerBound))),
-                                     minimum(lhs.upperBound,
-                                             add(rhs.upperBound, sub(lhs.upperBound, rhs.lowerBound)))));
-            ret.add(Interval32Box.of(negate(minimum(negate(rhs.lowerBound),
-                                                    add(lhs.upperBound,
-                                                        add(negate(rhs.lowerBound),
-                                                            negate(lhs.lowerBound))))),
-                                     minimum(rhs.upperBound, lhs.upperBound)));
+            ret.add(Interval32Box.of(negate(bounded_minimum(negate(lhs.lowerBound),
+                                                            negate(rhs.lowerBound))),
+                                     bounded_minimum(lhs.upperBound,
+                                                     add(rhs.upperBound, sub(lhs.upperBound, rhs.lowerBound)))));
+            ret.add(Interval32Box.of(negate(bounded_minimum(negate(rhs.lowerBound),
+                                                            add(lhs.upperBound,
+                                                                add(negate(rhs.lowerBound),
+                                                                    negate(lhs.lowerBound))))),
+                                     bounded_minimum(rhs.upperBound, lhs.upperBound)));
         }
         return ret;
     }
@@ -575,9 +575,9 @@ public class Interval32Box implements Comparable<Interval32Box> {
             ret.add(Interval32Box.of(lhs));
             ret.add(Interval32Box.of(rhs));
         } else {
-            ret.add(Interval32Box.of(negate(minimum(negate(a), sub(negate(c), Optional.of(1)))), b));
-            ret.add(Interval32Box.of(negate(minimum(negate(c), add(negate(a), sub(b, c)))),
-                                     minimum(d, sub(b, Optional.of(1)))));
+            ret.add(Interval32Box.of(negate(bounded_minimum(negate(a), sub(negate(c), Optional.of(1)))), b));
+            ret.add(Interval32Box.of(negate(bounded_minimum(negate(c), add(negate(a), sub(b, c)))),
+                                     bounded_minimum(d, sub(b, Optional.of(1)))));
         }
         return ret;
     }
@@ -674,11 +674,39 @@ public class Interval32Box implements Comparable<Interval32Box> {
     }
 
     private static Optional<Integer> minimum(Optional<Integer> A, Optional<Integer> B) {
+        return A.map(a -> B.map(b -> a <= b ? Optional.of(a) : Optional.of(b))
+                     .orElse(Optional.empty()))
+            .orElse(Optional.empty());
+    }
+
+    private static Optional<Integer> minimum(Stream<Optional<Integer>> xs) {
+        return xs.reduce(Interval32Box::minimum).orElse(Optional.empty());
+    }
+
+    private static Optional<Integer> bounded_minimum(Optional<Integer> A, Optional<Integer> B) {
         return A.map(a -> B.map(b -> a <= b ? Optional.of(a) : Optional.of(b)).orElse(A)).orElse(B);
     }
 
+    private static Optional<Integer> bounded_minimum(Stream<Optional<Integer>> xs) {
+        return xs.reduce(Interval32Box::bounded_minimum).orElse(Optional.empty());
+    }
+
     private static Optional<Integer> maximum(Optional<Integer> A, Optional<Integer> B) {
+        return A.map(a -> B.map(b -> a <= b ? Optional.of(b) : Optional.of(a))
+                     .orElse(Optional.empty()))
+            .orElse(Optional.empty());
+    }
+
+    private static Optional<Integer> maximum(Stream<Optional<Integer>> xs) {
+        return xs.reduce(Interval32Box::maximum).orElse(Optional.empty());
+    }
+
+    private static Optional<Integer> bounded_maximum(Optional<Integer> A, Optional<Integer> B) {
         return A.map(a -> B.map(b -> a <= b ? Optional.of(b) : Optional.of(a)).orElse(A)).orElse(B);
+    }
+
+    private static Optional<Integer> bounded_maximum(Stream<Optional<Integer>> xs) {
+        return xs.reduce(Interval32Box::bounded_maximum).orElse(Optional.empty());
     }
 
     private static Optional<Integer> add(Optional<Integer> A, Optional<Integer> B) {
