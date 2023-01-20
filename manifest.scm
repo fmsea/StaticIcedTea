@@ -13,6 +13,7 @@
   #:use-module (gnu packages maven)
   #:use-module (gnu packages maths)
   #:use-module (gnu packages machine-learning)
+  #:use-module (gnu packages parallel)
   #:use-module (gnu packages python)
   #:use-module (gnu packages python-science)
   #:use-module (gnu packages python-xyz)
@@ -81,6 +82,7 @@
          maven
          bash
          gnuplot
+         parallel
          python-wrapper
          python-matplotlib
          python-pandas
