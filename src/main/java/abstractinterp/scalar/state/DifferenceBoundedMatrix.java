@@ -556,13 +556,18 @@ public class DifferenceBoundedMatrix {
     }
 
     public boolean equals(DifferenceBoundedMatrix other) {
-        boolean equal = true;
         if (this.locals.size() != other.locals.size()) {
-            equal = false;
+            return false;
         } else {
-            equal = reduceMatrixToBool((i, j) -> this.matrix[i][j].equals(other.matrix[i][j]));
+            for (int i = 0; i < N; i++) {
+                for (int j = 0; j < N; j++) {
+                    if (!this.matrix[i][j].equals(other.matrix[i][j])) {
+                        return false;
+                    }
+                }
+            }
         }
-        return equal;
+        return true;
     }
 
     private boolean isConstant(Local source, Local target) {
