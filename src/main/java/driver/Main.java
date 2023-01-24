@@ -17,6 +17,7 @@ import driver.commands.*;
              StartIntervalNumericalCommand.class,
              StartPredicateNumericalCommand.class,
              StartIncZoneNumericalCommand.class,
+             StartIncZoneWithChangePriorityNumericalCommand.class,
              StartZoneNumericalCommand.class,
              StartMinZoneNumericalCommand.class,
              StartMaxZoneNumericalCommand.class,

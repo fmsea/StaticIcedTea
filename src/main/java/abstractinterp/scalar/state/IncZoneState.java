@@ -35,9 +35,12 @@ public class IncZoneState implements State {
      * @param top Create TOP (⟙) elements for each relation or BOT (⟘)
      */
     public IncZoneState(Set<Local> locals, boolean top) {
-        Set<Local> localsWithZero = new HashSet<>();
-        localsWithZero.addAll(locals);
-        localsWithZero.add(ZERO);
+        this.initializeMatrix(locals, top);
+    }
+
+    protected void initializeMatrix(Set<Local> locals, boolean top) {
+        Set<Local> localsWithZero = Stream.concat(locals.stream(), Stream.of(ZERO))
+            .collect(Collectors.toSet());
         this.matrix = new DifferenceBoundedMatrix(localsWithZero, top);
     }
 

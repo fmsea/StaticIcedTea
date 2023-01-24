@@ -39,18 +39,18 @@ import util.Configuration;
 
 public class DifferenceBoundedMatrix {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(DifferenceBoundedMatrix.class);
-    private final int N;
-    private Constraint[][] matrix;
-    private Set<Local> locals;
+    protected static Logger LOGGER = LoggerFactory.getLogger(DifferenceBoundedMatrix.class);
+    protected final int N;
+    protected Constraint[][] matrix;
+    protected Set<Local> locals;
     protected Set<Local> constants;
-    private Map<Local, Integer> localToIndices;
-    private Map<Integer, Local> indicesToLocals;
-    private boolean isClosed = false;
+    protected Map<Local, Integer> localToIndices;
+    protected Map<Integer, Local> indicesToLocals;
+    protected boolean isClosed = false;
 
     public DifferenceBoundedMatrix(Set<Local> locals, boolean top) {
         this.N = locals.size();
-        this.locals = new HashSet<>(N * 2);
+        this.locals = new HashSet<>(N);
         this.constants = new HashSet<>();
         this.locals.addAll(locals);
         this.localToIndices = new HashMap<>(N * 2 + 1, 0.7f);
@@ -116,7 +116,7 @@ public class DifferenceBoundedMatrix {
         this.setConstraint(i, j, constraint);
     }
 
-    private void setConstraint(int i, int j, Constraint c) {
+    protected void setConstraint(int i, int j, Constraint c) {
         Local source = this.indicesToLocals.get(i);
         Local target = this.indicesToLocals.get(j);
         this.isClosed = false;
@@ -159,11 +159,11 @@ public class DifferenceBoundedMatrix {
         return this.putConstraint(i, j, constraint, matrix);
     }
 
-    private boolean putConstraint(int i, int j, Constraint c) {
+    protected boolean putConstraint(int i, int j, Constraint c) {
         return this.putConstraint(i, j, c, this);
     }
 
-    private boolean putConstraint(int i, int j, Constraint c, DifferenceBoundedMatrix in) {
+    protected boolean putConstraint(int i, int j, Constraint c, DifferenceBoundedMatrix in) {
         boolean added = false;
         LOGGER.trace("Compare to existing constraint: {} ≤ {}", c, in.matrix[i][j]);
         if (Constraint.compare(c, in.matrix[i][j]) < 0) {
