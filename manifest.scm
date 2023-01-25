@@ -9,6 +9,7 @@
   #:use-module (gnu packages base)
   #:use-module (gnu packages bash)
   #:use-module ((gnu packages java) #:prefix java:)
+  #:use-module (gnu packages linux)
   #:use-module (gnu packages maven)
   #:use-module (gnu packages maths)
   #:use-module (gnu packages machine-learning)
@@ -86,4 +87,5 @@
        python-scipy
        python-statsmodels
        python-numpy
+       util-linux
        z3-with-java))
