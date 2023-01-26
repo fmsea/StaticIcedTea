@@ -1,6 +1,6 @@
 # DFA SMT #
 
-## Dependencies and Environment ##
+## Dependencies and environment ##
 
 * Java 11
 
@@ -41,7 +41,7 @@ patch the `use_guix` function for caching and channel loading.
 Currently, this does not extend to the JAR dependencies inside the project.
 However, those are handled via [Maven][maven].
 
-### Non-Nix ###
+### Non-Nix/Guix ###
 
 Download the Z3 sources and build the project for your machine.
 
@@ -81,7 +81,40 @@ using maven:
 mvn clean test-compile
 ```
 
-## Test Suite ##
+### Debug builds and graph exports ###
+
+To get debug or trace level logging, modify the
+`src/main/resources/simplelogger.properties` and set the desired logging level.
+For example, to enable tracing, use the following:
+
+```
+org.slf4j.simpleLogger.defaultLogLevel=trace
+```
+
+To enable exports of graph states during analysis, set
+`DFA_EXPORT_GRAPH_STATES` environment variable to `true`.
+
+For example,
+
+```bash
+DFA_EXPORT_GRAPH_STATES=true java -jar ./target/DFA_SMT-1.0-SNAPSHOT.jar \
+    inczone-numerical \
+    --classpath=./analysis/artifacts \
+    --output=$(mktemp -d) \
+    test.Fibonacci 1
+```
+
+In the output folder, there will be a new `test.Fibonacci_1` folder which
+contains the GraphVIZ dot files for each flow output state.
+
+To convert these graphs to a series of PNG's, we can use the following parallel
+command (in the directory of the output created by the above `mktemp -d`):
+
+```bash
+parallel dot -Kcirco -Tpng {} -o{.}.png :::: $(find . -name '*.dot')
+```
+
+## Test suite ##
 
 Run the test suite in the expected way:
 
@@ -89,7 +122,15 @@ Run the test suite in the expected way:
 mvn test
 ```
 
-## IDE/Editor Support ##
+## Packaging ##
+
+Create the JAR (dependencies included) file, use the usual goal:
+
+```bash
+mvn package
+```
+
+## IDE/editor support ##
 
 Maven can generate project files for IDE's:
 
@@ -105,7 +146,11 @@ Maven can generate project files for IDE's:
   mvn idea:idea
   ```
 
-## R2/Borah Deployments using Guix ##
+Notice: Eclipse and IntelliJ need to be informed of the "environment".  This
+can be accomplished either by using the "non-nix/guix" instructions, or by
+utilizing plugins which integrate with [direnv][direnv] or similar tools.
+
+## R2/Borah deployments using Guix ##
 
 If using [Guix][guix] as described above, we can create "packs" which can be
 uploaded to R2 or Borah and used without needing to setup the dependencies on
