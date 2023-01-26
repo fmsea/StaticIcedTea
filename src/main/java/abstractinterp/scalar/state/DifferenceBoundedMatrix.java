@@ -413,9 +413,20 @@ public class DifferenceBoundedMatrix {
         if (!this.computeClosure()) {
             return false;
         }
-        for (int i = 1; i < N; i++) {
-            for (int j = 1; j < N; j++) {
-                if (i == j) {
+
+        Set<Integer> intervals = IntStream.range(1, N)
+            .mapToObj(i -> {
+                if (!(this.matrix[i][0].isTop() && this.matrix[0][i].isTop())) {
+                    return Integer.valueOf(i);
+                }
+                return Integer.valueOf(-1);
+            })
+            .filter(index -> index > 0)
+            .collect(Collectors.toSet());
+
+        for (Integer i : intervals) {
+            for (Integer j : intervals) {
+                if (i.equals(j)) {
                     continue;
                 }
                 Constraint transitivePath = Constraint.add(this.matrix[i][0],
