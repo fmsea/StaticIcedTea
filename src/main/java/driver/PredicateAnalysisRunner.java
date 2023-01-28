@@ -38,17 +38,20 @@ public class PredicateAnalysisRunner implements Runnable {
     private final SootMethod sootMethod;
     private final Body body;
     private final ValueAnalysis analysis;
+    private final boolean outputStateReports;
 
     public PredicateAnalysisRunner(String className,
                                    int methodId,
                                    Path outputResultsPath,
                                    File domainFile,
-                                   boolean symbolic) {
+                                   boolean symbolic,
+                                   boolean outputStateReports) {
         this.className = className;
         this.methodId = methodId;
         this.outputResultsPath = outputResultsPath;
         this.domainFile = domainFile;
         this.symbolic = symbolic;
+        this.outputStateReports = outputStateReports;
         this.sootMethod = SootInitialization.getSootMethod(className, methodId);
         this.body = this.sootMethod.retrieveActiveBody();
         LOGGER.debug("Reading {} for domains", domainFile);
@@ -62,70 +65,72 @@ public class PredicateAnalysisRunner implements Runnable {
         LOGGER.info("Analyzing Method {} in {}", this.sootMethod.getName(), this.className);
         LOGGER.debug("Soot Method Body\n:{}", this.body);
         AnalysisTimer.time((s) -> analysis.start());
-        AnalysisTimer.time((s) -> {
-                File changed = Path.of(this.outputResultsPath.toString(),
-                                       String.format("%s_%d.changed.out",
-                                                     className,
-                                                     methodId)).toFile();
-                File reachable = Path.of(this.outputResultsPath.toString(),
-                                         String.format("%s_%d.reachable.out",
-                                                       className,
-                                                       methodId)).toFile();
-                File subgraph = Path.of(this.outputResultsPath.toString(),
-                                         String.format("%s_%d.subgraph.out",
-                                                       className,
-                                                       methodId)).toFile();
-                File minSubgraph = Path.of(this.outputResultsPath.toString(),
-                                           String.format("%s_%d.subgraph-min.out",
+        if (this.outputStateReports) {
+            AnalysisTimer.time((s) -> {
+                    File changed = Path.of(this.outputResultsPath.toString(),
+                                           String.format("%s_%d.changed.out",
                                                          className,
                                                          methodId)).toFile();
-                File fullSmt = Path.of(this.outputResultsPath.toString(),
-                                       String.format("%s_%d.smt.out",
-                                                     className,
-                                                     methodId)).toFile();
-                File symbSmt = Path.of(this.outputResultsPath.toString(),
-                                       String.format("%s_%d.symbolic.out",
-                                                     className,
-                                                     methodId)).toFile();
+                    File reachable = Path.of(this.outputResultsPath.toString(),
+                                             String.format("%s_%d.reachable.out",
+                                                           className,
+                                                           methodId)).toFile();
+                    File subgraph = Path.of(this.outputResultsPath.toString(),
+                                            String.format("%s_%d.subgraph.out",
+                                                          className,
+                                                          methodId)).toFile();
+                    File minSubgraph = Path.of(this.outputResultsPath.toString(),
+                                               String.format("%s_%d.subgraph-min.out",
+                                                             className,
+                                                             methodId)).toFile();
+                    File fullSmt = Path.of(this.outputResultsPath.toString(),
+                                           String.format("%s_%d.smt.out",
+                                                         className,
+                                                         methodId)).toFile();
+                    File symbSmt = Path.of(this.outputResultsPath.toString(),
+                                           String.format("%s_%d.symbolic.out",
+                                                         className,
+                                                         methodId)).toFile();
 
-                File dir = this.outputResultsPath.toFile();
-                dir.mkdirs();
+                    File dir = this.outputResultsPath.toFile();
+                    dir.mkdirs();
 
-                try (FileWriter fw1 = new FileWriter(changed);
-                     BufferedWriter buf1 = new BufferedWriter(fw1);
-                     FileWriter fw2 = new FileWriter(reachable);
-                     BufferedWriter buf2 = new BufferedWriter(fw2);
-                     FileWriter fw3 = new FileWriter(subgraph);
-                     BufferedWriter buf3 = new BufferedWriter(fw3);
-                     FileWriter fw4 = new FileWriter(minSubgraph);
-                     BufferedWriter buf4 = new BufferedWriter(fw4)) {
-                    String report = this.analysis.generateReport();
-                    buf1.write(report);
-                    buf1.flush();
-                    buf2.write(report);
-                    buf2.flush();
-                    buf3.write(report);
-                    buf3.flush();
-                    buf4.write(report);
-                    buf4.flush();
-                } catch (IOException ex) {
-                    LOGGER.error("Unable to write changed output file: {}", ex.getMessage());
-                }
+                    try (FileWriter fw1 = new FileWriter(changed);
+                         BufferedWriter buf1 = new BufferedWriter(fw1);
+                         FileWriter fw2 = new FileWriter(reachable);
+                         BufferedWriter buf2 = new BufferedWriter(fw2);
+                         FileWriter fw3 = new FileWriter(subgraph);
+                         BufferedWriter buf3 = new BufferedWriter(fw3);
+                         FileWriter fw4 = new FileWriter(minSubgraph);
+                         BufferedWriter buf4 = new BufferedWriter(fw4)) {
+                        String report = this.analysis.generateReport();
+                        buf1.write(report);
+                        buf1.flush();
+                        buf2.write(report);
+                        buf2.flush();
+                        buf3.write(report);
+                        buf3.flush();
+                        buf4.write(report);
+                        buf4.flush();
+                    } catch (IOException ex) {
+                        LOGGER.error("Unable to write changed output file: {}", ex.getMessage());
+                    }
 
-                try (FileWriter fw = new FileWriter(fullSmt)) {
-                    fw.write(this.analysis.generateFullSMT());
-                    fw.flush();
-                } catch (IOException ex) {
-                    LOGGER.error("Unable to write full SMT output file: {}", ex.getMessage());
-                }
+                    try (FileWriter fw = new FileWriter(fullSmt)) {
+                        fw.write(this.analysis.generateFullSMT());
+                        fw.flush();
+                    } catch (IOException ex) {
+                        LOGGER.error("Unable to write full SMT output file: {}", ex.getMessage());
+                    }
 
-                try (FileWriter fw = new FileWriter(symbSmt)) {
-                    fw.write(this.analysis.generateSymbolicSMT());
-                    fw.flush();
-                } catch (IOException ex) {
-                    LOGGER.error("Unable to write symbolic SMT output file: {}", ex.getMessage());
-                }
-            },
-            "Analysis reporting took {} ms");
+                    try (FileWriter fw = new FileWriter(symbSmt)) {
+                        fw.write(this.analysis.generateSymbolicSMT());
+                        fw.flush();
+                    } catch (IOException ex) {
+                        LOGGER.error("Unable to write symbolic SMT output file: {}", ex.getMessage());
+                    }
+                },
+                "Analysis reporting took {} ms");
+        }
     }
 }

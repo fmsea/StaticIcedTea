@@ -34,17 +34,27 @@ public abstract class AnalysisRunner<S extends State>  implements Runnable {
     private final SootMethod sootMethod;
     private final Body body;
     private final IntegerAnalysis<S> analysis;
+    private final boolean outputStateReports;
 
     public AnalysisRunner(String className,
                           int methodId,
                           Path outputResultsPath,
                           StateFactory<S> factory) {
+        this(className, methodId, outputResultsPath, factory, true);
+    }
+
+    public AnalysisRunner(String className,
+                          int methodId,
+                          Path outputResultsPath,
+                          StateFactory<S> factory,
+                          boolean outputStateReports) {
         this.className = className;
         this.methodId = methodId;
         this.outputResultsPath = outputResultsPath;
         this.sootMethod = SootInitialization.getSootMethod(className, methodId);
         this.body = this.sootMethod.retrieveActiveBody();
         this.analysis = new IntegerAnalysis<>(this.body, 2, factory);
+        this.outputStateReports = outputStateReports;
     }
 
     public void run() {
@@ -53,10 +63,14 @@ public abstract class AnalysisRunner<S extends State>  implements Runnable {
         // Time Analysis
         AnalysisTimer.time((s) -> this.analysis.runAnalysis());
         // Time Reporting
-        AnalysisTimer.time((s) -> {
-                this.report();
-            },
-            "analysis report took {} ms");
+        if (this.outputStateReports) {
+            AnalysisTimer.time((s) -> {
+                    this.report();
+                },
+                "analysis report took {} ms");
+        } else {
+            LOGGER.info("Skipping report generation...");
+        }
     }
 
     protected void report() {

@@ -23,6 +23,14 @@ public class StartIncZoneWithChangePriorityNumericalCommand implements Callable<
             required = true)
     private Path classpath;
 
+    @Option(names = "--report",
+            description = "Whether to output state reports",
+            required = false,
+            defaultValue = "true",
+            fallbackValue = "true",
+            negatable = true)
+    private boolean outputReport;
+
     @Parameters(index = "0",
                 description = "Class name of artifact to analyze")
     private String className;
@@ -36,7 +44,8 @@ public class StartIncZoneWithChangePriorityNumericalCommand implements Callable<
         SootInitialization.initializeSoot(className, classpath);
         Runnable runner = new IncZoneWithChangePriorityAnalysisRunner(className,
                                                                       methodId,
-                                                                      outputResultsPath);
+                                                                      outputResultsPath,
+                                                                      outputReport);
         runner.run();
         return 0;
     }

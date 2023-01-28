@@ -34,6 +34,14 @@ public class StartPredicateNumericalCommand implements Callable<Integer> {
             required = false)
     private String symbolic = "Y";
 
+    @Option(names = "--report",
+            description = "Whether to output state reports",
+            required = false,
+            defaultValue = "true",
+            fallbackValue = "true",
+            negatable = true)
+    private boolean outputReport;
+
     @Parameters(index = "0",
                 description = "Class Name of artifact to analyze")
     private String className;
@@ -49,7 +57,8 @@ public class StartPredicateNumericalCommand implements Callable<Integer> {
                                                       methodId,
                                                       outputResultsPath,
                                                       domainFile,
-                                                      symbolic.equals("Y"));
+                                                      symbolic.equals("Y"),
+                                                      outputReport);
         runner.run();
         return 0;
     }

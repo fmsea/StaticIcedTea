@@ -28,6 +28,14 @@ public class StartIntervalNumericalCommand implements Callable<Integer> {
             required = true)
     private Path classpath;
 
+    @Option(names = "--report",
+            description = "Whether to output state reports",
+            required = false,
+            defaultValue = "true",
+            fallbackValue = "true",
+            negatable = true)
+    private boolean outputReport;
+
     @Parameters(index = "0",
                 description = "Class Name of artifact to analyze")
     private String className;
@@ -41,7 +49,8 @@ public class StartIntervalNumericalCommand implements Callable<Integer> {
         SootInitialization.initializeSoot(className, classpath);
         Runnable runner = new IntervalAnalysisRunner(className,
                                                      methodId,
-                                                     outputResultsPath);
+                                                     outputResultsPath,
+                                                     outputReport);
         runner.run();
         return 0;
     }

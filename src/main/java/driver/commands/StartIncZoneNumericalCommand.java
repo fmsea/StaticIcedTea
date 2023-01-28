@@ -23,6 +23,14 @@ public class StartIncZoneNumericalCommand implements Callable<Integer> {
             required = true)
     private Path classpath;
 
+    @Option(names = "--report",
+            description = "Whether to output state reports",
+            required = false,
+            defaultValue = "true",
+            fallbackValue = "true",
+            negatable = true)
+    private boolean outputReport;
+
     @Parameters(index = "0",
                 description = "Class name of artifact to analyze")
     private String className;
@@ -35,8 +43,9 @@ public class StartIncZoneNumericalCommand implements Callable<Integer> {
     public Integer call() throws Exception {
         SootInitialization.initializeSoot(className, classpath);
         Runnable runner = new IncZoneAnalysisRunner(className,
-                                                   methodId,
-                                                   outputResultsPath);
+                                                    methodId,
+                                                    outputResultsPath,
+                                                    outputReport);
         runner.run();
         return 0;
     }
