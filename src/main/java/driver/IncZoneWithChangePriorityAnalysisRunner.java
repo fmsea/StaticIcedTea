@@ -9,11 +9,13 @@ public class IncZoneWithChangePriorityAnalysisRunner extends AnalysisRunner<IncZ
     public IncZoneWithChangePriorityAnalysisRunner(String className,
                                                    int methodId,
                                                    Path outputResultsPath,
-                                                   boolean outputStateReports) {
+                                                   boolean outputStateReports,
+                                                   int widenIterations) {
         super(className,
               methodId,
               outputResultsPath,
               new IncZoneStateWithChangePriorityFactory(),
-              outputStateReports);
+              outputStateReports,
+              widenIterations);
     }
 }

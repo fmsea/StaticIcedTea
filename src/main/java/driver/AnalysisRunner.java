@@ -48,12 +48,21 @@ public abstract class AnalysisRunner<S extends State>  implements Runnable {
                           Path outputResultsPath,
                           StateFactory<S> factory,
                           boolean outputStateReports) {
+        this(className, methodId, outputResultsPath, factory, outputStateReports, 2);
+    }
+
+    public AnalysisRunner(String className,
+                          int methodId,
+                          Path outputResultsPath,
+                          StateFactory<S> factory,
+                          boolean outputStateReports,
+                          int widenIterations) {
         this.className = className;
         this.methodId = methodId;
         this.outputResultsPath = outputResultsPath;
         this.sootMethod = SootInitialization.getSootMethod(className, methodId);
         this.body = this.sootMethod.retrieveActiveBody();
-        this.analysis = new IntegerAnalysis<>(this.body, 2, factory);
+        this.analysis = new IntegerAnalysis<>(this.body, widenIterations, factory);
         this.outputStateReports = outputStateReports;
     }
 

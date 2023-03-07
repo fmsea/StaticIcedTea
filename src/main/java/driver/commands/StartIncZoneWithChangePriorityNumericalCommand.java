@@ -31,6 +31,12 @@ public class StartIncZoneWithChangePriorityNumericalCommand implements Callable<
             negatable = true)
     private boolean outputReport;
 
+    @Option(names = {"--widen-after", "-k"},
+            description = "Widen widening nodes after `k` iterations",
+            required = false,
+            defaultValue = "2")
+    private int widenIterations;
+
     @Parameters(index = "0",
                 description = "Class name of artifact to analyze")
     private String className;
@@ -45,7 +51,8 @@ public class StartIncZoneWithChangePriorityNumericalCommand implements Callable<
         Runnable runner = new IncZoneWithChangePriorityAnalysisRunner(className,
                                                                       methodId,
                                                                       outputResultsPath,
-                                                                      outputReport);
+                                                                      outputReport,
+                                                                      widenIterations);
         runner.run();
         return 0;
     }

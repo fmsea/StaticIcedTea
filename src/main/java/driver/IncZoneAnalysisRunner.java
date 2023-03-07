@@ -9,7 +9,13 @@ public class IncZoneAnalysisRunner extends AnalysisRunner<IncZoneState> {
     public IncZoneAnalysisRunner(String className,
                                  int methodId,
                                  Path outputResultsPath,
-                                 boolean outputStateReports) {
-        super(className, methodId, outputResultsPath, new IncZoneStateFactory(), outputStateReports);
+                                 boolean outputStateReports,
+                                 int widenIterations) {
+        super(className,
+              methodId,
+              outputResultsPath,
+              new IncZoneStateFactory(),
+              outputStateReports,
+              widenIterations);
     }
 }

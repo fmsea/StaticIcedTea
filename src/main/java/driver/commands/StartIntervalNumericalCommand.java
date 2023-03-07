@@ -36,6 +36,12 @@ public class StartIntervalNumericalCommand implements Callable<Integer> {
             negatable = true)
     private boolean outputReport;
 
+    @Option(names = {"--widen-after", "-k"},
+            description = "Widen widening nodes after `k` iterations",
+            required = false,
+            defaultValue = "2")
+    private int widenIterations;
+
     @Parameters(index = "0",
                 description = "Class Name of artifact to analyze")
     private String className;
@@ -50,7 +56,8 @@ public class StartIntervalNumericalCommand implements Callable<Integer> {
         Runnable runner = new IntervalAnalysisRunner(className,
                                                      methodId,
                                                      outputResultsPath,
-                                                     outputReport);
+                                                     outputReport,
+                                                     widenIterations);
         runner.run();
         return 0;
     }
