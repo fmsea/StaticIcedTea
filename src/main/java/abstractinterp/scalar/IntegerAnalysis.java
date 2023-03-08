@@ -47,10 +47,22 @@ public class IntegerAnalysis<S extends State> implements Analysis {
     private Set<Local> locals;
 
     public IntegerAnalysis(Body b, int iterations, StateFactory<S> stateFactory) {
-        this(SolverFactory.getSolver(), b, iterations, stateFactory);
+        this(SolverFactory.getSolver(), b, iterations, stateFactory, Set.of());
+    }
+
+    public IntegerAnalysis(Body b, int iterations, StateFactory<S> stateFactory, Set<Integer> widenSteps) {
+        this(SolverFactory.getSolver(), b, iterations, stateFactory, widenSteps);
     }
 
     public IntegerAnalysis(SolverWrapper solver, Body b, int iterations, StateFactory<S> stateFactory) {
+        this(solver, b, iterations, stateFactory, Set.of());
+    }
+
+    public IntegerAnalysis(SolverWrapper solver,
+                           Body b,
+                           int iterations,
+                           StateFactory<S> stateFactory,
+                           Set<Integer> widenSteps) {
         this.solver = solver;
         this.b = b;
         this.g = new ExceptionalUnitGraph(b);
@@ -80,6 +92,7 @@ public class IntegerAnalysis<S extends State> implements Analysis {
                                                       wideningNode,
                                                       iterations,
                                                       locals,
+                                                      widenSteps,
                                                       stateFactory);
 
         // setup the flows

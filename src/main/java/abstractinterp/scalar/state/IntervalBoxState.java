@@ -115,17 +115,17 @@ public class IntervalBoxState implements State {
 
     }
 
-    public void widenWith(State prevBeforeFlow) {
+    public void widenWith(State prevBeforeFlow, Optional<Integer> step) {
         if (prevBeforeFlow instanceof IntervalBoxState) {
-            widenWith((IntervalBoxState) prevBeforeFlow);
+            widenWith((IntervalBoxState) prevBeforeFlow, step);
         } else {
             throw new RuntimeException("Invalid widen. The types are wrong!");
         }
     }
 
-    public void widenWith(IntervalBoxState prevBeforeFlow) {
+    public void widenWith(IntervalBoxState prevBeforeFlow, Optional<Integer> step) {
         for(Local l : state.keySet()){
-            getValue(l).wideningAssign(prevBeforeFlow.getValue(l));
+            getValue(l).wideningAssign(prevBeforeFlow.getValue(l), step);
         }
     }
 

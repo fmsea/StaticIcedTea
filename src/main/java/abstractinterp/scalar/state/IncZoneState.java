@@ -167,16 +167,16 @@ public class IncZoneState implements State {
         this.matrix.union(inState.matrix);
     }
 
-    public void widenWith(State inState) {
+    public void widenWith(State inState, Optional<Integer> step) {
         if (inState instanceof IncZoneState) {
-            this.widenWith((IncZoneState) inState);
+            this.widenWith((IncZoneState) inState, step);
         } else {
             throw new RuntimeException("Invalid type for widenWith");
         }
     }
 
-    public void widenWith(IncZoneState inState) {
-        this.matrix.widenWith(inState.matrix);
+    public void widenWith(IncZoneState inState, Optional<Integer> step) {
+        this.matrix.widenWith(inState.matrix, step);
     }
 
     public boolean isSubset(State inState) {

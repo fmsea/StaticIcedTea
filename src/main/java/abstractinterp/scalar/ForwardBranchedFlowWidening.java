@@ -4,11 +4,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+import java.util.Optional;
 
 import soot.Unit;
 import soot.toolkits.graph.DirectedGraph;
 
 import abstractinterp.scalar.state.State;
+import abstractinterp.scalar.util.Pair;
 /**
  * Widening also asks about after how many
  * iterations apply widening and also a list
@@ -28,7 +33,8 @@ public abstract class ForwardBranchedFlowWidening<N extends Unit, A extends Stat
     /**
      * Count of merging performed by a widening node
      */
-    Map<N,Integer> itersCount;
+    private final int defaultIterationCount;
+    Map<N, Pair<Integer, TreeSet<Integer>>> itersCount;
 
 
     public ForwardBranchedFlowWidening(DirectedGraph<N> graph,
@@ -37,6 +43,7 @@ public abstract class ForwardBranchedFlowWidening<N extends Unit, A extends Stat
                                        Map<N, List<A>> unitToAfterBranchFlow,
                                        Map<N, List<A>> unitToAfterFallFlow,
                                        Set<N> wideningNodes,
+                                       Set<Integer> wideningSteps,
                                        int iters) {
         super(graph);
         this.order = order;
@@ -44,9 +51,12 @@ public abstract class ForwardBranchedFlowWidening<N extends Unit, A extends Stat
         this.unitToAfterFallFlow = unitToAfterFallFlow;
         this.unitToBeforeFlow = unitToBeforeFlow;
         this.wideningNodes = wideningNodes;
-        itersCount = new HashMap<N,Integer>();
+        this.defaultIterationCount = iters + 1;
+        this.itersCount = new HashMap<>();
         for (N n : wideningNodes) {
-            itersCount.put(n, iters + 1);
+            TreeSet<Integer> steps = new TreeSet<>();
+            wideningSteps.forEach(s -> steps.add(s));
+            itersCount.put(n, Pair.of(this.defaultIterationCount, steps));
         }
     }
 
@@ -67,16 +77,24 @@ public abstract class ForwardBranchedFlowWidening<N extends Unit, A extends Stat
             LOGGER.trace("current before flow: {}", beforeFlow);
             if (!prevBeforeFlow.equals(beforeFlow)) {
                 //check the count
-                int mergeCounts = itersCount.get(node);
+                Pair<Integer, TreeSet<Integer>> iterSteps = this.itersCount.get(node);
+                int mergeCounts = iterSteps.fst();
+                TreeSet<Integer> steps = iterSteps.snd();
                 if (mergeCounts < MAX_WIDENING_ITERATIONS) {
                     throw new RuntimeException(String.format("Widening did not work [iterations=%d, node=%s]",
                                                              mergeCounts * -1,
                                                              node));
                 } else if (mergeCounts <= 0) {
-                    widen(prevBeforeFlow, beforeFlow);
+                    if (steps.isEmpty()) {
+                        widen(prevBeforeFlow, beforeFlow);
+                    } else {
+                        Integer step = steps.first();
+                        steps.remove(step);
+                        widen(prevBeforeFlow, beforeFlow, Optional.of(step));
+                    }
                 }
                 mergeCounts--;
-                itersCount.put(node, mergeCounts);
+                itersCount.put(node, Pair.of(mergeCounts, steps));
             }
 
         } else {
@@ -99,5 +117,15 @@ public abstract class ForwardBranchedFlowWidening<N extends Unit, A extends Stat
      * @return widened flow
      */
     protected abstract void widen(A prevBeforeFlow, A beforeFlow);
+
+    /**
+     * widens beforeFlow with prevBeforeFlow using an optional stepping.
+     *
+     *
+     * @param prevBeforeFlow
+     * @param beforeFlow
+     * @param step
+     */
+    protected abstract void widen(A prevBeforeFlow, A beforeFlow, Optional<Integer> step);
 
 }

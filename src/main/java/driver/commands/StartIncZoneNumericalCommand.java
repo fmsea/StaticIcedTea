@@ -1,5 +1,6 @@
 package driver.commands;
 
+import java.util.Set;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
@@ -37,6 +38,11 @@ public class StartIncZoneNumericalCommand implements Callable<Integer> {
             defaultValue = "2")
     private int widenIterations;
 
+    @Option(names = {"--widen-steps", "-S"},
+            description = "Use step values for widening",
+            required = false)
+    private Set<Integer> widenSteps;
+
     @Parameters(index = "0",
                 description = "Class name of artifact to analyze")
     private String className;
@@ -48,11 +54,21 @@ public class StartIncZoneNumericalCommand implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         SootInitialization.initializeSoot(className, classpath);
-        Runnable runner = new IncZoneAnalysisRunner(className,
-                                                    methodId,
-                                                    outputResultsPath,
-                                                    outputReport,
-                                                    widenIterations);
+        Runnable runner;
+        if (widenSteps != null) {
+            runner = new IncZoneAnalysisRunner(className,
+                                               methodId,
+                                               outputResultsPath,
+                                               outputReport,
+                                               widenIterations,
+                                               widenSteps);
+        } else {
+            runner = new IncZoneAnalysisRunner(className,
+                                               methodId,
+                                               outputResultsPath,
+                                               outputReport,
+                                               widenIterations);
+        }
         runner.run();
         return 0;
     }

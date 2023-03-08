@@ -182,21 +182,21 @@ public class Interval32Box implements Comparable<Interval32Box> {
         }
     }
 
-    private void minWidenAssign(Interval32Box n) {
+    private void minWidenAssign(Interval32Box n, Optional<Integer> step) {
         boolean shouldWiden = (!this.isLowerBounded() ||
                                !n.isLowerBounded() ||
                                this.lowerBound.flatMap(ml -> n.lowerBound.map(nl -> nl < ml)).orElse(false));
         if (shouldWiden) {
-            this.lowerBound = Optional.empty();
+            this.lowerBound = step.map(s -> s * -1);
         }
     }
 
-    private void maxWidenAssign(Interval32Box n) {
+    private void maxWidenAssign(Interval32Box n, Optional<Integer> step) {
         boolean shouldWiden = (!this.isUpperBounded() ||
                                !n.isUpperBounded() ||
                                this.upperBound.flatMap(mu -> n.upperBound.map(nu -> nu > mu)).orElse(false));
         if (shouldWiden) {
-            this.upperBound = Optional.empty();
+            this.upperBound = step;
         }
     }
 
@@ -221,12 +221,16 @@ public class Interval32Box implements Comparable<Interval32Box> {
     }
 
     public static Interval32Box wideningAssign(Interval32Box m, Interval32Box n) {
+        return Interval32Box.wideningAssign(m, n, Optional.empty());
+    }
+
+    public static Interval32Box wideningAssign(Interval32Box m, Interval32Box n, Optional<Integer> step) {
         Interval32Box c = Interval32Box.of(m);
-        c.wideningAssign(n);
+        c.wideningAssign(n, step);
         return c;
     }
 
-    public void wideningAssign(Interval32Box n) {
+    public void wideningAssign(Interval32Box n, Optional<Integer> step) {
         // this = m
         if (this.isBottom()) {
             this.lowerBound = n.lowerBound;
@@ -234,8 +238,8 @@ public class Interval32Box implements Comparable<Interval32Box> {
             this.bottom = n.bottom;
         } else if (!n.isBottom()) {
             // ⊃ this ≠ ⟘ ∧ box ≠ ⟘
-            minWidenAssign(n);
-            maxWidenAssign(n);
+            minWidenAssign(n, step);
+            maxWidenAssign(n, step);
             this.checkAndSetBottom();
         }
     }

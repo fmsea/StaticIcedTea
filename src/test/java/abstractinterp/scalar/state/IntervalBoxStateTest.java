@@ -300,4 +300,36 @@ public class IntervalBoxStateTest {
     //                      Arguments.arguments(states[2], Set.of(xs[0]), "(= x0 3)"),
     //                      Arguments.arguments(states[3], Set.of(xs[1], xs[2]), "true"));
     // }
+
+    @Test
+    void testWidening() {
+        Local[] xs = new Local[] {
+            Jimple.v().newLocal("x0", IntType.v()),
+            Jimple.v().newLocal("x1", IntType.v()),
+            Jimple.v().newLocal("x2", IntType.v()),
+            Jimple.v().newLocal("x3", IntType.v()),
+        };
+        Set<Local> locals = Stream.of(xs).collect(Collectors.toSet());
+        {
+            IntervalBoxState m = new IntervalBoxState(locals, true);
+            m.update(xs[0], Interval32Box.of(0));
+            m.update(xs[1], Interval32Box.of(-1, 1));
+            m.update(xs[2], Interval32Box.of(0, 2));
+            m.update(xs[3], Interval32Box.of(-2, -1));
+            IntervalBoxState n = new IntervalBoxState(locals, true);
+            n.update(xs[0], Interval32Box.of(0));
+            n.update(xs[1], Interval32Box.of(-2, 2));
+            n.update(xs[2], Interval32Box.of(0, 3));
+            n.update(xs[3], Interval32Box.of(-3, -1));
+            m.widenWith(n, Optional.of(10));
+            assertAll(() -> assertEquals(Interval32Box.of(0),
+                                         m.getValue(xs[0])),
+                      () -> assertEquals(Interval32Box.of(-10, 10),
+                                         m.getValue(xs[1])),
+                      () -> assertEquals(Interval32Box.of(0, 10),
+                                         m.getValue(xs[2])),
+                      () -> assertEquals(Interval32Box.of(-10, -1),
+                                         m.getValue(xs[3])));
+        }
+    }
 }

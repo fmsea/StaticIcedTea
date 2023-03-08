@@ -1,5 +1,6 @@
 package abstractinterp.scalar.state;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.List;
 import java.util.stream.Stream;
@@ -88,8 +89,8 @@ public class Interval32BoxProperties {
     void widenWithBottomTakesOther(@ForAll Interval32Box box) {
         Interval32Box a = Interval32Box.of(box);
         Interval32Box bot = Interval32Box.BOT();
-        a.wideningAssign(bot);
-        bot.wideningAssign(box);
+        a.wideningAssign(bot, Optional.empty());
+        bot.wideningAssign(box, Optional.empty());
         assertAll(() -> assertFalse(a.isBottom()),
                   () -> assertFalse(bot.isBottom()));
     }

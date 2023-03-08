@@ -2,6 +2,7 @@ package abstractinterp.scalar;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -51,12 +52,35 @@ public class ForwardBranchedFlowNumerical<S extends State>
                                         int iters,
                                         Set<Local> locals,
                                         StateFactory<S> stateFactory) {
+        this(graph,
+             order,
+             unitToBeforeFlow,
+             unitToAfterBranchFlow,
+             unitToAfterFallFlow,
+             wideningNodes,
+             iters,
+             locals,
+             Set.of(),
+             stateFactory);
+    }
+
+    public ForwardBranchedFlowNumerical(DirectedGraph<Unit> graph,
+                                        List<Unit> order,
+                                        Map<Unit, S> unitToBeforeFlow,
+                                        Map<Unit, List<S>> unitToAfterBranchFlow,
+                                        Map<Unit, List<S>> unitToAfterFallFlow,
+                                        Set<Unit> wideningNodes,
+                                        int iters,
+                                        Set<Local> locals,
+                                        Set<Integer> widenSteps,
+                                        StateFactory<S> stateFactory) {
         super(graph,
               order,
               unitToBeforeFlow,
               unitToAfterBranchFlow,
               unitToAfterFallFlow,
               wideningNodes,
+              widenSteps,
               iters);
         this.variables = locals;
         this.stateFactory = stateFactory;
@@ -74,9 +98,14 @@ public class ForwardBranchedFlowNumerical<S extends State>
      */
     @Override
     protected void widen(S prevBeforeFlow, S beforeFlow) {
+        this.widen(prevBeforeFlow, beforeFlow, Optional.empty());
+    }
+
+    @Override
+    protected void widen(S prevBeforeFlow, S beforeFlow, Optional<Integer> step) {
         LOGGER.trace("widening {} with {}", prevBeforeFlow, beforeFlow);
         State widenedFlow = prevBeforeFlow.copy();
-        widenedFlow.widenWith(beforeFlow);
+        widenedFlow.widenWith(beforeFlow, step);
         LOGGER.trace("widening result: {}", widenedFlow);
         widenedFlow.copyTo(beforeFlow);
     }

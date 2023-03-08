@@ -441,17 +441,23 @@ public class DifferenceBoundedMatrix {
 
     public static DifferenceBoundedMatrix widen(DifferenceBoundedMatrix m,
                                                 DifferenceBoundedMatrix n) {
+        return DifferenceBoundedMatrix.widen(m, n, Optional.empty());
+    }
+
+    public static DifferenceBoundedMatrix widen(DifferenceBoundedMatrix m,
+                                                DifferenceBoundedMatrix n,
+                                                Optional<Integer> step) {
         DifferenceBoundedMatrix res = new DifferenceBoundedMatrix(m);
-        res.widenWith(n);
+        res.widenWith(n, step);
         return res;
     }
 
-    public void widenWith(DifferenceBoundedMatrix n) {
+    public void widenWith(DifferenceBoundedMatrix n, Optional<Integer> step) {
         iterateMatrix((i, j) -> {
                 Constraint c1 = this.matrix[i][j];
                 Constraint c2 = n.matrix[i][j];
                 if (!(c1.isBottom() || c2.isBottom()) && c2.compareTo(c1) == 1) {
-                    this.matrix[i][j] = Constraint.TOP();
+                    this.matrix[i][j] = step.map(s -> Constraint.of(s)).orElse(Constraint.TOP());
                 }
             });
     }

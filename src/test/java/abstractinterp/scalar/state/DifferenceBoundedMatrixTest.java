@@ -658,6 +658,43 @@ public class DifferenceBoundedMatrixTest {
     }
 
     @Test
+    void testWideningWithSteps() {
+        {
+            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            m.setConstraint(xs[0], xs[1], Constraint.of(-2));
+            m.setConstraint(xs[0], xs[2], Constraint.of(0));
+            m.setConstraint(xs[1], xs[0], Constraint.of(4));
+            m.setConstraint(xs[1], xs[2], Constraint.of(2));
+            m.setConstraint(xs[2], xs[0], Constraint.of(3));
+            DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(this.locals, true);
+            n.setConstraint(xs[0], xs[1], Constraint.of(-1));
+            n.setConstraint(xs[0], xs[2], Constraint.of(-1));
+            n.setConstraint(xs[1], xs[0], Constraint.of(4));
+            n.setConstraint(xs[1], xs[2], Constraint.of(1));
+            n.setConstraint(xs[2], xs[0], Constraint.of(3));
+            DifferenceBoundedMatrix c = DifferenceBoundedMatrix.widen(m, n, Optional.of(10));
+            assertAll(() -> assertEquals(Constraint.of(0),
+                                         c.getConstraint(xs[0], xs[0])),
+                      () -> assertEquals(Constraint.of(0),
+                                         c.getConstraint(xs[1], xs[1])),
+                      () -> assertEquals(Constraint.of(0),
+                                         c.getConstraint(xs[2], xs[2])),
+                      () -> assertEquals(Constraint.of(10),
+                                         c.getConstraint(xs[0], xs[1])),
+                      () -> assertEquals(Constraint.of(0),
+                                         c.getConstraint(xs[0], xs[2])),
+                      () -> assertEquals(Constraint.of(4),
+                                         c.getConstraint(xs[1], xs[0])),
+                      () -> assertEquals(Constraint.of(2),
+                                         c.getConstraint(xs[1], xs[2])),
+                      () -> assertEquals(Constraint.of(3),
+                                         c.getConstraint(xs[2], xs[0])),
+                      () -> assertEquals(Constraint.TOP(),
+                                         c.getConstraint(xs[2], xs[1])));
+        }
+    }
+
+    @Test
     void testForget() {
         {
             DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);

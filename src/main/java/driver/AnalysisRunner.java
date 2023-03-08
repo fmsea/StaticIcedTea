@@ -35,6 +35,7 @@ public abstract class AnalysisRunner<S extends State>  implements Runnable {
     private final Body body;
     private final IntegerAnalysis<S> analysis;
     private final boolean outputStateReports;
+    private final Set<Integer> widenSteps;
 
     public AnalysisRunner(String className,
                           int methodId,
@@ -57,12 +58,23 @@ public abstract class AnalysisRunner<S extends State>  implements Runnable {
                           StateFactory<S> factory,
                           boolean outputStateReports,
                           int widenIterations) {
+        this(className, methodId, outputResultsPath, factory, outputStateReports, widenIterations, Set.of());
+    }
+
+    public AnalysisRunner(String className,
+                          int methodId,
+                          Path outputResultsPath,
+                          StateFactory<S> factory,
+                          boolean outputStateReports,
+                          int widenIterations,
+                          Set<Integer> widenSteps) {
         this.className = className;
         this.methodId = methodId;
         this.outputResultsPath = outputResultsPath;
         this.sootMethod = SootInitialization.getSootMethod(className, methodId);
         this.body = this.sootMethod.retrieveActiveBody();
-        this.analysis = new IntegerAnalysis<>(this.body, widenIterations, factory);
+        this.widenSteps = widenSteps;
+        this.analysis = new IntegerAnalysis<>(this.body, widenIterations, factory, this.widenSteps);
         this.outputStateReports = outputStateReports;
     }
 
