@@ -1,7 +1,7 @@
 grammar SmtExpression;
 
 WS
-    : [ \t\n]* -> skip
+    : [ \t\n]+ -> skip
     ;
 
 ParOpen
@@ -78,7 +78,7 @@ Numerial
     ;
 
 Identifier
-    : '$'? [a-z]* [0-9]*
+    : '$'? [a-z]+ [0-9]*
     ;
 
 expr
