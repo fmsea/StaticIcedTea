@@ -53,7 +53,9 @@ public class Smt2Reader {
         Map<String, String> fallThroughExprs = new HashMap<>();
         Map<String, String> branchOutExprs = new HashMap<>();
         Map<String, Set<String>> fallVariables = new HashMap<>();
+        Map<String, Set<String>> fallChangedVariables = new HashMap<>();
         Map<String, Set<String>> branchVariables = new HashMap<>();
+        Map<String, Set<String>> branchChangedVariables = new HashMap<>();
         BiConsumer<String, String> closeExpression = (statement, expression) -> {
             if (expression.startsWith("fall\t")) {
                 // "fall\t" is 5 characters
@@ -95,7 +97,28 @@ public class Smt2Reader {
                         closeExpression.accept(currentStatement, expr.toString());
                         expr = new StringBuilder();
                     }
-                    expr.append(line);
+                    boolean isFall = line.startsWith("fall");
+                    int first = line.indexOf('\t');
+                    int openExpr = Stream.of(line.indexOf('('),
+                                             line.lastIndexOf('f'),
+                                             line.lastIndexOf('t'))
+                        .mapToInt(i -> (int)i).max().orElse(-1);
+                    int last = line.lastIndexOf('\t');
+                    if (last > openExpr) {
+                        // there's a tab in the SMT expression, ignore.
+                        last = first;
+                    }
+                    Set<String> changedVariables = null;
+                    if (first != last) {
+                        changedVariables = parseVariables(line.substring(first, last));
+                    }
+                    if (isFall) {
+                        fallChangedVariables.put(currentStatement, changedVariables);
+                    } else {
+                        branchChangedVariables.put(currentStatement, changedVariables);
+                    }
+                    expr.append(line.substring(0, first + 1));
+                    expr.append(line.substring(last + 1));
                     expr.append("\n");
                 } else if (line.isEmpty()) {
                 } else {
@@ -109,11 +132,13 @@ public class Smt2Reader {
                                      variables,
                                      fallThroughExprs,
                                      fallVariables,
+                                     fallChangedVariables,
                                      branchOutExprs,
-                                     branchVariables);
+                                     branchVariables,
+                                     branchChangedVariables);
     }
 
-    private static Set<String> parseVariables(String variablesLine) {
+    protected static Set<String> parseVariables(String variablesLine) {
         Set<String> variables = new HashSet<>();
         Stream.of(TAB.split(variablesLine.trim())).forEach(v -> variables.add(v));
         return variables;

@@ -237,4 +237,85 @@ public class Smt2ReaderTest {
                       () -> assertTrue(report.getBranchOut("6 return $z0:<test.Base64: boolean isPad(byte)>").isEmpty()));
         }
     }
+
+    @Test
+    void testParseFullReportWithChangedVariables() {
+        {
+            String reportSource = Stream.of("b2\ti1",
+                                      "6 i1 = 0:<test.BallonFactory>",
+                                      "fall\ti1\t(= i1 0)",
+                                      "7 b2 = 2:<test.BallonFactory>",
+                                      "fall\tb2\t(and (< b2 5) (> b2 0) (>= b2 2))").collect(Collectors.joining("\n"));
+            Reader r1 = new StringReader(reportSource);
+            AnalysisSMTReport report = Smt2Reader.parse(r1);
+            assertAll(() -> assertEquals(reportSource, report.toString().trim()),
+                      () -> assertEquals(Optional.of(Set.of("i1")),
+                                         report.getFallChangedVariables("6 i1 = 0:<test.BallonFactory>")),
+                      () -> assertEquals(Optional.of(Set.of("b2")),
+                                         report.getFallChangedVariables("7 b2 = 2:<test.BallonFactory>")));
+        }
+
+        {
+            String inputAnalysisText = Stream.of("$z0	b0",
+                                                 "1 b0 := @parameter0: byte:<test.Base64: boolean isPad(byte)>",
+                                                 "2 if b0 != 61 goto $z0 = 0:<test.Base64: boolean isPad(byte)>",
+                                                 "fall	b0	(= b0 61)",
+                                                 "3 $z0 = 1:<test.Base64: boolean isPad(byte)>",
+                                                 "fall	$z0	(and (= $z0 1) (= b0 61))",
+                                                 "4 goto [?= return $z0]:<test.Base64: boolean isPad(byte)>",
+                                                 "branch	(and (= $z0 1)\n\t(= b0 61))",
+                                                 "5 $z0 = 0:<test.Base64: boolean isPad(byte)>",
+                                                 "fall	$z0	(= $z0 0)",
+                                                 "6 return $z0:<test.Base64: boolean isPad(byte)>",
+                                                 "fall	(and (>= $z0 0) (< $z0 0) (>= b0 0) (< b0 0))",
+                                                 "").collect(Collectors.joining("\n"));
+            Reader r1 = new StringReader(inputAnalysisText);
+            AnalysisSMTReport report = Smt2Reader.parse(r1);
+            assertAll(() -> assertEquals(inputAnalysisText, report.toString()),
+                      () -> assertEquals(Optional.empty(),
+                                         report.getFallChangedVariables("1 b0 := @parameter0: byte:<test.Base64: boolean isPad(byte)>")),
+                      () -> assertEquals(Optional.of(Set.of("b0")),
+                                         report.getFallChangedVariables("2 if b0 != 61 goto $z0 = 0:<test.Base64: boolean isPad(byte)>")),
+                      () -> assertEquals(Optional.empty(),
+                                         report.getBranchChangedVariables("4 goto [?= return $z0]:<test.Base64: boolean isPad(byte)>")),
+                      () -> assertEquals(Optional.of(Set.of("$z0")),
+                                         report.getFallChangedVariables("5 $z0 = 0:<test.Base64: boolean isPad(byte)>")),
+                      () -> assertEquals(Optional.empty(),
+                                         report.getFallChangedVariables("6 return $z0:<test.Base64: boolean isPad(byte)>")));
+        }
+    }
+
+    @Test
+    void testReadFalseWithChangedVariable() {
+        String reportSource = Stream.of("l0",
+                                        "4 if l0 >= 3 goto l3 = 6",
+                                        "fall	l0	false").collect(Collectors.joining("\n"));
+        Reader r1 = new StringReader(reportSource);
+        AnalysisSMTReport report = Smt2Reader.parse(r1);
+        assertAll(() -> assertEquals(reportSource, report.toString().trim()
+                                     ),
+                  () -> assertEquals(Optional.of(Set.of("l0")),
+                                     report.getFallChangedVariables("4 if l0 >= 3 goto l3 = 6")),
+                  () -> assertEquals(Optional.of("false"),
+                                     report.getFallThrough("4 if l0 >= 3 goto l3 = 6")));
+    }
+
+    @Test
+    void testReadWithVariablesContainingTorF() {
+        String reportSource = Stream.of("f0\tt0",
+                                        "7 test-statement",
+                                        "fall	t0	true",
+                                        "branch	true").collect(Collectors.joining("\n"));
+        Reader r1 = new StringReader(reportSource);
+        AnalysisSMTReport report = Smt2Reader.parse(r1);
+        assertAll(() -> assertEquals(reportSource, report.toString().trim()),
+                  () -> assertEquals(Optional.of(Set.of("t0")),
+                                     report.getFallChangedVariables("7 test-statement")),
+                  () -> assertEquals(Optional.of("true"),
+                                     report.getFallThrough("7 test-statement")),
+                  () -> assertEquals(Optional.empty(),
+                                     report.getBranchChangedVariables("7 test-statement")),
+                  () -> assertEquals(Optional.of("true"),
+                                     report.getBranchOut("7 test-statement")));
+    }
 }
