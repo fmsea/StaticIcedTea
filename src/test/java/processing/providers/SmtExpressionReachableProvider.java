@@ -81,6 +81,12 @@ public class SmtExpressionReachableProvider implements ArgumentsProvider {
                                                                                           IntConstant.v(4))))
                                                        .map(e -> (Value)e)
                                                        .reduce(and))),
+                         Stream.of(Arguments.arguments("(and (or (<= i0 0) (> i0 1)) (or (<= i1 0) (> i1 2)) (<= i0 (+ i3 4)) (>= i3 (- 4)))",
+                                                       Locals.get("i3"),
+                                                       Stream.of(g.newGeExpr(Locals.get("i3"),
+                                                                             g.newNegExpr(IntConstant.v(4))))
+                                                       .map(e -> (Value)e)
+                                                       .reduce(and))),
                          Stream.of(Arguments.arguments(Stream.of("(and (<= w 2)",
                                                                  "(>= w 2)",
                                                                  "(<= x 2)",
