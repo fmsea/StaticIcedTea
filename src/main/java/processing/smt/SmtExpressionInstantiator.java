@@ -6,7 +6,6 @@ import soot.jimple.Jimple;
 import soot.IntType;
 import soot.jimple.BinopExpr;
 import soot.jimple.IntConstant;
-import soot.grimp.Grimp;
 
 import processing.Locals;
 
@@ -40,80 +39,70 @@ public class SmtExpressionInstantiator extends SmtExpressionBaseVisitor<SmtExpre
     public SmtExpression visitLessThan(SmtExpressionParser.LessThanContext ctx) {
         SmtExpression left = visit(ctx.expr(0));
         SmtExpression right = visit(ctx.expr(1));
-        return new BinopSmtExpression(Grimp.v().newLtExpr(left.getValue(),
-                                                          right.getValue()));
+        return new LtSmtExpression(left, right);
     }
 
     @Override
     public SmtExpression visitGreaterThan(SmtExpressionParser.GreaterThanContext ctx) {
         SmtExpression left = visit(ctx.expr(0));
         SmtExpression right = visit(ctx.expr(1));
-        return new BinopSmtExpression(Grimp.v().newGtExpr(left.getValue(),
-                                                          right.getValue()));
+        return new GtSmtExpression(left, right);
     }
 
     @Override
     public SmtExpression visitLessOrEqual(SmtExpressionParser.LessOrEqualContext ctx) {
         SmtExpression left = visit(ctx.expr(0));
         SmtExpression right = visit(ctx.expr(1));
-        return new BinopSmtExpression(Grimp.v().newLeExpr(left.getValue(),
-                                                          right.getValue()));
+        return new LeSmtExpression(left, right);
     }
 
     @Override
     public SmtExpression visitGreaterOrEqual(SmtExpressionParser.GreaterOrEqualContext ctx) {
         SmtExpression left = visit(ctx.expr(0));
         SmtExpression right = visit(ctx.expr(1));
-        return new BinopSmtExpression(Grimp.v().newGeExpr(left.getValue(),
-                                                          right.getValue()));
+        return new GeSmtExpression(left, right);
     }
 
     @Override
     public SmtExpression visitEqual(SmtExpressionParser.EqualContext ctx) {
         SmtExpression left = visit(ctx.expr(0));
         SmtExpression right = visit(ctx.expr(1));
-        return new BinopSmtExpression(Grimp.v().newEqExpr(left.getValue(),
-                                                          right.getValue()));
+        return new EqSmtExpression(left, right);
     }
 
     @Override
     public SmtExpression visitMultiplication(SmtExpressionParser.MultiplicationContext ctx) {
         SmtExpression left = visit(ctx.expr(0));
         SmtExpression right = visit(ctx.expr(1));
-        return new BinopSmtExpression(Grimp.v().newMulExpr(left.getValue(),
-                                                           right.getValue()));
+        return new MultiplicationSmtExpression(left, right);
     }
 
     @Override
     public SmtExpression visitAddition(SmtExpressionParser.AdditionContext ctx) {
         SmtExpression left = visit(ctx.expr(0));
         SmtExpression right = visit(ctx.expr(1));
-        return new BinopSmtExpression(Grimp.v().newAddExpr(left.getValue(),
-                                                           right.getValue()));
+        return new AdditionSmtExpression(left, right);
     }
 
     @Override
     public SmtExpression visitSubtraction(SmtExpressionParser.SubtractionContext ctx) {
         SmtExpression left = visit(ctx.expr(0));
         SmtExpression right = visit(ctx.expr(1));
-        return new BinopSmtExpression(Grimp.v().newSubExpr(left.getValue(),
-                                                           right.getValue()));
+        return new SubtractionSmtExpression(left, right);
     }
 
     @Override
     public SmtExpression visitDivision(SmtExpressionParser.DivisionContext ctx) {
         SmtExpression left = visit(ctx.expr(0));
         SmtExpression right = visit(ctx.expr(1));
-        return new BinopSmtExpression(Grimp.v().newDivExpr(left.getValue(),
-                                                           right.getValue()));
+        return new DivisionSmtExpression(left, right);
     }
 
     @Override
     public SmtExpression visitModulus(SmtExpressionParser.ModulusContext ctx) {
         SmtExpression left = visit(ctx.expr(0));
         SmtExpression right = visit(ctx.expr(1));
-        return new BinopSmtExpression(Grimp.v().newRemExpr(left.getValue(),
-                                                           right.getValue()));
+        return new ModulusSmtExpression(left, right);
     }
 
     @Override

@@ -1,38 +1,39 @@
 package processing.smt;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import soot.Local;
 import soot.Value;
 import soot.jimple.BinopExpr;
-import soot.jimple.EqExpr;
 
 import solver.SolverWrapper;
 import solver.SolverFactory;
 
-public class BinopSmtExpression extends SmtExpression {
-    private final BinopExpr expression;
+public abstract class BinopSmtExpression extends SmtExpression {
+    protected final SmtExpression left;
+    protected final SmtExpression right;
 
-    public BinopSmtExpression(BinopExpr expression) {
+    public BinopSmtExpression(SmtExpression left, SmtExpression right) {
         super();
-        this.expression = expression;
+        this.left = left;
+        this.right = right;
     }
 
-    public Value getValue() {
-        return this.expression;
+    public Set<Local> getLocals() {
+        return Stream.concat(this.left.getLocals().stream(),
+                             this.right.getLocals().stream()).collect(Collectors.toSet());
     }
 
     public Optional<Value> getValue(Local id) {
-        Set<String> expressionLocals = ValueToMap.getLocals(this.expression)
-            .stream()
-            .map(l -> l.toString())
-            .collect(Collectors.toSet());
-        if (expressionLocals.contains(id.toString())) {
-            return Optional.of(this.expression);
+        Set<String> locals = this.getLocals().stream().map(s -> s.toString()).collect(Collectors.toSet());
+        if (locals.contains(id.toString())) {
+            return Optional.of(this.getValue());
         } else {
             return Optional.empty();
         }
@@ -40,7 +41,7 @@ public class BinopSmtExpression extends SmtExpression {
 
     public Optional<Value> getValue(Set<Local> variables) {
         if (this.getLocals().containsAll(variables)) {
-            return Optional.of(this.expression);
+            return Optional.of(this.getValue());
         } else {
             return Optional.empty();
         }
@@ -49,7 +50,7 @@ public class BinopSmtExpression extends SmtExpression {
     public Optional<Value> getReachableValue(Set<Local> sources) {
         Map<Local, Set<Local>> reachableVariables = this.getReachableVariables();
         if (reachableVariables.keySet().containsAll(sources)) {
-            return Optional.of(this.expression);
+            return Optional.of(this.getValue());
         } else {
             return Optional.empty();
         }
@@ -57,10 +58,8 @@ public class BinopSmtExpression extends SmtExpression {
 
     public Map<Local, Set<Local>> getConnectedVariables() {
         Map<Local, Set<Local>> connectedVariables = new HashMap<>();
-        Value left = this.expression.getOp1();
-        Value right = this.expression.getOp2();
-        Set<Local> leftLocals = ValueToMap.getLocals(left);
-        Set<Local> rightLocals = ValueToMap.getLocals(right);
+        Set<Local> leftLocals = this.left.getLocals();
+        Set<Local> rightLocals = this.right.getLocals();
         leftLocals.stream().forEach(l -> {
                 connectedVariables.merge(l, rightLocals, (a , b) -> {
                         a.addAll(b);
@@ -77,39 +76,19 @@ public class BinopSmtExpression extends SmtExpression {
     }
 
     public Map<Local, Set<Local>> getReachableVariables() {
-        Map<Local, Set<Local>> reachableVariables = new HashMap<>();
-        Value left = this.expression.getOp1();
-        Value right = this.expression.getOp2();
-        Set<Local> leftLocals = ValueToMap.getLocals(left);
-        Set<Local> rightLocals = ValueToMap.getLocals(right);
-        leftLocals.stream().forEach(l -> {
-                reachableVariables.merge(l, rightLocals, (a, b) -> {
-                        a.addAll(b);
-                        return a;
-                    });
-            });
-        if (this.expression instanceof EqExpr) {
-            rightLocals.stream().forEach(r -> {
-                    reachableVariables.merge(r, leftLocals, (a, b) -> {
-                            a.addAll(b);
-                            return a;
-                        });
-                });
-        }
-        return reachableVariables;
+        return this.getConnectedVariables();
     }
 
     public String toSmt2() {
         SolverWrapper solver = SolverFactory.getSolver();
-        return solver.smt2(this.expression);
+        return solver.smt2(this.getValue());
     }
 
     public boolean containsAll(Set<Local> variables) {
-        return ValueToMap.getLocals(this.expression)
-            .containsAll(variables);
+        return this.getLocals().containsAll(variables);
     }
 
     public int getPredicateCount() {
-        return 1;
+        return 0;
     }
 }
