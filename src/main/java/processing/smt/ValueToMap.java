@@ -3,6 +3,8 @@ package processing.smt;
 import java.util.Map;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import soot.Value;
 import soot.Local;
@@ -18,10 +20,19 @@ public class ValueToMap {
             return Set.of((Local) expr);
         } else if (expr instanceof BinopExpr) {
             BinopExpr e = (BinopExpr)expr;
-            Set<Local> locals = new HashSet<>();
-            locals.addAll(getLocals(e.getOp1()));
-            locals.addAll(getLocals(e.getOp2()));
+            Set<Local> locals = Stream.concat(getLocals(e.getOp1()).stream(),
+                                              getLocals(e.getOp2()).stream())
+                .collect(Collectors.toSet());
             return locals;
+        } else {
+            return Set.of();
+        }
+    }
+
+    public static Set<Local> getLeftLocals(Value expr) {
+        if (expr instanceof BinopExpr) {
+            BinopExpr e = (BinopExpr)expr;
+            return getLocals(e.getOp1());
         } else {
             return Set.of();
         }

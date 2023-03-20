@@ -24,26 +24,15 @@ public class GeSmtExpression extends BinopSmtExpression {
         return Grimp.v().newGeExpr(this.left.getValue(), this.right.getValue());
     }
 
-    public Map<Local, Set<Local>> getReachableVariables() {
-        Map<Local, Set<Local>> reachableVariables = new HashMap<>();
+    public SmtGraph toGraph() {
+        SmtGraph graph = super.toGraph();
         Set<Local> leftLocals = this.left.getLocals();
         Set<Local> rightLocals = this.right.getLocals();
-        leftLocals.forEach(l -> {
-                Set<Local> reachable = new HashSet<>();
-                reachable.add(l);
-                reachableVariables.put(l, reachable);
-            });
+        leftLocals.forEach(l -> graph.addEdge(l, l));
         rightLocals.forEach(r -> {
-                Set<Local> reachable = new HashSet<>();
-                reachable.add(r);
-                reachableVariables.put(r, reachable);
+                graph.addEdge(r, r);
+                leftLocals.forEach(l -> graph.addEdge(r, l));
             });
-        rightLocals.stream().forEach(l -> {
-                reachableVariables.merge(l, leftLocals, (a, b) -> {
-                        a.addAll(b);
-                        return a;
-                    });
-            });
-        return reachableVariables;
+        return graph;
     }
 }

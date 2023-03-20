@@ -18,14 +18,6 @@ public class FalseSmtExpression extends SmtExpression {
         return Jimple.v().newEqExpr(IntConstant.v(0), IntConstant.v(1));
     }
 
-    public Map<Local, Set<Local>> getConnectedVariables() {
-        return Map.of();
-    }
-
-    public Map<Local, Set<Local>> getReachableVariables() {
-        return Map.of();
-    }
-
     public Optional<Value> getValue(Local id) {
         return Optional.empty();
     }
@@ -48,5 +40,9 @@ public class FalseSmtExpression extends SmtExpression {
 
     public int getPredicateCount() {
         return 1;
+    }
+
+    public SmtGraph toGraph() {
+        return SmtGraph.empty();
     }
 }

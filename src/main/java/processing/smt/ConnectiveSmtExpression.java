@@ -57,7 +57,8 @@ public abstract class ConnectiveSmtExpression extends SmtExpression {
             .flatMap(s -> s.map(v -> v))
             .filter(o -> o.isPresent())
             .map(o -> o.get())
-            .collect(Collectors.toSet())
+            .collect(Collectors.toMap(expr -> expr.equivHashCode(), expr -> expr, (oExpr, nExpr) -> oExpr))
+            .values()
             .stream()
             .sorted((a, b) -> a.toString().compareTo(b.toString()))
             .reduce(combinator);
@@ -69,12 +70,12 @@ public abstract class ConnectiveSmtExpression extends SmtExpression {
         variables.stream()
             .map(v -> this.getConnectedVariables().getOrDefault(v, Set.of()))
             .forEach(v -> connectedVariables.addAll(v));
-        return connectedVariables.stream()
-            .map(v -> this.expressions.stream().map(e -> e.getValue(v)))
-            .flatMap(s -> s.map(v -> v))
+        return this.expressions.stream()
+            .map(expr -> expr.getValue(connectedVariables))
             .filter(o -> o.isPresent())
             .map(o -> o.get())
-            .collect(Collectors.toSet())
+            .collect(Collectors.toMap(expr -> expr.equivHashCode(), expr -> expr, (oExpr, nExpr) -> oExpr))
+            .values()
             .stream()
             .sorted((a, b) -> a.toString().compareTo(b.toString()))
             .reduce(combinator);
@@ -86,12 +87,12 @@ public abstract class ConnectiveSmtExpression extends SmtExpression {
         sources.stream()
             .map(v -> this.getReachableVariables().getOrDefault(v, Set.of()))
             .forEach(v -> reachableVariables.addAll(v));
-        return reachableVariables.stream()
-            .map(v -> this.expressions.stream().map(e -> e.getReachableValue(v)))
-            .flatMap(s -> s.map(v -> v))
+        return this.expressions.stream()
+            .map(expr -> expr.getReachableValue(reachableVariables))
             .filter(o -> o.isPresent())
             .map(o -> o.get())
-            .collect(Collectors.toSet())
+            .collect(Collectors.toMap(expr -> expr.equivHashCode(), expr -> expr, (oExpr, nExpr) -> oExpr))
+            .values()
             .stream()
             .sorted((a, b) -> a.toString().compareTo(b.toString()))
             .reduce(combinator);
@@ -101,32 +102,6 @@ public abstract class ConnectiveSmtExpression extends SmtExpression {
         return Stream.concat(v1.stream(),
                              v2.stream())
             .collect(Collectors.toSet());
-    }
-
-    public Map<Local, Set<Local>> getConnectedVariables() {
-        return this.expressions.stream()
-            .map(expr -> expr.getConnectedVariables())
-            .reduce((a, b) -> {
-                    return Stream.concat(a.entrySet().stream(),
-                                         b.entrySet().stream())
-                        .collect(Collectors.toMap(Map.Entry::getKey,
-                                                  Map.Entry::getValue,
-                                                  ConnectiveSmtExpression::mergeSets));
-                })
-            .get();
-    }
-
-    public Map<Local, Set<Local>> getReachableVariables() {
-        return this.expressions.stream()
-            .map(expr -> expr.getReachableVariables())
-            .reduce((a, b) -> {
-                    return Stream.concat(a.entrySet().stream(),
-                                         b.entrySet().stream())
-                        .collect(Collectors.toMap(Map.Entry::getKey,
-                                                  Map.Entry::getValue,
-                                                  ConnectiveSmtExpression::mergeSets));
-                })
-            .get();
     }
 
     protected String toSmt2(BinaryOperator<Value> combinator) {
@@ -144,4 +119,12 @@ public abstract class ConnectiveSmtExpression extends SmtExpression {
     public int getPredicateCount() {
         return this.expressions.size();
     };
+
+    public SmtGraph toGraph() {
+        return this.expressions.stream()
+            .map(expr -> expr.toGraph())
+            .reduce(SmtGraph::union)
+            .orElse(SmtGraph.empty())
+            .computeClosure();
+    }
 }

@@ -21,14 +21,6 @@ public class NotSmtExpression extends SmtExpression {
         return Grimp.v().newNeExpr(this.expr.getValue(), IntConstant.v(1));
     }
 
-    public Map<Local, Set<Local>> getConnectedVariables() {
-        return this.expr.getConnectedVariables();
-    }
-
-    public Map<Local, Set<Local>> getReachableVariables() {
-        return this.expr.getReachableVariables();
-    }
-
     public Optional<Value> getValue(Local id) {
         return this.expr.getValue(id)
             .map(v -> Grimp.v().newNeExpr(v, IntConstant.v(1)));
@@ -54,5 +46,9 @@ public class NotSmtExpression extends SmtExpression {
 
     public int getPredicateCount() {
         return this.expr.getPredicateCount();
+    }
+
+    public SmtGraph toGraph() {
+        return this.expr.toGraph();
     }
 }

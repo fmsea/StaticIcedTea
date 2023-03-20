@@ -31,14 +31,6 @@ public class Number extends SmtExpression {
         return Optional.empty();
     }
 
-    public Map<Local, Set<Local>> getConnectedVariables() {
-        return Map.of();
-    }
-
-    public Map<Local, Set<Local>> getReachableVariables() {
-        return Map.of();
-    }
-
     public String toSmt2() {
         return String.format("%d", this.value);
     }
@@ -53,5 +45,9 @@ public class Number extends SmtExpression {
 
     public int getPredicateCount() {
         return 0;
+    }
+
+    public SmtGraph toGraph() {
+        return SmtGraph.empty();
     }
 }

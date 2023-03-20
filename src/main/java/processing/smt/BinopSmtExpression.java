@@ -31,8 +31,8 @@ public abstract class BinopSmtExpression extends SmtExpression {
     }
 
     public Optional<Value> getValue(Local id) {
-        Set<String> locals = this.getLocals().stream().map(s -> s.toString()).collect(Collectors.toSet());
-        if (locals.contains(id.toString())) {
+        Set<Integer> locals = this.getLocals().stream().map(s -> s.equivHashCode()).collect(Collectors.toSet());
+        if (locals.contains(id.equivHashCode())) {
             return Optional.of(this.getValue());
         } else {
             return Optional.empty();
@@ -40,7 +40,12 @@ public abstract class BinopSmtExpression extends SmtExpression {
     }
 
     public Optional<Value> getValue(Set<Local> variables) {
-        if (this.getLocals().containsAll(variables)) {
+        Set<Local> locals = this.getLocals();
+        boolean containsSomeVariables = variables.stream()
+            .map(v -> locals.contains(v))
+            .reduce((a, b) -> a || b)
+            .orElse(false);
+        if (containsSomeVariables) {
             return Optional.of(this.getValue());
         } else {
             return Optional.empty();
@@ -49,34 +54,17 @@ public abstract class BinopSmtExpression extends SmtExpression {
 
     public Optional<Value> getReachableValue(Set<Local> sources) {
         Map<Local, Set<Local>> reachableVariables = this.getReachableVariables();
-        if (reachableVariables.keySet().containsAll(sources)) {
-            return Optional.of(this.getValue());
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    public Map<Local, Set<Local>> getConnectedVariables() {
-        Map<Local, Set<Local>> connectedVariables = new HashMap<>();
-        Set<Local> leftLocals = this.left.getLocals();
-        Set<Local> rightLocals = this.right.getLocals();
-        leftLocals.stream().forEach(l -> {
-                connectedVariables.merge(l, rightLocals, (a , b) -> {
-                        a.addAll(b);
-                        return a;
-                    });
+        Set<Local> locals = this.getLocals();
+        Set<Value> values = new HashSet<>();
+        sources.forEach(s -> {
+                Set<Local> reachable = reachableVariables.get(s);
+                    if (reachable != null &&
+                        reachable.containsAll(locals) &&
+                        locals.containsAll(reachable)) {
+                        values.add(this.getValue());
+                    }
             });
-        rightLocals.stream().forEach(r -> {
-                connectedVariables.merge(r, leftLocals, (a , b) -> {
-                        a.addAll(b);
-                        return a;
-                    });
-            });
-        return connectedVariables;
-    }
-
-    public Map<Local, Set<Local>> getReachableVariables() {
-        return this.getConnectedVariables();
+        return values.stream().findFirst();
     }
 
     public String toSmt2() {
@@ -90,5 +78,10 @@ public abstract class BinopSmtExpression extends SmtExpression {
 
     public int getPredicateCount() {
         return 0;
+    }
+
+    public SmtGraph toGraph() {
+        return SmtGraph.union(this.left.toGraph(),
+                              this.right.toGraph());
     }
 }

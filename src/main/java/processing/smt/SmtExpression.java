@@ -92,13 +92,19 @@ public abstract class SmtExpression {
         return this.getValue().equivTo(o.getValue());
     }
 
-    public abstract Map<Local, Set<Local>> getConnectedVariables();
+    public Map<Local, Set<Local>> getConnectedVariables() {
+        return this.toGraph().connectedProjection();
+    }
 
-    public abstract Map<Local, Set<Local>> getReachableVariables();
+    public Map<Local, Set<Local>> getReachableVariables() {
+        return this.toGraph().reachableProjection();
+    }
 
     public boolean contains(Local identifier) {
         return ValueToMap.getLocals(this.getValue()).contains(identifier);
     }
 
     public abstract boolean containsAll(Set<Local> variables);
+
+    public abstract SmtGraph toGraph();
 }

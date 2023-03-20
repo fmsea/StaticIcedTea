@@ -23,19 +23,24 @@ public class SmtExpressionIdentityProvider implements ArgumentsProvider {
         throws Exception {
 
         return Stream.of(Arguments.arguments("(= i0 0)",
-                                             Map.of(Locals.get("i0"), Set.of())),
+                                             Map.of(Locals.get("i0"), Set.of(Locals.get("i0")))),
                          Arguments.arguments("true",
                                              Map.of()),
                          Arguments.arguments("false",
                                              Map.of()),
                          Arguments.arguments("(or (= i0 1) (>= i1 2))",
-                                             Map.of(Locals.get("i0"), Set.of(),
-                                                    Locals.get("i1"), Set.of())),
+                                             Map.of(Locals.get("i0"), Set.of(Locals.get("i0")),
+                                                    Locals.get("i1"), Set.of(Locals.get("i1")))),
                          Arguments.arguments("(and (= $z0 0) (>= i3 0) (<= i4 (+ i0 (- 1))) (<= i3 (+ i4 0)))",
-                                             Map.of(Locals.get("$z0"), Set.of(),
-                                                    Locals.get("i3"), Set.of(Locals.get("i4")),
+                                             Map.of(Locals.get("$z0"), Set.of(Locals.get("$z0")),
+                                                    Locals.get("i3"), Set.of(Locals.get("i0"),
+                                                                             Locals.get("i3"),
+                                                                             Locals.get("i4")),
                                                     Locals.get("i4"), Set.of(Locals.get("i0"),
-                                                                             Locals.get("i3")),
-                                                    Locals.get("i0"), Set.of(Locals.get("i4")))));
+                                                                             Locals.get("i3"),
+                                                                             Locals.get("i4")),
+                                                    Locals.get("i0"), Set.of(Locals.get("i0"),
+                                                                             Locals.get("i3"),
+                                                                             Locals.get("i4")))));
     }
 }

@@ -87,11 +87,11 @@ public class SmtExpressionTest {
 
     @ParameterizedTest
     @ArgumentsSource(SmtExpressionReachableProvider.class)
-    void testGetReachableValueById(String smtExpression, Local id, Optional<Value> expected) {
+    void testGetReachableValueById(String smtExpression, Set<Local> variables, Optional<Value> expected) {
         try {
             SmtExpression expr = SmtExpressionReader.parse(smtExpression);
             assertEquals(expected.map(e -> e.toString()),
-                         expr.getReachableValue(id).map(e -> e.toString()));
+                         expr.getReachableValue(variables).map(e -> e.toString()));
         } catch (Exception ex) {
             ex.printStackTrace(System.err);
         }

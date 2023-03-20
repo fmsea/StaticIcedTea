@@ -50,4 +50,8 @@ public class NegSmtExpression extends SmtExpression {
     public int getPredicateCount() {
         return this.expr.getPredicateCount();
     }
+
+    public SmtGraph toGraph() {
+        return this.expr.toGraph();
+    }
 }

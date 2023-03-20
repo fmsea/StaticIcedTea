@@ -21,32 +21,18 @@ public class EqSmtExpression extends BinopSmtExpression {
         return Grimp.v().newEqExpr(this.left.getValue(), this.right.getValue());
     }
 
-    public Map<Local, Set<Local>> getReachableVariables() {
-        Map<Local, Set<Local>> reachableVariables = new HashMap<>();
+    public SmtGraph toGraph() {
+        SmtGraph graph = super.toGraph();
         Set<Local> leftLocals = this.left.getLocals();
         Set<Local> rightLocals = this.right.getLocals();
         leftLocals.forEach(l -> {
-                Set<Local> reachable = new HashSet<>();
-                reachable.add(l);
-                reachableVariables.put(l, reachable);
+                graph.addEdge(l, l);
+                rightLocals.forEach(r -> graph.addEdge(l, r));
             });
         rightLocals.forEach(r -> {
-                Set<Local> reachable = new HashSet<>();
-                reachable.add(r);
-                reachableVariables.put(r, reachable);
+                graph.addEdge(r, r);
+                leftLocals.forEach(l -> graph.addEdge(r, l));
             });
-        leftLocals.stream().forEach(l -> {
-                reachableVariables.merge(l, rightLocals, (a, b) -> {
-                        a.addAll(b);
-                        return a;
-                    });
-            });
-        rightLocals.stream().forEach(r -> {
-                reachableVariables.merge(r, leftLocals, (a, b) -> {
-                        a.addAll(b);
-                        return a;
-                    });
-            });
-        return reachableVariables;
+        return graph;
     }
 }

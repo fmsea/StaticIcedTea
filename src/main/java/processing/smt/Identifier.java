@@ -43,14 +43,6 @@ public class Identifier extends SmtExpression {
         }
     }
 
-    public Map<Local, Set<Local>> getConnectedVariables() {
-        return Map.of(this.identifier, Set.of());
-    }
-
-    public Map<Local, Set<Local>> getReachableVariables() {
-        return Map.of(this.identifier, Set.of(this.identifier));
-    }
-
     public String toSmt2() {
         return this.identifier.toString();
     }
@@ -69,5 +61,11 @@ public class Identifier extends SmtExpression {
 
     public int getPredicateCount() {
         return 0;
+    }
+
+    public SmtGraph toGraph() {
+        SmtGraph graph = SmtGraph.empty();
+        graph.addEdge(this.identifier, this.identifier);
+        return graph;
     }
 }
