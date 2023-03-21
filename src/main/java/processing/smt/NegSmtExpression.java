@@ -39,10 +39,6 @@ public class NegSmtExpression extends SmtExpression {
         return this.expr.getReachableValue(sources).map(v -> Grimp.v().newNegExpr(v));
     }
 
-    public String toSmt2() {
-        return String.format("(- %s)", this.expr.toSmt2());
-    }
-
     public boolean containsAll(Set<Local> variables) {
         return this.expr.containsAll(variables);
     }

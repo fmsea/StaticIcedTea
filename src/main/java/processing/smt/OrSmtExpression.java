@@ -42,6 +42,7 @@ public class OrSmtExpression extends ConnectiveSmtExpression {
         return this.getReachableValue(sources, OrSmtExpression::combinator);
     }
 
+    @Override
     public String toSmt2() {
         return this.toSmt2(OrSmtExpression::combinator);
     }

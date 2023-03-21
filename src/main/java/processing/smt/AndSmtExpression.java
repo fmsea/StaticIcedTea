@@ -45,6 +45,7 @@ public class AndSmtExpression extends ConnectiveSmtExpression {
         return this.getReachableValue(sources, AndSmtExpression::combinator);
     }
 
+    @Override
     public String toSmt2() {
         return this.toSmt2(AndSmtExpression::combinator);
     }

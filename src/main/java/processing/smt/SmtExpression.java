@@ -76,7 +76,9 @@ public abstract class SmtExpression {
         return this.getValue().toString();
     }
 
-    public abstract String toSmt2();
+    public String toSmt2() {
+        return this.solver.smt2(this.getValue());
+    }
 
     public Optional<String> toSmt2(Local id) {
         return this.getValue(id).map(v -> this.solver.smt2(v));

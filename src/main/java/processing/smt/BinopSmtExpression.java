@@ -67,11 +67,6 @@ public abstract class BinopSmtExpression extends SmtExpression {
         return values.stream().findFirst();
     }
 
-    public String toSmt2() {
-        SolverWrapper solver = SolverFactory.getSolver();
-        return solver.smt2(this.getValue());
-    }
-
     public boolean containsAll(Set<Local> variables) {
         return this.getLocals().containsAll(variables);
     }

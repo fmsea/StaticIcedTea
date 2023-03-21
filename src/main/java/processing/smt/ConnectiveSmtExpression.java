@@ -105,7 +105,7 @@ public abstract class ConnectiveSmtExpression extends SmtExpression {
     }
 
     protected String toSmt2(BinaryOperator<Value> combinator) {
-        ConditionExpr expr = (ConditionExpr)this.getValue(combinator);
+        Value expr = (Value)this.getValue(combinator);
         return this.solver.smt2(expr);
     }
 
