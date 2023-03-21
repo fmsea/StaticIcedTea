@@ -93,4 +93,34 @@ public class SmtGraph {
             });
         return reachable;
     }
+
+    public Map<Local, Set<Local>> neighborProjection() {
+        Map<Local, Set<Local>> neighbors = new HashMap<>();
+        this.graph.vertexSet().forEach(v -> {
+                Set<Local> inNeighbors = this.graph.incomingEdgesOf(v)
+                    .stream()
+                    .map(e -> this.graph.getEdgeSource(e))
+                    .collect(Collectors.toSet());
+                Set<Local> outNeighbors = this.graph.outgoingEdgesOf(v)
+                    .stream()
+                    .map(e -> this.graph.getEdgeTarget(e))
+                    .collect(Collectors.toSet());
+                neighbors.put(v, Stream.concat(inNeighbors.stream(),
+                                               outNeighbors.stream()).collect(Collectors.toSet()));
+            });
+        return neighbors;
+    }
+
+    public Set<Local> neighborsProjectionOf(Local l) {
+        return this.graph.edgesOf(l).stream()
+            .flatMap(e -> Stream.of(this.graph.getEdgeSource(e),
+                                    this.graph.getEdgeTarget(e)))
+            .collect(Collectors.toSet());
+    }
+
+    public Set<Local> neighborsProjectionOf(Set<Local> ls) {
+        return ls.stream()
+            .flatMap(l -> neighborsProjectionOf(l).stream())
+            .collect(Collectors.toSet());
+    }
 }
