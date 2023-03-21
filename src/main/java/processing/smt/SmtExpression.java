@@ -22,6 +22,14 @@ public abstract class SmtExpression {
         this.solver = SolverFactory.getSolver();
     }
 
+    public static SmtExpression TRUE() {
+        return new TrueSmtExpression();
+    }
+
+    public static SmtExpression FALSE() {
+        return new FalseSmtExpression();
+    }
+
     public abstract Value getValue();
 
     /** Return Value which are connected to the local `id`.
