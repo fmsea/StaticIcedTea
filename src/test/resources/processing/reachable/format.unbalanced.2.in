@@ -1,0 +1,5 @@
+b2	i1	i2
+6 i1 = 0:<test.BallonFactory: java.util.ArrayList getLines(java.awt.FontMetrics,java.lang.String,double,int)>
+fall	i1	(or (= i1 0) (>= i2 i1))
+
+7 b2 = 2:<test.BallonFactory: java.util.ArrayList getLines(java.awt.FontMetrics,java.lang.String,double,int)>

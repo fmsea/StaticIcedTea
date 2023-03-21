@@ -1,0 +1,3 @@
+k	v	w	x	y
+6 x = y:<test.BallonFactory: java.util.ArrayList getLines(java.awt.FontMetrics,java.lang.String,double,int)>
+fall	x	y	(and (<= x (+ y 0)) (<= v (+ y 0)) (<= w (+ k 0)))

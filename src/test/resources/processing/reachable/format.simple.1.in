@@ -1,0 +1,7 @@
+$z0	b0
+2 if b0 != 61 goto $z0 = 0:<test.Base64: boolean isPad(byte)>
+fall	b0	(= b0 61)
+3 $z0 = 1:<test.Base64: boolean isPad(byte)>
+fall	$z0	(and (= $z0 1) (= b0 61))
+5 $z0 = 0:<test.Base64: boolean isPad(byte)>
+fall	$z0	(= $z0 0)
