@@ -90,12 +90,7 @@ public class AnalysisSMTReport {
         if (this.variables.size() == 0) {
             return "";
         }
-        this.variables.forEach(v -> {
-                sb.append(v);
-                sb.append("\t");
-            });
-        // delete last tab
-        sb.deleteCharAt(sb.length() - 1);
+        sb.append(this.variables.stream().collect(Collectors.joining("\t")));
         sb.append("\n");
         this.statements.stream().sorted().forEach(statement -> {
                 sb.append(statement);

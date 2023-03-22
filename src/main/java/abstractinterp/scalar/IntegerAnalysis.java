@@ -209,14 +209,7 @@ public class IntegerAnalysis<S extends State> implements Analysis {
 
     private String generateOutput(BiFunction<State, Pair<Optional<Set<Local>>, Optional<Set<Local>>>, String> stateFormatter) {
         StringBuilder sb = new StringBuilder();
-        Set<String> locals = new TreeSet<>();
-        locals.addAll(this.locals.stream().map(l -> l.toString()).collect(Collectors.toSet()));
-        for (String l : locals) {
-            sb.append(l);
-            sb.append("\t");
-        }
-        // remove last tab
-        sb.deleteCharAt(sb.length() - 1);
+        sb.append(this.locals.stream().map(l -> l.toString()).sorted().collect(Collectors.joining("\t")));
         sb.append("\n");
 
         Set<Unit> outputStmt = this.analysis.getOutputStatements();
