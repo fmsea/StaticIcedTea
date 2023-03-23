@@ -25,8 +25,14 @@ sat
 fall through
 sat
 sat
+branch out
+sat
+sat
 7 l3 = l0 - 2:<test.Nonsense: void decode()>
 fall through
 sat
 sat
 9 l3 = l3 + 1:<test.Nonsense: void decode()>
+fall through
+sat
+sat

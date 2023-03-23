@@ -1,26 +1,26 @@
 $i0	i0	i1	i2	i3	i4	i5	i6
 2 i0 = 0:<test.Example: int decode(int)>
-fall	(= i0 0)
+fall	i0	(= i0 0)
 
 3 i1 = 0:<test.Example: int decode(int)>
-fall	(and (= i0 0) (= i1 0))
+fall	i1	(and (= i0 0) (= i1 0))
 
 4 i2 = 0:<test.Example: int decode(int)>
-fall	(and (= i0 0) (= i1 0) (= i2 0))
+fall	i2	(and (= i0 0) (= i1 0) (= i2 0))
 
 5 i3 = 0:<test.Example: int decode(int)>
-fall	(and (= i0 0) (= i1 0) (= i2 0) (= i3 0))
+fall	i3	(and (= i0 0) (= i1 0) (= i2 0) (= i3 0))
 
 6 i4 = i5 - 1:<test.Example: int decode(int)>
-fall	(and (>= i0 0) (= i1 0) (>= i2 0) (<= i2 1) (= i3 0))
+fall	i4	(and (>= i0 0) (= i1 0) (>= i2 0) (<= i2 1) (= i3 0))
 
 7 if i0 >= i4 goto return i5:<test.Example: int decode(int)>
-fall	(and (>= i0 0) (= i1 0) (>= i2 0) (<= i2 1) (= i3 0) (>= i4 1))
+fall	i0	i4	(and (>= i0 0) (= i1 0) (>= i2 0) (<= i2 1) (= i3 0) (>= i4 1))
 
-branch	(and (>= i0 0) (= i1 0) (>= i2 0) (<= i2 1) (= i3 0))
+branch	i0	i4	(and (>= i0 0) (= i1 0) (>= i2 0) (<= i2 1) (= i3 0))
 
 8 i2 = i1 + 1:<test.Example: int decode(int)>
-fall	(and (>= i0 0) (= i1 0) (= i2 1) (= i3 0) (>= i4 1))
+fall	i2	(and (>= i0 0) (= i1 0) (= i2 1) (= i3 0) (>= i4 1))
 
 9 i0 = i0 + 1:<test.Example: int decode(int)>
-fall	(and (>= i0 1) (= i1 0) (= i2 1) (= i3 0) (>= i4 1))
+fall	i0	(and (>= i0 1) (= i1 0) (= i2 1) (= i3 0) (>= i4 1))

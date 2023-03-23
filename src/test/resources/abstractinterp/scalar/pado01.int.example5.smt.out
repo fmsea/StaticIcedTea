@@ -7,10 +7,16 @@ fall through
 sat
 sat
 4 if b3 != 0 goto i4 = b3 + b2:<test.Example1M: int example_5(int)>
+fall through
+sat
+sat
 branch out
 sat
 sat
 5 i4 = b3 - b2:<test.Example1M: int example_5(int)>
+fall through
+sat
+sat
 7 i4 = b3 + b2:<test.Example1M: int example_5(int)>
 fall through
 sat

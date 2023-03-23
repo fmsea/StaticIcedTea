@@ -1,18 +1,26 @@
 i0	i1	i2	i3	i4
 2 i2 = 0:<test.Fibonacci: int fibonacci(int)>
-fall	(= i2 0)
+fall	i2	(= i2 0)
+
 3 i3 = 1:<test.Fibonacci: int fibonacci(int)>
-fall	(= i3 1)
+fall	i3	(and (= i2 0) (= i3 1))
+
 4 i4 = 2:<test.Fibonacci: int fibonacci(int)>
-fall	(= i4 2)
+fall	i4	(and (= i2 0) (= i3 1) (= i4 2))
+
 5 if i4 >= i0 goto return i3:<test.Fibonacci: int fibonacci(int)>
-fall	(and (>= i0 3) (>= i4 2))
-branch	(>= i4 2)
+fall	i0	i4	(and (>= i0 3) (>= i2 0) (>= i3 1) (>= i4 2))
+
+branch	i0	i4	(and (>= i2 0) (>= i3 1) (>= i4 2))
+
 6 i1 = i2 + i3:<test.Fibonacci: int fibonacci(int)>
-fall	(>= i1 1)
+fall	i1	(and (>= i0 3) (>= i1 1) (>= i2 0) (>= i3 1) (>= i4 2))
+
 7 i2 = i3:<test.Fibonacci: int fibonacci(int)>
-fall	(>= i2 1)
+fall	i2	(and (>= i0 3) (>= i1 1) (>= i2 1) (>= i3 1) (>= i4 2))
+
 8 i3 = i1:<test.Fibonacci: int fibonacci(int)>
-fall	(>= i3 1)
+fall	i3	(and (>= i0 3) (>= i1 1) (>= i2 1) (>= i3 1) (>= i4 2))
+
 9 i4 = i4 + 1:<test.Fibonacci: int fibonacci(int)>
-fall	(>= i4 3)
+fall	i4	(and (>= i0 3) (>= i1 1) (>= i2 1) (>= i3 1) (>= i4 3))

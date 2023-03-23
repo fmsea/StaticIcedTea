@@ -148,46 +148,50 @@ public class IntegerAnalysis<S extends State> implements Analysis {
         return sb.toString();
     }
 
-    public String generateSMTReportFull() {
-        return generateOutput((state, _locals) -> state.toSMT(this.solver));
-    }
-
     public String generateSMTReport() {
-        return generateOutput((state, pair) -> {
-                Optional<Set<Local>> union = Optional.of(Stream.concat(pair.fst().orElse(Set.of()).stream(),
-                                                                       pair.snd().orElse(Set.of()).stream())
-                                                         .collect(Collectors.toSet()));
-                return union.map(ls -> state.toSMT(ls, this.solver)).orElse("true");
-                // return pair.fst().map(ls -> state.toSMT(ls, this.solver)).orElse("true");
-            });
-    }
-
-    public String generateReachableSMTReport() {
-        return generateOutput((state, pair) -> pair.fst().map(ls -> state.toReachableSMT(ls, this.solver)).orElse("true"));
-    }
-
-    public String generateChangedVariablesSMTReport() {
-        return generateOutput((state, pair) -> {
-                Optional<Set<Local>> union = Optional.of(Stream.concat(pair.fst().orElse(Set.of()).stream(),
-                                                                       pair.snd().orElse(Set.of()).stream())
-                                                         .collect(Collectors.toSet()));
-                return union.map(ls -> state.toChangedVariablesSMT(ls, this.solver)).orElse("true");
-                // return pair.fst().map(ls -> state.toChangedVariablesSMT(ls, this.solver)).orElse("true");
-            });
-    }
-
-    public String generateChangedVariablesMinSMTReport() {
-        return generateOutput((state, locals) -> {
-                String smt = locals.snd()
-                    .map(ls -> state.toChangedVariablesSMT(ls, this.solver))
-                    .orElse("true");
-                if (smt.equals("true")) {
-                    smt = locals.fst()
-                        .map(ls -> state.toChangedVariablesSMT(ls, this.solver))
-                        .orElse("true");
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.locals.stream().map(l -> l.toString()).sorted().collect(Collectors.joining("\t")));
+        sb.append("\n");
+        Set<Unit> outputStmt = this.analysis.getOutputStatements();
+        Map<Unit, Set<Local>> variables = this.getChangedVariables();
+        String methodSignature = this.b.getMethod().getSignature();
+        int stmtCount = 0;
+        for (Unit u : this.g.getBody().getUnits()) {
+            stmtCount++;
+            if (outputStmt.contains(u) && variables.get(u).size() > 0) {
+                sb.append(stmtCount);
+                sb.append(" ");
+                sb.append(u);
+                sb.append(":");
+                sb.append(methodSignature);
+                sb.append('\n');
+                State state = analysis.getFallFlowAfter(u);
+                sb.append("fall\t");
+                sb.append(this.analysis.getFallMinChangedVariables(u)
+                          .map(vars -> vars
+                               .stream()
+                               .map(v -> v.toString())
+                               .sorted()
+                               .collect(Collectors.joining("\t", "", "\t")))
+                          .orElse(""));
+                sb.append(state.toSMT(this.solver));
+                sb.append("\n");
+                List<S> branches = analysis.getBranchFlowAfter(u);
+                for (S branch : branches) {
+                    sb.append("branch\t");
+                    sb.append(this.analysis.getBranchMinChangedVariables(u)
+                              .map(vars -> vars
+                                   .stream()
+                                   .map(v -> v.toString())
+                                   .sorted()
+                                   .collect(Collectors.joining("\t", "", "\t")))
+                              .orElse(""));
+                    sb.append(branch.toSMT(this.solver));
+                    sb.append("\n");
                 }
-                return smt;
-            });
+            }
+        }
+        return sb.toString();
     }
 
     public void generateGraphOutputs(Path output) {
@@ -205,52 +209,6 @@ public class IntegerAnalysis<S extends State> implements Analysis {
                 branch.toGraph().toDot(branchOutput);
             }
         }
-    }
-
-    private String generateOutput(BiFunction<State, Pair<Optional<Set<Local>>, Optional<Set<Local>>>, String> stateFormatter) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(this.locals.stream().map(l -> l.toString()).sorted().collect(Collectors.joining("\t")));
-        sb.append("\n");
-
-        Set<Unit> outputStmt = this.analysis.getOutputStatements();
-        Map<Unit, Set<Local>> variables = this.getChangedVariables();
-        String methodSignature = this.b.getMethod().getSignature();
-        int stmtCount = 0;
-        for (Unit u : this.g.getBody().getUnits()) {
-            stmtCount++;
-            if (outputStmt.contains(u) && variables.get(u).size() > 0) {
-                sb.append(stmtCount);
-                sb.append(" ");
-                sb.append(u);
-                sb.append(":");
-                sb.append(methodSignature);
-                sb.append('\n');
-                State state = analysis.getFallFlowAfter(u);
-                if (state.isFeasible()) {
-                    String fallSmtExpr = stateFormatter.apply(state, Pair.of(Optional.ofNullable(variables.get(u)),
-                                                                             this.analysis.getFallMinChangedVariables(u)));
-                    if (!fallSmtExpr.isEmpty()) {
-                        sb.append("fall\t");
-                        sb.append(fallSmtExpr);
-                        sb.append("\n");
-                    }
-                }
-                List<S> branches = analysis.getBranchFlowAfter(u);
-                for (S branch : branches) {
-                    if (branch.isFeasible()) {
-                        String branchSmtExpr = stateFormatter.apply(branch,
-                                                                    Pair.of(Optional.ofNullable(variables.get(u)),
-                                                                            this.analysis.getBranchMinChangedVariables(u)));
-                        if (!branchSmtExpr.isEmpty()) {
-                            sb.append("branch\t");
-                            sb.append(branchSmtExpr);
-                            sb.append("\n");
-                        }
-                    }
-                }
-            }
-        }
-        return sb.toString();
     }
 
     protected Map<Unit, Set<Local>> getChangedVariables() {

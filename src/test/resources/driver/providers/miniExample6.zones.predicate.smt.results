@@ -18,10 +18,28 @@ branch out
 sat
 sat
 6 if i1 != i2 goto $i3 = virtualinvoke r0.<miniExample6: int random()>():<miniExample6: void example()>
+fall through
+sat
+sat
 branch out
 sat
 unsat
 7 $i0 = virtualinvoke r0.<miniExample6: int random()>():<miniExample6: void example()>
+fall through
+sat
+sat
 8 if 1 != $i0 goto i1 = i2 + 1:<miniExample6: void example()>
+fall through
+sat
+sat
+branch out
+sat
+sat
 9 i2 = i1 + 1:<miniExample6: void example()>
+fall through
+sat
+sat
 11 i1 = i2 + 1:<miniExample6: void example()>
+fall through
+sat
+sat

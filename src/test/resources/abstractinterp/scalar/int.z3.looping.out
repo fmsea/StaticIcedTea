@@ -1,12 +1,17 @@
 l0	l1	l2	l3
 1 l0 = 5:<z3_simple_loopSootClass: void z3_simple_loop()>
-fall	(= l0 5)
+fall	l0	(= l0 5)
+
 2 l1 = 0:<z3_simple_loopSootClass: void z3_simple_loop()>
-fall	(= l1 0)
+fall	l1	(and (= l0 5) (= l1 0))
+
 3 if l1 >= 5 goto l3 = l0 + l1:<z3_simple_loopSootClass: void z3_simple_loop()>
-fall	(and (>= l1 0) (<= l1 4))
-branch	(>= l1 5)
+fall	l1	(and (= l0 5) (>= l1 0) (<= l1 4))
+
+branch	l1	(and (= l0 5) (>= l1 5))
+
 4 l1 = l1 + 1:<z3_simple_loopSootClass: void z3_simple_loop()>
-fall	(and (>= l1 1) (<= l1 5))
+fall	l1	(and (= l0 5) (>= l1 1) (<= l1 5))
+
 6 l3 = l0 + l1:<z3_simple_loopSootClass: void z3_simple_loop()>
-fall	(>= l3 10)
+fall	l3	(and (= l0 5) (>= l1 1) (<= l1 5) (>= l3 10))

@@ -1,12 +1,20 @@
 l0	l1	l2	l3
 1 l0 = 4:<z3_simpleIfSootClass: void z3_simpleIf()>
-fall	(= l0 4)
+fall	l0	(= l0 4)
+
 2 l1 = 0:<z3_simpleIfSootClass: void z3_simpleIf()>
-fall	(= l1 0)
+fall	l1	(and (= l0 4) (= l1 0))   
+
 3 l2 = 0:<z3_simpleIfSootClass: void z3_simpleIf()>
-fall	(= l2 0)
+fall	l2	(and (= l0 4) (= l1 0) (= l2 0))
+
 4 if l0 >= 3 goto l3 = 6:<z3_simpleIfSootClass: void z3_simpleIf()>
-branch	(= l0 4)
+fall	l0	false
+
+branch	l0	(and (= l0 4) (= l1 0) (= l2 0))
+
 5 l3 = l1 / l2:<z3_simpleIfSootClass: void z3_simpleIf()>
+fall	l3	false
+
 6 l3 = 6:<z3_simpleIfSootClass: void z3_simpleIf()>
-fall	(= l3 6)
+fall	l3	(and (= l0 4) (= l1 0) (= l2 0) (= l3 6))

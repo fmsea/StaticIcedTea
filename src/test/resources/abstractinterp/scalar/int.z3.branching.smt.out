@@ -11,10 +11,16 @@ fall through
 sat
 sat
 4 if l0 >= 3 goto l3 = 6:<z3_simpleIfSootClass: void z3_simpleIf()>
+fall through
+sat
+sat
 branch out
 sat
 sat
 5 l3 = l1 / l2:<z3_simpleIfSootClass: void z3_simpleIf()>
+fall through
+sat
+sat
 6 l3 = 6:<z3_simpleIfSootClass: void z3_simpleIf()>
 fall through
 sat

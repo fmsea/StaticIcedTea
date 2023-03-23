@@ -22,9 +22,7 @@ public abstract class MiniJavaExamplesComparativeProvider implements ArgumentsPr
     protected Arguments example(String name, String dom1, String dom2) {
         String source = readResourcesFile("driver/providers/" + name + ".java");
         String mask = "driver/providers/%s.%s.%s.out";
-        String dom1ExpectedChangedOutput = readResourcesFile(String.format(mask, name, dom1, "changed"));
         String dom1ExpectedFullOutput = readResourcesFile(String.format(mask, name, dom1, "smt"));
-        String dom2ExpectedChangedOutput = readResourcesFile(String.format(mask, name, dom2, "changed"));
         String dom2ExpectedFullOutput = readResourcesFile(String.format(mask, name, dom2, "smt"));
         String expectedSmtFormula = readResourcesFile(String.format("driver/providers/%s.%s.%s.smt",
                                                                     name,
@@ -36,9 +34,7 @@ public abstract class MiniJavaExamplesComparativeProvider implements ArgumentsPr
                                                                     dom2));
         return Arguments.arguments(name,
                                    source,
-                                   dom1ExpectedChangedOutput,
                                    dom1ExpectedFullOutput,
-                                   dom2ExpectedChangedOutput,
                                    dom2ExpectedFullOutput,
                                    expectedSmtFormula,
                                    expectedSmtResults);

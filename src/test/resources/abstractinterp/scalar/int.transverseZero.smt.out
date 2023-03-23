@@ -1,12 +1,20 @@
 r0	u0	x0	y0
 1 x0 = 60:<test.transverse: int zero()>
-fall	(= x0 60)
+fall	x0	(= x0 60)
+
 2 y0 = neg x0:<test.transverse: int zero()>
-fall	(= y0 (- 60))
+fall	y0	(and (= x0 60) (= y0 (- 60)))
+
 3 u0 = x0 - y0:<test.transverse: int zero()>
-fall	(= u0 120)
+fall	u0	(and (= u0 120) (= x0 60) (= y0 (- 60)))
+
 4 if u0 > 120 goto r0 = 1:<test.transverse: int zero()>
-fall	(= u0 120)
+fall	u0	(and (= u0 120) (= x0 60) (= y0 (- 60)))
+
+branch	u0	false
+
 5 r0 = neg 1:<test.transverse: int zero()>
-fall	(= r0 (- 1))
+fall	r0	(and (= r0 (- 1)) (= u0 120) (= x0 60) (= y0 (- 60)))
+
 7 r0 = 1:<test.transverse: int zero()>
+fall	r0	false

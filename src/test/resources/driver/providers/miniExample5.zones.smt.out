@@ -1,19 +1,19 @@
 $i1	$r0	i0	i2	r1
 3 if i0 < 0 goto $r0 = new java.lang.RuntimeException:<miniExample5: int example(int)>
-fall	(>= i0 0)
+fall	i0	(>= i0 0)
 
-branch	(<= i0 (- 1))
+branch	i0	(<= i0 (- 1))
 
 4 i2 = 0:<miniExample5: int example(int)>
-fall	(and (>= i0 0) (= i2 0))
+fall	i2	(and (>= i0 0) (= i2 0))
 
 5 if i2 >= i0 goto $i1 = i2 - i0:<miniExample5: int example(int)>
-fall	(and (>= i2 0) (<= i2 (+ i0 (- 1))))
+fall	i2	(and (>= i2 0) (<= i2 (+ i0 (- 1))))
 
-branch	(and (>= i0 0) (= i0 (+ i2 0)))
+branch	i0	(and (>= i0 0) (= i0 (+ i2 0)))
 
 6 i2 = i2 + 1:<miniExample5: int example(int)>
-fall	(and (>= i2 1) (<= i2 (+ i0 0)))
+fall	i2	(and (>= i2 1) (<= i2 (+ i0 0)))
 
 8 $i1 = i2 - i0:<miniExample5: int example(int)>
-fall	(and (>= i0 0) (= i0 (+ i2 0)))
+fall	$i1	(and (>= i0 0) (= i0 (+ i2 0)))

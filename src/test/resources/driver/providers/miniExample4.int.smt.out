@@ -1,26 +1,26 @@
 i0	i1	i2	i3	i4	r0
 3 i2 = 0:<miniExample4: int example(int)>
-fall	(= i2 0)
+fall	i2	(= i2 0)
 
 4 i3 = 1:<miniExample4: int example(int)>
-fall	(and (= i2 0) (= i3 1))
+fall	i3	(and (= i2 0) (= i3 1))
 
 5 i4 = 2:<miniExample4: int example(int)>
-fall	(and (= i2 0) (= i3 1) (= i4 2))
+fall	i4	(and (= i2 0) (= i3 1) (= i4 2))
 
 6 if i4 >= i0 goto return i3:<miniExample4: int example(int)>
-fall	(and (>= i0 3) (>= i2 0) (>= i3 1) (>= i4 2))
+fall	i0	i4	(and (>= i0 3) (>= i2 0) (>= i3 1) (>= i4 2))
 
-branch	(and (>= i2 0) (>= i3 1) (>= i4 2))
+branch	i0	i4	(and (>= i2 0) (>= i3 1) (>= i4 2))
 
 7 i1 = i2 + i3:<miniExample4: int example(int)>
-fall	(and (>= i0 3) (>= i1 1) (>= i2 0) (>= i3 1) (>= i4 2))
+fall	i1	(and (>= i0 3) (>= i1 1) (>= i2 0) (>= i3 1) (>= i4 2))
 
 8 i2 = i3:<miniExample4: int example(int)>
-fall	(and (>= i0 3) (>= i1 1) (>= i2 1) (>= i3 1) (>= i4 2))
+fall	i2	(and (>= i0 3) (>= i1 1) (>= i2 1) (>= i3 1) (>= i4 2))
 
 9 i3 = i1:<miniExample4: int example(int)>
-fall	(and (>= i0 3) (>= i1 1) (>= i2 1) (>= i3 1) (>= i4 2))
+fall	i3	(and (>= i0 3) (>= i1 1) (>= i2 1) (>= i3 1) (>= i4 2))
 
 10 i4 = i4 + 1:<miniExample4: int example(int)>
-fall	(and (>= i0 3) (>= i1 1) (>= i2 1) (>= i3 1) (>= i4 3))
+fall	i4	(and (>= i0 3) (>= i1 1) (>= i2 1) (>= i3 1) (>= i4 3))

@@ -207,7 +207,7 @@ public class IntervalNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<IntervalBoxState> analysis =
             new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReportFull().trim();
+        String actual = analysis.generateSMTReport().trim();
         String expected = readResourcesFile("int.factorial.out");
         assertEquals(expected, actual);
     }
@@ -218,7 +218,7 @@ public class IntervalNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<IntervalBoxState> analysis =
             new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReportFull().trim();
+        String actual = analysis.generateSMTReport().trim();
         String expected = readResourcesFile("int.decode.out");
         assertEquals(expected, actual);
     }

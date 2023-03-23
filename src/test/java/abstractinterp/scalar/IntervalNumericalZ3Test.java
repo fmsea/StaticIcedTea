@@ -29,7 +29,7 @@ import soot.Scene;
 import abstractinterp.scalar.state.IntervalBoxState;
 import abstractinterp.scalar.state.factory.IntervalBoxStateFactory;
 import abstractinterp.scalar.state.providers.JimpleProvider;
-import processing.Smt2Format;
+import processing.Smt2FormatReachable;
 import solver.SolverWrapper;
 import solver.SolverWrapperZ3;
 
@@ -109,7 +109,7 @@ public class IntervalNumericalZ3Test extends AbstractNumericalTest {
         Reader expected = new StringReader(oracle);
         try {
             Writer writer = new FileWriter(this.z3TestFile.toFile());
-            Smt2Format.SMT2Format(expected, actual, writer);
+            Smt2FormatReachable.Smt2FormatReachable(expected, actual, writer);
             Process z3 = Runtime.getRuntime().exec(new String[] {"z3",
                                                                  "-smt2",
                                                                  this.z3TestFile.toString()});

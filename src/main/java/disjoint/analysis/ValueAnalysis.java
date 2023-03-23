@@ -267,32 +267,28 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
                 sb.append(methodSignature);
                 sb.append("\n");
                 AbstractState fall = getFallFlowAfter(unit);
-                if (!fall.getStates().isEmpty() && fall.isFeasible()) {
-                    String fallExpr = formatState(fall);
-                    sb.append("fall\t");
-                    if (!fallExpr.isEmpty()) {
-                        sb.append(fallExpr);
-                    } else {
-                        sb.append("true");
-                    }
-                    sb.append("\n");
-                }
+                String changedVariablesForUnit = Optional.ofNullable(this.changedVariables.get(unit))
+                    .map(vars -> vars
+                         .stream()
+                         .map(v -> v.toString())
+                         .sorted()
+                         .collect(Collectors.joining("\t", "", "\t")))
+                    .orElse("");
+                String fallExpr = formatState(fall);
+                sb.append("fall\t");
+                sb.append(changedVariablesForUnit);
+                sb.append(fallExpr);
+                sb.append("\n");
                 List<AbstractState> branches = getBranchFlowAfter(unit);
                 for (AbstractState branch : branches) {
-                    if (!branch.getStates().isEmpty() && branch.isFeasible()) {
-                        String branchExpr = formatState(branch);
-                        sb.append("branch\t");
-                        if (!branchExpr.isEmpty()) {
-                            sb.append(branchExpr);
-                        } else {
-                            sb.append("true");
-                        }
-                        sb.append("\n");
-                    }
+                    String branchExpr = formatState(branch);
+                    sb.append("branch\t");
+                    sb.append(changedVariablesForUnit);
+                    sb.append(branchExpr);
+                    sb.append("\n");
                 }
             }
         }
-
         return sb.toString();
     }
 

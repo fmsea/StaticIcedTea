@@ -1,22 +1,33 @@
 $i0	$i3	i1	i2	r0
 2 i1 = 0:<miniExample6: void example()>
-fall	(= i1 0)
+fall	i1	(= i1 0)
 
 3 i2 = 1:<miniExample6: void example()>
-fall	(and (= i1 0) (= i2 1))
+fall	i2	(and (= i1 0) (= i2 1))
 
 4 $i3 = virtualinvoke r0.<miniExample6: int random()>():<miniExample6: void example()>
-fall	(and (= i1 0) (= i2 1))
+fall	$i3	(and (= i1 0) (= i2 1))
 
 5 if 1 != $i3 goto return:<miniExample6: void example()>
-fall	(and (= $i3 1) (= i1 0) (= i2 1))
+fall	$i3	(and (= $i3 1) (= i1 0) (= i2 1))
 
-branch	(and (= i1 0) (= i2 1))
+branch	$i3	(and (= i1 0) (= i2 1))
 
 6 if i1 != i2 goto $i3 = virtualinvoke r0.<miniExample6: int random()>():<miniExample6: void example()>
-branch	(and (= $i3 1) (= i1 0) (= i2 1))
+fall	i1	i2	false
+
+branch	i1	i2	(and (= $i3 1) (= i1 0) (= i2 1))
 
 7 $i0 = virtualinvoke r0.<miniExample6: int random()>():<miniExample6: void example()>
+fall	$i0	false
+
 8 if 1 != $i0 goto i1 = i2 + 1:<miniExample6: void example()>
+fall	$i0	false
+
+branch	$i0	false
+
 9 i2 = i1 + 1:<miniExample6: void example()>
+fall	i2	false
+
 11 i1 = i2 + 1:<miniExample6: void example()>
+fall	i1	false

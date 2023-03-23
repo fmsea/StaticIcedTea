@@ -1,11 +1,16 @@
 u0	w0	x0
 1 u0 = x0:<test.ints: int compareIntervals()>
-fall	true
+fall	u0	true
+
 2 if x0 < 20 goto (branch):<test.ints: int compareIntervals()>
-fall	(>= x0 20)
-branch	(<= x0 19)
+fall	x0	(>= x0 20)
+
+branch	x0	(<= x0 19)
+
 4 if x0 >= 0 goto w0 = x0 + u0:<test.ints: int compareIntervals()>
-fall	(<= x0 (- 1))
-branch	(and (>= x0 0) (<= x0 19))
+fall	x0	(<= x0 (- 1))
+
+branch	x0	(and (>= x0 0) (<= x0 19))
+
 6 w0 = x0 + u0:<test.ints: int compareIntervals()>
-fall	true
+fall	w0	(and (>= x0 0) (<= x0 19))

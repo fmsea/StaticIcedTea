@@ -31,9 +31,7 @@ public class ZonePredicateComparativeAnalysisTest extends NumericalAnalysisTest 
     @ArgumentsSource(ZonesPredicateComparativeProvider.class)
     void test(String name,
               String source,
-              String dom1ExpectedChanged,
               String dom1ExpectedFull,
-              String dom2ExpectedChanged,
               String dom2ExpectedFull,
               String expectedFormula,
               String expectedResults) throws Exception {
@@ -74,12 +72,8 @@ public class ZonePredicateComparativeAnalysisTest extends NumericalAnalysisTest 
             });
         analysis1.waitFor(60l, TimeUnit.SECONDS);
         analysis2.waitFor(60l, TimeUnit.SECONDS);
-        Path dom1ActualChangedOutput = Paths.get(dom1OutputDir.toString(),
-                                                 String.format("%s_1.changed.out", name));
         Path dom1ActualFullSmtOutput = Paths.get(dom1OutputDir.toString(),
                                                  String.format("%s_1.smt.out", name));
-        Path dom2ActualChangedOutput = Paths.get(dom2OutputDir.toString(),
-                                                 String.format("%s_1.changed.out", name));
         Path dom2ActualFullSmtOutput = Paths.get(dom2OutputDir.toString(),
                                                  String.format("%s_1.smt.out", name));
         Path actualFormulaOutput = Paths.get(this.testOutputDir.toString(),
@@ -89,11 +83,9 @@ public class ZonePredicateComparativeAnalysisTest extends NumericalAnalysisTest 
                 "-classpath",
                 System.getProperty("java.class.path"),
                 "driver.Main",
-                "smt2-format-min",
+                "smt2-format",
                 dom1ActualFullSmtOutput.toString(),
-                dom1ActualChangedOutput.toString(),
                 dom2ActualFullSmtOutput.toString(),
-                dom2ActualChangedOutput.toString(),
                 actualFormulaOutput.toString(),
             });
         prepareFormula.waitFor(60l, TimeUnit.SECONDS);
@@ -107,15 +99,9 @@ public class ZonePredicateComparativeAnalysisTest extends NumericalAnalysisTest 
                                                                         StandardCharsets.UTF_8))
             .lines()
             .collect(Collectors.joining("\n")).trim();
-        assertAll(() -> assertEquals(Optional.of(dom1ExpectedChanged),
-                                     readFile(dom1ActualChangedOutput),
-                                     "Zones Changed Output is Different"),
-                  () -> assertEquals(Optional.of(dom1ExpectedFull),
+        assertAll(() -> assertEquals(Optional.of(dom1ExpectedFull),
                                      readFile(dom1ActualFullSmtOutput),
                                      "Zones Full Output is Different"),
-                  () -> assertEquals(Optional.of(dom2ExpectedChanged),
-                                     readFile(dom2ActualChangedOutput),
-                                     "Predicates Changed Output is Different"),
                   () -> assertEquals(Optional.of(dom2ExpectedFull),
                                      readFile(dom2ActualFullSmtOutput),
                                      "Predicates Full Output is Different"),

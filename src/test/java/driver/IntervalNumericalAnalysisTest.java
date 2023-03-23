@@ -26,9 +26,6 @@ public class IntervalNumericalAnalysisTest extends NumericalAnalysisTest {
     @ArgumentsSource(IntMiniJavaExamplesProvider.class)
     void testAnalysis(String name,
                       String source,
-                      String expectedChangedOutput,
-                      String expectedSubgraphOutput,
-                      String expectedMinSubgraphOutput,
                       String expectedFullSmtOutput) throws Exception {
         Path clazz = Compiler.compileSource(name, source);
         Process analysis = Runtime.getRuntime().exec(new String [] {
@@ -46,14 +43,10 @@ public class IntervalNumericalAnalysisTest extends NumericalAnalysisTest {
             });
         analysis.waitFor(60l, TimeUnit.SECONDS);
         try {
-            Path changedOutputPath = Paths.get(this.testOutputDir.toString(),
-                                               String.format("%s_1.changed.out", name));
             Path fullSmtOutputPath = Paths.get(this.testOutputDir.toString(),
                                                String.format("%s_1.smt.out", name));
-            String changedOutput = Files.readString(changedOutputPath);
             String fullSmtOutput = Files.readString(fullSmtOutputPath);
-            assertAll(() -> assertEquals(expectedChangedOutput, changedOutput.trim()),
-                      () -> assertEquals(expectedFullSmtOutput, fullSmtOutput.trim()));
+            assertEquals(expectedFullSmtOutput, fullSmtOutput.trim());
         } catch (IOException ex) {
             System.err.println("Unable to assert interval analysis");
             System.err.println(ex.getMessage());

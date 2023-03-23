@@ -14,15 +14,9 @@ public abstract class MiniJavaExamplesProvider implements ArgumentsProvider {
 
     protected Arguments example(String name, String type) {
         String source = readResourcesFile("driver/providers/" + name + ".java");
-        String expectedChangedOutput = readResourcesFile("driver/providers/" + name + "." + type + ".changed.out");
-        String expectedSubgraphOutput = readResourcesFile("driver/providers/" + name + "." + type + ".subgraph.out");
-        String expectedSubgraphMinOutput = readResourcesFile("driver/providers/" + name + "." + type + ".subgraph-min.out");
         String expectedFullSmtOutput = readResourcesFile("driver/providers/" + name + "." + type + ".smt.out");
         return Arguments.arguments(name,
                                    source,
-                                   expectedChangedOutput.trim(),
-                                   expectedSubgraphOutput.trim(),
-                                   expectedSubgraphMinOutput.trim(),
                                    expectedFullSmtOutput.trim());
     }
 

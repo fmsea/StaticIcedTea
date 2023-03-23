@@ -30,7 +30,7 @@ import abstractinterp.scalar.state.IncZoneState;
 import abstractinterp.scalar.state.factory.ZoneStateFactory;
 import abstractinterp.scalar.state.factory.IncZoneStateFactory;
 import abstractinterp.scalar.state.providers.JimpleProvider;
-import processing.Smt2Format;
+import processing.Smt2FormatReachable;
 import solver.SolverWrapper;
 import solver.SolverWrapperZ3;
 
@@ -76,8 +76,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.constantValuePropagation.smt.out");
-        assertTrue(runComparison(analysis1.generateSMTReportFull(),
-                                 analysis2.generateSMTReportFull(),
+        assertTrue(runComparison(analysis1.generateSMTReport(),
+                                 analysis2.generateSMTReport(),
                                  expected));
     }
 
@@ -91,8 +91,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.constantMathPropagation.smt.out");
-        assertTrue(runComparison(analysis1.generateSMTReportFull(),
-                                 analysis2.generateSMTReportFull(),
+        assertTrue(runComparison(analysis1.generateSMTReport(),
+                                 analysis2.generateSMTReport(),
                                  expected));
     }
 
@@ -106,8 +106,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.branching.smt.out");
-        assertTrue(runComparison(analysis1.generateSMTReportFull(),
-                                 analysis2.generateSMTReportFull(),
+        assertTrue(runComparison(analysis1.generateSMTReport(),
+                                 analysis2.generateSMTReport(),
                                  expected));
     }
 
@@ -121,8 +121,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.looping.smt.out");
-        assertTrue(runComparison(analysis1.generateSMTReportFull(),
-                                 analysis2.generateSMTReportFull(),
+        assertTrue(runComparison(analysis1.generateSMTReport(),
+                                 analysis2.generateSMTReport(),
                                  expected));
     }
 
@@ -136,8 +136,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.example5.smt.out");
-        assertTrue(runComparison(analysis1.generateSMTReportFull(),
-                                 analysis2.generateSMTReportFull(),
+        assertTrue(runComparison(analysis1.generateSMTReport(),
+                                 analysis2.generateSMTReport(),
                                  expected));
     }
 
@@ -151,8 +151,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.nonsenseExample.smt.out");
-        assertTrue(runComparison(analysis1.generateSMTReportFull(),
-                                 analysis2.generateSMTReportFull(),
+        assertTrue(runComparison(analysis1.generateSMTReport(),
+                                 analysis2.generateSMTReport(),
                                  expected));
     }
 
@@ -166,8 +166,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.neqLoop.smt.out");
-        assertTrue(runComparison(analysis1.generateSMTReportFull(),
-                                 analysis2.generateSMTReportFull(),
+        assertTrue(runComparison(analysis1.generateSMTReport(),
+                                 analysis2.generateSMTReport(),
                                  expected));
     }
 
@@ -181,8 +181,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.getArrowSubset.smt.out");
-        assertTrue(runComparison(analysis1.generateSMTReportFull(),
-                                 analysis2.generateSMTReportFull(),
+        assertTrue(runComparison(analysis1.generateSMTReport(),
+                                 analysis2.generateSMTReport(),
                                  expected));
     }
 
@@ -196,8 +196,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.intervalComparison.smt.out");
-        assertTrue(runComparison(analysis1.generateSMTReportFull(),
-                                 analysis2.generateSMTReportFull(),
+        assertTrue(runComparison(analysis1.generateSMTReport(),
+                                 analysis2.generateSMTReport(),
                                  expected));
     }
 
@@ -211,8 +211,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.fibonacci.smt.out");
-        assertTrue(runComparison(analysis1.generateSMTReportFull(),
-                                 analysis2.generateSMTReportFull(),
+        assertTrue(runComparison(analysis1.generateSMTReport(),
+                                 analysis2.generateSMTReport(),
                                  expected));
     }
 
@@ -221,7 +221,7 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         Reader rightReader = new StringReader(right);
         try {
             Writer writer = new FileWriter(this.z3TestFile.toFile());
-            Smt2Format.SMT2Format(leftReader, rightReader, writer);
+            Smt2FormatReachable.Smt2FormatReachable(leftReader, rightReader, writer);
             Process z3 = Runtime.getRuntime().exec(new String[] {"z3",
                                                                  "-smt2",
                                                                  this.z3TestFile.toString()});

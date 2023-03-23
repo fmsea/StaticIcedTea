@@ -71,11 +71,11 @@ public abstract class ForwardBranchedFlowBasic<N extends Unit, A> {
     }
 
     public Optional<Set<Local>> getFallMinChangedVariables(Unit key) {
-        return this.minChangedVariables.getFallVariables(key).map(s -> Set.copyOf(s));
+        return this.minChangedVariables.getFallVariables(key).filter(s -> s.size() > 0);
     }
 
     public Optional<Set<Local>> getBranchMinChangedVariables(Unit key) {
-        return this.minChangedVariables.getBranchVariables(key).map(s -> Set.copyOf(s));
+        return this.minChangedVariables.getBranchVariables(key).filter(s -> s.size() > 0);
     }
 
     public void setOrder(List<N> order) {

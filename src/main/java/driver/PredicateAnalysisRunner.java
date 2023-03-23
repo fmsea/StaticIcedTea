@@ -67,22 +67,6 @@ public class PredicateAnalysisRunner implements Runnable {
         AnalysisTimer.time((s) -> analysis.start());
         if (this.outputStateReports) {
             AnalysisTimer.time((s) -> {
-                    File changed = Path.of(this.outputResultsPath.toString(),
-                                           String.format("%s_%d.changed.out",
-                                                         className,
-                                                         methodId)).toFile();
-                    File reachable = Path.of(this.outputResultsPath.toString(),
-                                             String.format("%s_%d.reachable.out",
-                                                           className,
-                                                           methodId)).toFile();
-                    File subgraph = Path.of(this.outputResultsPath.toString(),
-                                            String.format("%s_%d.subgraph.out",
-                                                          className,
-                                                          methodId)).toFile();
-                    File minSubgraph = Path.of(this.outputResultsPath.toString(),
-                                               String.format("%s_%d.subgraph-min.out",
-                                                             className,
-                                                             methodId)).toFile();
                     File fullSmt = Path.of(this.outputResultsPath.toString(),
                                            String.format("%s_%d.smt.out",
                                                          className,
@@ -94,27 +78,6 @@ public class PredicateAnalysisRunner implements Runnable {
 
                     File dir = this.outputResultsPath.toFile();
                     dir.mkdirs();
-
-                    try (FileWriter fw1 = new FileWriter(changed);
-                         BufferedWriter buf1 = new BufferedWriter(fw1);
-                         FileWriter fw2 = new FileWriter(reachable);
-                         BufferedWriter buf2 = new BufferedWriter(fw2);
-                         FileWriter fw3 = new FileWriter(subgraph);
-                         BufferedWriter buf3 = new BufferedWriter(fw3);
-                         FileWriter fw4 = new FileWriter(minSubgraph);
-                         BufferedWriter buf4 = new BufferedWriter(fw4)) {
-                        String report = this.analysis.generateReport();
-                        buf1.write(report);
-                        buf1.flush();
-                        buf2.write(report);
-                        buf2.flush();
-                        buf3.write(report);
-                        buf3.flush();
-                        buf4.write(report);
-                        buf4.flush();
-                    } catch (IOException ex) {
-                        LOGGER.error("Unable to write changed output file: {}", ex.getMessage());
-                    }
 
                     try (FileWriter fw = new FileWriter(fullSmt)) {
                         fw.write(this.analysis.generateFullSMT());

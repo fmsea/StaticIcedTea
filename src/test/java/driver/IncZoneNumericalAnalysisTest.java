@@ -27,9 +27,6 @@ public class IncZoneNumericalAnalysisTest extends NumericalAnalysisTest {
     @ArgumentsSource(ZonesMiniJavaExamplesProvider.class)
     void testAnalysis(String name,
                       String source,
-                      String expectedChangedOutput,
-                      String expectedSubgraphOutput,
-                      String expectedMinSubgraphOutput,
                       String expectedFullSmtOutput) throws Exception {
         Path clazz = Compiler.compileSource(name, source);
         ProcessBuilder pb = new ProcessBuilder(new String [] {
@@ -50,24 +47,12 @@ public class IncZoneNumericalAnalysisTest extends NumericalAnalysisTest {
         Process analysis = pb.start();
         analysis.waitFor(60l, TimeUnit.SECONDS);
         try {
-            Path changedOutputPath = Paths.get(this.testOutputDir.toString(),
-                                               String.format("%s_1.changed.out", name));
-            Path subgraphOutputPath = Paths.get(this.testOutputDir.toString(),
-                                                String.format("%s_1.subgraph.out", name));
-            Path minSubgraphOutputPath = Paths.get(this.testOutputDir.toString(),
-                                                   String.format("%s_1.subgraph-min.out", name));
             Path fullSmtOutputPath = Paths.get(this.testOutputDir.toString(),
                                                String.format("%s_1.smt.out", name));
-            String changedOutput = Files.readString(changedOutputPath);
-            String subgraphOutput = Files.readString(subgraphOutputPath);
-            String minSubgraphOutput = Files.readString(minSubgraphOutputPath);
             String fullSmtOutput = Files.readString(fullSmtOutputPath);
             String error = new BufferedReader(new InputStreamReader(analysis.getErrorStream()))
                 .lines().collect(Collectors.joining("\n"));
-            assertAll(() -> assertEquals(expectedChangedOutput, changedOutput.trim(), "Changed Report Not Equal"),
-                      () -> assertEquals(expectedSubgraphOutput, subgraphOutput.trim(), "Subgraph Report Not Equal"),
-                      () -> assertEquals(expectedMinSubgraphOutput, minSubgraphOutput.trim(), "Minimum Subgraph Report Not Equal"),
-                      () -> assertEquals(expectedFullSmtOutput, fullSmtOutput.trim(), "Full Report Not Equal"));
+            assertEquals(expectedFullSmtOutput, fullSmtOutput.trim(), "Full Report Not Equal");
         } catch (IOException ex) {
             System.err.println("Unable to assert interval analysis");
             System.err.println(ex.getMessage());
