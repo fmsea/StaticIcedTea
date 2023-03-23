@@ -15,7 +15,7 @@ import picocli.CommandLine.Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import processing.Smt2Format;
+import processing.Smt2FormatReachable;
 
 @Command(name = "smt2-format",
          mixinStandardHelpOptions=true,
@@ -37,7 +37,7 @@ public class Smt2FormatCommand implements Callable<Integer> {
         try (Reader fh1 = new FileReader(analysisOne);
              Reader fh2 = new FileReader(analysisTwo);
              Writer out = new FileWriter(outputFile)) {
-            Smt2Format.SMT2Format(fh1, fh2, out);
+            Smt2FormatReachable.Smt2FormatReachable(fh1, fh2, out);
             return 0;
         } catch (IOException ex) {
             log.error("Unable to format analysis: {}", ex.toString());
