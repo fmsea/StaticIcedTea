@@ -41,6 +41,9 @@ public interface State {
     public void forget(Local local);
     public void makeInfeasible();
     public Set<Local> getChangedVariables(State previous);
+    public Set<Local> getChangedVariables(BinaryOperatorType op, Value left, Value right);
+    public Set<Local> getChangedVariables(Value rhs);
+    public Set<Local> getChangedVariables(PredicateType predicate, Value left, Value right);
     public Set<Local> getConnectedVariablesOf(Local local);
     public Set<Local> getReachableVariablesOf(Local local);
     public Set<Local> getChangedVariablesSubgraph(Set<Local> locals);

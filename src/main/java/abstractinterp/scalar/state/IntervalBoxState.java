@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.function.Function;
 import soot.Local;
 import soot.Value;
 import soot.grimp.Grimp;
@@ -437,5 +438,27 @@ public class IntervalBoxState implements State {
             state.put((Local) right, result.get(1));
         }
         return this.isFeasible();
+    }
+
+    public Set<Local> getChangedVariables(BinaryOperatorType _op, Value _left, Value _right) {
+        return Set.of();
+    }
+
+    public Set<Local> getChangedVariables(Value _rhs) {
+        return Set.of();
+    }
+
+    public Set<Local> getChangedVariables(PredicateType _predicate, Value left, Value right) {
+        Function<Value, Optional<Local>> isLocal = (val) -> {
+            if (val instanceof Local) {
+                return Optional.of((Local)val);
+            } else {
+                return Optional.empty();
+            }
+        };
+        return Stream.of(isLocal.apply(left), isLocal.apply(right))
+            .filter(o -> o.isPresent())
+            .map(o -> o.get())
+            .collect(Collectors.toSet());
     }
 }

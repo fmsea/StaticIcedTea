@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import soot.jimple.ArrayRef;
 import soot.jimple.InstanceFieldRef;
@@ -142,11 +144,12 @@ public class ForwardBranchedFlowNumerical<S extends State>
             AssignStmt stmt = (AssignStmt)s;
             Value lhs = stmt.getLeftOp();
             if (lhs instanceof Local && isIntType(lhs)) {
+                Local lVar = (Local) lhs;
                 this.outputStmt.add(s);
                 Set<Local> track = new HashSet<>();
-                track.add((Local)lhs);
+                track.add(lVar);
                 this.changedVariables.put(s, track);
-                Local lVar = (Local) lhs;
+                Set<Local> fallChanged = Set.of(lVar);
                 Value rhs = stmt.getRightOp();
                 if (rhs instanceof BinopExpr) {
                     BinaryOperatorType op = BinaryOperatorType.fromJimple((BinopExpr) rhs);
@@ -160,19 +163,24 @@ public class ForwardBranchedFlowNumerical<S extends State>
                         this.deferredComparisons.put(lVar, left, right);
                     } else {
                         ifStmtFall.updateState(lVar, in, left, right, op);
+                        fallChanged = Stream.concat(fallChanged.stream(),
+                                                    ifStmtFall.getChangedVariables(op, left, right).stream())
+                            .collect(Collectors.toSet());
                     }
                 } else if (rhs instanceof JimpleLocal ||
                            rhs instanceof NumericConstant ||
                            rhs instanceof JNegExpr) {
                     ifStmtFall.updateState(lVar, in, rhs);
+                    fallChanged = Stream.concat(fallChanged.stream(),
+                                                ifStmtFall.getChangedVariables(rhs).stream())
+                        .collect(Collectors.toSet());
                 } else {
                     LOGGER.debug("Unhandled assignment expression [lhs={}, rhs={}]", lhs, rhs);
                     ifStmtFall.forget(lVar);
                 }
                 LOGGER.trace("[in state: {}, out state: {}]", in, ifStmtFall);
-                Set<Local> fallChanged = ifStmtFall.getChangedVariables(in);
                 LOGGER.trace("fall changed: {} [unit = {}]", fallChanged, s);
-                this.minChangedVariables.putFall(s, ifStmtFall.getChangedVariables(in));
+                this.minChangedVariables.putFall(s, fallChanged);
             }
         } else if (s instanceof IfStmt) {
             IfStmt stmt = (IfStmt)s;
@@ -226,12 +234,16 @@ public class ForwardBranchedFlowNumerical<S extends State>
         this.outputStmt.add(s);
         Set<Local> track = new HashSet<>();
         this.changedVariables.put(s, track);
+        Set<Local> fallChanged;
+        Set<Local> branchChanged;
 
         branch.updateCond(in, left, right, type);
+        branchChanged = branch.getChangedVariables(type, left, right);
 
         type = type.rotate();
 
         fall.updateCond(in, left, right, type);
+        fallChanged = fall.getChangedVariables(type, left, right);
 
         if (left instanceof JimpleLocal) {
             track.add((Local)left);
@@ -239,8 +251,6 @@ public class ForwardBranchedFlowNumerical<S extends State>
         if (right instanceof JimpleLocal) {
             track.add((Local)right);
         }
-        Set<Local> fallChanged = fall.getChangedVariables(in);
-        Set<Local> branchChanged = branch.getChangedVariables(in);
         LOGGER.trace("fall changed: {} [unit = {}]", fallChanged, s);
         LOGGER.trace("branch changed: {} [unit = {}]", branchChanged, s);
         this.minChangedVariables.putFall(s, fallChanged);

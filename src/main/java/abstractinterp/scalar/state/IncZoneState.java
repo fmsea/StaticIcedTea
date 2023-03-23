@@ -831,4 +831,58 @@ public class IncZoneState implements State {
     public boolean equals(IncZoneState other) {
         return other != null && this.matrix.equals(other.matrix);
     }
+
+    public Set<Local> getChangedVariables(BinaryOperatorType op, Value left, Value right) {
+        if (left instanceof Local && right instanceof Local) {
+            return Set.of();
+        } else if (left instanceof Local) {
+            switch (op) {
+            case ADDITION:
+            case SUBTRACTION:
+                return Set.of((Local) left);
+            default:
+                return Set.of();
+            }
+        } else if (right instanceof Local) {
+            switch (op) {
+            case ADDITION:
+                return Set.of((Local) right);
+            default:
+                return Set.of();
+            }
+        }
+        return Set.of();
+    }
+
+    public Set<Local> getChangedVariables(Value rhs) {
+        if (rhs instanceof Local) {
+            return Set.of((Local)rhs);
+        } else if (rhs instanceof JNegExpr && ((JNegExpr)rhs).getOp() instanceof Local) {
+            return Set.of((Local)((JNegExpr)rhs).getOp());
+        } else {
+            return Set.of();
+        }
+    }
+
+    public Set<Local> getChangedVariables(PredicateType predicate, Value left, Value right) {
+        if (left instanceof Local && right instanceof Local) {
+            switch (predicate) {
+            case Le:
+            case Lt:
+                return Set.of((Local) left);
+            case Ge:
+            case Gt:
+                return Set.of((Local) right);
+            case Eq:
+            case Ne:
+            default:
+                return Set.of((Local) left, (Local) right);
+            }
+        } else if (left instanceof Local) {
+            return Set.of((Local) left);
+        } else if (right instanceof Local) {
+            return Set.of((Local) right);
+        }
+        return Set.of();
+    }
 }
