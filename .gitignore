@@ -29,3 +29,6 @@ dependency-reduced-pom.xml
 # Ignore Slurm output files
 slurm-*.out
 slurm-*.err
+
+# Ignore Guix Pack
+dfa-smt.tar.gz

@@ -16,4 +16,5 @@ package: package.scm $(JARFILE)
 		--symlink=/artifacts.jar=share/java/artifacts.jar \
 		--symlink=/domains=share/PredicateDomains \
 		--symlink=/lib=lib \
-		--manifest=package.scm
+		--manifest=package.scm \
+		--root=dfa-smt.tar.gz
