@@ -26,8 +26,6 @@ import driver.commands.*;
              Smt2FormatFullCommand.class,
              Smt2FormatIdentifiersCommand.class,
              Smt2FormatDirectoryCommand.class,
-             Smt2FormatMinCommand.class,
-             Smt2FormatMinReachableCommand.class,
              ValueExtractionCommand.class,
              VariablePredicateCounterCommand.class,
          })
