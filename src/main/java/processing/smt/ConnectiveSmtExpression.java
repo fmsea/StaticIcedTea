@@ -47,13 +47,26 @@ public abstract class ConnectiveSmtExpression extends SmtExpression {
             .get();
     }
 
-    protected Optional<Value> getValue(Local id, BinaryOperator<Value> combinator) {
+    protected Optional<Value> getValue(Set<Local> variables, BinaryOperator<Value> combinator) {
+        return this.expressions
+            .stream()
+            .map(expr -> expr.getValue(variables))
+            .filter(o -> o.isPresent())
+            .map(o -> o.get())
+            .collect(Collectors.toMap(expr -> expr.equivHashCode(), expr -> expr, (oExpr, nExpr) -> oExpr))
+            .values()
+            .stream()
+            .sorted((a, b) -> a.toString().compareTo(b.toString()))
+            .reduce(combinator);
+    }
+
+    protected Optional<Value> getConnectedValue(Local id, BinaryOperator<Value> combinator) {
         Set<Local> variables = new HashSet<>();
         variables.addAll(this.getConnectedVariables().getOrDefault(id, Set.of()));
         variables.add(id);
 
         return variables.stream()
-            .map(v -> this.expressions.stream().map(e -> e.getValue(v)))
+            .map(v -> this.expressions.stream().map(e -> e.getConnectedValue(v)))
             .flatMap(s -> s.map(v -> v))
             .filter(o -> o.isPresent())
             .map(o -> o.get())
@@ -64,14 +77,14 @@ public abstract class ConnectiveSmtExpression extends SmtExpression {
             .reduce(combinator);
     }
 
-    protected Optional<Value> getValue(Set<Local> variables, BinaryOperator<Value> combinator) {
+    protected Optional<Value> getConnectedValue(Set<Local> variables, BinaryOperator<Value> combinator) {
         Set<Local> connectedVariables = new HashSet<>();
         connectedVariables.addAll(variables);
         variables.stream()
             .map(v -> this.getConnectedVariables().getOrDefault(v, Set.of()))
             .forEach(v -> connectedVariables.addAll(v));
         return this.expressions.stream()
-            .map(expr -> expr.getValue(connectedVariables))
+            .map(expr -> expr.getConnectedValue(connectedVariables))
             .filter(o -> o.isPresent())
             .map(o -> o.get())
             .collect(Collectors.toMap(expr -> expr.equivHashCode(), expr -> expr, (oExpr, nExpr) -> oExpr))

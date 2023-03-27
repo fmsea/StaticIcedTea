@@ -19,6 +19,10 @@ public class NegSmtExpression extends SmtExpression {
         return Grimp.v().newNegExpr(this.expr.getValue());
     }
 
+    public Optional<Value> getValue(Set<Local> variables) {
+        return Optional.empty();
+    }
+
     public Map<Local, Set<Local>> getConnectedVariables() {
         return this.expr.getConnectedVariables();
     }
@@ -27,12 +31,12 @@ public class NegSmtExpression extends SmtExpression {
         return this.expr.getReachableVariables();
     }
 
-    public Optional<Value> getValue(Local id) {
-        return this.expr.getValue(id).map(v -> Grimp.v().newNegExpr(v));
+    public Optional<Value> getConnectedValue(Local id) {
+        return this.expr.getConnectedValue(id).map(v -> Grimp.v().newNegExpr(v));
     }
 
-    public Optional<Value> getValue(Set<Local> variables) {
-        return this.expr.getValue(variables).map(v -> Grimp.v().newNegExpr(v));
+    public Optional<Value> getConnectedValue(Set<Local> variables) {
+        return this.expr.getConnectedValue(variables).map(v -> Grimp.v().newNegExpr(v));
     }
 
     public Optional<Value> getReachableValue(Set<Local> sources) {

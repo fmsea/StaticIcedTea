@@ -30,12 +30,16 @@ public class OrSmtExpression extends ConnectiveSmtExpression {
         return this.getValue(OrSmtExpression::combinator);
     }
 
-    public Optional<Value> getValue(Local id) {
-        return this.getValue(id, OrSmtExpression::combinator);
-    }
-
     public Optional<Value> getValue(Set<Local> variables) {
         return this.getValue(variables, OrSmtExpression::combinator);
+    }
+
+    public Optional<Value> getConnectedValue(Local id) {
+        return this.getConnectedValue(id, OrSmtExpression::combinator);
+    }
+
+    public Optional<Value> getConnectedValue(Set<Local> variables) {
+        return this.getConnectedValue(variables, OrSmtExpression::combinator);
     }
 
     public Optional<Value> getReachableValue(Set<Local> sources) {

@@ -63,11 +63,11 @@ public class SmtExpressionTest {
 
     @ParameterizedTest
     @ArgumentsSource(SmtExpressionConnectedProvider.class)
-    void testGetValueById(String smtExpression, Local id, Optional<Value> expected) {
+    void testGetConnectedValueById(String smtExpression, Local id, Optional<Value> expected) {
         try {
             SmtExpression expr = new SmtExpressionReader(smtExpression).getSmtExpression();
             assertEquals(expected.map(e -> e.toString()),
-                     expr.getValue(id).map(e -> e.toString()));
+                     expr.getConnectedValue(id).map(e -> e.toString()));
         } catch (Exception ex) {
             ex.printStackTrace(System.err);
         }
@@ -75,11 +75,11 @@ public class SmtExpressionTest {
 
     @ParameterizedTest
     @ArgumentsSource(SmtExpressionProvider.class)
-    void testGetValueByIds(String smtExpression, Set<Local> variables, Optional<Value> expected) {
+    void testGetConnectedValueByIds(String smtExpression, Set<Local> variables, Optional<Value> expected) {
         try {
             SmtExpression expr = new SmtExpressionReader(smtExpression).getSmtExpression();
             assertEquals(expected.map(e -> e.toString()),
-                         expr.getValue(variables).map(e -> e.toString()));
+                         expr.getConnectedValue(variables).map(e -> e.toString()));
         } catch (Exception ex) {
             ex.printStackTrace(System.err);
         }

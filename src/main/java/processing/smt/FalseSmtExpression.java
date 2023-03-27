@@ -19,12 +19,17 @@ public class FalseSmtExpression extends SmtExpression {
     }
 
     @Override
-    public Optional<Value> getValue(Local id) {
+    public Optional<Value> getValue(Set<Local> variables) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<Value> getValue(Set<Local> variables) {
+    public Optional<Value> getConnectedValue(Local id) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Value> getConnectedValue(Set<Local> variables) {
         return Optional.empty();
     }
 

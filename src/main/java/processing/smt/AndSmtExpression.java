@@ -33,12 +33,16 @@ public class AndSmtExpression extends ConnectiveSmtExpression {
         return this.getValue(AndSmtExpression::combinator);
     }
 
-    public Optional<Value> getValue(Local id) {
-        return this.getValue(id, AndSmtExpression::combinator);
-    }
-
     public Optional<Value> getValue(Set<Local> variables) {
         return this.getValue(variables, AndSmtExpression::combinator);
+    }
+
+    public Optional<Value> getConnectedValue(Local id) {
+        return this.getConnectedValue(Set.of(id), AndSmtExpression::combinator);
+    }
+
+    public Optional<Value> getConnectedValue(Set<Local> variables) {
+        return this.getConnectedValue(variables, AndSmtExpression::combinator);
     }
 
     public Optional<Value> getReachableValue(Set<Local> sources) {

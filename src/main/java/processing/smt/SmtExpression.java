@@ -32,17 +32,22 @@ public abstract class SmtExpression {
 
     public abstract Value getValue();
 
+    /** Return value for which all variables are present
+     *
+     */
+    public abstract Optional<Value> getValue(Set<Local> variables);
+
     /** Return Value which are connected to the local `id`.
      *
      * If `id` is not in the expression, then result shall be empty.
      */
-    public abstract Optional<Value> getValue(Local id);
+    public abstract Optional<Value> getConnectedValue(Local id);
 
     /** Return Value which is "connected" to the set of variables.
      *
      * If variables do not occur, then result shall be empty.
      */
-    public abstract Optional<Value> getValue(Set<Local> variables);
+    public abstract Optional<Value> getConnectedValue(Set<Local> variables);
 
     /** Return Value which is reachable from the local `id`.
      *
@@ -81,7 +86,7 @@ public abstract class SmtExpression {
     }
 
     public Optional<String> toSmt2(Local id) {
-        return this.getValue(id).map(v -> this.solver.smt2(v));
+        return this.getValue(Set.of(id)).map(v -> this.solver.smt2(v));
     }
 
     public Optional<String> toSmt2(Set<Local> variables) {

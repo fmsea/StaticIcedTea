@@ -19,7 +19,15 @@ public class Identifier extends SmtExpression {
         return this.identifier;
     }
 
-    public Optional<Value> getValue(Local id) {
+    public Optional<Value> getValue(Set<Local> variables) {
+        if (variables.contains(this.identifier)) {
+            return Optional.of(this.identifier);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Value> getConnectedValue(Local id) {
         if (this.identifier.toString().equals(id.toString())) {
             return Optional.of(identifier);
         } else {
@@ -27,7 +35,7 @@ public class Identifier extends SmtExpression {
         }
     }
 
-    public Optional<Value> getValue(Set<Local> variables) {
+    public Optional<Value> getConnectedValue(Set<Local> variables) {
         if (variables.contains(this.identifier)) {
             return Optional.of(this.identifier);
         } else {

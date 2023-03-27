@@ -21,13 +21,17 @@ public class NotSmtExpression extends SmtExpression {
         return Grimp.v().newNeExpr(this.expr.getValue(), IntConstant.v(1));
     }
 
-    public Optional<Value> getValue(Local id) {
-        return this.expr.getValue(id)
+    public Optional<Value> getValue(Set<Local> variables) {
+        return Optional.empty();
+    }
+
+    public Optional<Value> getConnectedValue(Local id) {
+        return this.expr.getConnectedValue(id)
             .map(v -> Grimp.v().newNeExpr(v, IntConstant.v(1)));
     }
 
-    public Optional<Value> getValue(Set<Local> variables) {
-        return this.expr.getValue(variables)
+    public Optional<Value> getConnectedValue(Set<Local> variables) {
+        return this.expr.getConnectedValue(variables)
             .map(v -> Grimp.v().newNeExpr(v, IntConstant.v(1)));
     }
 

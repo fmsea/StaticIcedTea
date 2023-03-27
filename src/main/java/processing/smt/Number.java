@@ -19,11 +19,15 @@ public class Number extends SmtExpression {
         return IntConstant.v(this.value);
     }
 
-    public Optional<Value> getValue(Local id) {
+    public Optional<Value> getValue(Set<Local> variables) {
         return Optional.empty();
     }
 
-    public Optional<Value> getValue(Set<Local> variables) {
+    public Optional<Value> getConnectedValue(Local id) {
+        return Optional.empty();
+    }
+
+    public Optional<Value> getConnectedValue(Set<Local> variables) {
         return Optional.empty();
     }
 

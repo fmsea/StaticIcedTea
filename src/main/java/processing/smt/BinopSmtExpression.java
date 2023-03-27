@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import soot.Local;
@@ -30,7 +31,20 @@ public abstract class BinopSmtExpression extends SmtExpression {
                              this.right.getLocals().stream()).collect(Collectors.toSet());
     }
 
-    public Optional<Value> getValue(Local id) {
+    public Optional<Value> getValue(Set<Local> variables) {
+        BiPredicate<Local, SmtExpression> contains = (v, expr) -> {
+            Set<Local> locals = expr.getLocals();
+            return locals.isEmpty() || locals.contains(v);
+        };
+        if (variables.stream().map(v -> contains.test(v, left)).reduce((a, b) -> a || b).orElse(false) &&
+            variables.stream().map(v -> contains.test(v, right)).reduce((a, b) -> a || b).orElse(false)) {
+            return Optional.of(this.getValue());
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Value> getConnectedValue(Local id) {
         Set<Integer> locals = this.getLocals().stream().map(s -> s.equivHashCode()).collect(Collectors.toSet());
         if (locals.contains(id.equivHashCode())) {
             return Optional.of(this.getValue());
@@ -39,7 +53,7 @@ public abstract class BinopSmtExpression extends SmtExpression {
         }
     }
 
-    public Optional<Value> getValue(Set<Local> variables) {
+    public Optional<Value> getConnectedValue(Set<Local> variables) {
         Set<Local> locals = this.getLocals();
         boolean containsSomeVariables = variables.stream()
             .map(v -> locals.contains(v))
