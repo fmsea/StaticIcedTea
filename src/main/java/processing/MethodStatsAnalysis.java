@@ -11,6 +11,7 @@ import soot.Local;
 import soot.Unit;
 import soot.Value;
 import soot.jimple.*;
+import soot.toolkits.graph.LoopNestTree;
 import soot.util.Chain;
 import abstractinterp.scalar.ForwardBranchedFlowNumerical;
 import abstractinterp.scalar.state.BinaryOperatorType;
@@ -30,6 +31,7 @@ public class MethodStatsAnalysis {
         ASSIGNMENT_STATEMENTS,
         BITWISE_OPERATIONS,
         BRANCHES,
+        LOOPS,
         CONSTANTS,
         EQUAL_COMPARISONS_TO_PARTITION_MEMBER,
         EQUAL_COMPARISONS_TO_CONSTANT,
@@ -64,6 +66,10 @@ public class MethodStatsAnalysis {
         Consumer<Statistics> update = (key) -> {
             counts.put(key, counts.getOrDefault(key, 0) + 1);
         };
+
+        LoopNestTree loopTree = new LoopNestTree(this.body);
+        loopTree.stream().forEach(l -> update.accept(Statistics.LOOPS));
+
         for (Unit unit : this.methodUnits) {
             LOGGER.trace("[unit: {}]", unit);
             if (unit instanceof IdentityStmt) {
