@@ -22,6 +22,7 @@ import driver.commands.*;
              StartMinZoneNumericalCommand.class,
              StartMaxZoneNumericalCommand.class,
              StartMethodStatsCommand.class,
+             StartClassEnumeratorCommand.class,
              Smt2FormatCommand.class,
              Smt2FormatFullCommand.class,
              Smt2FormatIdentifiersCommand.class,
