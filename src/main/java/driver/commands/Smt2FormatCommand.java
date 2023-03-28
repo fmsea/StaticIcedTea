@@ -11,24 +11,38 @@ import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 import java.util.stream.Collectors;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
+import picocli.CommandLine.ParameterException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import driver.commands.validation.Smt2FormatTypeConverter;
+
 import processing.Smt2FormatReachable;
+import processing.Smt2FormatType;
 
 @Command(name = "smt2-format",
          mixinStandardHelpOptions=true,
          description = "create SMT formula to (assert (=> f1 f2))")
 public class Smt2FormatCommand implements Callable<Integer> {
 
-    @Parameters(description="filename of first file")
+    @Option(names = {"-t", "--type"},
+            description = "Type of format to use, either full or min",
+            defaultValue = "min",
+            converter = Smt2FormatTypeConverter.class)
+    private Smt2FormatType type;
+
+    @Parameters(index = "0",
+                description="filename of first file")
     private String analysisOne;
 
-    @Parameters(description="filename of second file")
+    @Parameters(index = "1",
+                description="filename of second file")
     private String analysisTwo;
 
-    @Parameters(description="filename of output smt file")
+    @Parameters(index = "2",
+                description="filename of output smt file")
     private String outputFile;
 
     @Override
@@ -37,7 +51,7 @@ public class Smt2FormatCommand implements Callable<Integer> {
         try (Reader fh1 = new FileReader(analysisOne);
              Reader fh2 = new FileReader(analysisTwo);
              Writer out = new FileWriter(outputFile)) {
-            Smt2FormatReachable.Smt2FormatReachable(fh1, fh2, out);
+            Smt2FormatReachable.Smt2FormatReachable(fh1, fh2, out, type);
             return 0;
         } catch (IOException ex) {
             log.error("Unable to format analysis: {}", ex.toString());

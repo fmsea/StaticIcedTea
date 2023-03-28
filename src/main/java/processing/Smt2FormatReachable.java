@@ -36,7 +36,14 @@ public class Smt2FormatReachable extends Smt2Format {
 
     public static void Smt2FormatReachable(Reader left,
                                            Reader right,
-                                           Writer writer) throws IOException {
+                                           Writer writer) throws IOException{
+        Smt2FormatReachable(left, right, writer, Smt2FormatType.MIN);
+    }
+
+    public static void Smt2FormatReachable(Reader left,
+                                           Reader right,
+                                           Writer writer,
+                                           Smt2FormatType type) throws IOException {
         AnalysisSMTReport leftReport = Smt2Reader.parse(left);
         AnalysisSMTReport rightReport = Smt2Reader.parse(right);
         LOGGER.debug("parsed left and right reports");
@@ -63,14 +70,26 @@ public class Smt2FormatReachable extends Smt2Format {
                          rightFall,
                          leftBranch,
                          rightBranch);
-            Set<Local> changedVariablesFall = Stream.concat(leftReport.getFallChangedVariables(statement).orElse(Set.of()).stream(),
-                                                            rightReport.getFallChangedVariables(statement).orElse(Set.of()).stream())
-                .map(vars -> Locals.get(vars))
-                .collect(Collectors.toSet());
-            Set<Local> changedVariablesBranch = Stream.concat(leftReport.getBranchChangedVariables(statement).orElse(Set.of()).stream(),
-                                                              rightReport.getBranchChangedVariables(statement).orElse(Set.of()).stream())
-                .map(vars -> Locals.get(vars))
-                .collect(Collectors.toSet());
+            Set<Local> changedVariablesFall;
+            Set<Local> changedVariablesBranch;
+
+            switch (type) {
+            case MIN:
+                changedVariablesFall = Stream.concat(leftReport.getFallChangedVariables(statement).orElse(Set.of()).stream(),
+                                                     rightReport.getFallChangedVariables(statement).orElse(Set.of()).stream())
+                    .map(vars -> Locals.get(vars))
+                    .collect(Collectors.toSet());
+                changedVariablesBranch = Stream.concat(leftReport.getBranchChangedVariables(statement).orElse(Set.of()).stream(),
+                                                       rightReport.getBranchChangedVariables(statement).orElse(Set.of()).stream())
+                    .map(vars -> Locals.get(vars))
+                    .collect(Collectors.toSet());
+                break;
+            case FULL:
+            default:
+                changedVariablesFall = Set.of();
+                changedVariablesBranch = Set.of();
+            }
+
             if (leftFall.isPresent() || rightFall.isPresent()) {
                 writer.write("(echo \"fall through\")\n");
                 if (changedVariablesFall.size() > 0) {
