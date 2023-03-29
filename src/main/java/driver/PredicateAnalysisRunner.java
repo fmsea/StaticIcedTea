@@ -79,16 +79,18 @@ public class PredicateAnalysisRunner implements Runnable {
                     File dir = this.outputResultsPath.toFile();
                     dir.mkdirs();
 
-                    try (FileWriter fw = new FileWriter(fullSmt)) {
-                        fw.write(this.analysis.generateFullSMT());
-                        fw.flush();
+                    try (FileWriter fw = new FileWriter(fullSmt);
+                         BufferedWriter buf = new BufferedWriter(fw)) {
+                        this.analysis.writeFullSMT(buf);
+                        buf.flush();
                     } catch (IOException ex) {
                         LOGGER.error("Unable to write full SMT output file: {}", ex.getMessage());
                     }
 
-                    try (FileWriter fw = new FileWriter(symbSmt)) {
-                        fw.write(this.analysis.generateSymbolicSMT());
-                        fw.flush();
+                    try (FileWriter fw = new FileWriter(symbSmt);
+                         BufferedWriter buf = new BufferedWriter(fw)) {
+                        this.analysis.writeSymbolicSMT(buf);
+                        buf.flush();
                     } catch (IOException ex) {
                         LOGGER.error("Unable to write symbolic SMT output file: {}", ex.getMessage());
                     }

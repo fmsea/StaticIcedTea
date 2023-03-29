@@ -26,32 +26,12 @@ public class IntervalNumericalTest extends AbstractNumericalTest {
     }
 
     @Test
-    void testConstantValuePropagation() {
-        Body body = JimpleProvider.constantJimpleMethod("constant_test");
-        IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
-        analysis.runAnalysis();
-        String actual = analysis.generateReport().trim();
-        String expected = readResourcesFile("int.constantValuePropagation.out");
-        assertEquals(expected, actual);
-    }
-
-    @Test
     void testSMTFomulaReportWithConstantValuePropagation() {
         Body body = JimpleProvider.constantJimpleMethod("constant_test", true);
         IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("int.constantValuePropagation.smt.out");
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void testConstantMathPropagation() {
-        Body body = JimpleProvider.binaryArithmaticMethod("constantMath");
-        IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
-        analysis.runAnalysis();
-        String actual = analysis.generateReport().trim();
-        String expected = readResourcesFile("int.constantMathPropagation.out");
         assertEquals(expected, actual);
     }
 
@@ -60,18 +40,8 @@ public class IntervalNumericalTest extends AbstractNumericalTest {
         Body body = JimpleProvider.binaryArithmaticMethod("moreConstantMath");
         IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("int.constantMathPropagation.smt.out");
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void testIfStatementPropagation() {
-        Body body = JimpleProvider.simpleIfStatement("simpleIf");
-        IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
-        analysis.runAnalysis();
-        String actual = analysis.generateReport().trim();
-        String expected = readResourcesFile("int.branching.out");
         assertEquals(expected, actual);
     }
 
@@ -80,18 +50,8 @@ public class IntervalNumericalTest extends AbstractNumericalTest {
         Body body = JimpleProvider.simpleIfStatement("anotherSimpleIf");
         IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("int.branching.smt.out");
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void testWhileStatementPropagation() {
-        Body body = JimpleProvider.simpleLoopStatement("simpleLoop");
-        IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
-        analysis.runAnalysis();
-        String actual = analysis.generateReport().trim();
-        String expected = readResourcesFile("int.looping.out");
         assertEquals(expected, actual);
     }
 
@@ -100,18 +60,8 @@ public class IntervalNumericalTest extends AbstractNumericalTest {
         Body body = JimpleProvider.simpleLoopStatement("anotherSimpleLoop");
         IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("int.looping.smt.out");
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void testExample5() {
-        Body body = JimpleProvider.example5();
-        IntegerAnalysis<IntervalBoxState>  analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
-        analysis.runAnalysis();
-        String actual = analysis.generateReport().trim();
-        String expected = readResourcesFile("int.example5.out");
         assertEquals(expected, actual);
     }
 
@@ -120,7 +70,7 @@ public class IntervalNumericalTest extends AbstractNumericalTest {
         Body body = JimpleProvider.example5();
         IntegerAnalysis<IntervalBoxState> analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("int.example5.smt.out");
         assertEquals(expected, actual);
     }
@@ -130,7 +80,7 @@ public class IntervalNumericalTest extends AbstractNumericalTest {
         Body body = JimpleProvider.nonsense();
         IntegerAnalysis<IntervalBoxState> analysis = new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("int.nonsenseExample.smt.out");
         assertEquals(expected, actual);
     }
@@ -141,7 +91,7 @@ public class IntervalNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<IntervalBoxState> analysis =
             new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("int.neqLoop.smt.out");
         assertEquals(expected, actual);
     }
@@ -152,7 +102,7 @@ public class IntervalNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<IntervalBoxState> analysis =
             new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("int.getArrowSubset.smt.out");
         assertEquals(expected, actual);
     }
@@ -163,7 +113,7 @@ public class IntervalNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<IntervalBoxState> analysis =
             new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("int.intervalComparison.smt.out");
         assertEquals(expected, actual);
     }
@@ -174,7 +124,7 @@ public class IntervalNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<IntervalBoxState> analysis =
             new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("int.transverseZero.smt.out");
         assertEquals(expected, actual);
     }
@@ -185,7 +135,7 @@ public class IntervalNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<IntervalBoxState> analysis =
             new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("int.fibonacci.smt.out");
         assertEquals(expected, actual);
     }
@@ -196,7 +146,7 @@ public class IntervalNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<IntervalBoxState> analysis =
             new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("int.tribonacci.smt.out");
         assertEquals(expected, actual);
     }
@@ -207,7 +157,7 @@ public class IntervalNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<IntervalBoxState> analysis =
             new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("int.factorial.out");
         assertEquals(expected, actual);
     }
@@ -218,7 +168,7 @@ public class IntervalNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<IntervalBoxState> analysis =
             new IntegerAnalysis<>(body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("int.decode.out");
         assertEquals(expected, actual);
     }

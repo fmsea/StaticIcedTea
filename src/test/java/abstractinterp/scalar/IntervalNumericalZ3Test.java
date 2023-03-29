@@ -105,7 +105,7 @@ public class IntervalNumericalZ3Test extends AbstractNumericalTest {
         IntegerAnalysis<IntervalBoxState> analysis =
             new IntegerAnalysis<>(this.solver, body, 2, new IntervalBoxStateFactory());
         analysis.runAnalysis();
-        Reader actual = new StringReader(analysis.generateSMTReport());
+        Reader actual = new StringReader(generateReport(analysis));
         Reader expected = new StringReader(oracle);
         try {
             Writer writer = new FileWriter(this.z3TestFile.toFile());

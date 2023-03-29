@@ -1,12 +1,16 @@
 package disjoint.analysis;
 
+import java.io.IOException;
+import java.io.BufferedWriter;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-    import java.util.Map;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
@@ -245,27 +249,21 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
                     time);
     }
 
-    public String generateFullSMT() {
-        StringBuilder sb = new StringBuilder();
-        b.getLocals().stream().sorted((a, b) -> a.toString().compareTo(b.toString())).forEach(l -> {
-                sb.append(l.toString());
-                sb.append("\t");
-            });
-        // remove last tab
-        sb.deleteCharAt(sb.length() - 1);
-        sb.append("\n");
+    public void writeFullSMT(Writer writer) throws IOException {
+        writer.write(b.getLocals().stream().map(l -> l.toString()).sorted().collect(Collectors.joining("\t")));
+        writer.write("\n");
 
         String methodSignature = this.b.getMethod().getSignature();
         int stmtCount = 0;
         for (Unit unit : this.b.getUnits()) {
             stmtCount++;
             if (outputStmt.contains(unit)) {
-                sb.append(stmtCount);
-                sb.append(" ");
-                sb.append(unit);
-                sb.append(":");
-                sb.append(methodSignature);
-                sb.append("\n");
+                writer.write(String.valueOf(stmtCount));
+                writer.write(" ");
+                writer.write(unit.toString());
+                writer.write(":");
+                writer.write(methodSignature);
+                writer.write("\n");
                 AbstractState fall = getFallFlowAfter(unit);
                 String changedVariablesForUnit = Optional.ofNullable(this.changedVariables.get(unit))
                     .map(vars -> vars
@@ -275,59 +273,60 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
                          .collect(Collectors.joining("\t", "", "\t")))
                     .orElse("");
                 String fallExpr = formatState(fall);
-                sb.append("fall\t");
-                sb.append(changedVariablesForUnit);
-                sb.append(fallExpr);
-                sb.append("\n");
+                writer.write("fall\t");
+                writer.write(changedVariablesForUnit);
+                writer.write(fallExpr);
+                writer.write("\n");
                 List<AbstractState> branches = getBranchFlowAfter(unit);
                 for (AbstractState branch : branches) {
                     String branchExpr = formatState(branch);
-                    sb.append("branch\t");
-                    sb.append(changedVariablesForUnit);
-                    sb.append(branchExpr);
-                    sb.append("\n");
+                    writer.write("branch\t");
+                    writer.write(changedVariablesForUnit);
+                    writer.write(branchExpr);
+                    writer.write("\n");
                 }
+                writer.flush();
             }
         }
-        return sb.toString();
     }
 
     public void reportFullSMT() {
-        System.out.println(generateFullSMT());
-        System.out.flush();
+        try (PrintWriter writer = new PrintWriter(System.out);
+             BufferedWriter buf = new BufferedWriter(writer)) {
+            this.writeFullSMT(buf);
+            buf.flush();
+        } catch (IOException ex) {
+            LOGGER.error("Unable to write full SMT report: {}", ex);
+        }
     }
 
-    public String generateSymbolicSMT() {
-        StringBuilder sb = new StringBuilder();
-        b.getLocals().stream().sorted((a, b) -> a.toString().compareTo(b.toString())).forEach(l -> {
-                sb.append(l.toString());
-                sb.append("\t");
-            });
-        // remove last tab
-        sb.deleteCharAt(sb.length() - 1);
-        sb.append("\n");
+    public void writeSymbolicSMT(Writer writer) throws IOException {
+        writer.write(b.getLocals().stream().map(l -> l.toString()).sorted().collect(Collectors.joining("\t")));
+        writer.write("\n");
         String methodSignature = this.b.getMethod().getSignature();
         int stmtCount = 0;
         for (Unit unit : this.b.getUnits()) {
             stmtCount++;
             if (outputStmt.contains(unit)) {
-                sb.append(stmtCount);
-                sb.append(" ");
-                sb.append(unit);
-                sb.append(":");
-                sb.append(methodSignature);
-                sb.append("\n");
+                writer.write(String.valueOf(stmtCount));
+                writer.write(" ");
+                writer.write(unit.toString());
+                writer.write(":");
+                writer.write(methodSignature);
+                writer.write("\n");
                 AbstractState fall = getFallFlowAfter(unit);
                 if (!fall.getStates().isEmpty() && fall.isFeasible()) {
                     Optional<SymbolicState> symbState = fall.getStates().stream()
                         .filter(s -> s instanceof SymbolicState)
                         .map(s -> (SymbolicState)s)
                         .findFirst();
-                    symbState.ifPresentOrElse(state -> {
-                            sb.append("fall\t");
-                            sb.append(state.toSMT(this.solver));
-                            sb.append("\n");
-                        }, () -> sb.append("fall\ttrue\n"));
+                    writer.write(symbState.map(state -> {
+                                StringBuilder sb = new StringBuilder();
+                                sb.append("fall\t");
+                                sb.append(state.toSMT(this.solver));
+                                sb.append("\n");
+                                return sb.toString();
+                            }).orElse("fall\ttrue\n"));
                 }
                 List<AbstractState> branches = getBranchFlowAfter(unit);
                 for (AbstractState branch : branches) {
@@ -336,21 +335,30 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
                             .filter(s -> s instanceof SymbolicState)
                             .map(s -> (SymbolicState)s)
                             .findFirst();
-                        symbBranch.ifPresent(state -> {
-                                sb.append("branch\t");
-                                sb.append(state.toSMT(this.solver));
-                                sb.append("\n");
-                            });
+                        if (symbBranch.isPresent()) {
+                            writer.write(symbBranch.map(state -> {
+                                        StringBuilder sb = new StringBuilder();
+                                        sb.append("branch\t");
+                                        sb.append(state.toSMT(this.solver));
+                                        sb.append("\n");
+                                        return sb.toString();
+                                    }).get());
+                        }
                     }
                 }
+                writer.flush();
             }
         }
-        return sb.toString();
     }
 
     public void reportSymbolicSMT() {
-        System.out.println(generateSymbolicSMT());
-        System.out.flush();
+        try (PrintWriter writer = new PrintWriter(System.out);
+             BufferedWriter buf = new BufferedWriter(writer)) {
+            this.writeSymbolicSMT(buf);
+            buf.flush();
+        } catch (IOException ex) {
+            LOGGER.error("Unable to output symbolic SMT report: {}", ex);
+        }
     }
 
     private String formatState(AbstractState state) {
@@ -374,16 +382,10 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
         return r.toString();
     }
 
-    public String generateReport() {
-        StringBuilder sb = new StringBuilder();
+    public void writeReport(Writer writer) throws IOException {
         //printing the result
-        b.getLocals().stream().sorted((a, b) -> a.toString().compareTo(b.toString())).forEach(l -> {
-                sb.append(l.toString());
-                sb.append("\t");
-            });
-        // remove last tab
-        sb.deleteCharAt(sb.length() - 1);
-        sb.append("\n");
+        writer.write(b.getLocals().stream().map(l -> l.toString()).sorted().collect(Collectors.joining("\t")));
+        writer.write("\n");
         Iterator<Unit> iter = b.getUnits().iterator();
         int stmtCount = 0;
         while(iter.hasNext()){
@@ -392,23 +394,23 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
             //which state has been changed
             stmtCount++;
             if(outputStmt.contains(u)){
-                sb.append(stmtCount);
-                sb.append(" ");
-                sb.append(u);
-                sb.append(":");
-                sb.append(b.getMethod().getSignature());
-                sb.append("\n");
+                writer.write(String.valueOf(stmtCount));
+                writer.write(" ");
+                writer.write(u.toString());
+                writer.write(":");
+                writer.write(b.getMethod().getSignature());
+                writer.write("\n");
                 AbstractState fall = getFallFlowAfter(u);
                 if(!fall.getStates().isEmpty() && fall.isFeasible()){
                     Optional<Set<Local>> vars = Optional.ofNullable(changedVariables.get(u));
-                    sb.append("fall\t");
-                    sb.append(vars.flatMap(vs -> vs.stream()
-                                           .sorted((a, b) -> a.toString().compareTo(b.toString()))
-                                           .flatMap(v -> evaluateStates(fall, v).stream())
-                                           .reduce((a, b) -> Grimp.v().newAndExpr(a, b)))
-                              .map(expr -> solver.smt2(expr))
-                              .orElse("true"));
-                    sb.append("\n");
+                    writer.write("fall\t");
+                    writer.write(vars.flatMap(vs -> vs.stream()
+                                              .sorted((a, b) -> a.toString().compareTo(b.toString()))
+                                              .flatMap(v -> evaluateStates(fall, v).stream())
+                                              .reduce((a, b) -> Grimp.v().newAndExpr(a, b)))
+                                 .map(expr -> solver.smt2(expr))
+                                 .orElse("true"));
+                    writer.write("\n");
                 }
                 //for other branch outcome if one exists
                 List<AbstractState> branches = getBranchFlowAfter(u);
@@ -416,27 +418,31 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
                     for(AbstractState branch : branches){
                         if(!branch.getStates().isEmpty() && branch.isFeasible()){
                             Optional<Set<Local>> vars = Optional.ofNullable(changedVariables.get(u));
-                            sb.append("branch\t");
-                            sb.append(vars.flatMap(vs -> vs.stream()
-                                                   .sorted((a, b) -> a.toString().compareTo(b.toString()))
-                                                   .flatMap(v -> evaluateStates(branch, v).stream())
-                                                   .reduce((a, b) -> Grimp.v().newAndExpr(a, b)))
-                                      .map(expr -> solver.smt2(expr))
-                                      .orElse("true"));
-                            sb.append("\n");
+                            writer.write("branch\t");
+                            writer.write(vars.flatMap(vs -> vs.stream()
+                                                      .sorted((a, b) -> a.toString().compareTo(b.toString()))
+                                                      .flatMap(v -> evaluateStates(branch, v).stream())
+                                                      .reduce((a, b) -> Grimp.v().newAndExpr(a, b)))
+                                         .map(expr -> solver.smt2(expr))
+                                         .orElse("true"));
+                            writer.write("\n");
                         }
 
                     }
                 }
+                writer.flush();
             }//end outputStmt check
         }
-
-        return sb.toString();
     }
 
     public void report() {
-        System.out.print(generateReport());
-        System.out.flush();
+        try (PrintWriter writer = new PrintWriter(System.out);
+             BufferedWriter buf = new BufferedWriter(writer)) {
+            writeReport(buf);
+            buf.flush();
+        } catch (IOException ex) {
+            LOGGER.error("Unable to output report due to exception: {}", ex);
+        }
     }
 
     @Override

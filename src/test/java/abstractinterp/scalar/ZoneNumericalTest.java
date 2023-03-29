@@ -1,5 +1,8 @@
 package abstractinterp.scalar;
 
+import java.io.IOException;
+import java.io.StringWriter;
+
 import soot.Scene;
 import soot.Body;
 
@@ -29,7 +32,7 @@ public class ZoneNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<ZoneState> analysis =
             new IntegerAnalysis<>(body, 2, new ZoneStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.constantValuePropagation.out");
         assertEquals(expected, actual);
     }
@@ -40,7 +43,7 @@ public class ZoneNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<ZoneState> analysis =
             new IntegerAnalysis<>(body, 2, new ZoneStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.constantMathPropagation.out");
         assertEquals(expected, actual);
     }
@@ -51,7 +54,7 @@ public class ZoneNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<ZoneState> analysis =
             new IntegerAnalysis<>(body, 2, new ZoneStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.branching.out");
         assertEquals(expected, actual);
     }
@@ -62,7 +65,7 @@ public class ZoneNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<ZoneState> analysis =
             new IntegerAnalysis<>(body, 2, new ZoneStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.looping.out");
         assertEquals(expected, actual);
     }
@@ -73,7 +76,7 @@ public class ZoneNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<ZoneState> analysis =
             new IntegerAnalysis<>(body, 2, new ZoneStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.example5.out");
         assertEquals(expected, actual);
     }
@@ -84,7 +87,7 @@ public class ZoneNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<ZoneState> analysis =
             new IntegerAnalysis<>(body, 2, new ZoneStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.nonsenseExample.out");
         assertEquals(expected, actual);
     }
@@ -95,7 +98,7 @@ public class ZoneNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<ZoneState> analysis =
             new IntegerAnalysis<>(body, 2, new ZoneStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.neqLoop.out");
         assertEquals(expected, actual);
     }
@@ -106,7 +109,7 @@ public class ZoneNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<ZoneState> analysis =
             new IntegerAnalysis<>(body, 2, new ZoneStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.getArrowSubset.out");
         assertEquals(expected, actual);
     }
@@ -117,7 +120,7 @@ public class ZoneNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<ZoneState> analysis =
             new IntegerAnalysis<>(body, 2, new ZoneStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.intervalComparison.out");
         assertEquals(expected, actual);
     }
@@ -128,7 +131,7 @@ public class ZoneNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<ZoneState> analysis =
             new IntegerAnalysis<>(body, 2, new ZoneStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.transverseZero.out");
         assertEquals(expected, actual);
     }
@@ -139,7 +142,7 @@ public class ZoneNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<ZoneState> analysis =
             new IntegerAnalysis<>(body, 2, new ZoneStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.fibonacci.out");
         assertEquals(expected, actual);
     }
@@ -150,7 +153,7 @@ public class ZoneNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<ZoneState> analysis =
             new IntegerAnalysis<>(body, 2, new ZoneStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.tribonacci.out");
         assertEquals(expected, actual);
     }
@@ -161,7 +164,7 @@ public class ZoneNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<ZoneState> analysis =
             new IntegerAnalysis<>(body, 2, new ZoneStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.factorial.out");
         assertEquals(expected, actual);
     }
@@ -173,7 +176,7 @@ public class ZoneNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<ZoneState> analysis =
             new IntegerAnalysis<>(body, 2, new ZoneStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.decode.out");
         assertEquals(expected, actual);
     }
@@ -184,7 +187,7 @@ public class ZoneNumericalTest extends AbstractNumericalTest {
         IntegerAnalysis<ZoneState> analysis =
             new IntegerAnalysis<>(body, 2, new ZoneStateFactory());
         analysis.runAnalysis();
-        String actual = analysis.generateSMTReport().trim();
+        String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.swap.out");
         assertEquals(expected, actual);
     }

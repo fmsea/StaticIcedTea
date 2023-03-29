@@ -1,2 +1,0 @@
-l1 = 6 class soot.jimple.internal.JAssignStmt f->{l1=6}
-return l1 class soot.jimple.internal.JReturnStmt f->{l1=⟘}

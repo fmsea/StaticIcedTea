@@ -76,8 +76,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.constantValuePropagation.smt.out");
-        assertTrue(runComparison(analysis1.generateSMTReport(),
-                                 analysis2.generateSMTReport(),
+        assertTrue(runComparison(generateReport(analysis1),
+                                 generateReport(analysis2),
                                  expected));
     }
 
@@ -91,8 +91,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.constantMathPropagation.smt.out");
-        assertTrue(runComparison(analysis1.generateSMTReport(),
-                                 analysis2.generateSMTReport(),
+        assertTrue(runComparison(generateReport(analysis1),
+                                 generateReport(analysis2),
                                  expected));
     }
 
@@ -106,8 +106,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.branching.smt.out");
-        assertTrue(runComparison(analysis1.generateSMTReport(),
-                                 analysis2.generateSMTReport(),
+        assertTrue(runComparison(generateReport(analysis1),
+                                 generateReport(analysis2),
                                  expected));
     }
 
@@ -121,8 +121,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.looping.smt.out");
-        assertTrue(runComparison(analysis1.generateSMTReport(),
-                                 analysis2.generateSMTReport(),
+        assertTrue(runComparison(generateReport(analysis1),
+                                 generateReport(analysis2),
                                  expected));
     }
 
@@ -136,8 +136,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.example5.smt.out");
-        assertTrue(runComparison(analysis1.generateSMTReport(),
-                                 analysis2.generateSMTReport(),
+        assertTrue(runComparison(generateReport(analysis1),
+                                 generateReport(analysis2),
                                  expected));
     }
 
@@ -151,8 +151,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.nonsenseExample.smt.out");
-        assertTrue(runComparison(analysis1.generateSMTReport(),
-                                 analysis2.generateSMTReport(),
+        assertTrue(runComparison(generateReport(analysis1),
+                                 generateReport(analysis2),
                                  expected));
     }
 
@@ -166,8 +166,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.neqLoop.smt.out");
-        assertTrue(runComparison(analysis1.generateSMTReport(),
-                                 analysis2.generateSMTReport(),
+        assertTrue(runComparison(generateReport(analysis1),
+                                 generateReport(analysis2),
                                  expected));
     }
 
@@ -181,8 +181,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.getArrowSubset.smt.out");
-        assertTrue(runComparison(analysis1.generateSMTReport(),
-                                 analysis2.generateSMTReport(),
+        assertTrue(runComparison(generateReport(analysis1),
+                                 generateReport(analysis2),
                                  expected));
     }
 
@@ -196,8 +196,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.intervalComparison.smt.out");
-        assertTrue(runComparison(analysis1.generateSMTReport(),
-                                 analysis2.generateSMTReport(),
+        assertTrue(runComparison(generateReport(analysis1),
+                                 generateReport(analysis2),
                                  expected));
     }
 
@@ -211,8 +211,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.fibonacci.smt.out");
-        assertTrue(runComparison(analysis1.generateSMTReport(),
-                                 analysis2.generateSMTReport(),
+        assertTrue(runComparison(generateReport(analysis1),
+                                 generateReport(analysis2),
                                  expected));
     }
 

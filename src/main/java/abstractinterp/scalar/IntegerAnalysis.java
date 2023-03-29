@@ -129,71 +129,6 @@ public class IntegerAnalysis<S extends State> implements Analysis {
         analysis.doAnalysis();
     }
 
-    public String generateReport() {
-        StringBuilder sb = new StringBuilder();
-        for (Unit u : this.g.getBody().getUnits()) {
-            sb.append(u);
-            sb.append(" ");
-            sb.append(u.getClass());
-            sb.append(" f->");
-            sb.append(analysis.getFallFlowAfter(u));
-            sb.append('\n');
-            if (u.branches()) {
-                sb.append(u);
-                sb.append(" b->");
-                sb.append(analysis.getBranchFlowAfter(u));
-                sb.append('\n');
-            }
-        }
-        return sb.toString();
-    }
-
-    public String generateSMTReport() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(this.locals.stream().map(l -> l.toString()).sorted().collect(Collectors.joining("\t")));
-        sb.append("\n");
-        Set<Unit> outputStmt = this.analysis.getOutputStatements();
-        Map<Unit, Set<Local>> variables = this.getChangedVariables();
-        String methodSignature = this.b.getMethod().getSignature();
-        int stmtCount = 0;
-        for (Unit u : this.g.getBody().getUnits()) {
-            stmtCount++;
-            if (outputStmt.contains(u) && variables.get(u).size() > 0) {
-                sb.append(stmtCount);
-                sb.append(" ");
-                sb.append(u);
-                sb.append(":");
-                sb.append(methodSignature);
-                sb.append('\n');
-                State state = analysis.getFallFlowAfter(u);
-                sb.append("fall\t");
-                sb.append(this.analysis.getFallMinChangedVariables(u)
-                          .map(vars -> vars
-                               .stream()
-                               .map(v -> v.toString())
-                               .sorted()
-                               .collect(Collectors.joining("\t", "", "\t")))
-                          .orElse(""));
-                sb.append(state.toSMT(this.solver));
-                sb.append("\n");
-                List<S> branches = analysis.getBranchFlowAfter(u);
-                for (S branch : branches) {
-                    sb.append("branch\t");
-                    sb.append(this.analysis.getBranchMinChangedVariables(u)
-                              .map(vars -> vars
-                                   .stream()
-                                   .map(v -> v.toString())
-                                   .sorted()
-                                   .collect(Collectors.joining("\t", "", "\t")))
-                              .orElse(""));
-                    sb.append(branch.toSMT(this.solver));
-                    sb.append("\n");
-                }
-            }
-        }
-        return sb.toString();
-    }
-
     public void generateGraphOutputs(Path output) {
         File outputDir = output.toFile();
         outputDir.mkdirs();
@@ -215,11 +150,49 @@ public class IntegerAnalysis<S extends State> implements Analysis {
         return this.analysis.getChangedVariables();
     }
 
-    public void writeSMTReport(Writer writer) throws IOException {
-        writer.write(generateSMTReport());
-    }
-
-    public void report() {
-        System.out.print(generateSMTReport());
+    public void writeReport(Writer writer) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        writer.write(this.locals.stream().map(l -> l.toString()).sorted().collect(Collectors.joining("\t")));
+        writer.write("\n");
+        Set<Unit> outputStmt = this.analysis.getOutputStatements();
+        Map<Unit, Set<Local>> variables = this.getChangedVariables();
+        String methodSignature = this.b.getMethod().getSignature();
+        int stmtCount = 0;
+        for (Unit u : this.g.getBody().getUnits()) {
+            stmtCount++;
+            if (outputStmt.contains(u) && variables.get(u).size() > 0) {
+                writer.write(String.valueOf(stmtCount));
+                writer.write(" ");
+                writer.write(u.toString());
+                writer.write(":");
+                writer.write(methodSignature);
+                writer.write('\n');
+                State state = analysis.getFallFlowAfter(u);
+                writer.write("fall\t");
+                writer.write(this.analysis.getFallMinChangedVariables(u)
+                          .map(vars -> vars
+                               .stream()
+                               .map(v -> v.toString())
+                               .sorted()
+                               .collect(Collectors.joining("\t", "", "\t")))
+                          .orElse(""));
+                writer.write(state.toSMT(this.solver));
+                writer.write("\n");
+                List<S> branches = analysis.getBranchFlowAfter(u);
+                for (S branch : branches) {
+                    writer.write("branch\t");
+                    writer.write(this.analysis.getBranchMinChangedVariables(u)
+                              .map(vars -> vars
+                                   .stream()
+                                   .map(v -> v.toString())
+                                   .sorted()
+                                   .collect(Collectors.joining("\t", "", "\t")))
+                              .orElse(""));
+                    writer.write(branch.toSMT(this.solver));
+                    writer.write("\n");
+                }
+                writer.flush();
+            }
+        }
     }
 }

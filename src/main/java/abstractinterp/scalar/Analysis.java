@@ -5,8 +5,5 @@ import java.io.Writer;
 
 public interface Analysis {
     void runAnalysis();
-    String generateReport();
-    String generateSMTReport();
-    void writeSMTReport(Writer writer) throws IOException;
-    void report();
+    void writeReport(Writer writer) throws IOException;
 }
