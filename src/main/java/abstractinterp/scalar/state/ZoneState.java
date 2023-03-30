@@ -137,18 +137,18 @@ public class ZoneState implements State {
         this.matrix.union(inState.matrix);
     }
 
-    public void widenWith(State inState, Optional<Integer> step) {
+    public void widenWith(State inState, Set<Integer> steps) {
         if (inState instanceof ZoneState) {
-            this.widenWith((ZoneState) inState, step);
+            this.widenWith((ZoneState) inState, steps);
         } else {
             throw new RuntimeException("Invalid type for widenWith");
         }
     }
 
-    public void widenWith(ZoneState inState, Optional<Integer> step) {
+    public void widenWith(ZoneState inState, Set<Integer> steps) {
         this.matrix.computeClosure();
         inState.matrix.computeClosure();
-        this.matrix.widenWith(inState.matrix, step);
+        this.matrix.widenWith(inState.matrix, steps);
     }
 
     public boolean isSubset(State inState) {

@@ -24,7 +24,7 @@ public interface State {
      * Definition can be found in §4 of mine-pado-2001.
      * http://dx.doi.org/10.1007/3-540-44978-7_10
      */
-    public void widenWith(State newFlow, Optional<Integer> step);
+    public void widenWith(State newFlow, Set<Integer> steps);
     public boolean isSubset(State inState);
     public void updateState(Local var, State inState, Value left, Value right, BinaryOperatorType operator);
     public void updateState(Local var, State inState, Value v);

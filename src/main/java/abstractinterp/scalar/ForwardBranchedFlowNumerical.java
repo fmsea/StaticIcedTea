@@ -100,14 +100,14 @@ public class ForwardBranchedFlowNumerical<S extends State>
      */
     @Override
     protected void widen(S prevBeforeFlow, S beforeFlow) {
-        this.widen(prevBeforeFlow, beforeFlow, Optional.empty());
+        this.widen(prevBeforeFlow, beforeFlow, Set.of());
     }
 
     @Override
-    protected void widen(S prevBeforeFlow, S beforeFlow, Optional<Integer> step) {
+    protected void widen(S prevBeforeFlow, S beforeFlow, Set<Integer> steps) {
         LOGGER.trace("widening {} with {}", prevBeforeFlow, beforeFlow);
         State widenedFlow = prevBeforeFlow.copy();
-        widenedFlow.widenWith(beforeFlow, step);
+        widenedFlow.widenWith(beforeFlow, steps);
         LOGGER.trace("widening result: {}", widenedFlow);
         widenedFlow.copyTo(beforeFlow);
     }

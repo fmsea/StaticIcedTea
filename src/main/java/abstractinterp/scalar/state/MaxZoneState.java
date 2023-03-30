@@ -143,16 +143,16 @@ public class MaxZoneState implements State {
         this.matrix.union(inState.matrix);
     }
 
-    public void widenWith(State inState, Optional<Integer> step) {
+    public void widenWith(State inState, Set<Integer> steps) {
         if (inState instanceof MaxZoneState) {
-            this.widenWith((MaxZoneState) inState, step);
+            this.widenWith((MaxZoneState) inState, steps);
         } else {
             throw new RuntimeException("Invalid type for widenWith");
         }
     }
 
-    public void widenWith(MaxZoneState inState, Optional<Integer> step) {
-        this.matrix.widenWith(inState.matrix, step);
+    public void widenWith(MaxZoneState inState, Set<Integer> steps) {
+        this.matrix.widenWith(inState.matrix, steps);
     }
 
     public boolean isSubset(State inState) {

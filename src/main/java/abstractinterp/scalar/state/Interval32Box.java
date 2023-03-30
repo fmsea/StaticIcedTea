@@ -182,21 +182,26 @@ public class Interval32Box implements Comparable<Interval32Box> {
         }
     }
 
-    private void minWidenAssign(Interval32Box n, Optional<Integer> step) {
+    private void minWidenAssign(Interval32Box n, Set<Integer> steps) {
         boolean shouldWiden = (!this.isLowerBounded() ||
                                !n.isLowerBounded() ||
                                this.lowerBound.flatMap(ml -> n.lowerBound.map(nl -> nl < ml)).orElse(false));
         if (shouldWiden) {
-            this.lowerBound = step.map(s -> s * -1);
+            this.lowerBound = steps.stream()
+                .map(s -> s * -1)
+                .filter(s -> n.lowerBound.map(l -> s <= l).orElse(false))
+                .min(Integer::compare);
         }
     }
 
-    private void maxWidenAssign(Interval32Box n, Optional<Integer> step) {
+    private void maxWidenAssign(Interval32Box n, Set<Integer> steps) {
         boolean shouldWiden = (!this.isUpperBounded() ||
                                !n.isUpperBounded() ||
                                this.upperBound.flatMap(mu -> n.upperBound.map(nu -> nu > mu)).orElse(false));
         if (shouldWiden) {
-            this.upperBound = step;
+            this.upperBound = steps.stream()
+                .filter(s -> n.upperBound.map(u -> s >= u).orElse(false))
+                .min(Integer::compare);
         }
     }
 
@@ -221,16 +226,16 @@ public class Interval32Box implements Comparable<Interval32Box> {
     }
 
     public static Interval32Box wideningAssign(Interval32Box m, Interval32Box n) {
-        return Interval32Box.wideningAssign(m, n, Optional.empty());
+        return Interval32Box.wideningAssign(m, n, Set.of());
     }
 
-    public static Interval32Box wideningAssign(Interval32Box m, Interval32Box n, Optional<Integer> step) {
+    public static Interval32Box wideningAssign(Interval32Box m, Interval32Box n, Set<Integer> steps) {
         Interval32Box c = Interval32Box.of(m);
-        c.wideningAssign(n, step);
+        c.wideningAssign(n, steps);
         return c;
     }
 
-    public void wideningAssign(Interval32Box n, Optional<Integer> step) {
+    public void wideningAssign(Interval32Box n, Set<Integer> steps) {
         // this = m
         if (this.isBottom()) {
             this.lowerBound = n.lowerBound;
@@ -238,8 +243,8 @@ public class Interval32Box implements Comparable<Interval32Box> {
             this.bottom = n.bottom;
         } else if (!n.isBottom()) {
             // ⊃ this ≠ ⟘ ∧ box ≠ ⟘
-            minWidenAssign(n, step);
-            maxWidenAssign(n, step);
+            minWidenAssign(n, steps);
+            maxWidenAssign(n, steps);
             this.checkAndSetBottom();
         }
     }

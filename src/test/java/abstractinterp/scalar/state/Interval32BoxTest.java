@@ -223,7 +223,7 @@ public class Interval32BoxTest {
     void testWideningAssign() {
         {
             Interval32Box bot = Interval32Box.BOT();
-            bot.wideningAssign(bot, Optional.empty());
+            bot.wideningAssign(bot, Set.of());
             Interval32Box c = Interval32Box.wideningAssign(bot, bot);
             assertTrue(c.isBottom());
         }

@@ -321,7 +321,7 @@ public class IntervalBoxStateTest {
             n.update(xs[1], Interval32Box.of(-2, 2));
             n.update(xs[2], Interval32Box.of(0, 3));
             n.update(xs[3], Interval32Box.of(-3, -1));
-            m.widenWith(n, Optional.of(10));
+            m.widenWith(n, Set.of(10));
             assertAll(() -> assertEquals(Interval32Box.of(0),
                                          m.getValue(xs[0])),
                       () -> assertEquals(Interval32Box.of(-10, 10),

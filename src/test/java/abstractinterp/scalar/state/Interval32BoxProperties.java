@@ -89,8 +89,8 @@ public class Interval32BoxProperties {
     void widenWithBottomTakesOther(@ForAll Interval32Box box) {
         Interval32Box a = Interval32Box.of(box);
         Interval32Box bot = Interval32Box.BOT();
-        a.wideningAssign(bot, Optional.empty());
-        bot.wideningAssign(box, Optional.empty());
+        a.wideningAssign(bot, Set.of());
+        bot.wideningAssign(box, Set.of());
         assertAll(() -> assertFalse(a.isBottom()),
                   () -> assertFalse(bot.isBottom()));
     }

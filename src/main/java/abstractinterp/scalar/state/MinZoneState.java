@@ -145,18 +145,18 @@ public class MinZoneState implements State {
         this.matrix.union(inState.matrix);
     }
 
-    public void widenWith(State inState, Optional<Integer> step) {
+    public void widenWith(State inState, Set<Integer> steps) {
         if (inState instanceof MinZoneState) {
-            this.widenWith((MinZoneState) inState, step);
+            this.widenWith((MinZoneState) inState, steps);
         } else {
             throw new RuntimeException("Invalid type for widenWith");
         }
     }
 
-    public void widenWith(MinZoneState inState, Optional<Integer> step) {
+    public void widenWith(MinZoneState inState, Set<Integer> steps) {
         this.matrix.computeClosure();
         inState.matrix.computeClosure();
-        this.matrix.widenWith(inState.matrix, step);
+        this.matrix.widenWith(inState.matrix, steps);
     }
 
     public boolean isSubset(State inState) {
