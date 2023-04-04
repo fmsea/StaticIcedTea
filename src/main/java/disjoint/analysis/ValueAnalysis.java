@@ -315,6 +315,13 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
                 writer.write(methodSignature);
                 writer.write("\n");
                 AbstractState fall = getFallFlowAfter(unit);
+                String changedVariables = Optional.ofNullable(this.changedVariables.get(unit))
+                    .map(vars -> vars
+                         .stream()
+                         .map(v -> v.toString())
+                         .sorted()
+                         .collect(Collectors.joining("\t", "", "\t")))
+                    .orElse("");
                 if (!fall.getStates().isEmpty() && fall.isFeasible()) {
                     Optional<SymbolicState> symbState = fall.getStates().stream()
                         .filter(s -> s instanceof SymbolicState)
@@ -323,10 +330,15 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
                     writer.write(symbState.map(state -> {
                                 StringBuilder sb = new StringBuilder();
                                 sb.append("fall\t");
+                                sb.append(changedVariables);
                                 sb.append(state.toSMT(this.solver));
                                 sb.append("\n");
                                 return sb.toString();
                             }).orElse("fall\ttrue\n"));
+                } else {
+                    writer.write("fall\t");
+                    writer.write(changedVariables);
+                    writer.write("false\n");
                 }
                 List<AbstractState> branches = getBranchFlowAfter(unit);
                 for (AbstractState branch : branches) {
@@ -344,6 +356,10 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
                                         return sb.toString();
                                     }).get());
                         }
+                    }  else {
+                        writer.write("branch\t");
+                        writer.write(changedVariables);
+                        writer.write("false\n");
                     }
                 }
                 writer.flush();
