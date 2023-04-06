@@ -28,6 +28,7 @@ import soot.jimple.toolkits.annotation.logic.Loop;
 import soot.toolkits.graph.ExceptionalUnitGraph;
 import soot.toolkits.graph.LoopNestTree;
 import soot.toolkits.graph.PseudoTopologicalOrderer;
+import soot.toolkits.graph.Orderer;
 import soot.toolkits.graph.UnitGraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,11 +64,25 @@ public class IntegerAnalysis<S extends State> implements Analysis {
                            int iterations,
                            StateFactory<S> stateFactory,
                            Set<Integer> widenSteps) {
+        this(solver,
+             b,
+             iterations,
+             stateFactory,
+             widenSteps,
+             new PseudoTopologicalOrderer<>());
+    }
+
+    public IntegerAnalysis(SolverWrapper solver,
+                           Body b,
+                           int iterations,
+                           StateFactory<S> stateFactory,
+                           Set<Integer> widenSteps,
+                           Orderer<Unit> orderer) {
         this.solver = solver;
         this.b = b;
         this.g = new ExceptionalUnitGraph(b);
 
-        List<Unit> order = new PseudoTopologicalOrderer<Unit>().newList(g, false);
+        List<Unit> order = orderer.newList(g, false);
         Map<Unit, S> unitToBeforeFlow = new HashMap<>();
         Map<Unit, List<S>> unitToAfterBranchFlow = new HashMap<>();
         Map<Unit, List<S>> unitToAfterFallFlow = new HashMap<>();

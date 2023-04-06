@@ -8,6 +8,8 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import driver.util.SootInitialization;
+import driver.util.OrdererType;
+import driver.commands.validation.OrdererTypeConverter;
 import driver.IncZoneAnalysisRunner;
 
 @Command(name = "inczone-numerical",
@@ -43,6 +45,12 @@ public class StartIncZoneNumericalCommand implements Callable<Integer> {
             required = false)
     private Set<Integer> widenSteps;
 
+    @Option(names = {"--order"},
+            description = "CFG Topological Orderer",
+            defaultValue = "pseudo",
+            converter = OrdererTypeConverter.class)
+    private OrdererType orderer;
+
     @Parameters(index = "0",
                 description = "Class name of artifact to analyze")
     private String className;
@@ -61,7 +69,8 @@ public class StartIncZoneNumericalCommand implements Callable<Integer> {
                                                outputResultsPath,
                                                outputReport,
                                                widenIterations,
-                                               widenSteps);
+                                               widenSteps,
+                                               orderer);
         } else {
             runner = new IncZoneAnalysisRunner(className,
                                                methodId,

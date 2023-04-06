@@ -16,13 +16,17 @@ import java.util.stream.Collectors;
 import abstractinterp.scalar.IntegerAnalysis;
 import abstractinterp.scalar.state.State;
 import abstractinterp.scalar.state.factory.StateFactory;
+import driver.util.OrdererFactory;
 import driver.util.SootInitialization;
+import solver.SolverFactory;
 import util.AnalysisTimer;
 import util.Configuration;
 import soot.Body;
 import soot.Scene;
 import soot.SootClass;
 import soot.SootMethod;
+import soot.Unit;
+import soot.toolkits.graph.Orderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,13 +72,36 @@ public abstract class AnalysisRunner<S extends State>  implements Runnable {
                           boolean outputStateReports,
                           int widenIterations,
                           Set<Integer> widenSteps) {
+        this(className,
+             methodId,
+             outputResultsPath,
+             factory,
+             outputStateReports,
+             widenIterations,
+             widenSteps,
+             OrdererFactory.pseudoTopological());
+    }
+
+    public AnalysisRunner(String className,
+                          int methodId,
+                          Path outputResultsPath,
+                          StateFactory<S> factory,
+                          boolean outputStateReports,
+                          int widenIterations,
+                          Set<Integer> widenSteps,
+                          Orderer<Unit> orderer) {
         this.className = className;
         this.methodId = methodId;
         this.outputResultsPath = outputResultsPath;
         this.sootMethod = SootInitialization.getSootMethod(className, methodId);
         this.body = this.sootMethod.retrieveActiveBody();
         this.widenSteps = widenSteps;
-        this.analysis = new IntegerAnalysis<>(this.body, widenIterations, factory, this.widenSteps);
+        this.analysis = new IntegerAnalysis<>(SolverFactory.getSolver(),
+                                              this.body,
+                                              widenIterations,
+                                              factory,
+                                              this.widenSteps,
+                                              orderer);
         this.outputStateReports = outputStateReports;
     }
 
