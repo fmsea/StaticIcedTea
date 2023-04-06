@@ -60,20 +60,12 @@ public class StartIntervalNumericalCommand implements Callable<Integer> {
     public Integer call() throws Exception {
         SootInitialization.initializeSoot(className, classpath);
         Runnable runner;
-        if (widenSteps != null) {
-            runner = new IntervalAnalysisRunner(className,
-                                                methodId,
-                                                outputResultsPath,
-                                                outputReport,
-                                                widenIterations,
-                                                widenSteps);
-        } else {
-            runner = new IntervalAnalysisRunner(className,
-                                                methodId,
-                                                outputResultsPath,
-                                                outputReport,
-                                                widenIterations);
-        }
+        runner = new IntervalAnalysisRunner(className,
+                                            methodId,
+                                            outputResultsPath,
+                                            outputReport,
+                                            widenIterations,
+                                            widenSteps);
         runner.run();
         return 0;
     }

@@ -95,7 +95,7 @@ public abstract class AnalysisRunner<S extends State>  implements Runnable {
         this.outputResultsPath = outputResultsPath;
         this.sootMethod = SootInitialization.getSootMethod(className, methodId);
         this.body = this.sootMethod.retrieveActiveBody();
-        this.widenSteps = widenSteps;
+        this.widenSteps = widenSteps == null ? Set.of() : widenSteps;
         this.analysis = new IntegerAnalysis<>(SolverFactory.getSolver(),
                                               this.body,
                                               widenIterations,

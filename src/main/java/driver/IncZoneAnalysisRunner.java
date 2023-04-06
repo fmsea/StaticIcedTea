@@ -13,20 +13,6 @@ public class IncZoneAnalysisRunner extends AnalysisRunner<IncZoneState> {
                                  int methodId,
                                  Path outputResultsPath,
                                  boolean outputStateReports,
-                                 int widenIterations) {
-        this(className,
-             methodId,
-             outputResultsPath,
-             outputStateReports,
-             widenIterations,
-             Set.of(),
-             OrdererType.PseudoTopological);
-    }
-
-    public IncZoneAnalysisRunner(String className,
-                                 int methodId,
-                                 Path outputResultsPath,
-                                 boolean outputStateReports,
                                  int widenIterations,
                                  Set<Integer> widenSteps,
                                  OrdererType orderer) {

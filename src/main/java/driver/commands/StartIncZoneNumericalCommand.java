@@ -63,21 +63,13 @@ public class StartIncZoneNumericalCommand implements Callable<Integer> {
     public Integer call() throws Exception {
         SootInitialization.initializeSoot(className, classpath);
         Runnable runner;
-        if (widenSteps != null) {
-            runner = new IncZoneAnalysisRunner(className,
-                                               methodId,
-                                               outputResultsPath,
-                                               outputReport,
-                                               widenIterations,
-                                               widenSteps,
-                                               orderer);
-        } else {
-            runner = new IncZoneAnalysisRunner(className,
-                                               methodId,
-                                               outputResultsPath,
-                                               outputReport,
-                                               widenIterations);
-        }
+        runner = new IncZoneAnalysisRunner(className,
+                                           methodId,
+                                           outputResultsPath,
+                                           outputReport,
+                                           widenIterations,
+                                           widenSteps,
+                                           orderer);
         runner.run();
         return 0;
     }
