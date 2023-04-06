@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import processing.util.FlowSet;
+import solver.Smt2Logic;
 
 public class Smt2Format {
     private static String resultsPathFull;
@@ -271,6 +272,22 @@ public class Smt2Format {
                     return a.compareTo(b);
                 }
             }).collect(Collectors.toList());
+    }
+
+    protected static String convertLogicToString(Smt2Logic logic) {
+        switch (logic) {
+        case QF_LIA:
+            return "QF_LIA";
+        case LIA:
+            return "LIA";
+        case NIA:
+            return "NIA";
+        case UFNIA:
+            return "UFNIA";
+        case AUFNIRA:
+        default:
+            return "AUFNIRA";
+        }
     }
 }
 

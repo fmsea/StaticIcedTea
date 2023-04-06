@@ -18,9 +18,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import driver.commands.validation.Smt2FormatTypeConverter;
+import driver.commands.validation.Smt2LogicConverter;
 
 import processing.Smt2FormatReachable;
 import processing.Smt2FormatType;
+import solver.Smt2Logic;
 
 @Command(name = "smt2-format",
          mixinStandardHelpOptions=true,
@@ -32,6 +34,12 @@ public class Smt2FormatCommand implements Callable<Integer> {
             defaultValue = "min",
             converter = Smt2FormatTypeConverter.class)
     private Smt2FormatType type;
+
+    @Option(names = {"--logic"},
+            description = "SMT Logic to set at the top of the entailed file",
+            defaultValue = "LIA",
+            converter = Smt2LogicConverter.class)
+    private Smt2Logic logic;
 
     @Parameters(index = "0",
                 description="filename of first file")
@@ -51,7 +59,7 @@ public class Smt2FormatCommand implements Callable<Integer> {
         try (Reader fh1 = new FileReader(analysisOne);
              Reader fh2 = new FileReader(analysisTwo);
              Writer out = new FileWriter(outputFile)) {
-            Smt2FormatReachable.Smt2FormatReachable(fh1, fh2, out, type);
+            Smt2FormatReachable.Smt2FormatReachable(fh1, fh2, out, type, logic);
             return 0;
         } catch (IOException ex) {
             log.error("Unable to format analysis: {}", ex.toString());

@@ -29,6 +29,7 @@ import processing.smt.SmtExpressionReader;
 import processing.util.FlowSet;
 import solver.SolverWrapper;
 import solver.SolverFactory;
+import solver.Smt2Logic;
 
 public class Smt2FormatReachable extends Smt2Format {
     private static Logger LOGGER = LoggerFactory.getLogger(Smt2FormatReachable.class);
@@ -37,13 +38,14 @@ public class Smt2FormatReachable extends Smt2Format {
     public static void Smt2FormatReachable(Reader left,
                                            Reader right,
                                            Writer writer) throws IOException{
-        Smt2FormatReachable(left, right, writer, Smt2FormatType.MIN);
+        Smt2FormatReachable(left, right, writer, Smt2FormatType.MIN, Smt2Logic.LIA);
     }
 
     public static void Smt2FormatReachable(Reader left,
                                            Reader right,
                                            Writer writer,
-                                           Smt2FormatType type) throws IOException {
+                                           Smt2FormatType type,
+                                           Smt2Logic logic) throws IOException {
         AnalysisSMTReport leftReport = Smt2Reader.parse(left);
         AnalysisSMTReport rightReport = Smt2Reader.parse(right);
         LOGGER.debug("parsed left and right reports");
@@ -51,7 +53,9 @@ public class Smt2FormatReachable extends Smt2Format {
                                                rightReport.statements().stream())
             .collect(Collectors.toSet());
         List<String> sortedStatements = sortStatements(statements);
-        writer.write("(set-logic LIA)\n");
+        writer.write("(set-logic ");
+        writer.write(convertLogicToString(logic));
+        writer.write(")\n");
         for (String statement : sortedStatements) {
             writer.write("(echo \"");
             writer.write(statement.replaceAll("\"", "\"\""));
