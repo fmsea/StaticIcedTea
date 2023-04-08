@@ -39,19 +39,22 @@ public class PredicateAnalysisRunner implements Runnable {
     private final Body body;
     private final ValueAnalysis analysis;
     private final boolean outputStateReports;
+    private final boolean outputSymbolicStates;
 
     public PredicateAnalysisRunner(String className,
                                    int methodId,
                                    Path outputResultsPath,
                                    File domainFile,
                                    boolean symbolic,
-                                   boolean outputStateReports) {
+                                   boolean outputStateReports,
+                                   boolean outputSymbolicStates) {
         this.className = className;
         this.methodId = methodId;
         this.outputResultsPath = outputResultsPath;
         this.domainFile = domainFile;
         this.symbolic = symbolic;
         this.outputStateReports = outputStateReports;
+        this.outputSymbolicStates = outputSymbolicStates;
         this.sootMethod = SootInitialization.getSootMethod(className, methodId);
         this.body = this.sootMethod.retrieveActiveBody();
         LOGGER.debug("Reading {} for domains", domainFile);
@@ -71,28 +74,16 @@ public class PredicateAnalysisRunner implements Runnable {
                                            String.format("%s_%d.smt.out",
                                                          className,
                                                          methodId)).toFile();
-                    File symbSmt = Path.of(this.outputResultsPath.toString(),
-                                           String.format("%s_%d.symbolic.out",
-                                                         className,
-                                                         methodId)).toFile();
 
                     File dir = this.outputResultsPath.toFile();
                     dir.mkdirs();
 
                     try (FileWriter fw = new FileWriter(fullSmt);
                          BufferedWriter buf = new BufferedWriter(fw)) {
-                        this.analysis.writeFullSMT(buf);
+                        this.analysis.writeFullSMT(buf, this.outputSymbolicStates);
                         buf.flush();
                     } catch (IOException ex) {
                         LOGGER.error("Unable to write full SMT output file: {}", ex.getMessage());
-                    }
-
-                    try (FileWriter fw = new FileWriter(symbSmt);
-                         BufferedWriter buf = new BufferedWriter(fw)) {
-                        this.analysis.writeSymbolicSMT(buf);
-                        buf.flush();
-                    } catch (IOException ex) {
-                        LOGGER.error("Unable to write symbolic SMT output file: {}", ex.getMessage());
                     }
                 },
                 "Analysis reporting took {} ms");

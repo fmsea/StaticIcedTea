@@ -42,6 +42,14 @@ public class StartPredicateNumericalCommand implements Callable<Integer> {
             negatable = true)
     private boolean outputReport;
 
+    @Option(names = {"--output-symbolic-states"},
+            description = "Whether to include symbolic state information in analysis report.  Implies Symbolic",
+            required = false,
+            defaultValue = "false",
+            fallbackValue = "false",
+            negatable = true)
+    private boolean outputSymbolicStates;
+
     @Parameters(index = "0",
                 description = "Class Name of artifact to analyze")
     private String className;
@@ -57,8 +65,9 @@ public class StartPredicateNumericalCommand implements Callable<Integer> {
                                                       methodId,
                                                       outputResultsPath,
                                                       domainFile,
-                                                      symbolic.equals("Y"),
-                                                      outputReport);
+                                                      symbolic.equals("Y") || outputSymbolicStates,
+                                                      outputReport,
+                                                      outputSymbolicStates);
         runner.run();
         return 0;
     }

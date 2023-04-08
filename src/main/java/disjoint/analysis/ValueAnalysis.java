@@ -14,7 +14,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import soot.ByteType;
 import soot.IntType;
@@ -250,6 +252,10 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
     }
 
     public void writeFullSMT(Writer writer) throws IOException {
+        this.writeFullSMT(writer, false);
+    }
+
+    public void writeFullSMT(Writer writer, boolean includeSymbolic) throws IOException {
         writer.write(b.getLocals().stream().map(l -> l.toString()).sorted().collect(Collectors.joining("\t")));
         writer.write("\n");
 
@@ -272,14 +278,14 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
                          .sorted()
                          .collect(Collectors.joining("\t", "", "\t")))
                     .orElse("");
-                String fallExpr = formatState(fall);
+                String fallExpr = formatState(fall, includeSymbolic);
                 writer.write("fall\t");
                 writer.write(changedVariablesForUnit);
                 writer.write(fallExpr);
                 writer.write("\n");
                 List<AbstractState> branches = getBranchFlowAfter(unit);
                 for (AbstractState branch : branches) {
-                    String branchExpr = formatState(branch);
+                    String branchExpr = formatState(branch, includeSymbolic);
                     writer.write("branch\t");
                     writer.write(changedVariablesForUnit);
                     writer.write(branchExpr);
@@ -378,14 +384,25 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
     }
 
     private String formatState(AbstractState state) {
+        return this.formatState(state, false);
+    }
+
+    private String formatState(AbstractState state, boolean includeSymbolic) {
+        BinaryOperator<BinopExpr> and = (a, b) -> Grimp.v().newAndExpr(a, b);
         Chain<Local> locals = b.getLocals();
         StringBuilder r = new StringBuilder();
         if (!state.getStates().isEmpty() && state.isFeasible()) {
-            locals.stream().map(l -> evaluateStates(state, l).stream()
-                                .reduce((a, b) -> Grimp.v().newAndExpr(a, b)))
-                .filter(op -> op.isPresent())
-                .map(o -> o.get())
-                .reduce((a, b) -> Grimp.v().newAndExpr(a, b))
+            Stream<BinopExpr> predicates = locals.stream().flatMap(l -> evaluateStates(state, l).stream());
+            Stream<BinopExpr> symbolic = state.getStates().stream()
+                .filter(s -> includeSymbolic && s instanceof SymbolicState)
+                .map(s -> (SymbolicState) s)
+                .flatMap(s -> s.toBinopExpr().stream());
+            Stream.concat(predicates, symbolic)
+                .collect(Collectors.toMap(expr -> expr.equivHashCode(), expr -> expr, (oExpr, nExpr) -> oExpr))
+                .values()
+                .stream()
+                .sorted((a, b) -> a.toString().compareTo(b.toString()))
+                .reduce(and)
                 .ifPresentOrElse(expr -> {
                         r.append(solver.smt2(expr));
                         r.append("\n");

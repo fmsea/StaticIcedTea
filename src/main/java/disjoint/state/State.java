@@ -21,5 +21,4 @@ public interface State {
 	public void initEntry();
 
 	public State merge(State state);
-
 }

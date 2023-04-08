@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import soot.Local;
 import soot.Value;
@@ -218,7 +219,17 @@ public class SymbolicState implements State {
 
     public String toSMT(SolverWrapper solver) {
         StringBuilder sb = new StringBuilder();
-        this.reachedStmt.stream().map((s) -> {
+        this.toBinopExpr()
+            .stream()
+            .reduce((a, b) -> Grimp.v().newAndExpr(a, b))
+            .ifPresentOrElse(expr -> {
+                    sb.append(solver.smt2(expr));
+                }, () -> sb.append("true"));
+        return sb.toString();
+    }
+
+    public Set<BinopExpr> toBinopExpr() {
+        return this.reachedStmt.stream().map(s -> {
                 Optional<BinopExpr> r = Optional.empty();
                 if (s instanceof IfStmt) {
                     r = Optional.of(this.condToExpr.get(s));
@@ -228,11 +239,7 @@ public class SymbolicState implements State {
                 return r;
             }).filter(s -> s.isPresent())
             .map(s -> s.get())
-            .reduce((a, b) -> Grimp.v().newAndExpr(a, b))
-            .ifPresentOrElse(expr -> {
-                    sb.append(solver.smt2(expr));
-                }, () -> sb.append("true"));
-        return sb.toString();
+            .collect(Collectors.toSet());
     }
 
 	@Override
