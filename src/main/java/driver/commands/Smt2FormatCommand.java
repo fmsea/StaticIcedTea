@@ -1,10 +1,12 @@
 package driver.commands;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
@@ -56,10 +58,13 @@ public class Smt2FormatCommand implements Callable<Integer> {
     @Override
     public Integer call() {
         Logger log = LoggerFactory.getLogger("smt-format");
+        File output = Path.of(outputFile).toFile();
         try (Reader fh1 = new FileReader(analysisOne);
              Reader fh2 = new FileReader(analysisTwo);
-             Writer out = new FileWriter(outputFile)) {
+             Writer out = new FileWriter(output)) {
             Smt2FormatReachable.Smt2FormatReachable(fh1, fh2, out, type, logic);
+            out.flush();
+            output.setReadOnly();
             return 0;
         } catch (IOException ex) {
             log.error("Unable to format analysis: {}", ex.toString());

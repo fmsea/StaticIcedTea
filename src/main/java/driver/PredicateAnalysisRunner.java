@@ -82,6 +82,7 @@ public class PredicateAnalysisRunner implements Runnable {
                          BufferedWriter buf = new BufferedWriter(fw)) {
                         this.analysis.writeFullSMT(buf, this.outputSymbolicStates);
                         buf.flush();
+                        fullSmt.setReadOnly();
                     } catch (IOException ex) {
                         LOGGER.error("Unable to write full SMT output file: {}", ex.getMessage());
                     }

@@ -131,6 +131,7 @@ public abstract class AnalysisRunner<S extends State>  implements Runnable {
              BufferedWriter buf = new BufferedWriter(fw)) {
             this.analysis.writeReport(buf);
             buf.flush();
+            fullSmt.setReadOnly();
         } catch (IOException ex) {
             LOGGER.error("Unable to write full SMT output file: {}", ex.getMessage());
         }
