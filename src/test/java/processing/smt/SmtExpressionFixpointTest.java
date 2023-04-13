@@ -505,7 +505,100 @@ public class SmtExpressionFixpointTest {
                                                                  g.newGeExpr(Locals.get("b"),
                                                                              g.newNegExpr(IntConstant.v(1))))
                                                        .map(e -> (Value)e)
+                                                       .reduce(and))),
+                         // 11 - base64_17:147
+                         Stream.of(Arguments.arguments(Stream.of("(and (= $i1 0)",
+                                                                 "(>= i56 0)",
+                                                                 "(= $b19 (+ b78 0))",
+                                                                 "(= $b20 (+ b80 0))",
+                                                                 "(= $b21 (+ b82 0))",
+                                                                 "(= $b22 (+ b83 0))",
+                                                                 "(= $b5 (+ b60 0))",
+                                                                 "(= $b6 (+ b62 0))",
+                                                                 "(= $i3 (+ $i4 0))",
+                                                                 "(= $i3 (+ $i76 0))",
+                                                                 "(= $i3 (+ i2 (- 1)))",
+                                                                 "(<= i56 (+ $i3 (- 1)))",
+                                                                 "(<= i56 (+ i74 0))",
+                                                                 "(= i57 (+ i59 (- 1)))",
+                                                                 "(= i57 (+ i61 (- 2)))",
+                                                                 "(= i57 (+ i65 (- 3)))",
+                                                                 "(<= i74 (+ i75 (- 4)))",
+                                                                 "(= i74 (+ i88 (- 1)))",
+                                                                 "(= i75 (+ i77 3))",
+                                                                 "(= i75 (+ i79 2))",
+                                                                 "(= i75 (+ i81 1)))").collect(Collectors.joining(" ")),
+                                                       Stream.of("(and (= $i1 0)",
+                                                                 "(>= i56 0)",
+                                                                 "(= $b19 (+ b78 0))",
+                                                                 "(= $b20 (+ b80 0))",
+                                                                 "(= $b21 (+ b82 0))",
+                                                                 "(= $b22 (+ b83 0))",
+                                                                 "(= $b5 (+ b60 0))",
+                                                                 "(= $b6 (+ b62 0))",
+                                                                 "(= $i3 (+ $i4 0))",
+                                                                 "(= $i3 (+ $i76 0))",
+                                                                 "(= $i3 (+ i2 (- 1)))",
+                                                                 "(<= i56 (+ $i3 (- 1)))",
+                                                                 "(<= i56 (+ i74 0))",
+                                                                 "(= i57 (+ i59 (- 1)))",
+                                                                 "(= i57 (+ i61 (- 2)))",
+                                                                 "(= i57 (+ i65 (- 3)))",
+                                                                 "(<= i74 (+ i75 (- 4)))",
+                                                                 "(= i74 (+ i88 (- 1)))",
+                                                                 "(= i75 (+ i77 3))",
+                                                                 "(= i75 (+ i79 2))",
+                                                                 "(= i75 (+ i81 1)))").collect(Collectors.joining(" ")),
+                                                       Locals.get("i74", "i88"),
+                                                       Locals.get("i56", "i74", "i75", "i77", "i79", "i81", "i88"),
+                                                       Stream.of(newLeExpr("i56", "i74", 0),
+                                                                 newGeExpr("i56", 0),
+                                                                 newLeExpr("i74", "i75", -4),
+                                                                 newEqExpr("i74", "i88", -1),
+                                                                 newEqExpr("i75", "i77", 3),
+                                                                 newEqExpr("i75" , "i79", 2),
+                                                                 newEqExpr("i75", "i81", 1))
+                                                       .reduce(and),
+                                                       Stream.of(newLeExpr("i56", "i74", 0),
+                                                                 newGeExpr("i56", 0),
+                                                                 newLeExpr("i74", "i75", -4),
+                                                                 newEqExpr("i74", "i88", -1),
+                                                                 newEqExpr("i75", "i77", 3),
+                                                                 newEqExpr("i75" , "i79", 2),
+                                                                 newEqExpr("i75", "i81", 1))
                                                        .reduce(and)))
                          ).flatMap(s -> s.map(v -> v));
+    }
+
+    private static Value newIntValue(int value) {
+        if (value >= 0) {
+            return IntConstant.v(value);
+        } else {
+            return g.newNegExpr(IntConstant.v(value * -1));
+        }
+    }
+
+    private static Value newEqExpr(String x, int value) {
+        return g.newEqExpr(Locals.get(x), newIntValue(value));
+    }
+
+    private static Value newEqExpr(String x, String y, int value) {
+        return g.newEqExpr(Locals.get(x), g.newAddExpr(Locals.get(y), newIntValue(value)));
+    }
+
+    private static Value newLeExpr(String x, int value) {
+        return g.newLeExpr(Locals.get(x), newIntValue(value));
+    }
+
+    private static Value newLeExpr(String x, String y, int value) {
+        return g.newLeExpr(Locals.get(x), g.newAddExpr(Locals.get(y), newIntValue(value)));
+    }
+
+    private static Value newGeExpr(String x, int value) {
+        return g.newGeExpr(Locals.get(x), newIntValue(value));
+    }
+
+    private static Value newGeExpr(String x, String y, int value) {
+        return g.newGeExpr(Locals.get(x), g.newAddExpr(Locals.get(y), newIntValue(value)));
     }
 }

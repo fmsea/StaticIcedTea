@@ -127,8 +127,8 @@ public class Smt2FormatReachable extends Smt2Format {
                                            Set<Local> changedVariables) {
         StringBuilder sb = new StringBuilder();
         Set<Local> variables = SmtExpression.reachableUnion(changedVariables, left, right);
-        String leftSmt = left.toReachableSmt2(variables).orElse("true");
-        String rightSmt = right.toReachableSmt2(variables).orElse("true");
+        String leftSmt = left.toSmt2(variables).orElse("true");
+        String rightSmt = right.toSmt2(variables).orElse("true");
         Set<String> variableStrs = variables.stream().map(l -> l.toString()).collect(Collectors.toSet());
         sb.append(formatImplies(variableStrs, leftSmt, rightSmt));
         sb.append(formatImplies(variableStrs, rightSmt, leftSmt));

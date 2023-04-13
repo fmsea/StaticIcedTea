@@ -37,6 +37,12 @@ public class FormatReachableTestProvider implements ArgumentsProvider {
                                              getContents("processing/reachable/format.unchanged.out.smt")),
                          Arguments.arguments(getReader("processing/reachable/format.imagedata_10.dom2.in"),
                                              getReader("processing/reachable/format.imagedata_10.zones.in"),
-                                             getContents("processing/reachable/format.imagedata_10.out.smt")));
+                                             getContents("processing/reachable/format.imagedata_10.out.smt")),
+                         Arguments.arguments(getReader("processing/reachable/format.small.base64_17.zones.in"),
+                                             getReader("processing/reachable/format.small.base64_17.zones-k.in"),
+                                             getContents("processing/reachable/format.small.base64_17.out.smt")),
+                         Arguments.arguments(getReader("processing/reachable/format.base64_17.zones.in"),
+                                             getReader("processing/reachable/format.base64_17.zones-k.in"),
+                                             getContents("processing/reachable/format.base64_17.min.out.smt")));
     }
 }
