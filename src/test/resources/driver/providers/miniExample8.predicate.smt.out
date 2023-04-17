@@ -1,0 +1,23 @@
+i0	i1	i2	i3	i4	i5	r0
+7 i1 = i0:<miniExample8: void example(int,int,int,int,int)>
+fall	i1	true
+
+8 if i1 > i2 goto return:<miniExample8: void example(int,int,int,int,int)>
+fall	i1	i2	true
+
+branch	i1	i2	true
+
+9 if i3 > i4 goto return:<miniExample8: void example(int,int,int,int,int)>
+fall	i3	i4	true
+
+branch	i3	i4	true
+
+10 if i5 > i3 goto return:<miniExample8: void example(int,int,int,int,int)>
+fall	i3	i5	true
+
+branch	i3	i5	true
+
+11 if i1 > i3 goto return:<miniExample8: void example(int,int,int,int,int)>
+fall	i1	i3	true
+
+branch	i1	i3	true

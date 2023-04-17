@@ -1,37 +1,17 @@
 i0	i1	i2	i3	i4	r0
 3 i2 = 0:<miniExample4: int example(int)>
-fall	i2	(and (or (> i0 0) (= i0 0) (< i0 0))
-     (or (> i1 0) (= i1 0) (< i1 0))
-     (= i2 0)
-     (or (> i3 0) (= i3 0) (< i3 0))
-     (or (> i4 0) (= i4 0) (< i4 0)))
+fall	i2	(= i2 0)
 
 4 i3 = 1:<miniExample4: int example(int)>
-fall	i3	(and (or (> i0 0) (= i0 0) (< i0 0))
-     (or (> i1 0) (= i1 0) (< i1 0))
-     (= i2 0)
-     (> i3 0)
-     (or (> i4 0) (= i4 0) (< i4 0)))
+fall	i3	(and (= i2 0) (> i3 0))
 
 5 i4 = 2:<miniExample4: int example(int)>
-fall	i4	(and (or (> i0 0) (= i0 0) (< i0 0))
-     (or (> i1 0) (= i1 0) (< i1 0))
-     (= i2 0)
-     (> i3 0)
-     (> i4 0))
+fall	i4	(and (= i2 0) (> i3 0) (> i4 0))
 
 6 if i4 >= i0 goto return i3:<miniExample4: int example(int)>
-fall	i0	i4	(and (> i0 0)
-     (or (> i1 0) (= i1 0) (< i1 0))
-     (or (> i2 0) (= i2 0))
-     (> i3 0)
-     (> i4 0))
+fall	i0	i4	(and (> i0 0) (or (> i2 0) (= i2 0)) (> i3 0) (> i4 0))
 
-branch	i0	i4	(and (or (> i0 0) (= i0 0) (< i0 0))
-     (or (> i1 0) (= i1 0) (< i1 0))
-     (or (> i2 0) (= i2 0))
-     (> i3 0)
-     (> i4 0))
+branch	i0	i4	(and (or (> i2 0) (= i2 0)) (> i3 0) (> i4 0))
 
 7 i1 = i2 + i3:<miniExample4: int example(int)>
 fall	i1	(and (> i0 0) (> i1 0) (or (> i2 0) (= i2 0)) (> i3 0) (> i4 0))

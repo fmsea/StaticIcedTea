@@ -21,6 +21,8 @@ public class ZonesPredicateComparativeProvider extends MiniJavaExamplesComparati
                          example("miniExample4", "zones", "predicate"),
                          example("miniExample5", "zones", "predicate"),
                          example("miniExample6", "zones", "predicate"),
-                         example("miniExample7", "zones", "predicate"));
+                         example("miniExample7", "zones", "predicate"),
+                         example("miniExample8", "zones", "predicate"),
+                         example("miniExample9", "zones", "predicate"));
     }
 }

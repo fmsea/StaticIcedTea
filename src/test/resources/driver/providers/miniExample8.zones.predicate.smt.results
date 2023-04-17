@@ -1,0 +1,32 @@
+7 i1 = i0:<miniExample8: void example(int,int,int,int,int)>
+fall through
+sat
+unknown
+8 if i1 > i2 goto return:<miniExample8: void example(int,int,int,int,int)>
+fall through
+sat
+unknown
+branch out
+sat
+unsat
+9 if i3 > i4 goto return:<miniExample8: void example(int,int,int,int,int)>
+fall through
+sat
+unsat
+branch out
+sat
+unsat
+10 if i5 > i3 goto return:<miniExample8: void example(int,int,int,int,int)>
+fall through
+sat
+unsat
+branch out
+sat
+unsat
+11 if i1 > i3 goto return:<miniExample8: void example(int,int,int,int,int)>
+fall through
+sat
+unknown
+branch out
+sat
+unsat

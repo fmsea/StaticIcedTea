@@ -993,6 +993,10 @@ public class ValueAnalysis extends ForwardBranchedFlowAnalysis<AbstractState> {
                 for (int i = 0; i < intervalVal.size(); i++) {
                     BitSet value = intervalVal.get(i);
                     Domain d = indexToDisjointDomain.get(i);
+                    if (value.length() == d.size() && value.nextClearBit(0) == value.length()) {
+                        // domain is ⊤
+                        continue;
+                    }
                     BinopExpr dExpr = d.instantiate(value, v);
                     ret.add(dExpr);
                 }

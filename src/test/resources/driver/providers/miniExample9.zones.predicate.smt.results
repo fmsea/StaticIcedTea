@@ -1,0 +1,43 @@
+3 l2 = 0L:<miniExample9: long example(long)>
+fall through
+sat
+sat
+4 l3 = 1L:<miniExample9: long example(long)>
+fall through
+sat
+unsat
+5 l4 = 0L:<miniExample9: long example(long)>
+fall through
+sat
+sat
+6 l5 = 0L:<miniExample9: long example(long)>
+fall through
+sat
+sat
+7 $b1 = l5 cmp l0:<miniExample9: long example(long)>
+fall through
+sat
+sat
+8 if $b1 >= 0 goto return l4:<miniExample9: long example(long)>
+fall through
+sat
+unsat
+branch out
+sat
+unsat
+9 l4 = l3 + l2:<miniExample9: long example(long)>
+fall through
+sat
+sat
+10 l2 = l3:<miniExample9: long example(long)>
+fall through
+sat
+unsat
+11 l3 = l4:<miniExample9: long example(long)>
+fall through
+sat
+unsat
+12 l5 = l5 + 1L:<miniExample9: long example(long)>
+fall through
+sat
+unsat
