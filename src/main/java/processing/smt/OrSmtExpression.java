@@ -48,6 +48,10 @@ public class OrSmtExpression extends ConnectiveSmtExpression {
 
     @Override
     public String toSmt2() {
-        return this.toSmt2(OrSmtExpression::combinator);
+        return this.toSmt2("or");
+    }
+
+    public Optional<String> toSmt2(Set<Local> variables) {
+        return this.toSmt2(variables, "or");
     }
 }

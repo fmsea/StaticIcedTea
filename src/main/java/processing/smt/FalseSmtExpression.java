@@ -43,23 +43,12 @@ public class FalseSmtExpression extends SmtExpression {
         return "false";
     }
 
-    @Override
     public Optional<String> toSmt2(Local id) {
         return Optional.of("false");
     }
 
     @Override
     public Optional<String> toSmt2(Set<Local> variables) {
-        return Optional.of("false");
-    }
-
-    @Override
-    public Optional<String> toReachableSmt2(Local id) {
-        return Optional.of("false");
-    }
-
-    @Override
-    public Optional<String> toReachableSmt2(Set<Local> sources) {
         return Optional.of("false");
     }
 

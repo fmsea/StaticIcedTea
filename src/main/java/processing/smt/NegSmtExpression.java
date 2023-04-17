@@ -47,6 +47,14 @@ public class NegSmtExpression extends SmtExpression {
         return this.expr.containsAll(variables);
     }
 
+    public String toSmt2() {
+        return String.format("(- %s)", this.expr.toSmt2());
+    }
+
+    public Optional<String> toSmt2(Set<Local> variables) {
+        return this.expr.toSmt2(variables).map(smt -> String.format("(- %s)", smt));
+    }
+
     public int getPredicateCount() {
         return this.expr.getPredicateCount();
     }

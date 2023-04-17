@@ -37,8 +37,15 @@ public class Smt2FormatReachable extends Smt2Format {
 
     public static void Smt2FormatReachable(Reader left,
                                            Reader right,
-                                           Writer writer) throws IOException{
-        Smt2FormatReachable(left, right, writer, Smt2FormatType.MIN, Smt2Logic.LIA);
+                                           Writer writer) throws IOException {
+        Smt2FormatReachable(left, right, writer, Smt2FormatType.MIN);
+    }
+
+    public static void Smt2FormatReachable(Reader left,
+                                           Reader right,
+                                           Writer writer,
+                                           Smt2FormatType type) throws IOException {
+        Smt2FormatReachable(left, right, writer, type, Smt2Logic.LIA);
     }
 
     public static void Smt2FormatReachable(Reader left,
@@ -141,6 +148,7 @@ public class Smt2FormatReachable extends Smt2Format {
                                               right.getLocals().stream())
             .map(local -> local.toString())
             .collect(Collectors.toSet());
+        LOGGER.debug("left = {}, right = {}", left, right);
         String leftSmt = left.toSmt2();
         String rightSmt = right.toSmt2();
         sb.append(formatImplies(variables, leftSmt, rightSmt));

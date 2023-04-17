@@ -36,10 +36,26 @@ public class Number extends SmtExpression {
     }
 
     public String toSmt2() {
-        return String.format("%d", this.value);
+        if (this.value < 0) {
+            return String.format("(- %d)", this.value * -1);
+        } else {
+            return String.format("%d", this.value);
+        }
     }
 
     public Optional<String> toSmt2(Local id) {
+        return Optional.empty();
+    }
+
+    public Optional<String> toSmt2(Set<Local> variables) {
+        return Optional.empty();
+    }
+
+    public Optional<String> toReachableSmt2(Local id) {
+        return Optional.empty();
+    }
+
+    public Optional<String> toReachableSmt2(Set<Local> sources) {
         return Optional.empty();
     }
 

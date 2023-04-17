@@ -13,4 +13,10 @@ public class DivisionSmtExpression extends BinopSmtExpression {
         return Grimp.v().newDivExpr(this.left.getValue(),
                                     this.right.getValue());
     }
+
+    public String toSmt2() {
+        return String.format("(div %s %s)",
+                             this.left.toSmt2(),
+                             this.right.toSmt2());
+    }
 }

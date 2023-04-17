@@ -20,12 +20,14 @@ public class Smt2FormatReachableTest extends FormatTest {
     @ArgumentsSource(FormatReachableTestProvider.class)
     void testSimpleMinFormat(Reader fullLeft,
                              Reader fullRight,
-                             String expected) {
+                             String expected,
+                             Smt2FormatType type) {
         Writer out = new StringWriter();
         try {
             Smt2FormatReachable.Smt2FormatReachable(fullLeft,
                                                     fullRight,
-                                                    out);
+                                                    out,
+                                                    type);
             assertEquals(expected, out.toString());
         } catch (Exception ex) {
             ex.printStackTrace(System.err);

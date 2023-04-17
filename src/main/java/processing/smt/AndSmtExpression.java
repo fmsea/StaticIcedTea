@@ -51,6 +51,10 @@ public class AndSmtExpression extends ConnectiveSmtExpression {
 
     @Override
     public String toSmt2() {
-        return this.toSmt2(AndSmtExpression::combinator);
+        return this.toSmt2("and");
+    }
+
+    public Optional<String> toSmt2(Set<Local> variables) {
+        return this.toSmt2(variables, "and");
     }
 }

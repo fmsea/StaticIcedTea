@@ -76,30 +76,13 @@ public abstract class SmtExpression {
         return this.getConnectedVariables().get(id);
     }
 
-    @Override
     public String toString() {
-        return this.getValue().toString();
+        return this.toSmt2();
     }
 
-    public String toSmt2() {
-        return this.solver.smt2(this.getValue());
-    }
+    public abstract String toSmt2();
 
-    public Optional<String> toSmt2(Local id) {
-        return this.getValue(Set.of(id)).map(v -> this.solver.smt2(v));
-    }
-
-    public Optional<String> toSmt2(Set<Local> variables) {
-        return this.getValue(variables).map(v -> this.solver.smt2(v));
-    }
-
-    public Optional<String> toReachableSmt2(Local id) {
-        return this.toReachableSmt2(Set.of(id));
-    }
-
-    public Optional<String> toReachableSmt2(Set<Local> sources) {
-        return this.getReachableValue(sources).map(v -> this.solver.smt2(v));
-    }
+    public abstract Optional<String> toSmt2(Set<Local> variables);
 
     public abstract int getPredicateCount();
 

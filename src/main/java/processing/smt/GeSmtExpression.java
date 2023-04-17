@@ -24,6 +24,12 @@ public class GeSmtExpression extends BinopSmtExpression {
         return Grimp.v().newGeExpr(this.left.getValue(), this.right.getValue());
     }
 
+    public String toSmt2() {
+        return String.format("(>= %s %s)",
+                             this.left.toSmt2(),
+                             this.right.toSmt2());
+    }
+
     public SmtGraph toGraph() {
         SmtGraph graph = super.toGraph();
         Set<Local> leftLocals = this.left.getLocals();

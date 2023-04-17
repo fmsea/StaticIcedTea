@@ -13,4 +13,10 @@ public class MultiplicationSmtExpression extends BinopSmtExpression {
         return Grimp.v().newMulExpr(this.left.getValue(),
                                     this.right.getValue());
     }
+
+    public String toSmt2() {
+        return String.format("(* %s %s)",
+                             this.left.toSmt2(),
+                             this.right.toSmt2());
+    }
 }

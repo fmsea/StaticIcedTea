@@ -7,6 +7,7 @@ import soot.Local;
 import soot.Value;
 import soot.grimp.Grimp;
 import soot.jimple.IntConstant;
+import soot.dava.internal.javaRep.DNotExpr;
 
 public class NotSmtExpression extends SmtExpression {
 
@@ -18,7 +19,7 @@ public class NotSmtExpression extends SmtExpression {
     }
 
     public Value getValue() {
-        return Grimp.v().newNeExpr(this.expr.getValue(), IntConstant.v(1));
+        return new DNotExpr(this.expr.getValue());
     }
 
     public Optional<Value> getValue(Set<Local> variables) {
@@ -42,6 +43,10 @@ public class NotSmtExpression extends SmtExpression {
 
     public String toSmt2() {
         return String.format("(not %s)", this.expr.toSmt2());
+    }
+
+    public Optional<String> toSmt2(Set<Local> variables) {
+        return this.expr.toSmt2(variables).map(smt -> String.format("(not %s)", smt));
     }
 
     public boolean containsAll(Set<Local> variables) {

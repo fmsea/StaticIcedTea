@@ -81,6 +81,19 @@ public abstract class BinopSmtExpression extends SmtExpression {
         return values.stream().findFirst();
     }
 
+    public Optional<String> toSmt2(Set<Local> variables) {
+        BiPredicate<Local, SmtExpression> contains = (v, expr) -> {
+            Set<Local> locals = expr.getLocals();
+            return locals.isEmpty() || locals.contains(v);
+        };
+        if (variables.stream().map(v -> contains.test(v, left)).reduce((a, b) -> a || b).orElse(false) &&
+            variables.stream().map(v -> contains.test(v, right)).reduce((a, b) -> a || b).orElse(false)) {
+            return Optional.of(this.toSmt2());
+        } else {
+            return Optional.empty();
+        }
+    }
+
     public boolean containsAll(Set<Local> variables) {
         return this.getLocals().containsAll(variables);
     }

@@ -117,9 +117,42 @@ public abstract class ConnectiveSmtExpression extends SmtExpression {
             .collect(Collectors.toSet());
     }
 
-    protected String toSmt2(BinaryOperator<Value> combinator) {
-        Value expr = (Value)this.getValue(combinator);
-        return this.solver.smt2(expr);
+    protected String toSmt2(String combinator) {
+        Set<String> exprs = this.expressions
+            .stream()
+            .map(expr -> expr.toSmt2())
+            .collect(Collectors.toSet());
+        if (this.expressions.size() > 1) {
+            return this.expressions
+                .stream()
+                .map(expr -> expr.toSmt2())
+                .sorted()
+                .collect(Collectors.joining(" ", String.format("(%s ", combinator), ")"));
+        } else if (exprs.size() == 1) {
+            return this.expressions.get(0).toSmt2();
+        } else {
+            return "";
+        }
+    }
+
+    protected Optional<String> toSmt2(Set<Local> variables, String combinator) {
+        Set<String> exprs = this.expressions
+            .stream()
+            .map(expr -> expr.toSmt2(variables))
+            .filter(o -> o.isPresent())
+            .map(o -> o.get())
+            .sorted()
+            .collect(Collectors.toSet());
+        if (exprs.size() > 1) {
+            return exprs
+                .stream()
+                .reduce((a, b) -> a + " " + b)
+                .map(expr -> String.format("(%s %s)", combinator, expr));
+        } else if (exprs.size() == 1) {
+            return exprs.stream().findFirst();
+        } else {
+            return Optional.empty();
+        }
     }
 
     public boolean containsAll(Set<Local> variables) {

@@ -13,4 +13,10 @@ public class ModulusSmtExpression extends BinopSmtExpression {
         return Grimp.v().newRemExpr(this.left.getValue(),
                                     this.right.getValue());
     }
+
+    public String toSmt2() {
+        return String.format("(mod %s %s)",
+                             this.left.toSmt2(),
+                             this.right.toSmt2());
+    }
 }

@@ -1,0 +1,8 @@
+$b136	$b88	$b99	$i10	$i11	$i111	$i112	$i12	$i123	$i124	$i125	$i126	$i127	$i13	$i134	$i138	$i14	$i15	$i152	$i154	$i16	$i164	$i167	$i17	$i18	$i19	$i2	$i20	$i21	$i22	$i23	$i24	$i25	$i26	$i27	$i28	$i29	$i3	$i30	$i31	$i32	$i33	$i34	$i35	$i36	$i37	$i38	$i39	$i4	$i40	$i41	$i42	$i43	$i44	$i45	$i46	$i47	$i48	$i49	$i5	$i50	$i6	$i66	$i7	$i8	$i9	$i92	$i94	$i95	$r1	$r10	$r11	$r12	$r13	$r14	$r15	$r16	$r17	$r18	$r19	$r2	$r20	$r21	$r26	$r3	$r4	$r5	$r6	$r7	$r8	$r9	b104	b105	b110	b117	b121	b137	b147	b148	b155	b160	b165	b172	b176	b180	b75	b76	b83	b84	i0	i1	i100	i101	i102	i103	i106	i107	i108	i109	i113	i114	i115	i116	i118	i119	i120	i122	i128	i129	i130	i131	i132	i133	i135	i139	i140	i141	i142	i143	i144	i145	i146	i149	i150	i151	i153	i156	i157	i158	i159	i161	i162	i163	i166	i168	i169	i170	i171	i173	i174	i175	i177	i178	i179	i181	i182	i183	i51	i52	i53	i54	i55	i56	i57	i58	i59	i60	i61	i62	i63	i64	i65	i67	i68	i69	i70	i71	i72	i73	i74	i77	i78	i79	i80	i81	i82	i85	i86	i87	i89	i90	i91	i93	i96	i97	i98	r0	r22	r23	r24	r25	r27	r28	r29	r30	z0	z1	z2	z3	z4	z5	z6	z7	z8
+27 if i52 == 0 goto i68 = i63:<test.InfBlocks: int proc(int,int,int,int,int,int,int,int,int,int,int,int,int,int)>
+fall	i52	(<= i64 2)
+
+branch	i52	(and (= i52 0) (<= i64 2))
+
+34 i52 = i52 + -1:<test.InfBlocks: int proc(int,int,int,int,int,int,int,int,int,int,int,int,int,int)>
+fall	i52	(and (<= i64 2) (= z0 0))

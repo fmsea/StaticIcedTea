@@ -24,6 +24,9 @@ import processing.providers.SmtExpressionIdentityProvider;
 import processing.providers.SmtExpressionConnectedProvider;
 import processing.providers.SmtExpressionReachableIdentityProvider;
 import processing.providers.SmtExpressionReachableProvider;
+import processing.providers.SmtExpressionToSmt2Provider;
+import processing.providers.SmtExpressionToSmt2SelectionProvider;
+import processing.providers.SmtExpressionToStringProvider;
 
 public class SmtExpressionTest {
 
@@ -94,6 +97,42 @@ public class SmtExpressionTest {
                          expr.getReachableValue(variables).map(e -> e.toString()));
         } catch (Exception ex) {
             ex.printStackTrace(System.err);
+        }
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(SmtExpressionToSmt2Provider.class)
+    void testToSmt2(String smtExpression) {
+        try {
+            SmtExpression expr = SmtExpressionReader.parse(smtExpression);
+            assertEquals(smtExpression, expr.toSmt2());
+        } catch (Exception ex) {
+            ex.printStackTrace(System.err);
+            assertTrue(false);
+        }
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(SmtExpressionToSmt2SelectionProvider.class)
+    void testToSmt2Variables(String smtExpression, Set<Local> variables, Optional<String> expected) {
+        try {
+            SmtExpression expr = SmtExpressionReader.parse(smtExpression);
+            assertEquals(expected, expr.toSmt2(variables));
+        } catch (Exception ex) {
+            ex.printStackTrace(System.err);
+            assertTrue(false);
+        }
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(SmtExpressionToStringProvider.class)
+    void testToString(String smtExpression) {
+        try {
+            SmtExpression expr = SmtExpressionReader.parse(smtExpression);
+            assertEquals(smtExpression, expr.toString());
+        } catch (Exception ex) {
+            ex.printStackTrace(System.err);
+            assertTrue(false);
         }
     }
 }

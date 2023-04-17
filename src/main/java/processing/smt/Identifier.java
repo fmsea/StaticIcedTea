@@ -63,6 +63,14 @@ public class Identifier extends SmtExpression {
         }
     }
 
+    public Optional<String> toSmt2(Set<Local> variables) {
+        if (variables.contains(this.identifier)) {
+            return Optional.of(this.toSmt2());
+        } else {
+            return Optional.empty();
+        }
+    }
+
     public boolean containsAll(Set<Local> variables) {
         return variables.contains(this.identifier) && variables.size() == 1;
     }

@@ -24,6 +24,12 @@ public class LtSmtExpression extends BinopSmtExpression {
         return Grimp.v().newLtExpr(this.left.getValue(), this.right.getValue());
     }
 
+    public String toSmt2() {
+        return String.format("(< %s %s)",
+                             this.left.toSmt2(),
+                             this.right.toSmt2());
+    }
+
     @Override
     public SmtGraph toGraph() {
         SmtGraph graph = super.toGraph();

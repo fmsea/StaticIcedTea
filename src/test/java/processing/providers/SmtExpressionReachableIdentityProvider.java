@@ -70,6 +70,15 @@ public class SmtExpressionReachableIdentityProvider implements ArgumentsProvider
                                                                             Locals.get("z")),
                                                     Locals.get("z"), Set.of(Locals.get("k"),
                                                                             Locals.get("z")),
-                                                    Locals.get("k"), Set.of(Locals.get("k")))));
+                                                    Locals.get("k"), Set.of(Locals.get("k")))),
+                         Arguments.arguments("(and (or (= i3 1) (and (>= i3 2) (<= i3 5))) (<= i3 (+ i2 i0)))",
+                                             Map.of(Locals.get("i3"), Locals.get("i0", "i2", "i3"),
+                                                    Locals.get("i0"), Set.of(Locals.get("i0")),
+                                                    Locals.get("i2"), Set.of(Locals.get("i2")))),
+                         Arguments.arguments("(and (or (= i3 1) (and (>= i3 2) (<= i3 5))) (<= i3 (+ i2 i0)) (<= i0 (+ i4 4)))",
+                                             Map.of(Locals.get("i3"), Locals.get("i0", "i2", "i3", "i4"),
+                                                    Locals.get("i0"), Locals.get("i0", "i4"),
+                                                    Locals.get("i2"), Set.of(Locals.get("i2")),
+                                                    Locals.get("i4"), Set.of(Locals.get("i4")))));
     }
 }
