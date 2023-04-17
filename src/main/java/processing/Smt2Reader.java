@@ -41,7 +41,7 @@ public class Smt2Reader {
                          token.equals("false"))) {
                 identifiers.add(token);
             } else {
-                LOGGER.debug("token was not identified: {}", token);
+                LOGGER.trace("token was not identified: {}", token);
             }
         }
         return identifiers;
