@@ -14,68 +14,54 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import processing.util.FlowSet;
 
 public class Smt2ReaderTest {
 
-    @Test
-    void testGetIdentifiers() {
-        {
-            String smt = "(= i0 0)";
-            Set<String> result = Smt2Reader.getIdentifiers(smt);
-            assertAll("All identifiers are identified",
-                      () -> assertTrue(result.contains("i0")),
-                      () -> assertFalse(result.contains("0")));
-        }
+    @ParameterizedTest
+    @MethodSource("testGetIdentifiersProvider")
+    void testGetIdentifiers(String smt,
+                            Set<String> expectedPresent,
+                            Set<String> expectedAbsent) {
+        Set<String> results = Smt2Reader.getIdentifiers(smt);
+        Stream<Executable> assertions0 = Stream.of(() -> assertEquals(expectedPresent.size(), results.size()));
+        Stream<Executable> assertions1 = Stream.of(() -> assertTrue(results.containsAll(expectedPresent)));
+        Stream<Executable> assertions2 = expectedAbsent.stream().map(absent -> () -> assertFalse(results.contains(absent)));
+        Stream<Executable> assertions = Stream.of(assertions0,
+                                                  assertions1,
+                                                  assertions2).flatMap(s -> s.map(v -> v));
+        assertAll(assertions);
+    }
 
-        {
-            String smt = "(= i0 61)";
-            Set<String> result = Smt2Reader.getIdentifiers(smt);
-            assertAll("All identifiers are identified",
-                      () -> assertTrue(result.contains("i0")),
-                      () -> assertFalse(result.contains("61")));
-        }
-
-        {
-            String smt = "(and (< b2 5) (> b2 0) (>= b2 2))";
-            Set<String> result = Smt2Reader.getIdentifiers(smt);
-            assertAll("All Identifiers are identified",
-                      () -> assertTrue(result.contains("b2")),
-                      () -> assertFalse(result.contains("and")));
-        }
-
-        {
-            String smt = "(and (< b2 5) (> b2 0) (>= b2 i4))";
-            Set<String> result = Smt2Reader.getIdentifiers(smt);
-            assertAll("All Identifiers are identified",
-                      () -> assertTrue(result.contains("b2")),
-                      () -> assertTrue(result.contains("i4")),
-                      () -> assertFalse(result.contains("and")));
-        }
-
-        {
-            String smt = "(or (< b2 5) (>= b2 5))";
-            Set<String> result = Smt2Reader.getIdentifiers(smt);
-            assertAll("All identifiers are identified",
-                      () -> assertTrue(result.contains("b2")),
-                      () -> assertFalse(result.contains("or")));
-        }
-
-        {
-            String smt = "true";
-            Set<String> result = Smt2Reader.getIdentifiers(smt);
-            assertAll("No identifier is found",
-                      () -> assertEquals(0, result.size()));
-        }
-
-        {
-            String smt = "false";
-            Set<String> result = Smt2Reader.getIdentifiers(smt);
-            assertAll("No identifier is found",
-                      () -> assertEquals(0, result.size()));
-        }
+    private static Stream<Arguments> testGetIdentifiersProvider() {
+        return Stream.of(Arguments.arguments("(= i0 0)",
+                                             Set.of("i0"),
+                                             Set.of("0")),
+                         Arguments.arguments("(= i0 61)",
+                                             Set.of("i0"),
+                                             Set.of("61")),
+                         Arguments.arguments("(and (< b2 5) (> b2 0) (>= b2 2))",
+                                             Set.of("b2"),
+                                             Set.of("and")),
+                         Arguments.arguments("(and (< b2 5) (> b2 0) (>= b2 i4))",
+                                             Set.of("b2", "i4"),
+                                             Set.of("and")),
+                         Arguments.arguments("(or (< b2 5) (>= b2 5))",
+                                              Set.of("b2"),
+                                              Set.of("or")),
+                         Arguments.arguments("true",
+                                             Set.of(),
+                                             Set.of("true")),
+                         Arguments.arguments("false",
+                                             Set.of(),
+                                             Set.of("false")));
     }
 
     @Test
