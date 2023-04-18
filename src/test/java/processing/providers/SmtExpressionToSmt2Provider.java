@@ -14,6 +14,8 @@ public class SmtExpressionToSmt2Provider implements ArgumentsProvider {
 
         return Stream.of(Arguments.arguments("(= i52 0)"),
                          Arguments.arguments("(<= i64 2)"),
+                         Arguments.arguments("(= x 2147483647)"),
+                         Arguments.arguments("(= x (- 2147483648))"),
                          Arguments.arguments("(and (<= i0 0) (> i0 1))"),
                          Arguments.arguments("(and (<= i0 (+ i1 0)) (or (< i1 0) (> i1 0)))"),
                          Arguments.arguments("(and (<= i4 (+ i0 (- 1))) (>= i2 0) (>= i3 1) (>= i4 2))"),

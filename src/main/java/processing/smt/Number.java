@@ -8,15 +8,15 @@ import soot.Value;
 import soot.jimple.IntConstant;
 
 public class Number extends SmtExpression {
-    private final int value;
+    private final long value;
 
-    public Number(int value) {
+    public Number(long value) {
         super();
         this.value = value;
     }
 
     public Value getValue() {
-        return IntConstant.v(this.value);
+        return IntConstant.v((int)this.value);
     }
 
     public Optional<Value> getValue(Set<Local> variables) {

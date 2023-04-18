@@ -129,7 +129,7 @@ public class SmtExpressionInstantiator extends SmtExpressionBaseVisitor<SmtExpre
 
     @Override
     public SmtExpression visitNumber(SmtExpressionParser.NumberContext ctx) {
-        int value = Integer.parseInt(ctx.getChild(0).getText());
+        long value = Long.parseLong(ctx.getChild(0).getText());
         return new Number(value);
     }
 }
