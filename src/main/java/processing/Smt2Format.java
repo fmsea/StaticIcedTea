@@ -205,13 +205,9 @@ public class Smt2Format {
         sb.append("(push)\n");
         sb.append("(assert ");
         if (vars.size() > 0) {
-            sb.append("(forall (");
-            vars.stream().sorted().forEach(var -> {
-                    sb.append("(");
-                    sb.append(var);
-                    sb.append(" Int)");
-                });
-            sb.append(")\n");
+            sb.append(vars.stream().sorted()
+                      .map(v -> String.format("(%s Int)", v))
+                      .collect(Collectors.joining(" ", "(forall (", ")\n")));
         }
         sb.append("(=> ");
         sb.append(from);

@@ -1,5 +1,6 @@
 package driver.commands;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -61,9 +62,10 @@ public class Smt2FormatCommand implements Callable<Integer> {
         File output = Path.of(outputFile).toFile();
         try (Reader fh1 = new FileReader(analysisOne);
              Reader fh2 = new FileReader(analysisTwo);
-             Writer out = new FileWriter(output)) {
-            Smt2FormatReachable.Smt2FormatReachable(fh1, fh2, out, type, logic);
-            out.flush();
+             Writer out = new FileWriter(output);
+             BufferedWriter buf = new BufferedWriter(out)) {
+            Smt2FormatReachable.Smt2FormatReachable(fh1, fh2, buf, type, logic);
+            buf.flush();
             output.setReadOnly();
             return 0;
         } catch (IOException ex) {
