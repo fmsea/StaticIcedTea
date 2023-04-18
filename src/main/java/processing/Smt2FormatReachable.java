@@ -124,9 +124,8 @@ public class Smt2FormatReachable extends Smt2Format {
                                                       rightBranch.orElse(SmtExpression.FALSE())));
                 }
             }
+            writer.flush();
         }
-        writer.flush();
-        writer.close();
     }
 
     private static String formatSmtImplies(SmtExpression left,
