@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import soot.Local;
 
 import processing.util.FlowSet;
 import solver.Smt2Logic;
@@ -88,7 +89,7 @@ public class Smt2Format {
     public static void SMT2Format(Reader reader1, Reader reader2, Writer writer) throws IOException {
         AnalysisSMTReport report1 = Smt2Reader.parse(reader1);
         AnalysisSMTReport report2 = Smt2Reader.parse(reader2);
-        Set<String> allVariables = new HashSet<>();
+        Set<Local> allVariables = new HashSet<>();
         allVariables.addAll(report1.variables());
         allVariables.addAll(report2.variables());
         Set<String> statements = new TreeSet<>();
@@ -107,7 +108,7 @@ public class Smt2Format {
             if (fall1.isEmpty() && fall2.isEmpty()) {
                 // skip
             } else {
-                Set<String> variables = new HashSet<>();
+                Set<Local> variables = new HashSet<>();
                 variables.addAll(Smt2Reader.getIdentifiers(fall1.orElse("true")));
                 variables.addAll(Smt2Reader.getIdentifiers(fall2.orElse("true")));
                 writer.write("(echo \"fall through\")\n");
@@ -122,7 +123,7 @@ public class Smt2Format {
             if (branch1.isEmpty() && branch2.isEmpty()) {
                 // skip
             } else {
-                Set<String> variables = new HashSet<>();
+                Set<Local> variables = new HashSet<>();
                 variables.addAll(Smt2Reader.getIdentifiers(branch1.orElse("true")));
                 variables.addAll(Smt2Reader.getIdentifiers(branch2.orElse("true")));
                 writer.write("(echo \"branch out\")\n");
@@ -139,21 +140,27 @@ public class Smt2Format {
     }
 
     public static void SMT2FormatIdentifiers(Reader reader, Writer writer) throws IOException {
-        Map<String, FlowSet<String>> statementIdentifierMap = Smt2Reader.getIdentifiersPerStatement(reader);
+        Map<String, FlowSet<Local>> statementIdentifierMap = Smt2Reader.getIdentifiersPerStatement(reader);
         for (String statement : statementIdentifierMap.keySet()) {
             writer.write(statement);
-            FlowSet<String> flowSet = statementIdentifierMap.get(statement);
+            FlowSet<Local> flowSet = statementIdentifierMap.get(statement);
             writer.write("\tfall");
-            for (String identifier : flowSet.getFallThrough()) {
-                writer.write("\t");
-                writer.write(identifier);
+            if (flowSet.getFallThrough().size() > 0) {
+                writer.write(flowSet.getFallThrough()
+                             .stream()
+                             .map(i -> i.toString())
+                             .sorted()
+                             .collect(Collectors.joining("\t", "\t", "")));
             }
             writer.write("\n");
             writer.write(statement);
             writer.write("\tbranch");
-            for (String identifier : flowSet.getBranchOut()) {
-                writer.write("\t");
-                writer.write(identifier);
+            if (flowSet.getBranchOut().size() > 0) {
+                writer.write(flowSet.getBranchOut()
+                             .stream()
+                             .map(i -> i.toString())
+                             .sorted()
+                             .collect(Collectors.joining("\t", "\t", "")));
             }
             writer.write("\n");
         }
@@ -200,13 +207,13 @@ public class Smt2Format {
     //     return sb.toString();
     // }
 
-    protected static String formatImplies(Set<String> vars, String from, String to) {
+    protected static String formatImplies(Set<Local> vars, String from, String to) {
         StringBuilder sb = new StringBuilder();
         sb.append("(push)\n");
         sb.append("(assert ");
         if (vars.size() > 0) {
-            sb.append(vars.stream().sorted()
-                      .map(v -> String.format("(%s Int)", v))
+            sb.append(vars.stream().sorted((a, b) -> a.toString().compareTo(b.toString()))
+                      .map(v -> String.format("(%s Int)", v.toString()))
                       .collect(Collectors.joining(" ", "(forall (", ")\n")));
         }
         sb.append("(=> ");

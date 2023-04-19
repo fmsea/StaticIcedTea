@@ -8,22 +8,24 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import soot.Local;
+
 public class AnalysisSMTReport {
-    private Set<String> variables;
+    private Set<Local> variables;
     private Set<String> statements;
     private Map<String, String> fallThroughSmtExpressions;
-    private Map<String, Set<String>> fallVariables;
-    private Map<String, Set<String>> fallChangedVariables;
+    private Map<String, Set<Local>> fallVariables;
+    private Map<String, Set<Local>> fallChangedVariables;
     private Map<String, String> branchOutSmtExpressions;
-    private Map<String, Set<String>> branchVariables;
-    private Map<String, Set<String>> branchChangedVariables;
+    private Map<String, Set<Local>> branchVariables;
+    private Map<String, Set<Local>> branchChangedVariables;
 
     public AnalysisSMTReport(Set<String> statements,
-                             Set<String> variables,
+                             Set<Local> variables,
                              Map<String, String> fallThroughExprs,
-                             Map<String, Set<String>> fallVariables,
+                             Map<String, Set<Local>> fallVariables,
                              Map<String, String> branchOutExprs,
-                             Map<String, Set<String>> branchVariables) {
+                             Map<String, Set<Local>> branchVariables) {
         this(statements,
              variables,
              fallThroughExprs,
@@ -35,13 +37,13 @@ public class AnalysisSMTReport {
     }
 
     public AnalysisSMTReport(Set<String> statements,
-                             Set<String> variables,
+                             Set<Local> variables,
                              Map<String, String> fallThroughExprs,
-                             Map<String, Set<String>> fallVariables,
-                             Map<String, Set<String>> fallChangedVariables,
+                             Map<String, Set<Local>> fallVariables,
+                             Map<String, Set<Local>> fallChangedVariables,
                              Map<String, String> branchOutExprs,
-                             Map<String, Set<String>> branchVariables,
-                             Map<String, Set<String>> branchChangedVariables) {
+                             Map<String, Set<Local>> branchVariables,
+                             Map<String, Set<Local>> branchChangedVariables) {
         this.statements = statements;
         this.variables = variables;
         this.fallThroughSmtExpressions = fallThroughExprs;
@@ -52,7 +54,7 @@ public class AnalysisSMTReport {
         this.branchChangedVariables = branchChangedVariables;
     }
 
-    public Set<String> variables() {
+    public Set<Local> variables() {
         return Collections.unmodifiableSet(this.variables);
     }
 
@@ -68,19 +70,19 @@ public class AnalysisSMTReport {
         return Optional.ofNullable(this.branchOutSmtExpressions.get(statement));
     }
 
-    public Optional<Set<String>> getFallVariables(String statement) {
+    public Optional<Set<Local>> getFallVariables(String statement) {
         return Optional.ofNullable(this.fallVariables.get(statement));
     }
 
-    public Optional<Set<String>> getFallChangedVariables(String statement) {
+    public Optional<Set<Local>> getFallChangedVariables(String statement) {
         return Optional.ofNullable(this.fallChangedVariables.get(statement));
     }
 
-    public Optional<Set<String>> getBranchVariables(String statement) {
+    public Optional<Set<Local>> getBranchVariables(String statement) {
         return Optional.ofNullable(this.branchVariables.get(statement));
     }
 
-    public Optional<Set<String>> getBranchChangedVariables(String statement) {
+    public Optional<Set<Local>> getBranchChangedVariables(String statement) {
         return Optional.ofNullable(this.branchChangedVariables.get(statement));
     }
 
@@ -90,7 +92,7 @@ public class AnalysisSMTReport {
         if (this.variables.size() == 0) {
             return "";
         }
-        sb.append(this.variables.stream().collect(Collectors.joining("\t")));
+        sb.append(this.variables.stream().map(v -> v.toString()).sorted().collect(Collectors.joining("\t")));
         sb.append("\n");
         this.statements.stream().sorted().forEach(statement -> {
                 sb.append(statement);
@@ -98,10 +100,10 @@ public class AnalysisSMTReport {
                 Optional<String> fall = this.getFallThrough(statement);
                 Optional<String> branch = this.getBranchOut(statement);
                 String fallChangedVariables = this.getFallChangedVariables(statement)
-                    .map(vars -> vars.stream().collect(Collectors.joining("\t", "", "\t")))
+                    .map(vars -> vars.stream().map(v -> v.toString()).sorted().collect(Collectors.joining("\t", "", "\t")))
                     .orElse("");
                 String branchChangedVariables = this.getBranchChangedVariables(statement)
-                    .map(vars -> vars.stream().collect(Collectors.joining("\t", "", "\t")))
+                    .map(vars -> vars.stream().map(v -> v.toString()).sorted().collect(Collectors.joining("\t", "", "\t")))
                     .orElse("");
                 fall.ifPresent(expr -> {
                         sb.append("fall\t");

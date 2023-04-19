@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import soot.Local;
 
 import processing.util.FlowSet;
 
@@ -27,8 +28,8 @@ public class Smt2Reader {
     private static final Pattern SMT_TOKENS = Pattern.compile("[ ()>=<+-]");
     private static final Pattern TAB = Pattern.compile("\t");
 
-    public static Set<String> getIdentifiers(String smt) {
-        Set<String> identifiers = new HashSet<>();
+    public static Set<Local> getIdentifiers(String smt) {
+        Set<Local> identifiers = new HashSet<>();
         String[] tokens = SMT_TOKENS.split(smt);
         for (int i = 0; i < tokens.length; i++) {
             String token = tokens[i].trim();
@@ -39,7 +40,7 @@ public class Smt2Reader {
                          token.equals("and") ||
                          token.equals("true") ||
                          token.equals("false"))) {
-                identifiers.add(token);
+                identifiers.add(Locals.get(token));
             } else {
                 LOGGER.trace("token was not identified: {}", token);
             }
@@ -49,24 +50,24 @@ public class Smt2Reader {
 
     public static AnalysisSMTReport parse(Reader reader) {
         Set<String> statements = new HashSet<>();
-        Set<String> variables = new HashSet<>();
+        Set<Local> variables = new HashSet<>();
         Map<String, String> fallThroughExprs = new HashMap<>();
         Map<String, String> branchOutExprs = new HashMap<>();
-        Map<String, Set<String>> fallVariables = new HashMap<>();
-        Map<String, Set<String>> fallChangedVariables = new HashMap<>();
-        Map<String, Set<String>> branchVariables = new HashMap<>();
-        Map<String, Set<String>> branchChangedVariables = new HashMap<>();
+        Map<String, Set<Local>> fallVariables = new HashMap<>();
+        Map<String, Set<Local>> fallChangedVariables = new HashMap<>();
+        Map<String, Set<Local>> branchVariables = new HashMap<>();
+        Map<String, Set<Local>> branchChangedVariables = new HashMap<>();
         BiConsumer<String, String> closeExpression = (statement, expression) -> {
             if (expression.startsWith("fall\t")) {
                 // "fall\t" is 5 characters
                 String smtExpression = expression.substring(5).trim();
-                Set<String> vars = getIdentifiers(smtExpression);
+                Set<Local> vars = getIdentifiers(smtExpression);
                 fallThroughExprs.put(statement, smtExpression);
                 fallVariables.put(statement, vars);
             } else if (expression.startsWith("branch\t")) {
                 // "branch\t" is 7 characters
                 String smtExpression = expression.substring(7).trim();
-                Set<String> vars = getIdentifiers(smtExpression);
+                Set<Local> vars = getIdentifiers(smtExpression);
                 branchOutExprs.put(statement, smtExpression);
                 branchVariables.put(statement, vars);
             }
@@ -108,7 +109,7 @@ public class Smt2Reader {
                         // there's a tab in the SMT expression, ignore.
                         last = first;
                     }
-                    Set<String> changedVariables = null;
+                    Set<Local> changedVariables = null;
                     if (first != last) {
                         changedVariables = parseVariables(line.substring(first, last));
                     }
@@ -138,25 +139,25 @@ public class Smt2Reader {
                                      branchChangedVariables);
     }
 
-    protected static Set<String> parseVariables(String variablesLine) {
-        Set<String> variables = new HashSet<>();
-        Stream.of(TAB.split(variablesLine.trim())).forEach(v -> variables.add(v));
-        return variables;
+    protected static Set<Local> parseVariables(String variablesLine) {
+        return Stream.of(TAB.split(variablesLine.trim()))
+            .map(v -> Locals.get(v))
+            .collect(Collectors.toSet());
     }
 
-    public static Map<String, FlowSet<String>> parseExtraIdentifiers(Reader reader) {
-        Map<String, FlowSet<String>> statements = new HashMap<>();
+    public static Map<String, FlowSet<Local>> parseExtraIdentifiers(Reader reader) {
+        Map<String, FlowSet<Local>> statements = new HashMap<>();
         try (Scanner scanner = new Scanner(reader)) {
             while (scanner.hasNext()) {
                 String line = scanner.nextLine().trim();
                 LOGGER.debug("line from extra identifiers file: {}", line);
                 String[] elements = TAB.split(line);
-                FlowSet<String> identifiers = statements.getOrDefault(elements[0], new FlowSet<>());
+                FlowSet<Local> identifiers = statements.getOrDefault(elements[0], new FlowSet<>());
                 for (int i = 2; i < elements.length; i++) {
                     if ("fall".equals(elements[1])) {
-                        identifiers.addFallThrough(elements[i]);
+                        identifiers.addFallThrough(Locals.get(elements[i]));
                     } else if ("branch".equals(elements[1])) {
-                        identifiers.addBranchOut(elements[i]);
+                        identifiers.addBranchOut(Locals.get(elements[i]));
                     }
                 }
                 LOGGER.debug("statement and identifiers: {}->{}", elements[0], identifiers);
@@ -166,11 +167,11 @@ public class Smt2Reader {
         return statements;
     }
 
-    public static Map<String, FlowSet<String>> getIdentifiersPerStatement(Reader reader) {
+    public static Map<String, FlowSet<Local>> getIdentifiersPerStatement(Reader reader) {
         AnalysisSMTReport report = parse(reader);
-        Map<String, FlowSet<String>> result = new HashMap<>();
+        Map<String, FlowSet<Local>> result = new HashMap<>();
         for (String statement : report.statements()) {
-            FlowSet<String> identifiers = new FlowSet<>();
+            FlowSet<Local> identifiers = new FlowSet<>();
             result.put(statement, identifiers);
             report.getFallVariables(statement).ifPresent(vars -> identifiers.addAllFallThrough(vars));
             report.getBranchVariables(statement).ifPresent(vars -> identifiers.addAllBranchOut(vars));

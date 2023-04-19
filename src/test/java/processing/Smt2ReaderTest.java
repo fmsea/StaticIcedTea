@@ -21,6 +21,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import soot.Local;
 import processing.util.FlowSet;
 
 public class Smt2ReaderTest {
@@ -30,7 +31,7 @@ public class Smt2ReaderTest {
     void testGetIdentifiers(String smt,
                             Set<String> expectedPresent,
                             Set<String> expectedAbsent) {
-        Set<String> results = Smt2Reader.getIdentifiers(smt);
+        Set<String> results = Smt2Reader.getIdentifiers(smt).stream().map(v -> v.toString()).collect(Collectors.toSet());
         Stream<Executable> assertions0 = Stream.of(() -> assertEquals(expectedPresent.size(), results.size()));
         Stream<Executable> assertions1 = Stream.of(() -> assertTrue(results.containsAll(expectedPresent)));
         Stream<Executable> assertions2 = expectedAbsent.stream().map(absent -> () -> assertFalse(results.contains(absent)));
@@ -114,12 +115,12 @@ public class Smt2ReaderTest {
                                          "fall\t(= i1 0)\n" +
                                          "7 b2 = 2:<test.BallonFactory>\n" +
                                          "fall\t(and (< b2 5) (> b2 0) (>= b2 2))\n");
-            Map<String, FlowSet<String>> result = Smt2Reader.getIdentifiersPerStatement(r1);
+            Map<String, FlowSet<Local>> result = Smt2Reader.getIdentifiersPerStatement(r1);
             assertAll(() -> assertTrue(result.containsKey("6 i1 = 0:<test.BallonFactory>")),
                       () -> assertTrue(result.containsKey("7 b2 = 2:<test.BallonFactory>")),
-                      () -> assertTrue(result.get("6 i1 = 0:<test.BallonFactory>").getFallThrough().contains("i1")),
+                      () -> assertTrue(result.get("6 i1 = 0:<test.BallonFactory>").getFallThrough().contains(Locals.get("i1"))),
                       () -> assertTrue(result.get("6 i1 = 0:<test.BallonFactory>").getBranchOut().isEmpty()),
-                      () -> assertTrue(result.get("7 b2 = 2:<test.BallonFactory>").getFallThrough().contains("b2")),
+                      () -> assertTrue(result.get("7 b2 = 2:<test.BallonFactory>").getFallThrough().contains(Locals.get("b2"))),
                       () -> assertTrue(result.get("7 b2 = 2:<test.BallonFactory>").getBranchOut().isEmpty()));
         }
 
@@ -132,12 +133,12 @@ public class Smt2ReaderTest {
                                          "fall\t(and (< b2 5)\n" +
                                          "           (> b2 0)\n" +
                                          "           (>= b2 2))\n");
-            Map<String, FlowSet<String>> result = Smt2Reader.getIdentifiersPerStatement(r1);
+            Map<String, FlowSet<Local>> result = Smt2Reader.getIdentifiersPerStatement(r1);
             assertAll(() -> assertTrue(result.containsKey("6 i1 = 0:<test.BallonFactory>")),
                       () -> assertTrue(result.containsKey("7 b2 = 2:<test.BallonFactory>")),
-                      () -> assertTrue(result.get("6 i1 = 0:<test.BallonFactory>").getFallThrough().contains("i1")),
-                      () -> assertTrue(result.get("6 i1 = 0:<test.BallonFactory>").getBranchOut().contains("i1")),
-                      () -> assertTrue(result.get("7 b2 = 2:<test.BallonFactory>").getFallThrough().contains("b2")),
+                      () -> assertTrue(result.get("6 i1 = 0:<test.BallonFactory>").getFallThrough().contains(Locals.get("i1"))),
+                      () -> assertTrue(result.get("6 i1 = 0:<test.BallonFactory>").getBranchOut().contains(Locals.get("i1"))),
+                      () -> assertTrue(result.get("7 b2 = 2:<test.BallonFactory>").getFallThrough().contains(Locals.get("b2"))),
                       () -> assertTrue(result.get("7 b2 = 2:<test.BallonFactory>").getBranchOut().isEmpty()));
         }
     }
@@ -150,17 +151,17 @@ public class Smt2ReaderTest {
                                                    "6 i1 = 0:<test.BallonFactory>\tfall\tb2\tb6\ti1",
                                                    "6 i1 = 0:<test.BallonFactory>\tbranch\ti1")
                                          .collect(Collectors.joining("\n")));
-            Map<String, FlowSet<String>> result = Smt2Reader.parseExtraIdentifiers(r1);
+            Map<String, FlowSet<Local>> result = Smt2Reader.parseExtraIdentifiers(r1);
             assertAll(() -> assertTrue(result.containsKey("6 i1 = 0:<test.BallonFactory>")),
                       () -> assertTrue(result.containsKey("7 b2 = 2:<test.BallonFactory>")),
-                      () -> assertTrue(result.get("6 i1 = 0:<test.BallonFactory>").getFallThrough().contains("b2")),
-                      () -> assertTrue(result.get("6 i1 = 0:<test.BallonFactory>").getFallThrough().contains("b6")),
-                      () -> assertTrue(result.get("6 i1 = 0:<test.BallonFactory>").getFallThrough().contains("i1")),
-                      () -> assertFalse(result.get("6 i1 = 0:<test.BallonFactory>").getBranchOut().contains("b2")),
-                      () -> assertFalse(result.get("6 i1 = 0:<test.BallonFactory>").getBranchOut().contains("b6")),
-                      () -> assertTrue(result.get("6 i1 = 0:<test.BallonFactory>").getBranchOut().contains("i1")),
-                      () -> assertTrue(result.get("7 b2 = 2:<test.BallonFactory>").getFallThrough().contains("b2")),
-                      () -> assertTrue(result.get("7 b2 = 2:<test.BallonFactory>").getFallThrough().contains("i4")),
+                      () -> assertTrue(result.get("6 i1 = 0:<test.BallonFactory>").getFallThrough().contains(Locals.get("b2"))),
+                      () -> assertTrue(result.get("6 i1 = 0:<test.BallonFactory>").getFallThrough().contains(Locals.get("b6"))),
+                      () -> assertTrue(result.get("6 i1 = 0:<test.BallonFactory>").getFallThrough().contains(Locals.get("i1"))),
+                      () -> assertFalse(result.get("6 i1 = 0:<test.BallonFactory>").getBranchOut().contains(Locals.get("b2"))),
+                      () -> assertFalse(result.get("6 i1 = 0:<test.BallonFactory>").getBranchOut().contains(Locals.get("b6"))),
+                      () -> assertTrue(result.get("6 i1 = 0:<test.BallonFactory>").getBranchOut().contains(Locals.get("i1"))),
+                      () -> assertTrue(result.get("7 b2 = 2:<test.BallonFactory>").getFallThrough().contains(Locals.get("b2"))),
+                      () -> assertTrue(result.get("7 b2 = 2:<test.BallonFactory>").getFallThrough().contains(Locals.get("i4"))),
                       () -> assertTrue(result.get("7 b2 = 2:<test.BallonFactory>").getBranchOut().isEmpty()));
         }
     }
@@ -189,8 +190,8 @@ public class Smt2ReaderTest {
                                                  "").collect(Collectors.joining("\n"));
             Reader r1 = new StringReader(inputAnalysisText);
             AnalysisSMTReport report = Smt2Reader.parse(r1);
-            assertAll(() -> assertTrue(report.variables().contains("$z0")),
-                      () -> assertTrue(report.variables().contains("b0")),
+            assertAll(() -> assertTrue(report.variables().contains(Locals.get("$z0"))),
+                      () -> assertTrue(report.variables().contains(Locals.get("b0"))),
                       () -> assertTrue(report.statements().contains("1 b0 := @parameter0: byte:<test.Base64: boolean isPad(byte)>")),
                       () -> assertTrue(report.statements().contains("2 if b0 != 61 goto $z0 = 0:<test.Base64: boolean isPad(byte)>")),
                       () -> assertTrue(report.statements().contains("3 $z0 = 1:<test.Base64: boolean isPad(byte)>")),
@@ -200,7 +201,7 @@ public class Smt2ReaderTest {
                       () -> assertTrue(report.getFallThrough("1 b0 := @parameter0: byte:<test.Base64: boolean isPad(byte)>").isEmpty()),
                       () -> assertTrue(report.getBranchOut("1 b0 := @parameter0: byte:<test.Base64: boolean isPad(byte)>").isEmpty()),
                       () -> assertTrue(report.getFallThrough("2 if b0 != 61 goto $z0 = 0:<test.Base64: boolean isPad(byte)>").isPresent()),
-                      () -> assertEquals(Set.of("b0"), report.getFallVariables("2 if b0 != 61 goto $z0 = 0:<test.Base64: boolean isPad(byte)>").get()),
+                      () -> assertEquals(Set.of(Locals.get("b0")), report.getFallVariables("2 if b0 != 61 goto $z0 = 0:<test.Base64: boolean isPad(byte)>").get()),
                       () -> assertEquals("(= b0 61)",
                                          report.getFallThrough("2 if b0 != 61 goto $z0 = 0:<test.Base64: boolean isPad(byte)>").get()),
                       () -> assertTrue(report.getBranchOut("2 if b0 != 61 goto $z0 = 0:<test.Base64: boolean isPad(byte)>").isEmpty()),
@@ -213,7 +214,7 @@ public class Smt2ReaderTest {
                       () -> assertEquals("(and (= $z0 1)\n\t(= b0 61))",
                                          report.getBranchOut("4 goto [?= return $z0]:<test.Base64: boolean isPad(byte)>").get()),
                       () -> assertTrue(report.getFallThrough("5 $z0 = 0:<test.Base64: boolean isPad(byte)>").isPresent()),
-                      () -> assertEquals(Set.of("$z0"), report.getFallVariables("5 $z0 = 0:<test.Base64: boolean isPad(byte)>").get()),
+                      () -> assertEquals(Set.of(Locals.get("$z0")), report.getFallVariables("5 $z0 = 0:<test.Base64: boolean isPad(byte)>").get()),
                       () -> assertEquals("(= $z0 0)",
                                          report.getFallThrough("5 $z0 = 0:<test.Base64: boolean isPad(byte)>").get()),
                       () -> assertTrue(report.getBranchOut("5 $z0 = 0:<test.Base64: boolean isPad(byte)>").isEmpty()),
@@ -235,9 +236,9 @@ public class Smt2ReaderTest {
             Reader r1 = new StringReader(reportSource);
             AnalysisSMTReport report = Smt2Reader.parse(r1);
             assertAll(() -> assertEquals(reportSource, report.toString().trim()),
-                      () -> assertEquals(Optional.of(Set.of("i1")),
+                      () -> assertEquals(Optional.of(Set.of(Locals.get("i1"))),
                                          report.getFallChangedVariables("6 i1 = 0:<test.BallonFactory>")),
-                      () -> assertEquals(Optional.of(Set.of("b2")),
+                      () -> assertEquals(Optional.of(Set.of(Locals.get("b2"))),
                                          report.getFallChangedVariables("7 b2 = 2:<test.BallonFactory>")));
         }
 
@@ -260,11 +261,11 @@ public class Smt2ReaderTest {
             assertAll(() -> assertEquals(inputAnalysisText, report.toString()),
                       () -> assertEquals(Optional.empty(),
                                          report.getFallChangedVariables("1 b0 := @parameter0: byte:<test.Base64: boolean isPad(byte)>")),
-                      () -> assertEquals(Optional.of(Set.of("b0")),
+                      () -> assertEquals(Optional.of(Set.of(Locals.get("b0"))),
                                          report.getFallChangedVariables("2 if b0 != 61 goto $z0 = 0:<test.Base64: boolean isPad(byte)>")),
                       () -> assertEquals(Optional.empty(),
                                          report.getBranchChangedVariables("4 goto [?= return $z0]:<test.Base64: boolean isPad(byte)>")),
-                      () -> assertEquals(Optional.of(Set.of("$z0")),
+                      () -> assertEquals(Optional.of(Set.of(Locals.get("$z0"))),
                                          report.getFallChangedVariables("5 $z0 = 0:<test.Base64: boolean isPad(byte)>")),
                       () -> assertEquals(Optional.empty(),
                                          report.getFallChangedVariables("6 return $z0:<test.Base64: boolean isPad(byte)>")));
@@ -280,7 +281,7 @@ public class Smt2ReaderTest {
         AnalysisSMTReport report = Smt2Reader.parse(r1);
         assertAll(() -> assertEquals(reportSource, report.toString().trim()
                                      ),
-                  () -> assertEquals(Optional.of(Set.of("l0")),
+                  () -> assertEquals(Optional.of(Set.of(Locals.get("l0"))),
                                      report.getFallChangedVariables("4 if l0 >= 3 goto l3 = 6")),
                   () -> assertEquals(Optional.of("false"),
                                      report.getFallThrough("4 if l0 >= 3 goto l3 = 6")));
@@ -295,7 +296,7 @@ public class Smt2ReaderTest {
         Reader r1 = new StringReader(reportSource);
         AnalysisSMTReport report = Smt2Reader.parse(r1);
         assertAll(() -> assertEquals(reportSource, report.toString().trim()),
-                  () -> assertEquals(Optional.of(Set.of("t0")),
+                  () -> assertEquals(Optional.of(Set.of(Locals.get("t0"))),
                                      report.getFallChangedVariables("7 test-statement")),
                   () -> assertEquals(Optional.of("true"),
                                      report.getFallThrough("7 test-statement")),

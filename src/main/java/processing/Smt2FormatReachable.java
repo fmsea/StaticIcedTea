@@ -88,11 +88,9 @@ public class Smt2FormatReachable extends Smt2Format {
             case MIN:
                 changedVariablesFall = Stream.concat(leftReport.getFallChangedVariables(statement).orElse(Set.of()).stream(),
                                                      rightReport.getFallChangedVariables(statement).orElse(Set.of()).stream())
-                    .map(vars -> Locals.get(vars))
                     .collect(Collectors.toSet());
                 changedVariablesBranch = Stream.concat(leftReport.getBranchChangedVariables(statement).orElse(Set.of()).stream(),
                                                        rightReport.getBranchChangedVariables(statement).orElse(Set.of()).stream())
-                    .map(vars -> Locals.get(vars))
                     .collect(Collectors.toSet());
                 break;
             case FULL:
@@ -135,17 +133,15 @@ public class Smt2FormatReachable extends Smt2Format {
         Set<Local> variables = SmtExpression.reachableUnion(changedVariables, left, right);
         String leftSmt = left.toSmt2(variables).orElse("true");
         String rightSmt = right.toSmt2(variables).orElse("true");
-        Set<String> variableStrs = variables.stream().map(l -> l.toString()).collect(Collectors.toSet());
-        sb.append(formatImplies(variableStrs, leftSmt, rightSmt));
-        sb.append(formatImplies(variableStrs, rightSmt, leftSmt));
+        sb.append(formatImplies(variables, leftSmt, rightSmt));
+        sb.append(formatImplies(variables, rightSmt, leftSmt));
         return sb.toString();
     }
 
     private static String formatSmtImpliesFull(SmtExpression left, SmtExpression right) {
         StringBuilder sb = new StringBuilder();
-        Set<String> variables = Stream.concat(left.getLocals().stream(),
-                                              right.getLocals().stream())
-            .map(local -> local.toString())
+        Set<Local> variables = Stream.concat(left.getLocals().stream(),
+                                             right.getLocals().stream())
             .collect(Collectors.toSet());
         LOGGER.debug("left = {}, right = {}", left, right);
         String leftSmt = left.toSmt2();
