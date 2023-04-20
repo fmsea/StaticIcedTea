@@ -31,5 +31,4 @@ slurm-*.out
 slurm-*.err
 
 # Ignore Guix Pack
-dfa-smt.tar.gz
-dfa-smt.tar-*.gz
+dfa-*.tar.gz
