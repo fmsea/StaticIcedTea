@@ -33,10 +33,10 @@ public class LeSmtExpression extends BinopSmtExpression {
         Set<Local> leftLocals = this.left.getLocals();
         Set<Local> rightLocals = this.right.getLocals();
         leftLocals.forEach(l -> {
-                graph.addEdge(l, l);
-                rightLocals.forEach(r -> graph.addEdge(l, r));
+                graph.addEdge(l, l, this);
+                rightLocals.forEach(r -> graph.addEdge(l, r, this));
             });
-        rightLocals.forEach(r -> graph.addEdge(r, r));
+        rightLocals.forEach(r -> graph.addEdge(r, r, this));
         return graph;
     }
  }

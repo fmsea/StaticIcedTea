@@ -81,7 +81,7 @@ public class Identifier extends SmtExpression {
 
     public SmtGraph toGraph() {
         SmtGraph graph = SmtGraph.empty();
-        graph.addEdge(this.identifier, this.identifier);
+        graph.addEdge(this.identifier, this.identifier, this);
         return graph;
     }
 }

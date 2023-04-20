@@ -34,10 +34,10 @@ public class GeSmtExpression extends BinopSmtExpression {
         SmtGraph graph = super.toGraph();
         Set<Local> leftLocals = this.left.getLocals();
         Set<Local> rightLocals = this.right.getLocals();
-        leftLocals.forEach(l -> graph.addEdge(l, l));
+        leftLocals.forEach(l -> graph.addEdge(l, l, this));
         rightLocals.forEach(r -> {
-                graph.addEdge(r, r);
-                leftLocals.forEach(l -> graph.addEdge(r, l));
+                graph.addEdge(r, r, this);
+                leftLocals.forEach(l -> graph.addEdge(r, l, this));
             });
         return graph;
     }

@@ -32,12 +32,12 @@ public class EqSmtExpression extends BinopSmtExpression {
         Set<Local> leftLocals = this.left.getLocals();
         Set<Local> rightLocals = this.right.getLocals();
         leftLocals.forEach(l -> {
-                graph.addEdge(l, l);
-                rightLocals.forEach(r -> graph.addEdge(l, r));
+                graph.addEdge(l, l, this);
+                rightLocals.forEach(r -> graph.addEdge(l, r, this));
             });
         rightLocals.forEach(r -> {
-                graph.addEdge(r, r);
-                leftLocals.forEach(l -> graph.addEdge(r, l));
+                graph.addEdge(r, r, this);
+                leftLocals.forEach(l -> graph.addEdge(r, l, this));
             });
         return graph;
     }

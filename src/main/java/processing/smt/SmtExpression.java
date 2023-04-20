@@ -99,6 +99,11 @@ public abstract class SmtExpression {
         return this.getValue().equivTo(o.getValue());
     }
 
+    @Override
+    public int hashCode() {
+        return this.getValue().hashCode();
+    }
+
     public Map<Local, Set<Local>> getConnectedVariables() {
         return this.toGraph().connectedProjection();
     }
