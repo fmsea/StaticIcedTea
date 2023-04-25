@@ -143,7 +143,7 @@ public class Smt2FormatReachable extends Smt2Format {
         Set<Local> variables = Stream.concat(left.getLocals().stream(),
                                              right.getLocals().stream())
             .collect(Collectors.toSet());
-        LOGGER.debug("left = {}, right = {}", left, right);
+        LOGGER.debug("[left = {}, right = {}, variables = {}]", left, right, variables);
         String leftSmt = left.toSmt2();
         String rightSmt = right.toSmt2();
         sb.append(formatImplies(variables, leftSmt, rightSmt));

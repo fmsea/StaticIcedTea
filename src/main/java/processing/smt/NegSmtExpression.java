@@ -15,6 +15,10 @@ public class NegSmtExpression extends SmtExpression {
         this.expr = expr;
     }
 
+    public Set<Local> getLocals() {
+        return this.expr.getLocals();
+    }
+
     public Value getValue() {
         return Grimp.v().newNegExpr(this.expr.getValue());
     }

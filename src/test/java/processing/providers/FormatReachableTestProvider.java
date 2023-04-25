@@ -57,10 +57,26 @@ public class FormatReachableTestProvider implements ArgumentsProvider {
                                              getReader("processing/reachable/format.infblocks_1.dom5_4.in"),
                                              getContents("processing/reachable/format.infblocks_1.min.out.smt"),
                                              Smt2FormatType.MIN),
+                         Arguments.arguments(getReader("processing/reachable/format.wbs_2.zones-thres.in"),
+                                             getReader("processing/reachable/format.wbs_2.dom5_4.in"),
+                                             getContents("processing/reachable/format.wbs_2.min.out.smt"),
+                                             Smt2FormatType.MIN),
+                         Arguments.arguments(getReader("processing/reachable/format.wbs_2.zones-thres.in"),
+                                             getReader("processing/reachable/format.wbs_2.dom5_4.in"),
+                                             getContents("processing/reachable/format.wbs_2.full.out.smt"),
+                                             Smt2FormatType.FULL),
                          Arguments.arguments(getReader("processing/reachable/format.infblocks_1.zones-thres.in"),
                                              getReader("processing/reachable/format.infblocks_1.dom5_4.in"),
                                              getContents("processing/reachable/format.infblocks_1.full.out.smt"),
-                                             Smt2FormatType.FULL)
+                                             Smt2FormatType.FULL),
+                         Arguments.arguments(getReader("processing/reachable/format.constantvalue_1.zones-thres.in"),
+                                             getReader("processing/reachable/format.constantvalue_1.dom5_4.in"),
+                                             getContents("processing/reachable/format.constantvalue_1.full.out.smt"),
+                                             Smt2FormatType.FULL),
+                         Arguments.arguments(getReader("processing/reachable/format.constantvalue_1.zones-thres.in"),
+                                             getReader("processing/reachable/format.constantvalue_1.dom5_4.in"),
+                                             getContents("processing/reachable/format.constantvalue_1.min.out.smt"),
+                                             Smt2FormatType.MIN)
                          );
     }
 }

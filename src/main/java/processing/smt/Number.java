@@ -15,6 +15,10 @@ public class Number extends SmtExpression {
         this.value = value;
     }
 
+    public Set<Local> getLocals() {
+        return Set.of();
+    }
+
     public Value getValue() {
         return IntConstant.v((int)this.value);
     }

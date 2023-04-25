@@ -14,6 +14,10 @@ public class TrueSmtExpression extends SmtExpression {
         super();
     }
 
+    public Set<Local> getLocals() {
+        return Set.of();
+    }
+
     public Value getValue() {
         return Jimple.v().newEqExpr(IntConstant.v(0), IntConstant.v(0));
     }

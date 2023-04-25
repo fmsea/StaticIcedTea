@@ -32,6 +32,12 @@ public abstract class ConnectiveSmtExpression extends SmtExpression {
         this(new ArrayList<>());
     }
 
+    public Set<Local> getLocals() {
+        return this.expressions.stream()
+            .flatMap(expr -> expr.getLocals().stream())
+            .collect(Collectors.toSet());
+    }
+
     public List<SmtExpression> getExpressions() {
         return Collections.unmodifiableList(this.expressions);
     }

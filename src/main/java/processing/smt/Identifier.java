@@ -15,6 +15,10 @@ public class Identifier extends SmtExpression {
         this.identifier = identifier;
     }
 
+    public Set<Local> getLocals() {
+        return Set.of(identifier);
+    }
+
     public Value getValue() {
         return this.identifier;
     }

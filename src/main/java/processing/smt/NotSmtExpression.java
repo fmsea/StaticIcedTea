@@ -18,6 +18,10 @@ public class NotSmtExpression extends SmtExpression {
         this.expr = expr;
     }
 
+    public Set<Local> getLocals() {
+        return this.expr.getLocals();
+    }
+
     public Value getValue() {
         return new DNotExpr(this.expr.getValue());
     }

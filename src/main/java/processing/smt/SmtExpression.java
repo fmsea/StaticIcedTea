@@ -68,9 +68,7 @@ public abstract class SmtExpression {
      */
     public abstract Optional<Value> getReachableValue(Set<Local> sources);
 
-    public Set<Local> getLocals() {
-        return ValueToMap.getLocals(this.getValue());
-    }
+    public abstract Set<Local> getLocals();
 
     public Set<Local> getLocals(Local id) {
         return this.getConnectedVariables().get(id);

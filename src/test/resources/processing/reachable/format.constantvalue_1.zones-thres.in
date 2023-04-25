@@ -1,0 +1,12 @@
+b0	b1	i2	i3	i4	r0
+3 b0 = 1:<test.ConstantValuePropagation: int example(int)>
+fall	b0	(= b0 1)
+
+4 b1 = 2:<test.ConstantValuePropagation: int example(int)>
+fall	b1	(and (= b0 1) (= b1 2))
+
+5 i2 = b0 + b1:<test.ConstantValuePropagation: int example(int)>
+fall	i2	(and (= b0 1) (= b1 2) (= i2 3))
+
+6 i4 = i2 + i3:<test.ConstantValuePropagation: int example(int)>
+fall	i4	(and (= b0 1) (= b1 2) (= i2 3))

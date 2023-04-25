@@ -1,0 +1,20 @@
+$i0	$r0	$r10	$r11	$r12	$r13	$r14	$r15	$r16	$r17	$r18	$r19	$r20	$r21	$r22	$r23	$r24	$r25	$r26	$r27	$r28	$r29	$r3	$r30	$r31	$r32	$r4	$r5	$r6	$r7	$r8	$r9	i2	i3	i4	i5	r1	r2	z0	z1
+12 if $i0 != 6 goto virtualinvoke r1.<test.WBS: int update(int,boolean,boolean,int,int,int)>(i2, z0, z1, i3, i4, i5):<test.WBS: void main(java.lang.String[])>
+fall	$i0	(and (= $i0 6)
+     (>= $i0 5)
+     (= i2 0)
+     (= i3 0)
+     (= i4 0)
+     (= i5 100)
+     (>= i5 5)
+     (= z0 1)
+     (= z1 1))
+
+branch	$i0	(and (not (= $i0 6))
+     (= i2 0)
+     (= i3 0)
+     (= i4 0)
+     (= i5 100)
+     (>= i5 5)
+     (= z0 1)
+     (= z1 1))
