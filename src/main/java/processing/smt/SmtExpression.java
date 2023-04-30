@@ -9,7 +9,8 @@ import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import soot.Local;
-import soot.Value;
+
+import util.Sets;
 
 import solver.SolverWrapper;
 import solver.SolverFactory;
@@ -29,44 +30,6 @@ public abstract class SmtExpression {
     public static SmtExpression FALSE() {
         return new FalseSmtExpression();
     }
-
-    public abstract Value getValue();
-
-    /** Return value for which all variables are present
-     *
-     */
-    public abstract Optional<Value> getValue(Set<Local> variables);
-
-    /** Return Value which are connected to the local `id`.
-     *
-     * If `id` is not in the expression, then result shall be empty.
-     */
-    public abstract Optional<Value> getConnectedValue(Local id);
-
-    /** Return Value which is "connected" to the set of variables.
-     *
-     * If variables do not occur, then result shall be empty.
-     */
-    public abstract Optional<Value> getConnectedValue(Set<Local> variables);
-
-    /** Return Value which is reachable from the local `id`.
-     *
-     * This should mimic getValue, except instead of "contains", we are looking
-     * to see if `source` is in the first location of the BinOp expression, for
-     * example.
-     *
-     * If the expression does not contain reachable expressions, the result is
-     * empty.
-     */
-    public Optional<Value> getReachableValue(Local source) {
-        return this.getReachableValue(Set.of(source));
-    }
-
-    /** Return value which is reachable from the local sources.
-     *
-     * This is essentially a union of expressions over the singular version.
-     */
-    public abstract Optional<Value> getReachableValue(Set<Local> sources);
 
     public abstract Set<Local> getLocals();
 
@@ -94,12 +57,16 @@ public abstract class SmtExpression {
     }
 
     public boolean equals(SmtExpression o) {
-        return this.getValue().equivTo(o.getValue());
+        if (o == null) {
+            return false;
+        } else {
+            return this.toSmt2().equals(o.toSmt2());
+        }
     }
 
     @Override
     public int hashCode() {
-        return this.getValue().hashCode();
+        return this.toSmt2().hashCode();
     }
 
     public Map<Local, Set<Local>> getConnectedVariables() {
@@ -156,40 +123,38 @@ public abstract class SmtExpression {
                                     SmtExpression left,
                                     SmtExpression right,
                                     BiFunction<SmtExpression, Set<Local>, Set<Local>> connective) {
-        BinaryOperator<Set<Local>> cup = (a, b) -> Stream.concat(a.stream(), b.stream()).collect(Collectors.toSet());
-        BinaryOperator<Set<Local>> slash = (a, b) -> a.stream().filter(e -> !b.contains(e)).collect(Collectors.toSet());
-        BiPredicate<Set<Local>, Set<Local>> eq = (a, b) -> a.containsAll(b) && b.containsAll(a);
-        BiPredicate<Set<Local>, Set<Local>> subset = (a, b) -> b.containsAll(a);
         Set<Local> v1 = leftChanged;
         Set<Local> v2 = rightChanged;
         Set<Local> s1 = connective.apply(left, v1);
         Set<Local> s2 = connective.apply(right, v2);
-        Set<Local> previous = cup.apply(v1, v2);
-        Set<Local> current = cup.apply(s1, s2);
-        while (!(eq.test(current, previous))) {
-            if (subset.test(s2, s1)) { // s1 ⊃ s2
-                v2 = slash.apply(s1, s2);
-                s2 = cup.apply(s2, connective.apply(right, v2));
-            } else if (subset.test(s1, s2)) { // s2 ⊃ s1
-                v1 = slash.apply(s2, s1);
-                s1 = cup.apply(s1, connective.apply(left, v1));
+        Set<Local> previous = Sets.union(v1, v2);
+        Set<Local> current = Sets.union(s1, s2);
+        while (!(Sets.equal(current, previous))) {
+            if (Sets.subset(s2, s1)) { // s1 ⊃ s2
+                v2 = Sets.difference(s1, s2);
+                s2 = Sets.union(s2, connective.apply(right, v2));
+            } else if (Sets.subset(s1, s2)) { // s2 ⊃ s1
+                v1 = Sets.difference(s2, s1);
+                s1 = Sets.union(s1, connective.apply(left, v1));
             } else {
-                v1 = slash.apply(s2, s1);
-                v2 = slash.apply(s1, s2);
-                s1 = cup.apply(s1, connective.apply(left, v1));
-                s2 = cup.apply(s2, connective.apply(right, v2));
+                v1 = Sets.difference(s2, s1);
+                v2 = Sets.difference(s1, s2);
+                s1 = Sets.union(s1, connective.apply(left, v1));
+                s2 = Sets.union(s2, connective.apply(right, v2));
             }
             previous = current;
-            current = cup.apply(s1, s2);
+            current = Sets.union(s1, s2);
         }
         return current;
     }
 
     public boolean contains(Local identifier) {
-        return ValueToMap.getLocals(this.getValue()).contains(identifier);
+        return this.getLocals().contains(identifier);
     }
 
-    public abstract boolean containsAll(Set<Local> variables);
+    public boolean containsAll(Set<Local> variables) {
+        return this.getLocals().containsAll(variables);
+    }
 
     public abstract SmtGraph toGraph();
 }

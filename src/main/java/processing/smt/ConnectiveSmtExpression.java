@@ -12,11 +12,6 @@ import java.util.function.BinaryOperator;
 import java.util.stream.Stream;
 import java.util.stream.Collectors;
 import soot.Local;
-import soot.Value;
-import soot.jimple.Jimple;
-import soot.jimple.ConditionExpr;
-import soot.IntType;
-import soot.grimp.Grimp;
 
 import processing.Locals;
 
@@ -44,77 +39,6 @@ public abstract class ConnectiveSmtExpression extends SmtExpression {
 
     public void addExpression(SmtExpression expr) {
         this.expressions.add(expr);
-    }
-
-    protected Value getValue(BinaryOperator<Value> combinator) {
-        return this.expressions.stream()
-            .map(e -> e.getValue())
-            .reduce(combinator)
-            .get();
-    }
-
-    protected Optional<Value> getValue(Set<Local> variables, BinaryOperator<Value> combinator) {
-        return this.expressions
-            .stream()
-            .map(expr -> expr.getValue(variables))
-            .filter(o -> o.isPresent())
-            .map(o -> o.get())
-            .collect(Collectors.toMap(expr -> expr.equivHashCode(), expr -> expr, (oExpr, nExpr) -> oExpr))
-            .values()
-            .stream()
-            .sorted((a, b) -> a.toString().compareTo(b.toString()))
-            .reduce(combinator);
-    }
-
-    protected Optional<Value> getConnectedValue(Local id, BinaryOperator<Value> combinator) {
-        Set<Local> variables = new HashSet<>();
-        variables.addAll(this.getConnectedVariables().getOrDefault(id, Set.of()));
-        variables.add(id);
-
-        return variables.stream()
-            .map(v -> this.expressions.stream().map(e -> e.getConnectedValue(v)))
-            .flatMap(s -> s.map(v -> v))
-            .filter(o -> o.isPresent())
-            .map(o -> o.get())
-            .collect(Collectors.toMap(expr -> expr.equivHashCode(), expr -> expr, (oExpr, nExpr) -> oExpr))
-            .values()
-            .stream()
-            .sorted((a, b) -> a.toString().compareTo(b.toString()))
-            .reduce(combinator);
-    }
-
-    protected Optional<Value> getConnectedValue(Set<Local> variables, BinaryOperator<Value> combinator) {
-        Set<Local> connectedVariables = new HashSet<>();
-        connectedVariables.addAll(variables);
-        variables.stream()
-            .map(v -> this.getConnectedVariables().getOrDefault(v, Set.of()))
-            .forEach(v -> connectedVariables.addAll(v));
-        return this.expressions.stream()
-            .map(expr -> expr.getConnectedValue(connectedVariables))
-            .filter(o -> o.isPresent())
-            .map(o -> o.get())
-            .collect(Collectors.toMap(expr -> expr.equivHashCode(), expr -> expr, (oExpr, nExpr) -> oExpr))
-            .values()
-            .stream()
-            .sorted((a, b) -> a.toString().compareTo(b.toString()))
-            .reduce(combinator);
-    }
-
-    protected Optional<Value> getReachableValue(Set<Local> sources, BinaryOperator<Value> combinator) {
-        Set<Local> reachableVariables = new HashSet<>();
-        reachableVariables.addAll(sources);
-        sources.stream()
-            .map(v -> this.getReachableVariables().getOrDefault(v, Set.of()))
-            .forEach(v -> reachableVariables.addAll(v));
-        return this.expressions.stream()
-            .map(expr -> expr.getReachableValue(reachableVariables))
-            .filter(o -> o.isPresent())
-            .map(o -> o.get())
-            .collect(Collectors.toMap(expr -> expr.equivHashCode(), expr -> expr, (oExpr, nExpr) -> oExpr))
-            .values()
-            .stream()
-            .sorted((a, b) -> a.toString().compareTo(b.toString()))
-            .reduce(combinator);
     }
 
     private static Set<Local> mergeSets(Set<Local> v1, Set<Local> v2) {
@@ -163,7 +87,7 @@ public abstract class ConnectiveSmtExpression extends SmtExpression {
 
     public boolean containsAll(Set<Local> variables) {
         return this.expressions.stream()
-            .map(expr -> ValueToMap.getLocals(expr.getValue()))
+            .flatMap(expr -> expr.getLocals().stream())
             .collect(Collectors.toSet())
             .containsAll(variables);
     }

@@ -21,9 +21,7 @@ import soot.Value;
 import processing.Locals;
 import processing.providers.SmtExpressionProvider;
 import processing.providers.SmtExpressionIdentityProvider;
-import processing.providers.SmtExpressionConnectedProvider;
 import processing.providers.SmtExpressionReachableIdentityProvider;
-import processing.providers.SmtExpressionReachableProvider;
 import processing.providers.SmtExpressionToSmt2Provider;
 import processing.providers.SmtExpressionToSmt2SelectionProvider;
 import processing.providers.SmtExpressionToStringProvider;
@@ -62,42 +60,6 @@ public class SmtExpressionTest {
                                                   assertions2,
                                                   assertions3).flatMap(s -> s.map(v -> v));
         assertAll(assertions);
-    }
-
-    @ParameterizedTest
-    @ArgumentsSource(SmtExpressionConnectedProvider.class)
-    void testGetConnectedValueById(String smtExpression, Local id, Optional<Value> expected) {
-        try {
-            SmtExpression expr = new SmtExpressionReader(smtExpression).getSmtExpression();
-            assertEquals(expected.map(e -> e.toString()),
-                     expr.getConnectedValue(id).map(e -> e.toString()));
-        } catch (Exception ex) {
-            ex.printStackTrace(System.err);
-        }
-    }
-
-    @ParameterizedTest
-    @ArgumentsSource(SmtExpressionProvider.class)
-    void testGetConnectedValueByIds(String smtExpression, Set<Local> variables, Optional<Value> expected) {
-        try {
-            SmtExpression expr = new SmtExpressionReader(smtExpression).getSmtExpression();
-            assertEquals(expected.map(e -> e.toString()),
-                         expr.getConnectedValue(variables).map(e -> e.toString()));
-        } catch (Exception ex) {
-            ex.printStackTrace(System.err);
-        }
-    }
-
-    @ParameterizedTest
-    @ArgumentsSource(SmtExpressionReachableProvider.class)
-    void testGetReachableValueById(String smtExpression, Set<Local> variables, Optional<Value> expected) {
-        try {
-            SmtExpression expr = SmtExpressionReader.parse(smtExpression);
-            assertEquals(expected.map(e -> e.toString()),
-                         expr.getReachableValue(variables).map(e -> e.toString()));
-        } catch (Exception ex) {
-            ex.printStackTrace(System.err);
-        }
     }
 
     @ParameterizedTest

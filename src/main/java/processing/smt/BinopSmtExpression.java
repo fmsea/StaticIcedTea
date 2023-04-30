@@ -10,8 +10,6 @@ import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import soot.Local;
-import soot.Value;
-import soot.jimple.BinopExpr;
 
 import solver.SolverWrapper;
 import solver.SolverFactory;
@@ -29,56 +27,6 @@ public abstract class BinopSmtExpression extends SmtExpression {
     public Set<Local> getLocals() {
         return Stream.concat(this.left.getLocals().stream(),
                              this.right.getLocals().stream()).collect(Collectors.toSet());
-    }
-
-    public Optional<Value> getValue(Set<Local> variables) {
-        BiPredicate<Local, SmtExpression> contains = (v, expr) -> {
-            Set<Local> locals = expr.getLocals();
-            return locals.isEmpty() || locals.contains(v);
-        };
-        if (variables.stream().map(v -> contains.test(v, left)).reduce((a, b) -> a || b).orElse(false) &&
-            variables.stream().map(v -> contains.test(v, right)).reduce((a, b) -> a || b).orElse(false)) {
-            return Optional.of(this.getValue());
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    public Optional<Value> getConnectedValue(Local id) {
-        Set<Integer> locals = this.getLocals().stream().map(s -> s.equivHashCode()).collect(Collectors.toSet());
-        if (locals.contains(id.equivHashCode())) {
-            return Optional.of(this.getValue());
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    public Optional<Value> getConnectedValue(Set<Local> variables) {
-        Set<Local> locals = this.getLocals();
-        boolean containsSomeVariables = variables.stream()
-            .map(v -> locals.contains(v))
-            .reduce((a, b) -> a || b)
-            .orElse(false);
-        if (containsSomeVariables) {
-            return Optional.of(this.getValue());
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    public Optional<Value> getReachableValue(Set<Local> sources) {
-        Map<Local, Set<Local>> reachableVariables = this.getReachableVariables();
-        Set<Local> locals = this.getLocals();
-        Set<Value> values = new HashSet<>();
-        sources.forEach(s -> {
-                Set<Local> reachable = reachableVariables.get(s);
-                    if (reachable != null &&
-                        reachable.containsAll(locals) &&
-                        locals.containsAll(reachable)) {
-                        values.add(this.getValue());
-                    }
-            });
-        return values.stream().findFirst();
     }
 
     public Optional<String> toSmt2(Set<Local> variables) {

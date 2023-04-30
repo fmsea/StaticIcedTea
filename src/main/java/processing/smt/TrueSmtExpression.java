@@ -4,9 +4,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import soot.Local;
-import soot.Value;
-import soot.jimple.Jimple;
-import soot.jimple.IntConstant;
 
 public class TrueSmtExpression extends SmtExpression {
 
@@ -16,26 +13,6 @@ public class TrueSmtExpression extends SmtExpression {
 
     public Set<Local> getLocals() {
         return Set.of();
-    }
-
-    public Value getValue() {
-        return Jimple.v().newEqExpr(IntConstant.v(0), IntConstant.v(0));
-    }
-
-    public Optional<Value> getValue(Set<Local> variables) {
-        return Optional.empty();
-    }
-
-    public Optional<Value> getConnectedValue(Local id) {
-        return Optional.empty();
-    }
-
-    public Optional<Value> getConnectedValue(Set<Local> variables) {
-        return Optional.empty();
-    }
-
-    public Optional<Value> getReachableValue(Set<Local> sources) {
-        return Optional.empty();
     }
 
     public String toSmt2() {

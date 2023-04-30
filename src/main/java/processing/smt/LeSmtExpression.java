@@ -8,17 +8,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import soot.Local;
-import soot.Value;
-import soot.grimp.Grimp;
 
 public class LeSmtExpression extends BinopSmtExpression {
 
     public LeSmtExpression(SmtExpression left, SmtExpression right) {
         super(left, right);
-    }
-
-    public Value getValue() {
-        return Grimp.v().newLeExpr(this.left.getValue(), this.right.getValue());
     }
 
     public String toSmt2() {
