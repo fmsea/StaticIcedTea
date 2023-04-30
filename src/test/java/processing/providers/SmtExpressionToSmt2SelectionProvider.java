@@ -33,15 +33,15 @@ public class SmtExpressionToSmt2SelectionProvider implements ArgumentsProvider {
                          Arguments.arguments("(and (<= i0 0) (> i0 1))",
                                              Set.of(Locals.get("i0")),
                                              Optional.of("(and (<= i0 0) (> i0 1))")),
-                         Arguments.arguments("(and (or (> i1 0) (< i1 0)) (<= i0 (+ i1 0)))",
+                         Arguments.arguments("(and (<= i0 (+ i1 0)) (or (> i1 0) (< i1 0)))",
                                              Locals.get("i0", "i1"),
-                                             Optional.of("(and (or (< i1 0) (> i1 0)) (<= i0 (+ i1 0)))")),
+                                             Optional.of("(and (<= i0 (+ i1 0)) (or (< i1 0) (> i1 0)))")),
                          Arguments.arguments("(and (>= i2 0) (>= i3 1) (>= i4 2) (<= i4 (+ i0 (- 1))))",
                                              Locals.get("i0", "i2", "i3", "i4"),
-                                             Optional.of("(and (>= i4 2) (>= i3 1) (>= i2 0) (<= i4 (+ i0 (- 1))))")),
+                                             Optional.of("(and (<= i4 (+ i0 (- 1))) (>= i2 0) (>= i3 1) (>= i4 2))")),
                          Arguments.arguments("(and (= i52 0) (<= i64 2))",
                                              Locals.get("i52", "i64"),
-                                             Optional.of("(and (= i52 0) (<= i64 2))")),
+                                             Optional.of("(and (<= i64 2) (= i52 0))")),
                          Arguments.arguments("(not (= i52 0))",
                                              Set.of(Locals.get("i52")),
                                              Optional.of("(not (= i52 0))")),
@@ -62,6 +62,6 @@ public class SmtExpressionToSmt2SelectionProvider implements ArgumentsProvider {
                                              Optional.empty()),
                          Arguments.arguments("(and (or (= i3 0) (>= i3 5) (= i3 1) (and (< i3 5) (>= i3 2))) (<= i3 (+ i2 0)))",
                                              Set.of(Locals.get("i3")),
-                                             Optional.of("(or (= i3 0) (>= i3 5) (= i3 1) (and (< i3 5) (>= i3 2)))")));
+                                             Optional.of("(or (= i3 0) (= i3 1) (>= i3 5) (and (< i3 5) (>= i3 2)))")));
     }
 }

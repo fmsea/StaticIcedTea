@@ -71,11 +71,11 @@ public abstract class ConnectiveSmtExpression extends SmtExpression {
             .map(expr -> expr.toSmt2(variables))
             .filter(o -> o.isPresent())
             .map(o -> o.get())
-            .sorted()
             .collect(Collectors.toSet());
         if (exprs.size() > 1) {
             return exprs
                 .stream()
+                .sorted()
                 .reduce((a, b) -> a + " " + b)
                 .map(expr -> String.format("(%s %s)", combinator, expr));
         } else if (exprs.size() == 1) {
