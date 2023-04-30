@@ -41,6 +41,10 @@ public class SmtExpressionIdentityProvider implements ArgumentsProvider {
                                                                              Locals.get("i4")),
                                                     Locals.get("i0"), Set.of(Locals.get("i0"),
                                                                              Locals.get("i3"),
-                                                                             Locals.get("i4")))));
+                                                                             Locals.get("i4")))),
+                         Arguments.arguments("(and (<= k (+ y 0)) (<= x (+ y 3)))",
+                                             Map.of(Locals.get("k"), Locals.get("k", "x", "y"),
+                                                    Locals.get("x"), Locals.get("k", "x", "y"),
+                                                    Locals.get("y"), Locals.get("k", "x", "y"))));
     }
 }

@@ -12,11 +12,13 @@ import soot.Local;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.ManyToManyShortestPathsAlgorithm;
 import org.jgrapht.alg.shortestpath.DijkstraManyToManyShortestPaths;
+import org.jgrapht.graph.AsUndirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.nio.dot.DOTExporter;
 import org.jgrapht.nio.Attribute;
 import org.jgrapht.nio.DefaultAttribute;
+import util.Sets;
 
 public class SmtGraph {
     private Graph<Local, DefaultEdge> graph;
@@ -89,16 +91,37 @@ public class SmtGraph {
         return this;
     }
 
+    private Graph<Local, DefaultEdge> computeConnectedClosure() {
+        Graph<Local, DefaultEdge> graph = new AsUndirectedGraph(this.graph);
+        ManyToManyShortestPathsAlgorithm<Local, DefaultEdge> alg =
+            new DijkstraManyToManyShortestPaths<>(graph);
+        ManyToManyShortestPathsAlgorithm.ManyToManyShortestPaths<Local, DefaultEdge> paths =
+            alg.getManyToManyPaths(graph.vertexSet(), graph.vertexSet());
+        for (Local source : paths.getSources()) {
+            for (Local target : paths.getTargets()) {
+                if (paths.getPath(source, target) != null) {
+                    graph.addEdge(source, target);
+                    graph.addEdge(target, source);
+                }
+            }
+        }
+        return graph;
+    }
+
     public Map<Local, Set<Local>> connectedProjection() {
+        Graph<Local, DefaultEdge> graph = new AsUndirectedGraph(this.graph);
         Map<Local, Set<Local>> connected = new HashMap<>();
-        this.graph.vertexSet().forEach(source -> {
-                Set<Local> neighbors = this.graph.edgesOf(source)
-                    .stream()
-                    .flatMap(e -> Stream.of(this.graph.getEdgeSource(e),
-                                            this.graph.getEdgeTarget(e)))
-                    .collect(Collectors.toSet());
-                connected.put(source, neighbors);
-            });
+        ManyToManyShortestPathsAlgorithm<Local, DefaultEdge> alg =
+            new DijkstraManyToManyShortestPaths<>(graph);
+        ManyToManyShortestPathsAlgorithm.ManyToManyShortestPaths<Local, DefaultEdge> paths =
+            alg.getManyToManyPaths(graph.vertexSet(), graph.vertexSet());
+        for (Local source : paths.getSources()) {
+            for (Local target : paths.getTargets()) {
+                if (paths.getPath(source, target) != null) {
+                    connected.merge(source, Set.of(target), Sets::union);
+                }
+            }
+        }
         return connected;
     }
 
