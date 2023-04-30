@@ -53,6 +53,15 @@ public class Smt2FormatReachable extends Smt2Format {
                                            Writer writer,
                                            Smt2FormatType type,
                                            Smt2Logic logic) throws IOException {
+        Smt2FormatReachable(left, right, writer, type, logic, Smt2UnionType.REACHABLE);
+    }
+
+    public static void Smt2FormatReachable(Reader left,
+                                           Reader right,
+                                           Writer writer,
+                                           Smt2FormatType type,
+                                           Smt2Logic logic,
+                                           Smt2UnionType unionType) throws IOException {
         AnalysisSMTReport leftReport = Smt2Reader.parse(left);
         AnalysisSMTReport rightReport = Smt2Reader.parse(right);
         LOGGER.debug("parsed left and right reports");
@@ -104,7 +113,8 @@ public class Smt2FormatReachable extends Smt2Format {
                 if (changedVariablesFall.size() > 0) {
                     writer.write(formatSmtImplies(leftFall.orElse(SmtExpression.FALSE()),
                                                   rightFall.orElse(SmtExpression.FALSE()),
-                                                  changedVariablesFall));
+                                                  changedVariablesFall,
+                                                  unionType));
                 } else {
                     writer.write(formatSmtImpliesFull(leftFall.orElse(SmtExpression.FALSE()),
                                                       rightFall.orElse(SmtExpression.FALSE())));
@@ -116,7 +126,8 @@ public class Smt2FormatReachable extends Smt2Format {
                 if (changedVariablesBranch.size() > 0) {
                     writer.write(formatSmtImplies(leftBranch.orElse(SmtExpression.FALSE()),
                                                   rightBranch.orElse(SmtExpression.FALSE()),
-                                                  changedVariablesFall));
+                                                  changedVariablesFall,
+                                                  unionType));
                 } else {
                     writer.write(formatSmtImpliesFull(leftBranch.orElse(SmtExpression.FALSE()),
                                                       rightBranch.orElse(SmtExpression.FALSE())));
@@ -128,9 +139,10 @@ public class Smt2FormatReachable extends Smt2Format {
 
     private static String formatSmtImplies(SmtExpression left,
                                            SmtExpression right,
-                                           Set<Local> changedVariables) {
+                                           Set<Local> changedVariables,
+                                           Smt2UnionType unionMethod) {
         StringBuilder sb = new StringBuilder();
-        Set<Local> variables = SmtExpression.reachableUnion(changedVariables, left, right);
+        Set<Local> variables = SmtExpression.union(changedVariables, left, right, unionMethod);
         String leftSmt = left.toSmt2(variables).orElse("true");
         String rightSmt = right.toSmt2(variables).orElse("true");
         sb.append(formatImplies(variables, leftSmt, rightSmt));

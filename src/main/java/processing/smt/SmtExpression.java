@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import soot.Local;
 
+import processing.Smt2UnionType;
 import util.Sets;
 
 import solver.SolverWrapper;
@@ -96,6 +97,19 @@ public abstract class SmtExpression {
         return variables.stream()
             .flatMap(v -> neighbors.getOrDefault(v, Set.of()).stream())
             .collect(Collectors.toSet());
+    }
+
+    public static Set<Local> union(Set<Local> changedVariables,
+                                   SmtExpression left,
+                                   SmtExpression right,
+                                   Smt2UnionType method) {
+        switch (method) {
+        case CONNECTED:
+            return connectedUnion(changedVariables, left, right);
+        case REACHABLE:
+        default:
+            return reachableUnion(changedVariables, left, right);
+        }
     }
 
     public static Set<Local> connectedUnion(Set<Local> changedVariables,

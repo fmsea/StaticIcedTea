@@ -22,9 +22,11 @@ import org.slf4j.LoggerFactory;
 
 import driver.commands.validation.Smt2FormatTypeConverter;
 import driver.commands.validation.Smt2LogicConverter;
+import driver.commands.validation.Smt2UnionTypeConverter;
 
 import processing.Smt2FormatReachable;
 import processing.Smt2FormatType;
+import processing.Smt2UnionType;
 import solver.Smt2Logic;
 
 @Command(name = "smt2-format",
@@ -43,6 +45,12 @@ public class Smt2FormatCommand implements Callable<Integer> {
             defaultValue = "LIA",
             converter = Smt2LogicConverter.class)
     private Smt2Logic logic;
+
+    @Option(names = {"--union-method"},
+            description = "The fixed-point method for selecting variables from expressions, either CONNECTED or REACHABLE",
+            defaultValue = "reachable",
+            converter = Smt2UnionTypeConverter.class)
+    private Smt2UnionType unionType;
 
     @Parameters(index = "0",
                 description="filename of first file")
@@ -64,7 +72,7 @@ public class Smt2FormatCommand implements Callable<Integer> {
              Reader fh2 = new FileReader(analysisTwo);
              Writer out = new FileWriter(output);
              BufferedWriter buf = new BufferedWriter(out)) {
-            Smt2FormatReachable.Smt2FormatReachable(fh1, fh2, buf, type, logic);
+            Smt2FormatReachable.Smt2FormatReachable(fh1, fh2, buf, type, logic, unionType);
             buf.flush();
             output.setReadOnly();
             return 0;
