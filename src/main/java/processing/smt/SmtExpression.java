@@ -8,6 +8,7 @@ import java.util.function.BinaryOperator;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.IntStream;
 import soot.Local;
 
 import processing.Smt2UnionType;
@@ -137,6 +138,13 @@ public abstract class SmtExpression {
                                     SmtExpression left,
                                     SmtExpression right,
                                     BiFunction<SmtExpression, Set<Local>, Set<Local>> connective) {
+        double variables = IntStream.of(1,
+                                        left.getLocals().size(),
+                                        right.getLocals().size()).max().getAsInt();
+        int s1sup = 0;
+        int s2sup = 0;
+        int neither = 0;
+        double proportion;
         Set<Local> v1 = leftChanged;
         Set<Local> v2 = rightChanged;
         Set<Local> s1 = connective.apply(left, v1);
@@ -145,12 +153,15 @@ public abstract class SmtExpression {
         Set<Local> current = Sets.union(s1, s2);
         while (!(Sets.equal(current, previous))) {
             if (Sets.subset(s2, s1)) { // s1 ⊃ s2
+                s1sup++;
                 v2 = Sets.difference(s1, s2);
                 s2 = Sets.union(s2, connective.apply(right, v2));
             } else if (Sets.subset(s1, s2)) { // s2 ⊃ s1
+                s2sup++;
                 v1 = Sets.difference(s2, s1);
                 s1 = Sets.union(s1, connective.apply(left, v1));
             } else {
+                neither++;
                 v1 = Sets.difference(s2, s1);
                 v2 = Sets.difference(s1, s2);
                 s1 = Sets.union(s1, connective.apply(left, v1));
@@ -159,6 +170,8 @@ public abstract class SmtExpression {
             previous = current;
             current = Sets.union(s1, s2);
         }
+        proportion = current.size() / variables;
+        System.err.println(String.format("union\t%d\t%d\t%d\t%f", s1sup, s2sup, neither, proportion));
         return current;
     }
 
