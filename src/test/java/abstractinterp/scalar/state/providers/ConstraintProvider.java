@@ -19,9 +19,20 @@ public class ConstraintProvider implements ArbitraryProvider {
 
     @Override
     public Set<Arbitrary<?>> provideFor(TypeUsage targetType, SubtypeProvider subtypeProvider) {
+        return provideConstraints();
+    }
+
+    public static Arbitrary<Constraint> provideConstraint() {
         Arbitrary<Integer> bounds = Arbitraries.integers().between(Integer.MIN_VALUE,
                                                                    Integer.MAX_VALUE);
+        return bounds.map(b -> Constraint.of(b));
+    }
 
-        return Collections.singleton(bounds.map(b -> Constraint.of(b)));
+    public static Set<Arbitrary<?>> provideConstraints() {
+        return ProviderUtils.provideSetOf(ConstraintProvider::provideConstraint);
+    }
+
+    public static Constraint sample() {
+        return provideConstraint().sample();
     }
 }

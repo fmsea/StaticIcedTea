@@ -24,7 +24,7 @@ public class LocalProvider implements ArbitraryProvider {
 
     @Override
     public Set<Arbitrary<?>> provideFor(TypeUsage targetType, SubtypeProvider subtypeProvider) {
-        return Collections.singleton(provideLocal());
+        return ProviderUtils.provideSetOf(LocalProvider::provideLocal);
     }
 
     public static Arbitrary<Local> provideLocal() {
@@ -41,13 +41,13 @@ public class LocalProvider implements ArbitraryProvider {
     public static Set<Local> generateLocals(int size) {
         Set<Local> locals = new HashSet<>(size);
         for (int i = 0; i < size; i++) {
-            locals.add(generateLocal("l" + i));
+            locals.add(provideLocal().sample());
         }
         return locals;
     }
 
-    public static Local generateLocal(String name) {
-        return Jimple.v().newLocal(name, IntType.v());
+    public static Local sample() {
+        return provideLocal().sample();
     }
 
     public class Unique implements Function<Local, Object> {

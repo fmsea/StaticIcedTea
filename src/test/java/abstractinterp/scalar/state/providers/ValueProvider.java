@@ -25,7 +25,7 @@ public class ValueProvider implements ArbitraryProvider {
 
     @Override
     public Set<Arbitrary<?>> provideFor(TypeUsage targetType, SubtypeProvider subtypeProvider) {
-        return Collections.singleton(provideValue());
+        return ProviderUtils.provideSetOf(ValueProvider::provideValue);
     }
 
     public static Arbitrary<Value> provideValue() {
