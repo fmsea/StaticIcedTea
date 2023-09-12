@@ -14,16 +14,7 @@ import soot.Local;
 import processing.Smt2UnionType;
 import util.Sets;
 
-import solver.SolverWrapper;
-import solver.SolverFactory;
-
 public abstract class SmtExpression {
-
-    protected SolverWrapper solver;
-
-    public SmtExpression() {
-        this.solver = SolverFactory.getSolver();
-    }
 
     public static SmtExpression TRUE() {
         return new TrueSmtExpression();
