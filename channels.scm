@@ -1,6 +1,7 @@
 (list (channel
        (name 'guix)
        (url "https://git.sr.ht/~kennyballou/guix.git")
+       (branch "master")
        (commit "dff1689bb37e5303868584d3f1d7a33cbcb7f51e")
        (introduction
         (make-channel-introduction
