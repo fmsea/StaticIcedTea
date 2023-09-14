@@ -67,13 +67,19 @@ public class DifferenceBoundedMatrix {
                 i++;
             }
         }
-        iterateMatrix((i, j) -> {
-                if (top && i == j) {
-                    this.matrix[i][j] = Constraint.of(0);
-                } else {
-                    this.matrix[i][j] = top ? Constraint.TOP() : Constraint.BOT();
-                }
-            });
+        if (top) {
+            iterateMatrix((i, j) -> {
+                    if (i == j) {
+                        this.matrix[i][j] = Constraint.of(0);
+                    } else {
+                        this.matrix[i][j] = Constraint.TOP();
+                    }
+                });
+        } else {
+            iterateMatrix((i, j) -> {
+                    this.matrix[i][j] = Constraint.BOT();
+                });
+        }
     }
 
     public DifferenceBoundedMatrix(DifferenceBoundedMatrix copy) {
