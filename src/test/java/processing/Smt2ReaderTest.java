@@ -22,6 +22,7 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import soot.Local;
+import common.Locals;
 import processing.util.FlowSet;
 
 public class Smt2ReaderTest {

@@ -7,7 +7,7 @@ import soot.IntType;
 import soot.jimple.BinopExpr;
 import soot.jimple.IntConstant;
 
-import processing.Locals;
+import common.Locals;
 
 public class SmtExpressionInstantiator extends SmtExpressionBaseVisitor<SmtExpression> {
 

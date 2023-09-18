@@ -1,4 +1,4 @@
-package processing;
+package common;
 
 import java.util.Set;
 import java.util.Collection;

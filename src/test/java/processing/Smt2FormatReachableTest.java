@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
+import common.Locals;
 import processing.providers.FormatReachableTestProvider;
 
 public class Smt2FormatReachableTest extends FormatTest {

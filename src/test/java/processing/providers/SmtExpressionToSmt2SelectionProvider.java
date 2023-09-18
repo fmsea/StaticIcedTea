@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.ArgumentsProvider;
 
 import soot.Local;
 
-import processing.Locals;
+import common.Locals;
 
 public class SmtExpressionToSmt2SelectionProvider implements ArgumentsProvider {
 

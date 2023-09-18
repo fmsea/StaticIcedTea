@@ -18,7 +18,7 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 import soot.Local;
 import soot.Value;
 
-import processing.Locals;
+import common.Locals;
 import processing.providers.SmtExpressionProvider;
 import processing.providers.SmtExpressionIdentityProvider;
 import processing.providers.SmtExpressionReachableIdentityProvider;

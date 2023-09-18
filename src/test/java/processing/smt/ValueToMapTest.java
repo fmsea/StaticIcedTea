@@ -15,7 +15,7 @@ import soot.jimple.BinopExpr;
 import soot.jimple.Jimple;
 import soot.grimp.Grimp;
 
-import processing.Locals;
+import common.Locals;
 
 public class ValueToMapTest {
 

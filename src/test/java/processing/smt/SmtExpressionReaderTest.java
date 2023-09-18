@@ -16,7 +16,7 @@ import soot.jimple.Jimple;
 import soot.jimple.IntConstant;
 import soot.grimp.Grimp;
 import processing.providers.SmtExpressionProvider;
-import processing.Locals;
+import common.Locals;
 
 public class SmtExpressionReaderTest {
 

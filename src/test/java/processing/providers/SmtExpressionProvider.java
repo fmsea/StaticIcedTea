@@ -15,7 +15,7 @@ import soot.jimple.Jimple;
 import soot.jimple.IntConstant;
 import soot.grimp.Grimp;
 
-import processing.Locals;
+import common.Locals;
 
 public class SmtExpressionProvider implements ArgumentsProvider {
 

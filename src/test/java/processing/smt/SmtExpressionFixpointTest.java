@@ -14,7 +14,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import soot.Local;
-import processing.Locals;
+import common.Locals;
 
 public class SmtExpressionFixpointTest {
 

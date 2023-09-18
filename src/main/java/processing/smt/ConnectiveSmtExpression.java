@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 import java.util.stream.Collectors;
 import soot.Local;
 
-import processing.Locals;
+import common.Locals;
 
 public abstract class ConnectiveSmtExpression extends SmtExpression {
     private List<SmtExpression> expressions;
