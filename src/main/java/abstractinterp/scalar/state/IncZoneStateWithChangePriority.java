@@ -33,14 +33,14 @@ public class IncZoneStateWithChangePriority extends IncZoneState {
     protected void initializeMatrix(Set<Local> locals, boolean top) {
         Set<Local> localsWithZero = Stream.concat(locals.stream(), Stream.of(ZERO))
             .collect(Collectors.toSet());
-        this.matrix = new DifferenceBoundedMatrixWithChangePriority(localsWithZero, top);
+        this.matrix = new ZoneDifferenceBoundedMatrixWithChangePriority(localsWithZero, top);
     }
 
     public IncZoneStateWithChangePriority(IncZoneState state) {
         super(state);
     }
 
-    public IncZoneStateWithChangePriority(DifferenceBoundedMatrixWithChangePriority matrix) {
+    public IncZoneStateWithChangePriority(ZoneDifferenceBoundedMatrixWithChangePriority matrix) {
         super(matrix);
     }
 }

@@ -37,11 +37,11 @@ import abstractinterp.scalar.state.util.GraphProjection;
 import solver.SolverWrapper;
 import util.Configuration;
 
-public class DifferenceBoundedMatrixWithChangePriority extends DifferenceBoundedMatrix {
+public class ZoneDifferenceBoundedMatrixWithChangePriority extends ZoneDifferenceBoundedMatrix {
 
     protected Set<Local> changedVariables;
 
-    public DifferenceBoundedMatrixWithChangePriority(Set<Local> locals, boolean top) {
+    public ZoneDifferenceBoundedMatrixWithChangePriority(Set<Local> locals, boolean top) {
         super(locals, top);
         this.changedVariables = new HashSet<>(4);
     }
@@ -94,7 +94,7 @@ public class DifferenceBoundedMatrixWithChangePriority extends DifferenceBounded
     public boolean putIncremental(Local source,
                                   Local target,
                                   Constraint constraint,
-                                  DifferenceBoundedMatrix in) {
+                                  ZoneDifferenceBoundedMatrix in) {
         this.changedVariables.removeAll(this.changedVariables);
         this.changedVariables.add(source);
         this.changedVariables.add(target);
@@ -102,7 +102,7 @@ public class DifferenceBoundedMatrixWithChangePriority extends DifferenceBounded
     }
 
     @Override
-    public boolean equals(DifferenceBoundedMatrix other) {
+    public boolean equals(ZoneDifferenceBoundedMatrix other) {
         if (this.locals.size() != other.locals.size()) {
             return false;
         } else {

@@ -26,7 +26,7 @@ public class ZoneStateTest {
     private Set<Local> locals;
     private Local[] xs;
     private SolverWrapper solver;
-    private DifferenceBoundedMatrix matrix;
+    private ZoneDifferenceBoundedMatrix matrix;
 
     @BeforeEach
     void setupSolver() {
@@ -43,7 +43,7 @@ public class ZoneStateTest {
             Jimple.v().newLocal("x4", IntType.v()),
         };
         this.locals = Stream.of(xs).collect(Collectors.toSet());
-        this.matrix = new DifferenceBoundedMatrix(this.locals, true);
+        this.matrix = new ZoneDifferenceBoundedMatrix(this.locals, true);
     }
 
     @Test
@@ -743,7 +743,7 @@ public class ZoneStateTest {
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], IntConstant.v(3), BinaryOperatorType.ADDITION);
         matrix.computeClosure();
-        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix));
+        assertAll(() -> assertEquals(new ZoneDifferenceBoundedMatrix(this.locals, true), matrix));
     }
 
     @Test
@@ -803,7 +803,7 @@ public class ZoneStateTest {
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], IntConstant.v(3), BinaryOperatorType.SUBTRACTION);
         matrix.computeClosure();
-        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix));
+        assertAll(() -> assertEquals(new ZoneDifferenceBoundedMatrix(this.locals, true), matrix));
     }
 
     @Test
@@ -833,7 +833,7 @@ public class ZoneStateTest {
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], IntConstant.v(3), BinaryOperatorType.MULTIPLICATION);
         matrix.computeClosure();
-        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix));
+        assertAll(() -> assertEquals(new ZoneDifferenceBoundedMatrix(this.locals, true), matrix));
     }
 
     @Test
@@ -860,7 +860,7 @@ public class ZoneStateTest {
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], IntConstant.v(3), BinaryOperatorType.MULTIPLICATION);
         matrix.computeClosure();
-        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix));
+        assertAll(() -> assertEquals(new ZoneDifferenceBoundedMatrix(this.locals, true), matrix));
     }
 
     @Test
@@ -893,7 +893,7 @@ public class ZoneStateTest {
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], IntConstant.v(3), BinaryOperatorType.DIVISION);
         matrix.computeClosure();
-        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix));
+        assertAll(() -> assertEquals(new ZoneDifferenceBoundedMatrix(this.locals, true), matrix));
     }
 
     @Test
@@ -920,7 +920,7 @@ public class ZoneStateTest {
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], IntConstant.v(3), BinaryOperatorType.DIVISION);
         matrix.computeClosure();
-        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix));
+        assertAll(() -> assertEquals(new ZoneDifferenceBoundedMatrix(this.locals, true), matrix));
     }
 
     @Test
@@ -983,7 +983,7 @@ public class ZoneStateTest {
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[1], BinaryOperatorType.ADDITION);
         matrix.computeClosure();
-        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix));
+        assertAll(() -> assertEquals(new ZoneDifferenceBoundedMatrix(this.locals, true), matrix));
     }
 
     @Test
@@ -1047,7 +1047,7 @@ public class ZoneStateTest {
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[1], BinaryOperatorType.SUBTRACTION);
         matrix.computeClosure();
-        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix));
+        assertAll(() -> assertEquals(new ZoneDifferenceBoundedMatrix(this.locals, true), matrix));
     }
 
     @Test
@@ -1080,7 +1080,7 @@ public class ZoneStateTest {
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[2], BinaryOperatorType.MULTIPLICATION);
         matrix.computeClosure();
-        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix));
+        assertAll(() -> assertEquals(new ZoneDifferenceBoundedMatrix(this.locals, true), matrix));
     }
 
     @Test
@@ -1107,7 +1107,7 @@ public class ZoneStateTest {
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[1], BinaryOperatorType.MULTIPLICATION);
         matrix.computeClosure();
-        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix));
+        assertAll(() -> assertEquals(new ZoneDifferenceBoundedMatrix(this.locals, true), matrix));
     }
 
     @Test
@@ -1140,7 +1140,7 @@ public class ZoneStateTest {
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[2], BinaryOperatorType.DIVISION);
         matrix.computeClosure();
-        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix));
+        assertAll(() -> assertEquals(new ZoneDifferenceBoundedMatrix(this.locals, true), matrix));
     }
 
     @Test
@@ -1167,7 +1167,7 @@ public class ZoneStateTest {
         in.copyTo(out);
         out.updateState(xs[1], in, IntConstant.v(3), xs[1], BinaryOperatorType.DIVISION);
         matrix.computeClosure();
-        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix));
+        assertAll(() -> assertEquals(new ZoneDifferenceBoundedMatrix(this.locals, true), matrix));
     }
 
     @Test
@@ -1233,7 +1233,7 @@ public class ZoneStateTest {
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], xs[2], BinaryOperatorType.ADDITION);
         matrix.computeClosure();
-        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix));
+        assertAll(() -> assertEquals(new ZoneDifferenceBoundedMatrix(this.locals, true), matrix));
     }
 
     @Test
@@ -1294,7 +1294,7 @@ public class ZoneStateTest {
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], xs[2], BinaryOperatorType.SUBTRACTION);
         matrix.computeClosure();
-        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix));
+        assertAll(() -> assertEquals(new ZoneDifferenceBoundedMatrix(this.locals, true), matrix));
     }
 
     @Test
@@ -1333,7 +1333,7 @@ public class ZoneStateTest {
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], xs[3], BinaryOperatorType.MULTIPLICATION);
         matrix.computeClosure();
-        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix));
+        assertAll(() -> assertEquals(new ZoneDifferenceBoundedMatrix(this.locals, true), matrix));
     }
 
     @Test
@@ -1362,7 +1362,7 @@ public class ZoneStateTest {
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], xs[2], BinaryOperatorType.MULTIPLICATION);
         matrix.computeClosure();
-        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix));
+        assertAll(() -> assertEquals(new ZoneDifferenceBoundedMatrix(this.locals, true), matrix));
     }
 
     @Test
@@ -1401,7 +1401,7 @@ public class ZoneStateTest {
         in.copyTo(out);
         out.updateState(xs[1], in, xs[2], xs[3], BinaryOperatorType.DIVISION);
         matrix.computeClosure();
-        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix));
+        assertAll(() -> assertEquals(new ZoneDifferenceBoundedMatrix(this.locals, true), matrix));
     }
 
     @Test
@@ -1430,7 +1430,7 @@ public class ZoneStateTest {
         in.copyTo(out);
         out.updateState(xs[1], in, xs[1], xs[2], BinaryOperatorType.DIVISION);
         matrix.computeClosure();
-        assertAll(() -> assertEquals(new DifferenceBoundedMatrix(this.locals, true), matrix));
+        assertAll(() -> assertEquals(new ZoneDifferenceBoundedMatrix(this.locals, true), matrix));
     }
 
     @Test

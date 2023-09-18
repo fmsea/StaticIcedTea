@@ -16,12 +16,12 @@ import java.util.stream.Stream;
 import soot.Local;
 
 import abstractinterp.scalar.state.Constraint;
-import abstractinterp.scalar.state.DifferenceBoundedMatrix;
+import abstractinterp.scalar.state.ZoneDifferenceBoundedMatrix;
 
-public class DBMProvider implements ArbitraryProvider {
+public class ZoneDifferenceBoundedMatrixProvider implements ArbitraryProvider {
     @Override
     public boolean canProvideFor(TypeUsage targetType) {
-        return targetType.isOfType(DifferenceBoundedMatrix.class);
+        return targetType.isOfType(ZoneDifferenceBoundedMatrix.class);
     }
 
     @Override
@@ -30,11 +30,11 @@ public class DBMProvider implements ArbitraryProvider {
         return ProviderUtils.provideSetOf(this::provideDBM);
     }
 
-    public Arbitrary<DifferenceBoundedMatrix> provideDBM() {
+    public Arbitrary<ZoneDifferenceBoundedMatrix> provideDBM() {
         Random r = new Random();
-        Arbitrary<DifferenceBoundedMatrix> matrix = Arbitraries.create(() -> {
+        Arbitrary<ZoneDifferenceBoundedMatrix> matrix = Arbitraries.create(() -> {
                 Set<Local> ls = LocalProvider.generateLocals(r.nextInt(15) + 1);
-                DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(ls, true);
+                ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(ls, true);
                 for (Local s : ls) {
                     for (Local t : ls) {
                         // if they are not the same variable, 50% chance we add

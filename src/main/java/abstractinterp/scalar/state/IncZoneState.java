@@ -25,7 +25,7 @@ import solver.SolverWrapper;
 
 public class IncZoneState implements State {
 
-    protected DifferenceBoundedMatrix matrix;
+    protected ZoneDifferenceBoundedMatrix matrix;
     private static Logger LOGGER = LoggerFactory.getLogger(IncZoneState.class);
     public static final Local ZERO = Variable.ZERO;
 
@@ -41,7 +41,7 @@ public class IncZoneState implements State {
     protected void initializeMatrix(Set<Local> locals, boolean top) {
         Set<Local> localsWithZero = Stream.concat(locals.stream(), Stream.of(ZERO))
             .collect(Collectors.toSet());
-        this.matrix = new DifferenceBoundedMatrix(localsWithZero, top);
+        this.matrix = new ZoneDifferenceBoundedMatrix(localsWithZero, top);
     }
 
     /** Copy Constructor: Creates new instance seeded with <i>state</i> values.
@@ -57,7 +57,7 @@ public class IncZoneState implements State {
      *
      * Should not be used for regular use.
      */
-    public IncZoneState(DifferenceBoundedMatrix matrix) {
+    public IncZoneState(ZoneDifferenceBoundedMatrix matrix) {
         this.matrix = matrix;
     }
 

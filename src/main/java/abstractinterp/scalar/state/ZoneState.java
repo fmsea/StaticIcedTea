@@ -25,7 +25,7 @@ import solver.SolverWrapper;
 
 public class ZoneState implements State {
 
-    private DifferenceBoundedMatrix matrix;
+    private ZoneDifferenceBoundedMatrix matrix;
     private static Logger LOGGER = LoggerFactory.getLogger(ZoneState.class);
     public static final Local ZERO = Variable.ZERO;
 
@@ -38,7 +38,7 @@ public class ZoneState implements State {
         Set<Local> localsWithZero = new HashSet<>();
         localsWithZero.addAll(locals);
         localsWithZero.add(ZERO);
-        this.matrix = new DifferenceBoundedMatrix(localsWithZero, top);
+        this.matrix = new ZoneDifferenceBoundedMatrix(localsWithZero, top);
     }
 
     /** Copy Constructor: Creates new instance seeded with <i>state</i> values.
@@ -54,7 +54,7 @@ public class ZoneState implements State {
      *
      * Should not be used for regular use.
      */
-    public ZoneState(DifferenceBoundedMatrix matrix) {
+    public ZoneState(ZoneDifferenceBoundedMatrix matrix) {
         this.matrix = matrix;
     }
 

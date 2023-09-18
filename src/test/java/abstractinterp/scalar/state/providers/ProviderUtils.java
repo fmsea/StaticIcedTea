@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 import soot.Local;
 
 import abstractinterp.scalar.state.Constraint;
-import abstractinterp.scalar.state.DifferenceBoundedMatrix;
+import abstractinterp.scalar.state.ZoneDifferenceBoundedMatrix;
 
 public class ProviderUtils {
 

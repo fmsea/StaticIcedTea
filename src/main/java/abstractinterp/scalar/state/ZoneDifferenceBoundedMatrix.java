@@ -37,9 +37,9 @@ import abstractinterp.scalar.state.util.GraphProjection;
 import solver.SolverWrapper;
 import util.Configuration;
 
-public class DifferenceBoundedMatrix {
+public class ZoneDifferenceBoundedMatrix {
 
-    protected static Logger LOGGER = LoggerFactory.getLogger(DifferenceBoundedMatrix.class);
+    protected static Logger LOGGER = LoggerFactory.getLogger(ZoneDifferenceBoundedMatrix.class);
     protected final int N;
     protected Constraint[][] matrix;
     protected Set<Local> locals;
@@ -48,7 +48,7 @@ public class DifferenceBoundedMatrix {
     protected Map<Integer, Local> indicesToLocals;
     protected boolean isClosed = false;
 
-    public DifferenceBoundedMatrix(Set<Local> locals, boolean top) {
+    public ZoneDifferenceBoundedMatrix(Set<Local> locals, boolean top) {
         this.N = locals.size();
         this.locals = new HashSet<>(N);
         this.constants = new HashSet<>();
@@ -82,7 +82,7 @@ public class DifferenceBoundedMatrix {
         }
     }
 
-    public DifferenceBoundedMatrix(DifferenceBoundedMatrix copy) {
+    public ZoneDifferenceBoundedMatrix(ZoneDifferenceBoundedMatrix copy) {
         this(copy.locals, false);
         this.isClosed = copy.isClosed;
         this.constants.addAll(copy.constants);
@@ -91,7 +91,7 @@ public class DifferenceBoundedMatrix {
             });
     }
 
-    public void copyTo(DifferenceBoundedMatrix destination) {
+    public void copyTo(ZoneDifferenceBoundedMatrix destination) {
         iterateMatrix((i, j) -> {
                 destination.matrix[i][j] = this.matrix[i][j].copy();
             });
@@ -159,7 +159,7 @@ public class DifferenceBoundedMatrix {
     public boolean putConstraint(Local source,
                                  Local target,
                                  Constraint constraint,
-                                 DifferenceBoundedMatrix matrix) {
+                                 ZoneDifferenceBoundedMatrix matrix) {
         int i = this.localToIndices.get(source);
         int j = this.localToIndices.get(target);
         return this.putConstraint(i, j, constraint, matrix);
@@ -169,7 +169,7 @@ public class DifferenceBoundedMatrix {
         return this.putConstraint(i, j, c, this);
     }
 
-    protected boolean putConstraint(int i, int j, Constraint c, DifferenceBoundedMatrix in) {
+    protected boolean putConstraint(int i, int j, Constraint c, ZoneDifferenceBoundedMatrix in) {
         boolean added = false;
         LOGGER.trace("Compare to existing constraint: {} ≤ {}", c, in.matrix[i][j]);
         if (Constraint.compare(c, in.matrix[i][j]) < 0) {
@@ -186,7 +186,7 @@ public class DifferenceBoundedMatrix {
     public boolean putIncremental(Local source,
                                   Local target,
                                   Constraint constraint,
-                                  DifferenceBoundedMatrix in) {
+                                  ZoneDifferenceBoundedMatrix in) {
         boolean feasible = false;
         boolean edgeAdded = putConstraint(source, target, constraint, in);
         if (!edgeAdded) {
@@ -205,7 +205,7 @@ public class DifferenceBoundedMatrix {
 
     /** Compute the least upper bound between two matrices
      */
-    public void union(DifferenceBoundedMatrix other) {
+    public void union(ZoneDifferenceBoundedMatrix other) {
         assert this.locals.size() == other.locals.size();
         LOGGER.debug("computing least upper bound");
         LOGGER.trace("{} ⊔ {}", this, other);
@@ -218,7 +218,7 @@ public class DifferenceBoundedMatrix {
 
     /** Compute "intersection" between two matrices
      **/
-    public void intersection(DifferenceBoundedMatrix other) {
+    public void intersection(ZoneDifferenceBoundedMatrix other) {
         assert this.locals.size() == other.locals.size();
         LOGGER.debug("computing intersection");
         LOGGER.trace("{} ⊓ {}", this, other);
@@ -229,8 +229,8 @@ public class DifferenceBoundedMatrix {
         LOGGER.trace("⊓ result:", this);
     }
 
-    public static DifferenceBoundedMatrix intersect(DifferenceBoundedMatrix m1,
-                                                    DifferenceBoundedMatrix m2) {
+    public static ZoneDifferenceBoundedMatrix intersect(ZoneDifferenceBoundedMatrix m1,
+                                                        ZoneDifferenceBoundedMatrix m2) {
         m1.intersection(m2);
         return m1;
     }
@@ -254,7 +254,7 @@ public class DifferenceBoundedMatrix {
     /** compute preorder/subset relation between two matrices
      *
      */
-    public boolean isSubset(DifferenceBoundedMatrix other) {
+    public boolean isSubset(ZoneDifferenceBoundedMatrix other) {
         return reduceMatrixToBool((i, j) -> {
                 return Constraint.compare(this.matrix[i][j],
                                           other.matrix[i][j]) <= 0;
@@ -263,13 +263,13 @@ public class DifferenceBoundedMatrix {
 
     public void closeConstants(Set<Local> sources) {
         LOGGER.debug("These are no longer constants: {}", sources);
-        DifferenceBoundedMatrix newMatrix = constants.stream().flatMap(c -> {
+        ZoneDifferenceBoundedMatrix newMatrix = constants.stream().flatMap(c -> {
                 return sources.stream().map(s -> {
-                        DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this);
+                        ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this);
                         m.computeProjectedClosure(s, c);
                         return m;
                     });
-            }).reduce(DifferenceBoundedMatrix::intersect).get();
+            }).reduce(ZoneDifferenceBoundedMatrix::intersect).get();
         this.intersection(newMatrix);
     }
 
@@ -422,11 +422,11 @@ public class DifferenceBoundedMatrix {
 
         Set<Integer> intervals = IntStream.range(1, N)
             .mapToObj(i -> {
-                if (!(this.matrix[i][0].isTop() && this.matrix[0][i].isTop())) {
-                    return Integer.valueOf(i);
-                }
-                return Integer.valueOf(-1);
-            })
+                    if (!(this.matrix[i][0].isTop() && this.matrix[0][i].isTop())) {
+                        return Integer.valueOf(i);
+                    }
+                    return Integer.valueOf(-1);
+                })
             .filter(index -> index > 0)
             .collect(Collectors.toSet());
 
@@ -445,20 +445,20 @@ public class DifferenceBoundedMatrix {
         return true;
     }
 
-    public static DifferenceBoundedMatrix widen(DifferenceBoundedMatrix m,
-                                                DifferenceBoundedMatrix n) {
-        return DifferenceBoundedMatrix.widen(m, n, Set.of());
+    public static ZoneDifferenceBoundedMatrix widen(ZoneDifferenceBoundedMatrix m,
+                                                    ZoneDifferenceBoundedMatrix n) {
+        return ZoneDifferenceBoundedMatrix.widen(m, n, Set.of());
     }
 
-    public static DifferenceBoundedMatrix widen(DifferenceBoundedMatrix m,
-                                                DifferenceBoundedMatrix n,
-                                                Set<Integer> steps) {
-        DifferenceBoundedMatrix res = new DifferenceBoundedMatrix(m);
+    public static ZoneDifferenceBoundedMatrix widen(ZoneDifferenceBoundedMatrix m,
+                                                    ZoneDifferenceBoundedMatrix n,
+                                                    Set<Integer> steps) {
+        ZoneDifferenceBoundedMatrix res = new ZoneDifferenceBoundedMatrix(m);
         res.widenWith(n, steps);
         return res;
     }
 
-    public void widenWith(DifferenceBoundedMatrix n, Set<Integer> steps) {
+    public void widenWith(ZoneDifferenceBoundedMatrix n, Set<Integer> steps) {
         iterateMatrix((i, j) -> {
                 Constraint c1 = this.matrix[i][j];
                 Constraint c2 = n.matrix[i][j];
@@ -533,7 +533,7 @@ public class DifferenceBoundedMatrix {
         this.subOutgoing(source, sub, this);
     }
 
-    public void addIncoming(Local target, Constraint add, DifferenceBoundedMatrix from) {
+    public void addIncoming(Local target, Constraint add, ZoneDifferenceBoundedMatrix from) {
         int k = this.localToIndices.get(target);
         for (int i = 0; i < N; i++) {
             if (i == k) {
@@ -543,7 +543,7 @@ public class DifferenceBoundedMatrix {
         }
     }
 
-    public void addOutgoing(Local source, Constraint add, DifferenceBoundedMatrix from) {
+    public void addOutgoing(Local source, Constraint add, ZoneDifferenceBoundedMatrix from) {
         int k = this.localToIndices.get(source);
         for (int i = 0; i < N; i++) {
             if (i == k) {
@@ -553,7 +553,7 @@ public class DifferenceBoundedMatrix {
         }
     }
 
-    public void subIncoming(Local target, Constraint sub, DifferenceBoundedMatrix from) {
+    public void subIncoming(Local target, Constraint sub, ZoneDifferenceBoundedMatrix from) {
         int k = this.localToIndices.get(target);
         for (int i = 0; i < N; i++) {
             if (i == k) {
@@ -563,7 +563,7 @@ public class DifferenceBoundedMatrix {
         }
     }
 
-    public void subOutgoing(Local source, Constraint sub, DifferenceBoundedMatrix from) {
+    public void subOutgoing(Local source, Constraint sub, ZoneDifferenceBoundedMatrix from) {
         int k = this.localToIndices.get(source);
         for (int i = 0; i < N; i++) {
             if (i == k) {
@@ -576,13 +576,13 @@ public class DifferenceBoundedMatrix {
     @Override
     public boolean equals(Object o) {
         boolean equal = false;
-        if (o != null && o instanceof DifferenceBoundedMatrix) {
-            equal = this.equals((DifferenceBoundedMatrix) o);
+        if (o != null && o instanceof ZoneDifferenceBoundedMatrix) {
+            equal = this.equals((ZoneDifferenceBoundedMatrix) o);
         }
         return equal;
     }
 
-    public boolean equals(DifferenceBoundedMatrix other) {
+    public boolean equals(ZoneDifferenceBoundedMatrix other) {
         if (this.locals.size() != other.locals.size()) {
             return false;
         } else {
@@ -822,10 +822,10 @@ public class DifferenceBoundedMatrix {
         return graph;
     }
 
-    public static DifferenceBoundedGraph to(DifferenceBoundedMatrix m) {
-        DifferenceBoundedGraph g;
+    public static ZoneDifferenceBoundedGraph to(ZoneDifferenceBoundedMatrix m) {
+        ZoneDifferenceBoundedGraph g;
         if (m.isFeasible()) {
-            g = new DifferenceBoundedGraph(m.locals, true);
+            g = new ZoneDifferenceBoundedGraph(m.locals, true);
             m.iterateMatrix((i, j) -> {
                     Local s = m.indicesToLocals.get(i);
                     Local t = m.indicesToLocals.get(j);
@@ -835,13 +835,13 @@ public class DifferenceBoundedMatrix {
                     }
                 });
         } else {
-            g = new DifferenceBoundedGraph(m.locals, false);
+            g = new ZoneDifferenceBoundedGraph(m.locals, false);
         }
         return g;
     }
 
-    public static DifferenceBoundedMatrix from(DifferenceBoundedGraph graph) {
-        return DifferenceBoundedGraph.to(graph);
+    public static ZoneDifferenceBoundedMatrix from(ZoneDifferenceBoundedGraph graph) {
+        return ZoneDifferenceBoundedGraph.to(graph);
     }
 
     public Set<Local> getConnectedVariablesOf(Local id) {

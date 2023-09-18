@@ -3,10 +3,10 @@ package abstractinterp.scalar.state;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
 
-public class DifferenceBoundedMatrixProperties {
+public class ZoneDifferenceBoundedMatrixProperties {
 
     @Property
-    boolean closureAndFeasibilityAreSame(@ForAll DifferenceBoundedMatrix m) {
+    boolean closureAndFeasibilityAreSame(@ForAll ZoneDifferenceBoundedMatrix m) {
         return m.computeClosure() == m.isFeasible();
     }
 }

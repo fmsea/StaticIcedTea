@@ -24,7 +24,7 @@ import soot.jimple.Jimple;
 import solver.SolverWrapper;
 import solver.SolverFactory;
 
-public class DifferenceBoundedMatrixTest {
+public class ZoneDifferenceBoundedMatrixTest {
 
     SolverWrapper solver;
     Set<Local> locals;
@@ -51,7 +51,7 @@ public class DifferenceBoundedMatrixTest {
 
     @Test
     void testInitializeWithTop() {
-        DifferenceBoundedMatrix matrix = new DifferenceBoundedMatrix(this.locals, true);
+        ZoneDifferenceBoundedMatrix matrix = new ZoneDifferenceBoundedMatrix(this.locals, true);
         checkMatrixCondition((s, t) -> {
                 if (s.equals(t)) {
                     assertEquals(Constraint.of(0),
@@ -65,7 +65,7 @@ public class DifferenceBoundedMatrixTest {
 
     @Test
     void testInitializeWithoutTop() {
-        DifferenceBoundedMatrix matrix = new DifferenceBoundedMatrix(this.locals, false);
+        ZoneDifferenceBoundedMatrix matrix = new ZoneDifferenceBoundedMatrix(this.locals, false);
         checkMatrixCondition((s, t) -> {
                 assertEquals(Constraint.BOT(), matrix.getConstraint(s, t));
             });
@@ -73,8 +73,8 @@ public class DifferenceBoundedMatrixTest {
 
     @Test
     void testCopyConstructor() {
-        DifferenceBoundedMatrix source = new DifferenceBoundedMatrix(this.locals, true);
-        DifferenceBoundedMatrix target = new DifferenceBoundedMatrix(source);
+        ZoneDifferenceBoundedMatrix source = new ZoneDifferenceBoundedMatrix(this.locals, true);
+        ZoneDifferenceBoundedMatrix target = new ZoneDifferenceBoundedMatrix(source);
         assertAll(() -> assertEquals(source, target),
                   () -> checkMatrixCondition((s, t) -> {
                           assertFalse(source.getConstraint(s, t) == target.getConstraint(s, t));
@@ -84,14 +84,14 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testPutConstraint() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.putConstraint(xs[0], xs[1], Constraint.of(3));
             assertEquals(Constraint.of(3),
                          m.getConstraint(xs[0], xs[1]));
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(3));
             m.putConstraint(xs[0], xs[1], Constraint.of(4));
             assertEquals(Constraint.of(3),
@@ -99,7 +99,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(4));
             m.putConstraint(xs[0], xs[1], Constraint.of(3));
             assertEquals(Constraint.of(3),
@@ -110,14 +110,14 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testSetConstraint() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[1], xs[1], Constraint.of(3));
             assertEquals(Constraint.of(0),
                          m.getConstraint(xs[1], xs[1]));
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[1], xs[1], Constraint.of(-3));
             assertAll(() -> assertFalse(m.isFeasible()),
                       () -> assertEquals(Constraint.BOT(),
@@ -128,8 +128,8 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testUnion() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(this.locals, false);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix n = new ZoneDifferenceBoundedMatrix(this.locals, false);
             m.union(n);
             checkMatrixCondition((s, t) -> {
                     if (s.equals(t)) {
@@ -141,8 +141,8 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, false);
-            DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, false);
+            ZoneDifferenceBoundedMatrix n = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.union(n);
             checkMatrixCondition((s, t) -> {
                     if (s.equals(t)) {
@@ -154,13 +154,13 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-1));
             m.setConstraint(xs[0], xs[2], Constraint.of(-1));
             m.setConstraint(xs[1], xs[0], Constraint.of(4));
             m.setConstraint(xs[1], xs[2], Constraint.of(1));
             m.setConstraint(xs[2], xs[0], Constraint.of(3));
-            DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix n = new ZoneDifferenceBoundedMatrix(this.locals, true);
             n.setConstraint(xs[0], xs[1], Constraint.of(-2));
             n.setConstraint(xs[0], xs[2], Constraint.of(-3));
             n.setConstraint(xs[1], xs[0], Constraint.of(5));
@@ -186,8 +186,8 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testIntersection() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(this.locals, false);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix n = new ZoneDifferenceBoundedMatrix(this.locals, false);
             m.intersection(n);
             checkMatrixCondition((s, t) -> {
                     assertEquals(Constraint.BOT(), m.getConstraint(s, t));
@@ -195,8 +195,8 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, false);
-            DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, false);
+            ZoneDifferenceBoundedMatrix n = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.intersection(n);
             checkMatrixCondition((s, t) -> {
                     assertEquals(Constraint.BOT(), m.getConstraint(s, t));
@@ -204,13 +204,13 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-1));
             m.setConstraint(xs[0], xs[2], Constraint.of(-1));
             m.setConstraint(xs[1], xs[0], Constraint.of(4));
             m.setConstraint(xs[1], xs[2], Constraint.of(1));
             m.setConstraint(xs[2], xs[0], Constraint.of(3));
-            DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix n = new ZoneDifferenceBoundedMatrix(this.locals, true);
             n.setConstraint(xs[0], xs[1], Constraint.of(-2));
             n.setConstraint(xs[0], xs[2], Constraint.of(-3));
             n.setConstraint(xs[1], xs[0], Constraint.of(5));
@@ -236,17 +236,17 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testIsFeasible() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             assertTrue(m.isFeasible());
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, false);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, false);
             assertFalse(m.isFeasible());
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-1));
             m.setConstraint(xs[0], xs[2], Constraint.of(-1));
             m.setConstraint(xs[1], xs[0], Constraint.of(4));
@@ -260,26 +260,26 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testIsSubset() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(this.locals, false);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix n = new ZoneDifferenceBoundedMatrix(this.locals, false);
             assertAll(() -> assertFalse(m.isSubset(n)),
                       () -> assertTrue(n.isSubset(m)));
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-1));
             m.setConstraint(xs[0], xs[2], Constraint.of(-1));
             m.setConstraint(xs[1], xs[0], Constraint.of(4));
             m.setConstraint(xs[1], xs[2], Constraint.of(1));
             m.setConstraint(xs[2], xs[0], Constraint.of(3));
-            DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix n = new ZoneDifferenceBoundedMatrix(this.locals, true);
             assertAll(() -> assertTrue(m.isSubset(n)),
                       () -> assertFalse(n.isSubset(m)));
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-1));
             m.setConstraint(xs[0], xs[2], Constraint.of(-1));
             m.setConstraint(xs[1], xs[0], Constraint.of(4));
@@ -289,13 +289,13 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-2));
             m.setConstraint(xs[0], xs[2], Constraint.of(-1));
             m.setConstraint(xs[1], xs[0], Constraint.of(4));
             m.setConstraint(xs[1], xs[2], Constraint.of(1));
             m.setConstraint(xs[2], xs[0], Constraint.of(3));
-            DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix n = new ZoneDifferenceBoundedMatrix(this.locals, true);
             n.setConstraint(xs[0], xs[1], Constraint.of(-1));
             n.setConstraint(xs[0], xs[2], Constraint.of(0));
             n.setConstraint(xs[1], xs[0], Constraint.of(4));
@@ -309,7 +309,7 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testClosure() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             assertTrue(m.computeClosure());
             checkMatrixCondition((s, t) -> {
                     if (s.equals(t)) {
@@ -321,7 +321,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, false);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, false);
             assertFalse(m.computeClosure());
             checkMatrixCondition((s, t) -> {
                     assertEquals(Constraint.BOT(), m.getConstraint(s, t));
@@ -329,7 +329,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-1));
             m.setConstraint(xs[0], xs[2], Constraint.of(-1));
             m.setConstraint(xs[1], xs[0], Constraint.of(5));
@@ -357,7 +357,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-1));
             m.setConstraint(xs[0], xs[2], Constraint.of(-1));
             m.setConstraint(xs[1], xs[0], Constraint.of(0));
@@ -385,7 +385,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(+2));
             m.setConstraint(xs[0], xs[2], Constraint.of(-1));
             m.setConstraint(xs[1], xs[2], Constraint.of(-3));
@@ -404,7 +404,7 @@ public class DifferenceBoundedMatrixTest {
             for (Local x : xs) { locals.add(x); }
 
             // Figure 3 from https://doi.org/10.1109/REAL.1997.641265
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             m.setConstraint(xs[0], xs[3], Constraint.of(5));
             m.setConstraint(xs[1], xs[0], Constraint.of(3));
             m.setConstraint(xs[1], xs[2], Constraint.of(10));
@@ -450,7 +450,7 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testReducedClosure() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             assertTrue(m.computeClosure());
             checkMatrixCondition((s, t) -> {
                     if (s.equals(t)) {
@@ -462,7 +462,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, false);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, false);
             assertFalse(m.computeClosure());
             checkMatrixCondition((s, t) -> {
                     assertEquals(Constraint.BOT(), m.getConstraint(s, t));
@@ -470,7 +470,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-1));
             m.setConstraint(xs[0], xs[2], Constraint.of(-1));
             m.setConstraint(xs[1], xs[0], Constraint.of(5));
@@ -508,7 +508,7 @@ public class DifferenceBoundedMatrixTest {
             for (Local x : xs) { locals.add(x); }
 
             // Figure 3 from https://doi.org/10.1109/REAL.1997.641265
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             m.setConstraint(xs[0], xs[3], Constraint.of(5));
             m.setConstraint(xs[1], xs[0], Constraint.of(3));
             m.setConstraint(xs[1], xs[2], Constraint.of(10));
@@ -560,7 +560,7 @@ public class DifferenceBoundedMatrixTest {
             Jimple.v().newLocal("x3", IntType.v()),
         };
         Set<Local> locals = Stream.of(xs).collect(Collectors.toSet());
-        DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+        ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
         m.setConstraint(xs[0], xs[1], Constraint.of(-1));
         m.setConstraint(xs[0], xs[2], Constraint.of(-1));
         m.setConstraint(xs[1], xs[0], Constraint.of(4));
@@ -597,9 +597,9 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testWidening() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(this.locals, false);
-            DifferenceBoundedMatrix c = DifferenceBoundedMatrix.widen(m, n);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix n = new ZoneDifferenceBoundedMatrix(this.locals, false);
+            ZoneDifferenceBoundedMatrix c = ZoneDifferenceBoundedMatrix.widen(m, n);
             checkMatrixCondition((s, t) -> {
                     if (s.equals(t)) {
                         assertEquals(Constraint.of(0), c.getConstraint(s, t));
@@ -610,9 +610,9 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
-            DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(this.locals, true);
-            DifferenceBoundedMatrix c = DifferenceBoundedMatrix.widen(m, n);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix n = new ZoneDifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix c = ZoneDifferenceBoundedMatrix.widen(m, n);
             checkMatrixCondition((s, t) -> {
                     if (s.equals(t)) {
                         assertEquals(Constraint.of(0), c.getConstraint(s, t));
@@ -623,19 +623,19 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-2));
             m.setConstraint(xs[0], xs[2], Constraint.of(0));
             m.setConstraint(xs[1], xs[0], Constraint.of(4));
             m.setConstraint(xs[1], xs[2], Constraint.of(2));
             m.setConstraint(xs[2], xs[0], Constraint.of(3));
-            DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix n = new ZoneDifferenceBoundedMatrix(this.locals, true);
             n.setConstraint(xs[0], xs[1], Constraint.of(-1));
             n.setConstraint(xs[0], xs[2], Constraint.of(-1));
             n.setConstraint(xs[1], xs[0], Constraint.of(4));
             n.setConstraint(xs[1], xs[2], Constraint.of(1));
             n.setConstraint(xs[2], xs[0], Constraint.of(3));
-            DifferenceBoundedMatrix c = DifferenceBoundedMatrix.widen(m, n);
+            ZoneDifferenceBoundedMatrix c = ZoneDifferenceBoundedMatrix.widen(m, n);
             assertAll(() -> assertEquals(Constraint.of(0),
                                          c.getConstraint(xs[0], xs[0])),
                       () -> assertEquals(Constraint.of(0),
@@ -660,19 +660,19 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testWideningWithSteps() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-2));
             m.setConstraint(xs[0], xs[2], Constraint.of(0));
             m.setConstraint(xs[1], xs[0], Constraint.of(4));
             m.setConstraint(xs[1], xs[2], Constraint.of(2));
             m.setConstraint(xs[2], xs[0], Constraint.of(3));
-            DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix n = new ZoneDifferenceBoundedMatrix(this.locals, true);
             n.setConstraint(xs[0], xs[1], Constraint.of(-1));
             n.setConstraint(xs[0], xs[2], Constraint.of(-1));
             n.setConstraint(xs[1], xs[0], Constraint.of(4));
             n.setConstraint(xs[1], xs[2], Constraint.of(1));
             n.setConstraint(xs[2], xs[0], Constraint.of(3));
-            DifferenceBoundedMatrix c = DifferenceBoundedMatrix.widen(m, n, Set.of(10));
+            ZoneDifferenceBoundedMatrix c = ZoneDifferenceBoundedMatrix.widen(m, n, Set.of(10));
             assertAll(() -> assertEquals(Constraint.of(0),
                                          c.getConstraint(xs[0], xs[0])),
                       () -> assertEquals(Constraint.of(0),
@@ -697,7 +697,7 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testForget() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-1));
             m.setConstraint(xs[0], xs[2], Constraint.of(-1));
             m.setConstraint(xs[1], xs[0], Constraint.of(4));
@@ -726,7 +726,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-1));
             m.setConstraint(xs[0], xs[2], Constraint.of(-1));
             m.setConstraint(xs[1], xs[0], Constraint.of(4));
@@ -764,7 +764,7 @@ public class DifferenceBoundedMatrixTest {
             };
             Set<Local> locals = new HashSet<>(5);
             for (Local x : xs) { locals.add(x); }
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(0));
             m.setConstraint(xs[1], xs[0], Constraint.of(0));
             m.setConstraint(xs[2], xs[0], Constraint.of(0));
@@ -807,7 +807,7 @@ public class DifferenceBoundedMatrixTest {
             int N = xs.length;
             Set<Local> locals = new HashSet<>();
             for (Local x : xs) { locals.add(x); }
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             // [[0, -1, -2, -3, -4, -5, -6],
             //  [1,  0, -1, -2, -3, -4, -5],
             //  [2,  1,  0, -1, -2, -3, -4],
@@ -851,7 +851,7 @@ public class DifferenceBoundedMatrixTest {
             };
             Set<Local> locals = new HashSet<>();
             for (Local x : xs) { locals.add(x); }
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             m.setConstraint(xs[1], xs[2], Constraint.of(0));
             m.setConstraint(xs[2], xs[1], Constraint.of(0));
             m.setConstraint(xs[2], xs[3], Constraint.of(-1));
@@ -870,7 +870,7 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testSimpleForget() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-1));
             m.setConstraint(xs[0], xs[2], Constraint.of(-2));
             m.setConstraint(xs[1], xs[0], Constraint.of(+1));
@@ -899,7 +899,7 @@ public class DifferenceBoundedMatrixTest {
                 .toArray(Local[]::new);
             Set<Local> locals = new HashSet<>();
             for (Local x : xs) { locals.add(x); }
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             // m = [[0, -1, -2, -3, -4, -5, -6, ..., -99],
             //      [1,  0, -1, -2, -3, -4, -5, ..., -98],
             //      [2,  1,  0, -1, -2, -3, -4, ..., -97],
@@ -939,14 +939,14 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testProjection() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[2], xs[1], Constraint.of(3));
             m.setConstraint(xs[1], xs[2], Constraint.of(2));
             assertEquals(Interval32Box.TOP(), m.projectToInterval(xs[2]));
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[2], xs[1], Constraint.of(3));
             m.setConstraint(xs[1], xs[0], Constraint.of(2));
             m.setConstraint(xs[2], xs[0], Constraint.of(5));
@@ -957,7 +957,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[2], xs[1], Constraint.of(3));
             m.setConstraint(xs[1], xs[0], Constraint.of(2));
             m.setConstraint(xs[2], xs[0], Constraint.of(5));
@@ -973,7 +973,7 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testMakeInfeasible() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, false);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, false);
             m.makeInfeasible();
             checkMatrixCondition((s, t) -> {
                     assertEquals(Constraint.BOT(), m.getConstraint(s, t));
@@ -981,7 +981,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.makeInfeasible();
             checkMatrixCondition((s, t) -> {
                     assertEquals(Constraint.BOT(), m.getConstraint(s, t));
@@ -989,7 +989,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-1));
             m.setConstraint(xs[0], xs[2], Constraint.of(-1));
             m.setConstraint(xs[1], xs[0], Constraint.of(4));
@@ -1005,7 +1005,7 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testToString() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             String expected = Stream.of("",
                                         "[[0, ⟙, ⟙],",
                                         " [⟙, 0, ⟙],",
@@ -1014,7 +1014,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, false);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, false);
             String expected = Stream.of("",
                                         "[[⟘, ⟘, ⟘],",
                                         " [⟘, ⟘, ⟘],",
@@ -1023,7 +1023,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-1));
             m.setConstraint(xs[0], xs[2], Constraint.of(-1));
             m.setConstraint(xs[1], xs[0], Constraint.of(4));
@@ -1040,17 +1040,17 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testToSMT() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             assertEquals("true\n", m.toSMT(this.solver));
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, false);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, false);
             assertEquals("false\n", m.toSMT(this.solver));
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-1));
             m.setConstraint(xs[0], xs[2], Constraint.of(-1));
             m.setConstraint(xs[1], xs[0], Constraint.of(4));
@@ -1064,7 +1064,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-1));
             m.setConstraint(xs[0], xs[2], Constraint.of(-1));
             m.setConstraint(xs[1], xs[0], Constraint.of(1));
@@ -1080,17 +1080,17 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testToBinop() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             assertTrue(m.toBinop().isEmpty());
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, false);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, false);
             assertEquals("(= 0 1)", this.solver.smt2(m.toBinop().get()));
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-1));
             m.setConstraint(xs[0], xs[2], Constraint.of(-1));
             m.setConstraint(xs[1], xs[0], Constraint.of(4));
@@ -1104,7 +1104,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-1));
             m.setConstraint(xs[0], xs[2], Constraint.of(-1));
             m.setConstraint(xs[1], xs[0], Constraint.of(1));
@@ -1120,18 +1120,18 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testLocalToSMT() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, false);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, false);
             assertEquals("false", m.toSMT(xs[1], this.solver));
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             assertAll(() -> assertEquals("true", m.toSMT(xs[1], this.solver)),
                       () -> assertEquals("true", m.toSMT(xs[2], this.solver)));
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-1));
             m.setConstraint(xs[0], xs[2], Constraint.of(-1));
             m.setConstraint(xs[1], xs[0], Constraint.of(4));
@@ -1159,18 +1159,18 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testReachableQueries() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, false);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, false);
             assertEquals(Set.of(xs[1]), m.getReachableVariablesOf(xs[1]));
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             assertAll(() -> assertEquals(Set.of(xs[1]), m.getReachableVariablesOf(xs[1])),
                       () -> assertEquals(Set.of(xs[2]), m.getReachableVariablesOf(xs[2])));
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[1], xs[2], Constraint.of(-2));
             m.computeClosure();
             assertAll(() -> assertEquals(Set.of(xs[1], xs[2]),
@@ -1186,7 +1186,7 @@ public class DifferenceBoundedMatrixTest {
                 Jimple.v().newLocal("x3", IntType.v()),
             };
             this.locals = Stream.of(this.xs).collect(Collectors.toSet());
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[1], xs[2], Constraint.of(-1));
             m.setConstraint(xs[3], xs[2], Constraint.of(+3));
             m.computeClosure();
@@ -1205,7 +1205,7 @@ public class DifferenceBoundedMatrixTest {
                 Jimple.v().newLocal("x4", IntType.v()),
             };
             this.locals = Stream.of(this.xs).collect(Collectors.toSet());
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[1], xs[2], Constraint.of(0));
             m.setConstraint(xs[1], xs[3], Constraint.of(0));
             m.setConstraint(xs[1], xs[4], Constraint.of(0));
@@ -1228,7 +1228,7 @@ public class DifferenceBoundedMatrixTest {
                 Jimple.v().newLocal("x6", IntType.v()),
             };
             this.locals = Stream.of(this.xs).collect(Collectors.toSet());
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[2], xs[1], Constraint.of(0));
             m.setConstraint(xs[2], xs[3], Constraint.of(0));
             m.setConstraint(xs[2], xs[4], Constraint.of(0));
@@ -1251,7 +1251,7 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testLocalsToSMT() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, false);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, false);
             assertAll(() -> assertEquals("(<= x1 (+ x1 1))",
                                          m.toSMT(xs[1], xs[1], this.solver)),
                       () -> assertEquals("(and (<= x1 (+ x2 0)) (> x1 (+ x2 0)))",
@@ -1259,7 +1259,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             assertAll(() -> assertEquals("(or (<= x1 0) (> x1 0))",
                                          m.toSMT(xs[0], xs[1], this.solver)),
                       () -> assertEquals("(or (<= x1 0) (> x1 0))",
@@ -1269,7 +1269,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-1));
             m.setConstraint(xs[0], xs[2], Constraint.of(-1));
             m.setConstraint(xs[1], xs[0], Constraint.of(4));
@@ -1292,7 +1292,7 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testAddIncoming() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.addIncoming(xs[1], Constraint.of(3));
             checkMatrixCondition((s, t) -> {
                     if (s.equals(t)) {
@@ -1304,7 +1304,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[1], xs[2], Constraint.of(+2));
             m.setConstraint(xs[2], xs[1], Constraint.of(+3));
             m.setConstraint(xs[2], xs[0], Constraint.of(+3));
@@ -1321,7 +1321,7 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testAddOutgoing() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.addIncoming(xs[1], Constraint.of(3));
             checkMatrixCondition((s, t) -> {
                     if (s.equals(t)) {
@@ -1333,7 +1333,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[1], xs[2], Constraint.of(+2));
             m.setConstraint(xs[2], xs[1], Constraint.of(+3));
             m.setConstraint(xs[2], xs[0], Constraint.of(+3));
@@ -1350,7 +1350,7 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testSubIncoming() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.addIncoming(xs[1], Constraint.of(3));
             checkMatrixCondition((s, t) -> {
                     if (s.equals(t)) {
@@ -1362,7 +1362,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[1], xs[2], Constraint.of(+2));
             m.setConstraint(xs[2], xs[1], Constraint.of(+3));
             m.setConstraint(xs[2], xs[0], Constraint.of(+3));
@@ -1379,7 +1379,7 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testSubOutgoing() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.addIncoming(xs[1], Constraint.of(3));
             checkMatrixCondition((s, t) -> {
                     if (s.equals(t)) {
@@ -1391,7 +1391,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(this.locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(this.locals, true);
             m.setConstraint(xs[1], xs[2], Constraint.of(+2));
             m.setConstraint(xs[2], xs[1], Constraint.of(+3));
             m.setConstraint(xs[2], xs[0], Constraint.of(+3));
@@ -1417,7 +1417,7 @@ public class DifferenceBoundedMatrixTest {
         Set<Local> locals = new HashSet<>();
         for (Local x : xs) { locals.add(x); }
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(1));
             m.setConstraint(xs[0], xs[2], Constraint.of(4));
             // add and close
@@ -1429,7 +1429,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             m.setConstraint(xs[1], xs[2], Constraint.of(2));
             m.setConstraint(xs[1], xs[4], Constraint.of(15));
             m.setConstraint(xs[3], xs[4], Constraint.of(5));
@@ -1446,7 +1446,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             m.setConstraint(xs[0], xs[4], Constraint.of(3));
             m.setConstraint(xs[1], xs[0], Constraint.of(5));
             m.setConstraint(xs[1], xs[2], Constraint.of(2));
@@ -1474,7 +1474,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             m.setConstraint(xs[1], xs[2], Constraint.of(+2));
             m.setConstraint(xs[1], xs[3], Constraint.of(-1));
             m.setConstraint(xs[2], xs[3], Constraint.of(-3));
@@ -1485,18 +1485,18 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testConstantsCache() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             assertTrue(m.getConstants().isEmpty());
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(+2));
             assertTrue(m.getConstants().isEmpty());
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(+2));
             m.setConstraint(xs[1], xs[0], Constraint.of(-2));
             assertAll(() -> assertFalse(m.getConstants().isEmpty()),
@@ -1504,7 +1504,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(+2));
             m.setConstraint(xs[1], xs[0], Constraint.of(-2));
             m.setConstraint(xs[1], xs[2], Constraint.of(+3));
@@ -1513,7 +1513,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(+2));
             m.setConstraint(xs[1], xs[0], Constraint.of(-2));
             m.setConstraint(xs[1], xs[0], Constraint.of(+3));
@@ -1521,10 +1521,10 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-1));
             m.setConstraint(xs[1], xs[0], Constraint.of(+1));
-            DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix n = new ZoneDifferenceBoundedMatrix(locals, true);
             n.setConstraint(xs[0], xs[1], Constraint.of(-1));
             n.setConstraint(xs[1], xs[0], Constraint.of(+1));
             m.union(n);
@@ -1533,12 +1533,12 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-1));
             m.setConstraint(xs[0], xs[2], Constraint.of(-1));
             m.setConstraint(xs[1], xs[0], Constraint.of(+1));
             m.setConstraint(xs[2], xs[0], Constraint.of(+1));
-            DifferenceBoundedMatrix n = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix n = new ZoneDifferenceBoundedMatrix(locals, true);
             n.setConstraint(xs[0], xs[1], Constraint.of(-1));
             n.setConstraint(xs[0], xs[2], Constraint.of(-1));
             n.setConstraint(xs[1], xs[0], Constraint.of(+2));
@@ -1564,7 +1564,7 @@ public class DifferenceBoundedMatrixTest {
         notConstant.add(xs[3]);
         for (Local x : xs) { locals.add(x); }
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-0));
             m.setConstraint(xs[0], xs[2], Constraint.of(-1));
             m.setConstraint(xs[0], xs[3], Constraint.of(-2));
@@ -1599,7 +1599,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-0));
             m.setConstraint(xs[0], xs[2], Constraint.of(-1));
             m.setConstraint(xs[0], xs[3], Constraint.of(-2));
@@ -1647,7 +1647,7 @@ public class DifferenceBoundedMatrixTest {
     @Test
     void testGetConnectedVariables() {
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             m.setConstraint(xs[1], xs[0], Constraint.of(0));
             m.setConstraint(xs[2], xs[0], Constraint.of(1));
             m.setConstraint(xs[0], xs[1], Constraint.of(0));
@@ -1658,7 +1658,7 @@ public class DifferenceBoundedMatrixTest {
         }
 
         {
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             m.setConstraint(xs[1], xs[2], Constraint.of(0));
             assertAll(() -> assertEquals(Set.of(xs[1], xs[2]),
                                          m.getConnectedVariablesOf(xs[1])),
@@ -1674,7 +1674,7 @@ public class DifferenceBoundedMatrixTest {
                 Jimple.v().newLocal("x4", IntType.v()),
             };
             locals = Stream.of(xs).collect(Collectors.toSet());
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             m.setConstraint(xs[1], xs[2], Constraint.of(0));
             m.setConstraint(xs[2], xs[3], Constraint.of(1));
             assertAll(() -> assertEquals(Set.of(xs[1], xs[2], xs[3]),
@@ -1696,7 +1696,7 @@ public class DifferenceBoundedMatrixTest {
                 Jimple.v().newLocal("x6", IntType.v()),
             };
             locals = Stream.of(xs).collect(Collectors.toSet());
-            DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+            ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
             m.setConstraint(xs[0], xs[1], Constraint.of(-1));
             m.setConstraint(xs[0], xs[2], Constraint.of(-1));
             m.setConstraint(xs[0], xs[5], Constraint.of(-1));

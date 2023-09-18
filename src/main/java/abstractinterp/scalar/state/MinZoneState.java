@@ -25,7 +25,7 @@ import solver.SolverWrapper;
 
 public class MinZoneState implements State {
 
-    private DifferenceBoundedMatrix matrix;
+    private ZoneDifferenceBoundedMatrix matrix;
     private static Logger LOGGER = LoggerFactory.getLogger(MinZoneState.class);
     public static final Local ZERO = Variable.ZERO;
 
@@ -38,7 +38,7 @@ public class MinZoneState implements State {
         Set<Local> localsWithZero = new HashSet<>();
         localsWithZero.addAll(locals);
         localsWithZero.add(ZERO);
-        this.matrix = new DifferenceBoundedMatrix(localsWithZero, top);
+        this.matrix = new ZoneDifferenceBoundedMatrix(localsWithZero, top);
     }
 
     /** Copy Constructor: Creates new instance seeded with <i>state</i> values.
@@ -54,7 +54,7 @@ public class MinZoneState implements State {
      *
      * Should not be used for regular use.
      */
-    public MinZoneState(DifferenceBoundedMatrix matrix) {
+    public MinZoneState(ZoneDifferenceBoundedMatrix matrix) {
         this.matrix = matrix;
     }
 

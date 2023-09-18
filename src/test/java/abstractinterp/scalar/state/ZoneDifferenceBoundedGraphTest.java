@@ -21,7 +21,7 @@ import soot.jimple.Jimple;
 import solver.SolverWrapper;
 import solver.SolverFactory;
 
-public class DifferenceBoundedGraphTest {
+public class ZoneDifferenceBoundedGraphTest {
 
     SolverWrapper solver;
     Set<Local> locals;
@@ -41,7 +41,7 @@ public class DifferenceBoundedGraphTest {
     @Test
     void testGetConnectedVariables() {
         {
-            DifferenceBoundedGraph g = new DifferenceBoundedGraph(this.locals, true);
+            ZoneDifferenceBoundedGraph g = new ZoneDifferenceBoundedGraph(this.locals, true);
             g.setConstraint(xs[0], xs[1], Constraint.of(-1));
             g.setConstraint(xs[0], xs[2], Constraint.of(-1));
             g.setConstraint(xs[1], xs[0], Constraint.of(4));
@@ -51,14 +51,14 @@ public class DifferenceBoundedGraphTest {
         }
 
         {
-            DifferenceBoundedGraph g = new DifferenceBoundedGraph(this.locals, true);
+            ZoneDifferenceBoundedGraph g = new ZoneDifferenceBoundedGraph(this.locals, true);
             g.setConstraint(xs[1], xs[2], Constraint.of(1));
             assertAll(() -> assertEquals(Set.of(xs[1], xs[2]), g.getConnectedVariablesOf(xs[1])),
                       () -> assertEquals(Set.of(xs[1], xs[2]), g.getConnectedVariablesOf(xs[2])));
         }
 
         {
-            DifferenceBoundedGraph g = new DifferenceBoundedGraph(this.locals, true);
+            ZoneDifferenceBoundedGraph g = new ZoneDifferenceBoundedGraph(this.locals, true);
             g.setConstraint(xs[0], xs[1], Constraint.of(-1));
             g.setConstraint(xs[0], xs[2], Constraint.of(-1));
             g.setConstraint(xs[1], xs[0], Constraint.of(4));
@@ -79,7 +79,7 @@ public class DifferenceBoundedGraphTest {
                 Jimple.v().newLocal("x6", IntType.v()),
             };
             locals = Stream.of(this.xs).collect(Collectors.toSet());
-            DifferenceBoundedGraph g = new DifferenceBoundedGraph(this.locals, true);
+            ZoneDifferenceBoundedGraph g = new ZoneDifferenceBoundedGraph(this.locals, true);
             g.setConstraint(xs[0], xs[1], Constraint.of(-1));
             g.setConstraint(xs[0], xs[2], Constraint.of(-2));
             g.setConstraint(xs[0], xs[5], Constraint.of(-3));

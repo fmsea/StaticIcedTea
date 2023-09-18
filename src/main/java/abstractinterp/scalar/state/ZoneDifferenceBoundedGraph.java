@@ -41,13 +41,13 @@ import abstractinterp.scalar.state.util.GraphProjection;
 import solver.SolverWrapper;
 import util.Configuration;
 
-public class DifferenceBoundedGraph {
-    private static Logger LOGGER = LoggerFactory.getLogger(DifferenceBoundedGraph.class);
+public class ZoneDifferenceBoundedGraph {
+    private static Logger LOGGER = LoggerFactory.getLogger(ZoneDifferenceBoundedGraph.class);
 
     private Graph<Local, DefaultEdge> graph;
     private Map<DefaultEdge, Constraint> constraints;
 
-    public DifferenceBoundedGraph(Set<Local> locals, boolean top) {
+    public ZoneDifferenceBoundedGraph(Set<Local> locals, boolean top) {
         this.graph = new DefaultDirectedGraph<>(DefaultEdge.class);
         this.constraints = new HashMap<>(locals.size() * 2);
         this.graph.addVertex(Variable.ZERO);
@@ -130,9 +130,9 @@ public class DifferenceBoundedGraph {
         return g;
     }
 
-    public static DifferenceBoundedMatrix to(DifferenceBoundedGraph g) {
+    public static ZoneDifferenceBoundedMatrix to(ZoneDifferenceBoundedGraph g) {
         Set<Local> locals = g.graph.vertexSet();
-        DifferenceBoundedMatrix m = new DifferenceBoundedMatrix(locals, true);
+        ZoneDifferenceBoundedMatrix m = new ZoneDifferenceBoundedMatrix(locals, true);
         g.graph.edgeSet().stream().forEach(e -> {
                 Local s = g.graph.getEdgeSource(e);
                 Local t = g.graph.getEdgeTarget(e);
@@ -142,12 +142,12 @@ public class DifferenceBoundedGraph {
         return m;
     }
 
-    public static DifferenceBoundedGraph from(DifferenceBoundedMatrix m) {
-        return DifferenceBoundedMatrix.to(m);
+    public static ZoneDifferenceBoundedGraph from(ZoneDifferenceBoundedMatrix m) {
+        return ZoneDifferenceBoundedMatrix.to(m);
     }
 
     @Override
     public String toString() {
-        return DifferenceBoundedGraph.to(this).toString();
+        return ZoneDifferenceBoundedGraph.to(this).toString();
     }
 }
