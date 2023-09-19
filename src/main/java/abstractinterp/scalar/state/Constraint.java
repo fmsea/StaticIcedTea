@@ -1,6 +1,7 @@
 package abstractinterp.scalar.state;
 
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -85,6 +86,26 @@ public class Constraint implements Comparable<Constraint> {
         this.bound = Optional.empty();
     }
 
+    public Stream<Constraint> stream() {
+        if (this.isTop()) {
+            return Stream.of();
+        } else {
+            return Stream.of(this);
+        }
+    }
+
+    public <U> Optional<U> map(Function<? super Constraint, U> f) {
+        if (this.isTop()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(f.apply(this));
+        }
+    }
+
+    public static Constraint add(Constraint... cs) {
+        return Constraint.add(Stream.of(cs));
+    }
+
     public static Constraint add(Stream<Constraint> cs) {
         return cs.reduce((a, b) -> Constraint.add(a, b)).orElse(Constraint.TOP());
     }
@@ -101,6 +122,10 @@ public class Constraint implements Comparable<Constraint> {
         Constraint z = x.copy();
         z.subtract(y);
         return z;
+    }
+
+    public static Constraint multiply(Constraint... cs) {
+        return Constraint.multiply(Stream.of(cs));
     }
 
     public static Constraint multiply(Stream<Constraint> cs) {
@@ -267,5 +292,21 @@ public class Constraint implements Comparable<Constraint> {
             sb.append(this.bound.map(b -> b.toString()).orElse("+∞"));;
         }
         return sb.toString();
+    }
+
+    public String toSmt() {
+        if (this.isBottom()) {
+            return "false";
+        } else if (this.isTop()) {
+            return "true";
+        } else {
+            return this.bound.map(b -> {
+                    if (b < 0) {
+                        return String.format("(- %d)", b * -1);
+                    }else {
+                        return String.format("%d", b);
+                    }
+                }).get();
+        }
     }
 }

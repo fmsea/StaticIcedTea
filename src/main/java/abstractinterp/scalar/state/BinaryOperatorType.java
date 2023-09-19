@@ -63,4 +63,22 @@ public enum BinaryOperatorType {
         }
         return op;
     }
+
+
+    public String toSmt() {
+        switch (this) {
+        case ADDITION:
+            return "+";
+        case SUBTRACTION:
+            return "-";
+        case MULTIPLICATION:
+            return "*";
+        case DIVISION:
+            return "/";
+        case MODULUS:
+            return "mod";
+        default:
+            return this.toString();
+        }
+    }
 }

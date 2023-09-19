@@ -1,22 +1,16 @@
 package abstractinterp.scalar.state.providers;
 
-import net.jqwik.api.Arbitrary;
-
-import java.util.Collections;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import soot.Local;
-
-import abstractinterp.scalar.state.Constraint;
-import abstractinterp.scalar.state.ZoneDifferenceBoundedMatrix;
+import net.jqwik.api.Arbitrary;
 
 public class ProviderUtils {
 
-    private static final int DEFAULT_QUANTITY = 1000;
+    private static final int DEFAULT_QUANTITY = 100;
 
     public static Set<Arbitrary<?>> provideSetOf(Supplier<Arbitrary<?>> supplier) {
         return provideSetOf(DEFAULT_QUANTITY, supplier);

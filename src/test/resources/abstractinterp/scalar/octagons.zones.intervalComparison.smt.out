@@ -1,0 +1,22 @@
+1 u0 = x0:<test.ints: int compareIntervals()>
+fall through
+sat
+sat
+2 if x0 < 20 goto (branch):<test.ints: int compareIntervals()>
+fall through
+sat
+sat
+branch out
+sat
+sat
+4 if x0 >= 0 goto w0 = x0 + u0:<test.ints: int compareIntervals()>
+fall through
+sat
+sat
+branch out
+sat
+sat
+6 w0 = x0 + u0:<test.ints: int compareIntervals()>
+fall through
+sat
+unsat

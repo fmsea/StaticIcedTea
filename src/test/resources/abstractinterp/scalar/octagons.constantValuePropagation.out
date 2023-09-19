@@ -1,0 +1,3 @@
+l0	l1
+2 l1 = 6:<constant_testSootClass: int constant_test(int)>
+fall	l1	(and (<= l1 6) (>= l1 6))

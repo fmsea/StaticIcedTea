@@ -681,12 +681,13 @@ public class Interval32Box implements Comparable<Interval32Box> {
         return ret;
     }
 
-    public void negate() {
+    public Interval32Box negate() {
         Optional<Integer> lower = this.upperBound.map((u) -> u * -1);
         Optional<Integer> upper = this.lowerBound.map((l) -> l * -1);
         this.lowerBound = lower;
         this.upperBound = upper;
         this.checkAndSetBottom();
+        return this;
     }
 
     public boolean isSingleton() {

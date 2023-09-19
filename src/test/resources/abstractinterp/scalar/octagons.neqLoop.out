@@ -1,0 +1,8 @@
+l0	l1	l2
+1 l1 = 4:<test.neqBranch: void neq()>
+fall	l1	(and (<= l1 4) (>= l1 4))
+2 if l0 != 0 goto return:<test.neqBranch: void neq()>
+fall	l0	(and (<= l0 0) (<= l1 4) (>= l0 0) (>= l1 4))
+branch	(and (<= l1 4) (>= l1 4))
+3 l2 = l1 + 1:<test.neqBranch: void neq()>
+fall	l1	l2	(and (<= l0 0) (<= l1 4) (<= l2 5) (>= l0 0) (>= l1 4) (>= l2 5))

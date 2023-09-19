@@ -1,0 +1,31 @@
+2 b2 = 1:<test.Example1M: int example_5(int)>
+fall through
+sat
+sat
+3 b3 = 3:<test.Example1M: int example_5(int)>
+fall through
+sat
+sat
+4 if b3 != 0 goto i4 = b3 + b2:<test.Example1M: int example_5(int)>
+fall through
+sat
+sat
+branch out
+sat
+sat
+5 i4 = b3 - b2:<test.Example1M: int example_5(int)>
+fall through
+sat
+sat
+7 i4 = b3 + b2:<test.Example1M: int example_5(int)>
+fall through
+sat
+sat
+8 $i0 = b3 * i4:<test.Example1M: int example_5(int)>
+fall through
+sat
+sat
+9 i5 = $i0 - 18:<test.Example1M: int example_5(int)>
+fall through
+sat
+sat
