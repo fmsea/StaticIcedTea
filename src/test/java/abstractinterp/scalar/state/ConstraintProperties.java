@@ -11,8 +11,18 @@ public class ConstraintProperties {
     }
 
     @Property
+    boolean testCompareToTopReflexive(@ForAll Constraint c) {
+        return Constraint.compare(Constraint.TOP(), c) == 1;
+    }
+
+    @Property
     boolean testCompareToBot(@ForAll Constraint c) {
         return Constraint.compare(c, Constraint.BOT()) == 1;
+    }
+
+    @Property
+    boolean testCompareToBotReflexive(@ForAll Constraint c) {
+        return Constraint.compare(Constraint.BOT(), c) == -1;
     }
 
     @Property
