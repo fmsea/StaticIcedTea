@@ -80,28 +80,28 @@ public class Constraint implements Comparable<Constraint> {
     }
 
     public static Constraint add(Constraint x,
-                                     Constraint y) {
+                                 Constraint y) {
         Constraint z = x.copy();
         z.add(y);
         return z;
     }
 
     public static Constraint subtract(Constraint x,
-                                          Constraint y) {
+                                      Constraint y) {
         Constraint z = x.copy();
         z.subtract(y);
         return z;
     }
 
     public static Constraint multiply(Constraint x,
-                                          Constraint y) {
+                                      Constraint y) {
         Constraint z = x.copy();
         z.multiply(y);
         return z;
     }
 
     public static Constraint divide(Constraint x,
-                                        Constraint y) {
+                                    Constraint y) {
         Constraint z = x.copy();
         z.divide(y);
         return z;
