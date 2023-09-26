@@ -2,9 +2,14 @@ package abstractinterp.scalar.state;
 
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import soot.jimple.IntConstant;
 
 public class Constraint implements Comparable<Constraint> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Constraint.class);
     private Optional<Integer> bound;
     private boolean bottom = false;
 
@@ -125,6 +130,8 @@ public class Constraint implements Comparable<Constraint> {
             try {
                 this.bound = this.bound.flatMap(t -> c.bound.map(b -> Math.addExact(t, b)));
             } catch (ArithmeticException ex) {
+                LOGGER.debug("[this = {}, c = {}]", this, c);
+                LOGGER.trace("Overflowed!", ex);
                 this.makeTop();
             }
         }

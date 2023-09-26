@@ -30,4 +30,20 @@ public class ConstraintProperties {
         Constraint d = c.copy();
         return d.equals(c) && d.hashCode() == c.hashCode();
     }
+
+    @Property
+    boolean overflowAdditionBecomesTop(@ForAll Constraint c) {
+        if (c.bound().map(b -> b > 0).orElse(false)) {
+            return Constraint.TOP().equals(Constraint.add(Constraint.of(Integer.MAX_VALUE), c));
+        }
+        return true;
+    }
+
+    @Property
+    boolean underflowSubtractionBecomesTop(@ForAll Constraint c) {
+        if (c.bound().map(b -> b > 0).orElse(false)) {
+            return Constraint.TOP().equals(Constraint.subtract(Constraint.of(Integer.MIN_VALUE), c));
+        }
+        return true;
+    }
 }
