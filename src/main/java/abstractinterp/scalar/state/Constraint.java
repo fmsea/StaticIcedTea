@@ -80,6 +80,10 @@ public class Constraint implements Comparable<Constraint> {
         this.bound = Optional.empty();
     }
 
+    public static Constraint add(Stream<Constraint> cs) {
+        return cs.reduce((a, b) -> Constraint.add(a, b)).orElse(Constraint.TOP());
+    }
+
     public static Constraint add(Constraint x,
                                  Constraint y) {
         Constraint z = x.copy();
@@ -92,6 +96,10 @@ public class Constraint implements Comparable<Constraint> {
         Constraint z = x.copy();
         z.subtract(y);
         return z;
+    }
+
+    public static Constraint multiply(Stream<Constraint> cs) {
+        return cs.reduce((a, b) -> Constraint.multiply(a, b)).orElse(Constraint.TOP());
     }
 
     public static Constraint multiply(Constraint x,
