@@ -1,6 +1,8 @@
 package abstractinterp.scalar.state;
 
 import java.util.Optional;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -406,6 +408,13 @@ public class ConstraintTest {
                   () -> assertEquals(Constraint.BOT(),
                                      Constraint.min(Constraint.BOT(),
                                                     Constraint.of(0))));
+    }
+
+    @Test
+    void testMultipleMin() {
+        assertEquals(Constraint.of(0),
+                     Constraint.min(IntStream.range(0, 100)
+                                    .boxed().map(i -> Constraint.of(i))));
     }
 
     @Test

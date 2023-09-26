@@ -1,6 +1,7 @@
 package abstractinterp.scalar.state;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 import soot.jimple.IntConstant;
 
 public class Constraint implements Comparable<Constraint> {
@@ -188,6 +189,14 @@ public class Constraint implements Comparable<Constraint> {
             r = a.copy();
         }
         return r;
+    }
+
+    public static Constraint min(Stream<Constraint> cs) {
+        return cs.reduce(Constraint::min).orElse(Constraint.BOT());
+    }
+
+    public static Constraint min(Constraint... cs) {
+        return min(Stream.of(cs));
     }
 
     public static Constraint min(Constraint a, Constraint b) {
