@@ -8,7 +8,7 @@ import soot.Value;
 import soot.jimple.BinopExpr;
 import soot.jimple.ConditionExpr;
 import soot.jimple.IntConstant;
-import abstractinterp.scalar.util.Pair;
+import util.Pair;
 
 /** Deferred Comparison Map between two Values.
  *

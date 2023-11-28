@@ -33,11 +33,11 @@ import soot.toolkits.graph.UnitGraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import abstractinterp.scalar.util.Pair;
 import abstractinterp.scalar.state.State;
 import abstractinterp.scalar.state.factory.StateFactory;
 import solver.SolverWrapper;
 import solver.SolverFactory;
+import util.Pair;
 
 public class IntegerAnalysis<S extends State> implements Analysis {
     private static final Logger LOGGER = LoggerFactory.getLogger(IntegerAnalysis.class);

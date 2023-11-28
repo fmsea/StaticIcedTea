@@ -1,4 +1,4 @@
-package abstractinterp.scalar.util;
+package util;
 
 public class Pair<S, T> {
     private S fst;

@@ -1,6 +1,6 @@
 package abstractinterp.scalar.state;
 
-import abstractinterp.scalar.util.Pair;
+import util.Pair;
 
 public class PredicateValuePair extends Pair<PredicateType, Long> {
 

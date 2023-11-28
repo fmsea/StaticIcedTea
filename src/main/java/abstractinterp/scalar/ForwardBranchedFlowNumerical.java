@@ -36,7 +36,7 @@ import abstractinterp.scalar.state.factory.StateFactory;
 import abstractinterp.scalar.state.DeferredCmpMap;
 import abstractinterp.scalar.state.BinaryOperatorType;
 import abstractinterp.scalar.state.PredicateType;
-import abstractinterp.scalar.util.Pair;
+import util.Pair;
 
 public class ForwardBranchedFlowNumerical<S extends State>
     extends ForwardBranchedFlowWidening<Unit, S> {

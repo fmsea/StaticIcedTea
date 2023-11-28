@@ -13,7 +13,7 @@ import soot.Unit;
 import soot.toolkits.graph.DirectedGraph;
 
 import abstractinterp.scalar.state.State;
-import abstractinterp.scalar.util.Pair;
+import util.Pair;
 /**
  * Widening also asks about after how many
  * iterations apply widening and also a list
