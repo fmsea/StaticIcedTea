@@ -681,6 +681,10 @@ public class Interval32Box implements Comparable<Interval32Box> {
         return ret;
     }
 
+    public static Interval32Box negate(Interval32Box copy) {
+        return Interval32Box.of(copy).negate();
+    }
+
     public Interval32Box negate() {
         Optional<Integer> lower = this.upperBound.map((u) -> u * -1);
         Optional<Integer> upper = this.lowerBound.map((l) -> l * -1);
