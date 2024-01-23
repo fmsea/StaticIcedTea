@@ -14,6 +14,7 @@ import driver.commands.*;
          description = "Run various dfa-smt utilities",
          subcommands = {
              PrintJimpleCommand.class,
+             GenerateOctagonsCommand.class,
              StartIntervalNumericalCommand.class,
              StartPredicateNumericalCommand.class,
              StartIncZoneNumericalCommand.class,
