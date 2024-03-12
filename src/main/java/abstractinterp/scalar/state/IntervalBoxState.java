@@ -332,14 +332,15 @@ public class IntervalBoxState implements State {
 
     public GraphProjection toGraph() {
         GraphProjection graph = new GraphProjection(Stream.concat(Stream.of(Variable.ZERO), this.state.keySet().stream())
-                                                    .collect(Collectors.toSet()));
+            .map(l -> l.toString())
+            .collect(Collectors.toSet()));
         this.state.forEach((l, i) -> {
                 if (i.isBottom()) {
-                    graph.setConstraint(l, l, Constraint.BOT());
+                    graph.setConstraint(l.toString(), l.toString(), Constraint.BOT());
                 } else if (i.isTop()) {
                 } else {
-                    graph.setConstraint(l, Variable.ZERO, Constraint.of(i.upperBound(), i.isBottom()));
-                    graph.setConstraint(Variable.ZERO, l, Constraint.of(i.lowerBound().map(b -> b * -1), i.isBottom()));
+                    graph.setConstraint(l.toString(), Variable.ZERO.toString(), Constraint.of(i.upperBound(), i.isBottom()));
+                    graph.setConstraint(Variable.ZERO.toString(), l.toString(), Constraint.of(i.lowerBound().map(b -> b * -1), i.isBottom()));
                 }
             });
         return graph;

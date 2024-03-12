@@ -801,21 +801,21 @@ public class ZoneDifferenceBoundedMatrix {
     }
 
     public GraphProjection toGraph() {
-        GraphProjection graph = new GraphProjection(this.locals);
+        GraphProjection graph = new GraphProjection(this.locals.stream().map(l -> l.toString()).collect(Collectors.toSet()));
         if (this.isFeasible()) {
             iterateMatrix((i, j) -> {
                     Local s = this.indicesToLocals.get(i);
                     Local t = this.indicesToLocals.get(j);
                     if (this.matrix[i][j].isTop() || i == j) {
                     } else {
-                        graph.setConstraint(s, t, this.matrix[i][j].copy());
+                        graph.setConstraint(s.toString(), t.toString(), this.matrix[i][j].copy());
                     }
                 });
         } else {
             iterateMatrix((i, j) -> {
                     if (i == j) {
                         Local s = this.indicesToLocals.get(i);
-                        graph.setConstraint(s, s, Constraint.BOT());
+                        graph.setConstraint(s.toString(), s.toString(), Constraint.BOT());
                     }
                 });
         }

@@ -1,45 +1,25 @@
 package abstractinterp.scalar.state;
 
-import java.util.Arrays;
-import java.util.ArrayList;
 import java.util.ArrayDeque;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.BinaryOperator;
-import java.util.function.BiPredicate;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
-import java.util.stream.IntStream;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import soot.Local;
-import soot.Value;
-import soot.grimp.Grimp;
-import soot.jimple.BinopExpr;
-import soot.jimple.IntConstant;
-import soot.jimple.internal.JNegExpr;
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
-import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import abstractinterp.scalar.state.util.GraphProjection;
-import solver.SolverWrapper;
-import util.Configuration;
+import soot.Local;
 
 public class ZoneDifferenceBoundedGraph {
     private static Logger LOGGER = LoggerFactory.getLogger(ZoneDifferenceBoundedGraph.class);
@@ -120,12 +100,12 @@ public class ZoneDifferenceBoundedGraph {
     }
 
     public GraphProjection toGraph() {
-        GraphProjection g = new GraphProjection(this.getLocals());
+        GraphProjection g = new GraphProjection(this.getLocals().stream().map(l -> l.toString()).collect(Collectors.toSet()));
         this.graph.edgeSet().stream().forEach(e -> {
                 Local s = this.graph.getEdgeSource(e);
                 Local t = this.graph.getEdgeTarget(e);
                 Constraint c = this.constraints.get(e);
-                g.setConstraint(s, t, c);
+                g.setConstraint(s.toString(), t.toString(), c);
             });
         return g;
     }
