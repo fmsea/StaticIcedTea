@@ -182,7 +182,7 @@ public class IntegerAnalysis<S extends State> implements Analysis {
                 writer.write(":");
                 writer.write(methodSignature);
                 writer.write('\n');
-                State state = analysis.getFallFlowAfter(u);
+                S state = analysis.getFallFlowAfter(u);
                 writer.write("fall\t");
                 writer.write(this.analysis.getFallMinChangedVariables(u)
                           .map(vars -> vars
@@ -191,6 +191,7 @@ public class IntegerAnalysis<S extends State> implements Analysis {
                                .sorted()
                                .collect(Collectors.joining("\t", "", "\t")))
                           .orElse(""));
+                state.reduce();
                 writer.write(state.toSMT(this.solver));
                 writer.write("\n");
                 List<S> branches = analysis.getBranchFlowAfter(u);
@@ -203,6 +204,7 @@ public class IntegerAnalysis<S extends State> implements Analysis {
                                    .sorted()
                                    .collect(Collectors.joining("\t", "", "\t")))
                               .orElse(""));
+                    branch.reduce();
                     writer.write(branch.toSMT(this.solver));
                     writer.write("\n");
                 }

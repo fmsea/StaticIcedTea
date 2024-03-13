@@ -545,6 +545,10 @@ public class MaxZoneState implements State {
         return this.matrix.toBinop();
     }
 
+    public boolean reduce() {
+        return this.matrix.w0zReduction();
+    }
+
     public String toSMT(SolverWrapper solver) {
         return this.matrix.toSMT(solver);
     }

@@ -693,7 +693,7 @@ public class ZoneDifferenceBoundedMatrix {
     }
 
     public String toSMT(Set<Local> sources, SolverWrapper solver) {
-        if (!this.w0zReduction()) {
+        if (!this.isFeasible()) {
             return "false";
         } else {
             Set<Local> connectedVariables = sources.stream().flatMap(source -> this.getConnectedVariablesOf(source).stream())

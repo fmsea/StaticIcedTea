@@ -29,6 +29,7 @@ public interface State {
     public void updateState(Local var, State inState, Value left, Value right, BinaryOperatorType operator);
     public void updateState(Local var, State inState, Value v);
     public Optional<BinopExpr> toBinop();
+    public boolean reduce();
     public String toSMT(SolverWrapper solver);
     public String toSMT(Local l, SolverWrapper solver);
     public String toSMT(Set<Local> locals, SolverWrapper solver);

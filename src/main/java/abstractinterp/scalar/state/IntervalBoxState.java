@@ -287,6 +287,11 @@ public class IntervalBoxState implements State {
         return sb.toString();
     }
 
+    public boolean reduce() {
+        // Noop
+        return true;
+    }
+
     public Optional<BinopExpr> toBinop() {
         Stream<Local> locals = this.state.keySet()
             .stream().sorted((a, b) -> a.toString().compareTo(b.toString()));
