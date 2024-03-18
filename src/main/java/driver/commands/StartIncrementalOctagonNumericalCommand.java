@@ -11,10 +11,11 @@ import driver.util.SootInitialization;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
+import util.Properties;
 
 @Command(name = "incoct-numerical",
          mixinStandardHelpOptions = true,
-         description = "Run Incremental Octagon Analysis")
+         description = "Run Incremental Octagon Analysis using Search")
 public class StartIncrementalOctagonNumericalCommand implements Callable<Integer> {
     @Option(names = {"-o", "--output"},
             description = "Output file path for results",
@@ -62,14 +63,15 @@ public class StartIncrementalOctagonNumericalCommand implements Callable<Integer
     @Override
     public Integer call() throws Exception {
         SootInitialization.initializeSoot(className, classpath);
-        Runnable runner;
-        runner = new IncrementalOctagonAnalysisRunner(className,
-                                                      methodId,
-                                                      outputResultsPath,
-                                                      outputReport,
-                                                      widenIterations,
-                                                      widenSteps,
-                                                      orderer);
+        Properties.IncrementalClosureAlgorithm = Properties.OctagonIncrementalClosureAlgorithm.SEARCH;
+        Runnable runner = new IncrementalOctagonAnalysisRunner(
+            className,
+            methodId,
+            outputResultsPath,
+            outputReport,
+            widenIterations,
+            widenSteps,
+            orderer);
         runner.run();
         return 0;
     }

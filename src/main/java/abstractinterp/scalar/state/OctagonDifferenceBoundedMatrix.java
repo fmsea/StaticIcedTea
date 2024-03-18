@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import abstractinterp.scalar.state.util.GraphProjection;
 import util.Pair;
+import util.Properties;
 
 public class OctagonDifferenceBoundedMatrix {
 
@@ -116,7 +117,17 @@ public class OctagonDifferenceBoundedMatrix {
     }
 
     public boolean putIncremental(int i, int j, Constraint constraint, OctagonDifferenceBoundedMatrix in) {
-        return this.incrementalClosure(i, j, constraint);
+        switch (Properties.IncrementalClosureAlgorithm) {
+            case CHAWDHARY:
+                if (putConstraint(i, j, constraint, in)) {
+                    return this.incrementalZClosure(i, j, constraint);
+                } else {
+                    return this.isFeasible();
+                }
+            case SEARCH:
+            default:
+                return this.incrementalClosure(i, j, constraint);
+        }
     }
 
     public Constraint getConstraint(int i, int j) {

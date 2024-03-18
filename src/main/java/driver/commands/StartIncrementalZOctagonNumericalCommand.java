@@ -4,20 +4,19 @@ import java.nio.file.Path;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import driver.DeferredIncrementalOctagonAnalysisRunner;
+import driver.IncrementalOctagonAnalysisRunner;
 import driver.commands.validation.OrdererTypeConverter;
 import driver.util.OrdererType;
 import driver.util.SootInitialization;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
-
 import util.Properties;
 
-@Command(name = "defoct-numerical",
+@Command(name = "incoctz-numerical",
          mixinStandardHelpOptions = true,
-         description = "Run Deferred Incremental Octagon Analysis")
-public class StartDeferredIncrementalOctagonNumericalCommand implements Callable<Integer> {
+         description = "Run Incremental Octagon Analysis using Chawdhary Incremental Closure")
+public class StartIncrementalZOctagonNumericalCommand implements Callable<Integer> {
     @Option(names = {"-o", "--output"},
             description = "Output file path for results",
             required = true)
@@ -64,8 +63,8 @@ public class StartDeferredIncrementalOctagonNumericalCommand implements Callable
     @Override
     public Integer call() throws Exception {
         SootInitialization.initializeSoot(className, classpath);
-        Properties.IncrementalClosureAlgorithm = Properties.IncrementalClosureAlgorithm.SEARCH;
-        Runnable runner = new DeferredIncrementalOctagonAnalysisRunner(
+        Properties.IncrementalClosureAlgorithm = Properties.OctagonIncrementalClosureAlgorithm.CHAWDHARY;
+        Runnable runner = new IncrementalOctagonAnalysisRunner(
             className,
             methodId,
             outputResultsPath,
