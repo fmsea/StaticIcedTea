@@ -11,36 +11,26 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.TreeSet;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import abstractinterp.scalar.state.State;
+import abstractinterp.scalar.state.factory.StateFactory;
+import solver.SolverFactory;
+import solver.SolverWrapper;
 import soot.Body;
 import soot.Local;
 import soot.Trap;
 import soot.Unit;
-import soot.Value;
-import soot.util.Chain;
 import soot.jimple.toolkits.annotation.logic.Loop;
 import soot.toolkits.graph.ExceptionalUnitGraph;
 import soot.toolkits.graph.LoopNestTree;
-import soot.toolkits.graph.PseudoTopologicalOrderer;
 import soot.toolkits.graph.Orderer;
+import soot.toolkits.graph.PseudoTopologicalOrderer;
 import soot.toolkits.graph.UnitGraph;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import abstractinterp.scalar.state.State;
-import abstractinterp.scalar.state.factory.StateFactory;
-import solver.SolverWrapper;
-import solver.SolverFactory;
-import util.Pair;
 
 public class IntegerAnalysis<S extends State> implements Analysis {
-    private static final Logger LOGGER = LoggerFactory.getLogger(IntegerAnalysis.class);
+
     protected Body b;
     UnitGraph g;
     ForwardBranchedFlowNumerical<S> analysis;
@@ -166,7 +156,6 @@ public class IntegerAnalysis<S extends State> implements Analysis {
     }
 
     public void writeReport(Writer writer) throws IOException {
-        StringBuilder sb = new StringBuilder();
         writer.write(this.locals.stream().map(l -> l.toString()).sorted().collect(Collectors.joining("\t")));
         writer.write("\n");
         Set<Unit> outputStmt = this.analysis.getOutputStatements();
