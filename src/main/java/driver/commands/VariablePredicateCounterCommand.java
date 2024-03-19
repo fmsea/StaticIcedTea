@@ -11,11 +11,12 @@ import java.nio.file.Path;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Parameters;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Parameters;
 import processing.AnalysisSMTReport;
 import processing.Smt2Reader;
 import processing.VariablePredicateStats;

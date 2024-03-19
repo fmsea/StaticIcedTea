@@ -1,7 +1,7 @@
 package driver.commands.validation;
 
-import picocli.CommandLine.ITypeConverter;
 import driver.util.OrdererType;
+import picocli.CommandLine.ITypeConverter;
 
 public class OrdererTypeConverter implements ITypeConverter<OrdererType> {
     public OrdererType convert(String value) throws Exception {
