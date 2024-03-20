@@ -1,18 +1,14 @@
 package abstractinterp.scalar;
 
-import soot.Scene;
-import soot.Body;
-
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.Test;
+
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import abstractinterp.scalar.state.MaxZoneState;
-import abstractinterp.scalar.state.factory.MaxZoneStateFactory;
 import abstractinterp.scalar.state.providers.JimpleProvider;
+import soot.Body;
+import soot.Scene;
 
 public class MaxZoneNumericalTest extends AbstractNumericalTest {
 
@@ -27,7 +23,7 @@ public class MaxZoneNumericalTest extends AbstractNumericalTest {
     void testSMTFormulaReportWithConstantValuePropagation() {
         Body body = JimpleProvider.constantJimpleMethod("constant_test", true);
         IntegerAnalysis<MaxZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, new MaxZoneStateFactory());
+            new IntegerAnalysis<>(body, 2, MaxZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.constantValuePropagation.out");
@@ -38,7 +34,7 @@ public class MaxZoneNumericalTest extends AbstractNumericalTest {
     void testSMTFormulaReportWithConstantMathPropagation() {
         Body body = JimpleProvider.binaryArithmaticMethod("moreConstantMath");
         IntegerAnalysis<MaxZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, new MaxZoneStateFactory());
+            new IntegerAnalysis<>(body, 2, MaxZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.constantMathPropagation.out");
@@ -49,7 +45,7 @@ public class MaxZoneNumericalTest extends AbstractNumericalTest {
     void testSMTWhenBranching() {
         Body body = JimpleProvider.simpleIfStatement("anotherSimpleIf");
         IntegerAnalysis<MaxZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, new MaxZoneStateFactory());
+            new IntegerAnalysis<>(body, 2, MaxZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.branching.out");
@@ -60,7 +56,7 @@ public class MaxZoneNumericalTest extends AbstractNumericalTest {
     void testSMTWhenLooping() {
         Body body = JimpleProvider.simpleLoopStatement("anotherSimpleLoop");
         IntegerAnalysis<MaxZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, new MaxZoneStateFactory());
+            new IntegerAnalysis<>(body, 2, MaxZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.looping.out");
@@ -71,7 +67,7 @@ public class MaxZoneNumericalTest extends AbstractNumericalTest {
     void testSMTExample5() {
         Body body = JimpleProvider.example5();
         IntegerAnalysis<MaxZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, new MaxZoneStateFactory());
+            new IntegerAnalysis<>(body, 2, MaxZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.example5.out");
@@ -82,7 +78,7 @@ public class MaxZoneNumericalTest extends AbstractNumericalTest {
     void testNonsenseExample() {
         Body body = JimpleProvider.nonsense();
         IntegerAnalysis<MaxZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, new MaxZoneStateFactory());
+            new IntegerAnalysis<>(body, 2, MaxZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.nonsenseExample.out");
@@ -93,7 +89,7 @@ public class MaxZoneNumericalTest extends AbstractNumericalTest {
     void testNeqLoop() {
         Body body = JimpleProvider.neqLoop();
         IntegerAnalysis<MaxZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, new MaxZoneStateFactory());
+            new IntegerAnalysis<>(body, 2, MaxZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.neqLoop.out");
@@ -104,7 +100,7 @@ public class MaxZoneNumericalTest extends AbstractNumericalTest {
     void testGetArrowSubset() {
         Body body = JimpleProvider.ballonGetArrow();
         IntegerAnalysis<MaxZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, new MaxZoneStateFactory());
+            new IntegerAnalysis<>(body, 2, MaxZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.getArrowSubset.out");
@@ -115,7 +111,7 @@ public class MaxZoneNumericalTest extends AbstractNumericalTest {
     void testIntervalComparison() {
         Body body = JimpleProvider.intervalComparison();
         IntegerAnalysis<MaxZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, new MaxZoneStateFactory());
+            new IntegerAnalysis<>(body, 2, MaxZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.intervalComparison.out");
@@ -126,7 +122,7 @@ public class MaxZoneNumericalTest extends AbstractNumericalTest {
     void testTransverseZero() {
         Body body = JimpleProvider.transverseZero();
         IntegerAnalysis<MaxZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, new MaxZoneStateFactory());
+            new IntegerAnalysis<>(body, 2, MaxZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.transverseZero.out");
@@ -137,7 +133,7 @@ public class MaxZoneNumericalTest extends AbstractNumericalTest {
     void testFibonacci() {
         Body body = JimpleProvider.fibonacci();
         IntegerAnalysis<MaxZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, new MaxZoneStateFactory());
+            new IntegerAnalysis<>(body, 2, MaxZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.fibonacci.out");
@@ -148,7 +144,7 @@ public class MaxZoneNumericalTest extends AbstractNumericalTest {
     void testTribonacci() {
         Body body = JimpleProvider.tribonacci();
         IntegerAnalysis<MaxZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, new MaxZoneStateFactory());
+            new IntegerAnalysis<>(body, 2, MaxZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.tribonacci.out");
@@ -159,7 +155,7 @@ public class MaxZoneNumericalTest extends AbstractNumericalTest {
     void testFactorial() {
         Body body = JimpleProvider.factorial();
         IntegerAnalysis<MaxZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, new MaxZoneStateFactory());
+            new IntegerAnalysis<>(body, 2, MaxZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.factorial.out");
@@ -171,7 +167,7 @@ public class MaxZoneNumericalTest extends AbstractNumericalTest {
     void testDecode() {
         Body body = JimpleProvider.decode();
         IntegerAnalysis<MaxZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, new MaxZoneStateFactory());
+            new IntegerAnalysis<>(body, 2, MaxZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.decode.out");
@@ -182,7 +178,7 @@ public class MaxZoneNumericalTest extends AbstractNumericalTest {
     void testSwap() {
         Body body = JimpleProvider.swap();
         IntegerAnalysis<MaxZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, new MaxZoneStateFactory());
+            new IntegerAnalysis<>(body, 2, MaxZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.swap.out");

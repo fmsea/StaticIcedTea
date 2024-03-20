@@ -1,5 +1,9 @@
 package driver.commands;
 
+import abstractinterp.scalar.state.IncZoneStateWithChangePriority;
+import abstractinterp.scalar.state.factory.IncZoneStateWithChangePriorityFactory;
+import driver.AnalysisOptions;
+import driver.AnalysisOptionsBuilder;
 import driver.IncZoneWithChangePriorityAnalysisRunner;
 import driver.util.SootInitialization;
 import picocli.CommandLine.Command;
@@ -12,12 +16,17 @@ public class StartIncZoneWithChangePriorityNumericalCommand extends NumericalAna
     @Override
     public Integer call() throws Exception {
         SootInitialization.initializeSoot(className, classpath);
-        Runnable runner = new IncZoneWithChangePriorityAnalysisRunner(
-            className,
-            methodId,
-            outputResultsPath,
-            outputReport,
-            widenIterations);
+        AnalysisOptions options = new AnalysisOptionsBuilder()
+            .withClassName(className)
+            .withMethodId(methodId)
+            .withOutputResultsPath(outputResultsPath)
+            .withOutputStateReports(outputReport)
+            .withWidenIterations(widenIterations)
+            .withWidenSteps(widenSteps)
+            .withStateType(IncZoneStateWithChangePriority.class)
+            .withOrderer(orderer)
+            .build();
+        Runnable runner = new IncZoneWithChangePriorityAnalysisRunner(options);
         runner.run();
         return 0;
     }

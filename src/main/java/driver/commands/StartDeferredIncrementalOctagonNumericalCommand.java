@@ -1,5 +1,8 @@
 package driver.commands;
 
+import abstractinterp.scalar.state.DeferredIncrementalOctagonState;
+import driver.AnalysisOptions;
+import driver.AnalysisOptionsBuilder;
 import driver.DeferredIncrementalOctagonAnalysisRunner;
 import driver.util.SootInitialization;
 import picocli.CommandLine.Command;
@@ -13,15 +16,18 @@ public class StartDeferredIncrementalOctagonNumericalCommand extends NumericalAn
     @Override
     public Integer call() throws Exception {
         SootInitialization.initializeSoot(className, classpath);
-        Properties.IncrementalClosureAlgorithm = Properties.IncrementalClosureAlgorithm.SEARCH;
-        Runnable runner = new DeferredIncrementalOctagonAnalysisRunner(
-            className,
-            methodId,
-            outputResultsPath,
-            outputReport,
-            widenIterations,
-            widenSteps,
-            orderer);
+        Properties.IncrementalClosureAlgorithm = Properties.OctagonIncrementalClosureAlgorithm.SEARCH;
+        AnalysisOptions options = new AnalysisOptionsBuilder()
+            .withClassName(className)
+            .withMethodId(methodId)
+            .withOutputResultsPath(outputResultsPath)
+            .withOutputStateReports(outputReport)
+            .withWidenIterations(widenIterations)
+            .withWidenSteps(widenSteps)
+            .withStateType(DeferredIncrementalOctagonState.class)
+            .withOrderer(orderer)
+            .build();
+        Runnable runner = new DeferredIncrementalOctagonAnalysisRunner(options);
         runner.run();
         return 0;
     }

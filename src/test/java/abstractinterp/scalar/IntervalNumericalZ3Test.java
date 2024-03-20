@@ -1,37 +1,33 @@
 package abstractinterp.scalar;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.BufferedReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.io.FileWriter;
-import java.io.StringReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
 import java.util.concurrent.TimeUnit;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import soot.Body;
-import soot.Scene;
-
 import abstractinterp.scalar.state.IntervalBoxState;
-import abstractinterp.scalar.state.factory.IntervalBoxStateFactory;
 import abstractinterp.scalar.state.providers.JimpleProvider;
 import processing.Smt2FormatReachable;
 import solver.SolverWrapper;
 import solver.SolverWrapperZ3;
+import soot.Body;
+import soot.Scene;
 
 public class IntervalNumericalZ3Test extends AbstractNumericalTest {
 
@@ -103,7 +99,7 @@ public class IntervalNumericalZ3Test extends AbstractNumericalTest {
 
     private boolean runAnalysis(Body body, String oracle, String expectedZ3Output) {
         IntegerAnalysis<IntervalBoxState> analysis =
-            new IntegerAnalysis<>(this.solver, body, 2, new IntervalBoxStateFactory());
+            new IntegerAnalysis<>(this.solver, body, 2, IntervalBoxState.class);
         analysis.runAnalysis();
         Reader actual = new StringReader(generateReport(analysis));
         Reader expected = new StringReader(oracle);

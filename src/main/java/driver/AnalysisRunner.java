@@ -1,36 +1,26 @@
 package driver;
 
 import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.FileWriter;
 import java.io.File;
-import java.io.Reader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
-import java.util.stream.Collectors;
 
-import abstractinterp.scalar.IntegerAnalysis;
-import abstractinterp.scalar.state.State;
-import abstractinterp.scalar.state.factory.StateFactory;
-import driver.util.OrdererFactory;
-import driver.util.SootInitialization;
-import solver.SolverFactory;
-import util.AnalysisTimer;
-import util.Configuration;
-import soot.Body;
-import soot.Scene;
-import soot.SootClass;
-import soot.SootMethod;
-import soot.Unit;
-import soot.toolkits.graph.Orderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AnalysisRunner<S extends State>  implements Runnable {
+import abstractinterp.scalar.IntegerAnalysis;
+import abstractinterp.scalar.state.State;
+import driver.util.OrdererFactory;
+import driver.util.SootInitialization;
+import solver.SolverFactory;
+import soot.Body;
+import soot.SootMethod;
+import util.AnalysisTimer;
+import util.Configuration;
+
+public class AnalysisRunner<S extends State>  implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(AnalysisRunner.class);
     private final String className;
     private final int methodId;
@@ -41,68 +31,21 @@ public abstract class AnalysisRunner<S extends State>  implements Runnable {
     private final boolean outputStateReports;
     private final Set<Integer> widenSteps;
 
-    public AnalysisRunner(String className,
-                          int methodId,
-                          Path outputResultsPath,
-                          StateFactory<S> factory) {
-        this(className, methodId, outputResultsPath, factory, true);
-    }
-
-    public AnalysisRunner(String className,
-                          int methodId,
-                          Path outputResultsPath,
-                          StateFactory<S> factory,
-                          boolean outputStateReports) {
-        this(className, methodId, outputResultsPath, factory, outputStateReports, 2);
-    }
-
-    public AnalysisRunner(String className,
-                          int methodId,
-                          Path outputResultsPath,
-                          StateFactory<S> factory,
-                          boolean outputStateReports,
-                          int widenIterations) {
-        this(className, methodId, outputResultsPath, factory, outputStateReports, widenIterations, Set.of());
-    }
-
-    public AnalysisRunner(String className,
-                          int methodId,
-                          Path outputResultsPath,
-                          StateFactory<S> factory,
-                          boolean outputStateReports,
-                          int widenIterations,
-                          Set<Integer> widenSteps) {
-        this(className,
-             methodId,
-             outputResultsPath,
-             factory,
-             outputStateReports,
-             widenIterations,
-             widenSteps,
-             OrdererFactory.pseudoTopological());
-    }
-
-    public AnalysisRunner(String className,
-                          int methodId,
-                          Path outputResultsPath,
-                          StateFactory<S> factory,
-                          boolean outputStateReports,
-                          int widenIterations,
-                          Set<Integer> widenSteps,
-                          Orderer<Unit> orderer) {
-        this.className = className;
-        this.methodId = methodId;
-        this.outputResultsPath = outputResultsPath;
+    public AnalysisRunner(AnalysisOptions options) {
+        this.className = options.className;
+        this.methodId = options.methodId;
+        this.outputResultsPath = options.outputResultsPath;
         this.sootMethod = SootInitialization.getSootMethod(className, methodId);
         this.body = this.sootMethod.retrieveActiveBody();
-        this.widenSteps = widenSteps == null ? Set.of() : widenSteps;
-        this.analysis = new IntegerAnalysis<>(SolverFactory.getSolver(),
-                                              this.body,
-                                              widenIterations,
-                                              factory,
-                                              this.widenSteps,
-                                              orderer);
-        this.outputStateReports = outputStateReports;
+        this.widenSteps = options.widenSteps.orElse(Set.of());
+        this.analysis = new IntegerAnalysis<>(
+            SolverFactory.getSolver(),
+            this.body,
+            options.widenIterations,
+            options.stateType,
+            this.widenSteps,
+            OrdererFactory.get(options.orderer));
+        this.outputStateReports = options.outputStateReports;
     }
 
     public void run() {

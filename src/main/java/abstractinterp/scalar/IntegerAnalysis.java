@@ -37,37 +37,34 @@ public class IntegerAnalysis<S extends State> implements Analysis {
     private SolverWrapper solver;
     private Set<Local> locals;
 
-    public IntegerAnalysis(Body b, int iterations, StateFactory<S> stateFactory) {
-        this(SolverFactory.getSolver(), b, iterations, stateFactory, Set.of());
+    public IntegerAnalysis(Body b, int iterations, Class<?> type) {
+        this(SolverFactory.getSolver(), b, iterations, type, Set.of());
     }
 
-    public IntegerAnalysis(Body b, int iterations, StateFactory<S> stateFactory, Set<Integer> widenSteps) {
-        this(SolverFactory.getSolver(), b, iterations, stateFactory, widenSteps);
+    public IntegerAnalysis(Body b, int iterations, Class<?> type, Set<Integer> widenSteps) {
+        this(SolverFactory.getSolver(), b, iterations, type, widenSteps);
     }
 
-    public IntegerAnalysis(SolverWrapper solver, Body b, int iterations, StateFactory<S> stateFactory) {
-        this(solver, b, iterations, stateFactory, Set.of());
+    public IntegerAnalysis(SolverWrapper solver, Body b, int iterations, Class<?> type) {
+        this(solver, b, iterations, type, Set.of());
     }
 
-    public IntegerAnalysis(SolverWrapper solver,
-                           Body b,
-                           int iterations,
-                           StateFactory<S> stateFactory,
-                           Set<Integer> widenSteps) {
-        this(solver,
-             b,
-             iterations,
-             stateFactory,
-             widenSteps,
-             new PseudoTopologicalOrderer<>());
+    public IntegerAnalysis(
+        SolverWrapper solver,
+        Body b,
+        int iterations,
+        Class<?> type,
+        Set<Integer> widenSteps) {
+        this(solver, b, iterations, type, widenSteps, new PseudoTopologicalOrderer<>());
     }
 
-    public IntegerAnalysis(SolverWrapper solver,
-                           Body b,
-                           int iterations,
-                           StateFactory<S> stateFactory,
-                           Set<Integer> widenSteps,
-                           Orderer<Unit> orderer) {
+    public IntegerAnalysis(
+        SolverWrapper solver,
+        Body b,
+        int iterations,
+        Class<?> type,
+        Set<Integer> widenSteps,
+        Orderer<Unit> orderer) {
         this.solver = solver;
         this.b = b;
         this.g = new ExceptionalUnitGraph(b);
@@ -89,16 +86,17 @@ public class IntegerAnalysis<S extends State> implements Analysis {
             wideningNode.add(loopIterator.next().getHead());
         }
 
-        analysis = new ForwardBranchedFlowNumerical<>(g,
-                                                      order,
-                                                      unitToBeforeFlow,
-                                                      unitToAfterBranchFlow,
-                                                      unitToAfterFallFlow,
-                                                      wideningNode,
-                                                      iterations,
-                                                      locals,
-                                                      widenSteps,
-                                                      stateFactory);
+        analysis = new ForwardBranchedFlowNumerical<>(
+            g,
+            order,
+            unitToBeforeFlow,
+            unitToAfterBranchFlow,
+            unitToAfterFallFlow,
+            wideningNode,
+            iterations,
+            locals,
+            widenSteps,
+            StateFactory.getFactory(type));
 
         // setup the flows
         for (Unit node : order) {
