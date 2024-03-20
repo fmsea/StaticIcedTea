@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import abstractinterp.scalar.IntegerAnalysis;
-import abstractinterp.scalar.state.State;
 import driver.util.OrdererFactory;
 import driver.util.SootInitialization;
 import solver.SolverFactory;
@@ -20,14 +19,14 @@ import soot.SootMethod;
 import util.AnalysisTimer;
 import util.Configuration;
 
-public class AnalysisRunner<S extends State>  implements Runnable {
+public class AnalysisRunner  implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(AnalysisRunner.class);
     private final String className;
     private final int methodId;
     private final Path outputResultsPath;
     private final SootMethod sootMethod;
     private final Body body;
-    private final IntegerAnalysis<S> analysis;
+    private final IntegerAnalysis analysis;
     private final boolean outputStateReports;
     private final Set<Integer> widenSteps;
 
@@ -38,7 +37,7 @@ public class AnalysisRunner<S extends State>  implements Runnable {
         this.sootMethod = SootInitialization.getSootMethod(className, methodId);
         this.body = this.sootMethod.retrieveActiveBody();
         this.widenSteps = options.widenSteps.orElse(Set.of());
-        this.analysis = new IntegerAnalysis<>(
+        this.analysis = new IntegerAnalysis(
             SolverFactory.getSolver(),
             this.body,
             options.widenIterations,

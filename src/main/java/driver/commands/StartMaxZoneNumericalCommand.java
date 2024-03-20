@@ -1,10 +1,9 @@
 package driver.commands;
 
 import abstractinterp.scalar.state.MaxZoneState;
-import abstractinterp.scalar.state.factory.MaxZoneStateFactory;
 import driver.AnalysisOptions;
 import driver.AnalysisOptionsBuilder;
-import driver.MaxAnalysisRunner;
+import driver.AnalysisRunner;
 import driver.util.SootInitialization;
 import picocli.CommandLine.Command;
 
@@ -27,7 +26,7 @@ public class StartMaxZoneNumericalCommand extends NumericalAnalysisCommand {
             .withOrderer(orderer)
             .withReduceOutput(reduceOutput)
             .build();
-        Runnable runner = new MaxAnalysisRunner(options);
+        Runnable runner = new AnalysisRunner(options);
         runner.run();
         return 0;
     }

@@ -65,10 +65,8 @@ public class ZoneIntervalComparativeTest extends AbstractNumericalTest {
     @Test
     void testConstantValue() {
         Body body = JimpleProvider.constantJimpleMethod("z3_constant_test");
-        IntegerAnalysis<ZoneState> zoneAnalysis =
-            new IntegerAnalysis<>(this.solver, body, 2, ZoneState.class);
-        IntegerAnalysis<IntervalBoxState> intervalAnalysis =
-            new IntegerAnalysis<>(this.solver, body, 2, IntervalBoxState.class);
+        IntegerAnalysis zoneAnalysis = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
+        IntegerAnalysis intervalAnalysis = new IntegerAnalysis(this.solver, body, 2, IntervalBoxState.class);
         zoneAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.constantValuePropagation.smt.out");
@@ -80,10 +78,8 @@ public class ZoneIntervalComparativeTest extends AbstractNumericalTest {
     @Test
     void testConstantArithmatic() {
         Body body = JimpleProvider.binaryArithmaticMethod("z3ConstantMath");
-        IntegerAnalysis<ZoneState> zoneAnalysis =
-            new IntegerAnalysis<>(this.solver, body, 2, ZoneState.class);
-        IntegerAnalysis<IntervalBoxState> intervalAnalysis =
-            new IntegerAnalysis<>(this.solver, body, 2, IntervalBoxState.class);
+        IntegerAnalysis zoneAnalysis = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
+        IntegerAnalysis intervalAnalysis = new IntegerAnalysis(this.solver, body, 2, IntervalBoxState.class);
         zoneAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.constantMathPropagation.smt.out");
@@ -95,10 +91,8 @@ public class ZoneIntervalComparativeTest extends AbstractNumericalTest {
     @Test
     void testBranchingStatement() {
         Body body = JimpleProvider.simpleIfStatement("z3_simpleIf");
-        IntegerAnalysis<ZoneState> zoneAnalysis =
-            new IntegerAnalysis<>(this.solver, body, 2, ZoneState.class);
-        IntegerAnalysis<IntervalBoxState> intervalAnalysis =
-            new IntegerAnalysis<>(this.solver, body, 2, IntervalBoxState.class);
+        IntegerAnalysis zoneAnalysis = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
+        IntegerAnalysis intervalAnalysis = new IntegerAnalysis(this.solver, body, 2, IntervalBoxState.class);
         zoneAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.branching.smt.out");
@@ -110,10 +104,8 @@ public class ZoneIntervalComparativeTest extends AbstractNumericalTest {
     @Test
     void testLoopingStatement() {
         Body body = JimpleProvider.simpleLoopStatement("z3_simple_loop");
-        IntegerAnalysis<ZoneState> zoneAnalysis =
-            new IntegerAnalysis<>(this.solver, body, 2, ZoneState.class);
-        IntegerAnalysis<IntervalBoxState> intervalAnalysis =
-            new IntegerAnalysis<>(this.solver, body, 2, IntervalBoxState.class);
+        IntegerAnalysis zoneAnalysis = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
+        IntegerAnalysis intervalAnalysis = new IntegerAnalysis(this.solver, body, 2, IntervalBoxState.class);
         zoneAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.looping.smt.out");
@@ -125,10 +117,8 @@ public class ZoneIntervalComparativeTest extends AbstractNumericalTest {
     @Test
     void testExample5() {
         Body body = JimpleProvider.example5();
-        IntegerAnalysis<ZoneState> zoneAnalysis =
-            new IntegerAnalysis<>(this.solver, body, 2, ZoneState.class);
-        IntegerAnalysis<IntervalBoxState> intervalAnalysis =
-            new IntegerAnalysis<>(this.solver, body, 2, IntervalBoxState.class);
+        IntegerAnalysis zoneAnalysis = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
+        IntegerAnalysis intervalAnalysis = new IntegerAnalysis(this.solver, body, 2, IntervalBoxState.class);
         zoneAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.example5.smt.out");
@@ -140,10 +130,8 @@ public class ZoneIntervalComparativeTest extends AbstractNumericalTest {
     @Test
     void testNonsenseExample() {
         Body body = JimpleProvider.nonsense();
-        IntegerAnalysis<ZoneState> zoneAnalysis =
-            new IntegerAnalysis<>(this.solver, body, 2, ZoneState.class);
-        IntegerAnalysis<IntervalBoxState> intervalAnalysis =
-            new IntegerAnalysis<>(this.solver, body, 2, IntervalBoxState.class);
+        IntegerAnalysis zoneAnalysis = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
+        IntegerAnalysis intervalAnalysis = new IntegerAnalysis(this.solver, body, 2, IntervalBoxState.class);
         zoneAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.nonsenseExample.smt.out");
@@ -155,10 +143,8 @@ public class ZoneIntervalComparativeTest extends AbstractNumericalTest {
     @Test
     void testNeqLoop() {
         Body body = JimpleProvider.neqLoop();
-        IntegerAnalysis<ZoneState> zoneAnalysis =
-            new IntegerAnalysis<>(this.solver, body, 2, ZoneState.class);
-        IntegerAnalysis<IntervalBoxState> intervalAnalysis =
-            new IntegerAnalysis<>(this.solver, body, 2, IntervalBoxState.class);
+        IntegerAnalysis zoneAnalysis = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
+        IntegerAnalysis intervalAnalysis = new IntegerAnalysis(this.solver, body, 2, IntervalBoxState.class);
         zoneAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.neqLoop.smt.out");
@@ -170,10 +156,8 @@ public class ZoneIntervalComparativeTest extends AbstractNumericalTest {
     @Test
     void testGetArrowSubset() {
         Body body = JimpleProvider.ballonGetArrow();
-        IntegerAnalysis<ZoneState> zoneAnalysis =
-            new IntegerAnalysis<>(this.solver, body, 2, ZoneState.class);
-        IntegerAnalysis<IntervalBoxState> intervalAnalysis =
-            new IntegerAnalysis<>(this.solver, body, 2, IntervalBoxState.class);
+        IntegerAnalysis zoneAnalysis = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
+        IntegerAnalysis intervalAnalysis = new IntegerAnalysis(this.solver, body, 2, IntervalBoxState.class);
         zoneAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.getArrowSubset.smt.out");
@@ -185,10 +169,8 @@ public class ZoneIntervalComparativeTest extends AbstractNumericalTest {
     @Test
     void testIntervalComparison() {
         Body body = JimpleProvider.intervalComparison();
-        IntegerAnalysis<ZoneState> zoneAnalysis =
-            new IntegerAnalysis<>(this.solver, body, 2, ZoneState.class);
-        IntegerAnalysis<IntervalBoxState> intervalAnalysis =
-            new IntegerAnalysis<>(this.solver, body, 2, IntervalBoxState.class);
+        IntegerAnalysis zoneAnalysis = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
+        IntegerAnalysis intervalAnalysis = new IntegerAnalysis(this.solver, body, 2, IntervalBoxState.class);
         zoneAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.intervalComparison.smt.out");
@@ -200,10 +182,8 @@ public class ZoneIntervalComparativeTest extends AbstractNumericalTest {
     @Test
     void testFibonacci() {
         Body body = JimpleProvider.fibonacci();
-        IntegerAnalysis<ZoneState> zoneAnalysis =
-            new IntegerAnalysis<>(this.solver, body, 2, ZoneState.class);
-        IntegerAnalysis<IntervalBoxState> intervalAnalysis =
-            new IntegerAnalysis<>(this.solver, body, 2, IntervalBoxState.class);
+        IntegerAnalysis zoneAnalysis = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
+        IntegerAnalysis intervalAnalysis = new IntegerAnalysis(this.solver, body, 2, IntervalBoxState.class);
         zoneAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile("pado01.int.fibonacci.smt.out");

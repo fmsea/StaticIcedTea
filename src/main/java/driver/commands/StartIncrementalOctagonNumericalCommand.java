@@ -3,7 +3,7 @@ package driver.commands;
 import abstractinterp.scalar.state.IncrementalOctagonState;
 import driver.AnalysisOptions;
 import driver.AnalysisOptionsBuilder;
-import driver.IncrementalOctagonAnalysisRunner;
+import driver.AnalysisRunner;
 import driver.util.SootInitialization;
 import picocli.CommandLine.Command;
 import util.Properties;
@@ -28,7 +28,7 @@ public class StartIncrementalOctagonNumericalCommand extends NumericalAnalysisCo
             .withOrderer(orderer)
             .withReduceOutput(reduceOutput)
             .build();
-        Runnable runner = new IncrementalOctagonAnalysisRunner(options);
+        Runnable runner = new AnalysisRunner(options);
         runner.run();
         return 0;
     }

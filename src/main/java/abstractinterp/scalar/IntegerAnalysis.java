@@ -29,11 +29,11 @@ import soot.toolkits.graph.Orderer;
 import soot.toolkits.graph.PseudoTopologicalOrderer;
 import soot.toolkits.graph.UnitGraph;
 
-public class IntegerAnalysis<S extends State> implements Analysis {
+public class IntegerAnalysis implements Analysis {
 
     protected Body b;
     UnitGraph g;
-    ForwardBranchedFlowNumerical<S> analysis;
+    ForwardBranchedFlowNumerical<State> analysis;
     private SolverWrapper solver;
     private Set<Local> locals;
     private final boolean reduceOutput;
@@ -83,9 +83,9 @@ public class IntegerAnalysis<S extends State> implements Analysis {
         this.reduceOutput = reduceOutput;
 
         List<Unit> order = orderer.newList(g, false);
-        Map<Unit, S> unitToBeforeFlow = new HashMap<>();
-        Map<Unit, List<S>> unitToAfterBranchFlow = new HashMap<>();
-        Map<Unit, List<S>> unitToAfterFallFlow = new HashMap<>();
+        Map<Unit, State> unitToBeforeFlow = new HashMap<>();
+        Map<Unit, List<State>> unitToAfterBranchFlow = new HashMap<>();
+        Map<Unit, List<State>> unitToAfterFallFlow = new HashMap<>();
         Set<Unit> wideningNode = new HashSet<>();
         this.locals = new HashSet<>();
         for (Local l : b.getLocals()) {
@@ -99,7 +99,7 @@ public class IntegerAnalysis<S extends State> implements Analysis {
             wideningNode.add(loopIterator.next().getHead());
         }
 
-        analysis = new ForwardBranchedFlowNumerical<>(
+        analysis = new ForwardBranchedFlowNumerical<State>(
             g,
             order,
             unitToBeforeFlow,
@@ -114,7 +114,7 @@ public class IntegerAnalysis<S extends State> implements Analysis {
         // setup the flows
         for (Unit node : order) {
             unitToBeforeFlow.put(node, analysis.newInitialFlow());
-            List<S> f = new ArrayList<>();
+            List<State> f = new ArrayList<>();
             unitToAfterFallFlow.put(node, f);
             if (node.fallsThrough()) {
                 f.add(analysis.newInitialFlow());
@@ -154,8 +154,8 @@ public class IntegerAnalysis<S extends State> implements Analysis {
             State state = analysis.getFallFlowAfter(u);
             String fallOutput = Paths.get(output.toString(), String.format("/%d-fall.dot", stmtCount)).toString();
             state.toGraph().toDot(fallOutput);
-            List<S> branches = analysis.getBranchFlowAfter(u);
-            for (S branch : branches) {
+            List<State> branches = analysis.getBranchFlowAfter(u);
+            for (State branch : branches) {
                 String branchOutput = Paths.get(output.toString(), String.format("/%d-branch.dot", stmtCount)).toString();
                 branch.toGraph().toDot(branchOutput);
             }
@@ -182,7 +182,7 @@ public class IntegerAnalysis<S extends State> implements Analysis {
                 writer.write(":");
                 writer.write(methodSignature);
                 writer.write('\n');
-                S state = analysis.getFallFlowAfter(u);
+                State state = analysis.getFallFlowAfter(u);
                 writer.write("fall\t");
                 writer.write(this.analysis.getFallMinChangedVariables(u)
                           .map(vars -> vars
@@ -196,8 +196,8 @@ public class IntegerAnalysis<S extends State> implements Analysis {
                 }
                 writer.write(state.toSMT(this.solver));
                 writer.write("\n");
-                List<S> branches = analysis.getBranchFlowAfter(u);
-                for (S branch : branches) {
+                List<State> branches = analysis.getBranchFlowAfter(u);
+                for (State branch : branches) {
                     writer.write("branch\t");
                     writer.write(this.analysis.getBranchMinChangedVariables(u)
                               .map(vars -> vars

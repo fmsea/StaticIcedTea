@@ -3,7 +3,7 @@ package driver.commands;
 import abstractinterp.scalar.state.IncZoneState;
 import driver.AnalysisOptions;
 import driver.AnalysisOptionsBuilder;
-import driver.IncZoneAnalysisRunner;
+import driver.AnalysisRunner;
 import driver.util.SootInitialization;
 import picocli.CommandLine.Command;
 
@@ -26,7 +26,7 @@ public class StartIncZoneNumericalCommand extends NumericalAnalysisCommand {
             .withOrderer(orderer)
             .withReduceOutput(reduceOutput)
             .build();
-        Runnable runner = new IncZoneAnalysisRunner(options);
+        Runnable runner = new AnalysisRunner(options);
         runner.run();
         return 0;
     }

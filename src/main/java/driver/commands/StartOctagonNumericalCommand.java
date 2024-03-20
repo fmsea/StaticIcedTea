@@ -3,7 +3,7 @@ package driver.commands;
 import abstractinterp.scalar.state.DefaultOctagonState;
 import driver.AnalysisOptions;
 import driver.AnalysisOptionsBuilder;
-import driver.OctagonAnalysisRunner;
+import driver.AnalysisRunner;
 import driver.util.SootInitialization;
 import picocli.CommandLine.Command;
 
@@ -26,7 +26,7 @@ public class StartOctagonNumericalCommand extends NumericalAnalysisCommand {
             .withOrderer(orderer)
             .withReduceOutput(reduceOutput)
             .build();
-        Runnable runner = new OctagonAnalysisRunner(options);
+        Runnable runner = new AnalysisRunner(options);
         runner.run();
         return 0;
     }

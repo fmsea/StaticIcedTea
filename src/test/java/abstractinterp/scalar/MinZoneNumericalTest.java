@@ -22,8 +22,7 @@ public class MinZoneNumericalTest extends AbstractNumericalTest {
     @Test
     void testSMTFormulaReportWithConstantValuePropagation() {
         Body body = JimpleProvider.constantJimpleMethod("constant_test", true);
-        IntegerAnalysis<MinZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, MinZoneState.class);
+        IntegerAnalysis analysis = new IntegerAnalysis(body, 2, MinZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.constantValuePropagation.out");
@@ -33,8 +32,7 @@ public class MinZoneNumericalTest extends AbstractNumericalTest {
     @Test
     void testSMTFormulaReportWithConstantMathPropagation() {
         Body body = JimpleProvider.binaryArithmaticMethod("moreConstantMath");
-        IntegerAnalysis<MinZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, MinZoneState.class);
+        IntegerAnalysis analysis = new IntegerAnalysis(body, 2, MinZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.constantMathPropagation.out");
@@ -44,8 +42,7 @@ public class MinZoneNumericalTest extends AbstractNumericalTest {
     @Test
     void testSMTWhenBranching() {
         Body body = JimpleProvider.simpleIfStatement("anotherSimpleIf");
-        IntegerAnalysis<MinZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, MinZoneState.class);
+        IntegerAnalysis analysis = new IntegerAnalysis(body, 2, MinZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.branching.out");
@@ -55,8 +52,7 @@ public class MinZoneNumericalTest extends AbstractNumericalTest {
     @Test
     void testSMTWhenLooping() {
         Body body = JimpleProvider.simpleLoopStatement("anotherSimpleLoop");
-        IntegerAnalysis<MinZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, MinZoneState.class);
+        IntegerAnalysis analysis = new IntegerAnalysis(body, 2, MinZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.looping.out");
@@ -66,8 +62,7 @@ public class MinZoneNumericalTest extends AbstractNumericalTest {
     @Test
     void testSMTExample5() {
         Body body = JimpleProvider.example5();
-        IntegerAnalysis<MinZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, MinZoneState.class);
+        IntegerAnalysis analysis = new IntegerAnalysis(body, 2, MinZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.example5.out");
@@ -77,8 +72,7 @@ public class MinZoneNumericalTest extends AbstractNumericalTest {
     @Test
     void testNonsenseExample() {
         Body body = JimpleProvider.nonsense();
-        IntegerAnalysis<MinZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, MinZoneState.class);
+        IntegerAnalysis analysis = new IntegerAnalysis(body, 2, MinZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.nonsenseExample.out");
@@ -88,8 +82,7 @@ public class MinZoneNumericalTest extends AbstractNumericalTest {
     @Test
     void testNeqLoop() {
         Body body = JimpleProvider.neqLoop();
-        IntegerAnalysis<MinZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, MinZoneState.class);
+        IntegerAnalysis analysis = new IntegerAnalysis(body, 2, MinZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.neqLoop.out");
@@ -99,8 +92,7 @@ public class MinZoneNumericalTest extends AbstractNumericalTest {
     @Test
     void testGetArrowSubset() {
         Body body = JimpleProvider.ballonGetArrow();
-        IntegerAnalysis<MinZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, MinZoneState.class);
+        IntegerAnalysis analysis = new IntegerAnalysis(body, 2, MinZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.getArrowSubset.out");
@@ -110,8 +102,7 @@ public class MinZoneNumericalTest extends AbstractNumericalTest {
     @Test
     void testIntervalComparison() {
         Body body = JimpleProvider.intervalComparison();
-        IntegerAnalysis<MinZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, MinZoneState.class);
+        IntegerAnalysis analysis = new IntegerAnalysis(body, 2, MinZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.intervalComparison.out");
@@ -121,8 +112,7 @@ public class MinZoneNumericalTest extends AbstractNumericalTest {
     @Test
     void testTransverseZero() {
         Body body = JimpleProvider.transverseZero();
-        IntegerAnalysis<MinZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, MinZoneState.class);
+        IntegerAnalysis analysis = new IntegerAnalysis(body, 2, MinZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.transverseZero.out");
@@ -132,8 +122,7 @@ public class MinZoneNumericalTest extends AbstractNumericalTest {
     @Test
     void testFibonacci() {
         Body body = JimpleProvider.fibonacci();
-        IntegerAnalysis<MinZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, MinZoneState.class);
+        IntegerAnalysis analysis = new IntegerAnalysis(body, 2, MinZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.fibonacci.out");
@@ -143,8 +132,7 @@ public class MinZoneNumericalTest extends AbstractNumericalTest {
     @Test
     void testTribonacci() {
         Body body = JimpleProvider.tribonacci();
-        IntegerAnalysis<MinZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, MinZoneState.class);
+        IntegerAnalysis analysis = new IntegerAnalysis(body, 2, MinZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.tribonacci.out");
@@ -154,8 +142,7 @@ public class MinZoneNumericalTest extends AbstractNumericalTest {
     @Test
     void testFactorial() {
         Body body = JimpleProvider.factorial();
-        IntegerAnalysis<MinZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, MinZoneState.class);
+        IntegerAnalysis analysis = new IntegerAnalysis(body, 2, MinZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.factorial.out");
@@ -166,8 +153,7 @@ public class MinZoneNumericalTest extends AbstractNumericalTest {
     @Test
     void testDecode() {
         Body body = JimpleProvider.decode();
-        IntegerAnalysis<MinZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, MinZoneState.class);
+        IntegerAnalysis analysis = new IntegerAnalysis(body, 2, MinZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.decode.out");
@@ -177,8 +163,7 @@ public class MinZoneNumericalTest extends AbstractNumericalTest {
     @Test
     void testSwap() {
         Body body = JimpleProvider.swap();
-        IntegerAnalysis<MinZoneState> analysis =
-            new IntegerAnalysis<>(body, 2, MinZoneState.class);
+        IntegerAnalysis analysis = new IntegerAnalysis(body, 2, MinZoneState.class);
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile("zones.swap.out");

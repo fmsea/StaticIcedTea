@@ -65,10 +65,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
     @Test
     void testConstantValue() {
         Body body = JimpleProvider.constantJimpleMethod("z3_constant_test");
-        IntegerAnalysis<IncZoneState> analysis1 =
-            new IntegerAnalysis<>(this.solver, body, 2, IncZoneState.class);
-        IntegerAnalysis<ZoneState> analysis2 =
-            new IntegerAnalysis<>(this.solver, body, 2, ZoneState.class);
+        IntegerAnalysis analysis1 = new IntegerAnalysis(this.solver, body, 2, IncZoneState.class);
+        IntegerAnalysis analysis2 = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.constantValuePropagation.smt.out");
@@ -80,10 +78,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
     @Test
     void testConstantArithmatic() {
         Body body = JimpleProvider.binaryArithmaticMethod("z3ConstantMath");
-        IntegerAnalysis<IncZoneState> analysis1 =
-            new IntegerAnalysis<>(this.solver, body, 2, IncZoneState.class);
-        IntegerAnalysis<ZoneState> analysis2 =
-            new IntegerAnalysis<>(this.solver, body, 2, ZoneState.class);
+        IntegerAnalysis analysis1 = new IntegerAnalysis(this.solver, body, 2, IncZoneState.class);
+        IntegerAnalysis analysis2 = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.constantMathPropagation.smt.out");
@@ -95,10 +91,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
     @Test
     void testBranchingStatement() {
         Body body = JimpleProvider.simpleIfStatement("z3_simpleIf");
-        IntegerAnalysis<IncZoneState> analysis1 =
-            new IntegerAnalysis<>(this.solver, body, 2, IncZoneState.class);
-        IntegerAnalysis<ZoneState> analysis2 =
-            new IntegerAnalysis<>(this.solver, body, 2, ZoneState.class);
+        IntegerAnalysis analysis1 = new IntegerAnalysis(this.solver, body, 2, IncZoneState.class);
+        IntegerAnalysis analysis2 = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.branching.smt.out");
@@ -110,10 +104,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
     @Test
     void testLoopingStatement() {
         Body body = JimpleProvider.simpleLoopStatement("z3_simple_loop");
-        IntegerAnalysis<IncZoneState> analysis1 =
-            new IntegerAnalysis<>(this.solver, body, 2, IncZoneState.class);
-        IntegerAnalysis<ZoneState> analysis2 =
-            new IntegerAnalysis<>(this.solver, body, 2, ZoneState.class);
+        IntegerAnalysis analysis1 = new IntegerAnalysis(this.solver, body, 2, IncZoneState.class);
+        IntegerAnalysis analysis2 = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.looping.smt.out");
@@ -125,10 +117,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
     @Test
     void testExample5() {
         Body body = JimpleProvider.example5();
-        IntegerAnalysis<IncZoneState> analysis1 =
-            new IntegerAnalysis<>(this.solver, body, 2, IncZoneState.class);
-        IntegerAnalysis<ZoneState> analysis2 =
-            new IntegerAnalysis<>(this.solver, body, 2, ZoneState.class);
+        IntegerAnalysis analysis1 = new IntegerAnalysis(this.solver, body, 2, IncZoneState.class);
+        IntegerAnalysis analysis2 = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.example5.smt.out");
@@ -140,10 +130,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
     @Test
     void testNonsenseExample() {
         Body body = JimpleProvider.nonsense();
-        IntegerAnalysis<IncZoneState> analysis1 =
-            new IntegerAnalysis<>(this.solver, body, 2, IncZoneState.class);
-        IntegerAnalysis<ZoneState> analysis2 =
-            new IntegerAnalysis<>(this.solver, body, 2, ZoneState.class);
+        IntegerAnalysis analysis1 = new IntegerAnalysis(this.solver, body, 2, IncZoneState.class);
+        IntegerAnalysis analysis2 = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.nonsenseExample.smt.out");
@@ -155,10 +143,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
     @Test
     void testNeqLoop() {
         Body body = JimpleProvider.neqLoop();
-        IntegerAnalysis<IncZoneState> analysis1 =
-            new IntegerAnalysis<>(this.solver, body, 2, IncZoneState.class);
-        IntegerAnalysis<ZoneState> analysis2 =
-            new IntegerAnalysis<>(this.solver, body, 2, ZoneState.class);
+        IntegerAnalysis analysis1 = new IntegerAnalysis(this.solver, body, 2, IncZoneState.class);
+        IntegerAnalysis analysis2 = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.neqLoop.smt.out");
@@ -170,10 +156,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
     @Test
     void testGetArrowSubset() {
         Body body = JimpleProvider.ballonGetArrow();
-        IntegerAnalysis<IncZoneState> analysis1 =
-            new IntegerAnalysis<>(this.solver, body, 2, IncZoneState.class);
-        IntegerAnalysis<ZoneState> analysis2 =
-            new IntegerAnalysis<>(this.solver, body, 2, ZoneState.class);
+        IntegerAnalysis analysis1 = new IntegerAnalysis(this.solver, body, 2, IncZoneState.class);
+        IntegerAnalysis analysis2 = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.getArrowSubset.smt.out");
@@ -185,10 +169,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
     @Test
     void testIntervalComparison() {
         Body body = JimpleProvider.intervalComparison();
-        IntegerAnalysis<IncZoneState> analysis1 =
-            new IntegerAnalysis<>(this.solver, body, 2, IncZoneState.class);
-        IntegerAnalysis<ZoneState> analysis2 =
-            new IntegerAnalysis<>(this.solver, body, 2, ZoneState.class);
+        IntegerAnalysis analysis1 = new IntegerAnalysis(this.solver, body, 2, IncZoneState.class);
+        IntegerAnalysis analysis2 = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.intervalComparison.smt.out");
@@ -200,10 +182,8 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
     @Test
     void testFibonacci() {
         Body body = JimpleProvider.fibonacci();
-        IntegerAnalysis<IncZoneState> analysis1 =
-            new IntegerAnalysis<>(this.solver, body, 2, IncZoneState.class);
-        IntegerAnalysis<ZoneState> analysis2 =
-            new IntegerAnalysis<>(this.solver, body, 2, ZoneState.class);
+        IntegerAnalysis analysis1 = new IntegerAnalysis(this.solver, body, 2, IncZoneState.class);
+        IntegerAnalysis analysis2 = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
         analysis1.runAnalysis();
         analysis2.runAnalysis();
         String expected = readResourcesFile("inc.pado01.fibonacci.smt.out");
