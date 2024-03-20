@@ -25,6 +25,7 @@ public class StartIncZoneWithChangePriorityNumericalCommand extends NumericalAna
             .withWidenSteps(widenSteps)
             .withStateType(IncZoneStateWithChangePriority.class)
             .withOrderer(orderer)
+            .withReduceOutput(reduceOutput)
             .build();
         Runnable runner = new IncZoneWithChangePriorityAnalysisRunner(options);
         runner.run();

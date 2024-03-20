@@ -24,6 +24,7 @@ public class StartIncZoneNumericalCommand extends NumericalAnalysisCommand {
             .withWidenSteps(widenSteps)
             .withStateType(IncZoneState.class)
             .withOrderer(orderer)
+            .withReduceOutput(reduceOutput)
             .build();
         Runnable runner = new IncZoneAnalysisRunner(options);
         runner.run();

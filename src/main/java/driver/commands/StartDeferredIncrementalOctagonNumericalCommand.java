@@ -26,6 +26,7 @@ public class StartDeferredIncrementalOctagonNumericalCommand extends NumericalAn
             .withWidenSteps(widenSteps)
             .withStateType(DeferredIncrementalOctagonState.class)
             .withOrderer(orderer)
+            .withReduceOutput(reduceOutput)
             .build();
         Runnable runner = new DeferredIncrementalOctagonAnalysisRunner(options);
         runner.run();

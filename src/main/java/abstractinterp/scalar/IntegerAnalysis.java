@@ -36,6 +36,7 @@ public class IntegerAnalysis<S extends State> implements Analysis {
     ForwardBranchedFlowNumerical<S> analysis;
     private SolverWrapper solver;
     private Set<Local> locals;
+    private final boolean reduceOutput;
 
     public IntegerAnalysis(Body b, int iterations, Class<?> type) {
         this(SolverFactory.getSolver(), b, iterations, type, Set.of());
@@ -65,9 +66,21 @@ public class IntegerAnalysis<S extends State> implements Analysis {
         Class<?> type,
         Set<Integer> widenSteps,
         Orderer<Unit> orderer) {
+        this(solver, b, iterations, type, widenSteps, orderer, true);
+    }
+
+    public IntegerAnalysis(
+        SolverWrapper solver,
+        Body b,
+        int iterations,
+        Class<?> type,
+        Set<Integer> widenSteps,
+        Orderer<Unit> orderer,
+        boolean reduceOutput) {
         this.solver = solver;
         this.b = b;
         this.g = new ExceptionalUnitGraph(b);
+        this.reduceOutput = reduceOutput;
 
         List<Unit> order = orderer.newList(g, false);
         Map<Unit, S> unitToBeforeFlow = new HashMap<>();
@@ -178,7 +191,9 @@ public class IntegerAnalysis<S extends State> implements Analysis {
                                .sorted()
                                .collect(Collectors.joining("\t", "", "\t")))
                           .orElse(""));
-                state.reduce();
+                if (this.reduceOutput) {
+                    state.reduce();
+                }
                 writer.write(state.toSMT(this.solver));
                 writer.write("\n");
                 List<S> branches = analysis.getBranchFlowAfter(u);
@@ -191,7 +206,9 @@ public class IntegerAnalysis<S extends State> implements Analysis {
                                    .sorted()
                                    .collect(Collectors.joining("\t", "", "\t")))
                               .orElse(""));
-                    branch.reduce();
+                    if (this.reduceOutput) {
+                        branch.reduce();
+                    }
                     writer.write(branch.toSMT(this.solver));
                     writer.write("\n");
                 }

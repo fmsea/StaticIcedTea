@@ -25,6 +25,7 @@ public class StartMaxZoneNumericalCommand extends NumericalAnalysisCommand {
             .withWidenSteps(widenSteps)
             .withStateType(MaxZoneState.class)
             .withOrderer(orderer)
+            .withReduceOutput(reduceOutput)
             .build();
         Runnable runner = new MaxAnalysisRunner(options);
         runner.run();

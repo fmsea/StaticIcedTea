@@ -16,6 +16,7 @@ public class AnalysisOptionsBuilder {
     private Class<?> stateType;
     private Optional<Set<Integer>> widenSteps;
     private OrdererType orderer;
+    private boolean reduceOutput;
 
     public AnalysisOptionsBuilder() {
         this.outputStateReports = true;
@@ -64,6 +65,11 @@ public class AnalysisOptionsBuilder {
         return this;
     }
 
+    public AnalysisOptionsBuilder withReduceOutput(boolean reduce) {
+        this.reduceOutput = reduce;
+        return this;
+    }
+
     public AnalysisOptions build() {
         return new AnalysisOptions(
             this.stateType,
@@ -73,6 +79,7 @@ public class AnalysisOptionsBuilder {
             this.outputStateReports,
             this.widenIterations,
             this.widenSteps,
-            this.orderer);
+            this.orderer,
+            this.reduceOutput);
     }
 }

@@ -26,6 +26,7 @@ public class StartIncrementalOctagonNumericalCommand extends NumericalAnalysisCo
             .withWidenSteps(widenSteps)
             .withStateType(IncrementalOctagonState.class)
             .withOrderer(orderer)
+            .withReduceOutput(reduceOutput)
             .build();
         Runnable runner = new IncrementalOctagonAnalysisRunner(options);
         runner.run();

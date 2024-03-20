@@ -17,6 +17,7 @@ public class AnalysisOptions {
     public final int widenIterations;
     public final Optional<Set<Integer>> widenSteps;
     public final OrdererType orderer;
+    public final boolean reduceOutput;
 
     public AnalysisOptions(
         Class<?> stateType,
@@ -26,7 +27,8 @@ public class AnalysisOptions {
         boolean outputStateReports,
         int widenIterations,
         Optional<Set<Integer>> widenSteps,
-        OrdererType orderer) {
+        OrdererType orderer,
+        boolean reduceOutput) {
 
         this.stateType = stateType;
         this.className = className;
@@ -36,5 +38,6 @@ public class AnalysisOptions {
         this.widenIterations = widenIterations;
         this.widenSteps = widenSteps;
         this.orderer = orderer;
+        this.reduceOutput = reduceOutput;
     }
 }

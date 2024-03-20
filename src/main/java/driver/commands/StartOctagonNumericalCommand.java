@@ -24,6 +24,7 @@ public class StartOctagonNumericalCommand extends NumericalAnalysisCommand {
             .withWidenSteps(widenSteps)
             .withStateType(DefaultOctagonState.class)
             .withOrderer(orderer)
+            .withReduceOutput(reduceOutput)
             .build();
         Runnable runner = new OctagonAnalysisRunner(options);
         runner.run();

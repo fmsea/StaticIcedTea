@@ -24,6 +24,7 @@ public class StartIntervalNumericalCommand extends NumericalAnalysisCommand {
             .withWidenSteps(widenSteps)
             .withStateType(IntervalBoxState.class)
             .withOrderer(orderer)
+            .withReduceOutput(reduceOutput)
             .build();
         Runnable runner = new IntervalAnalysisRunner(options);
         runner.run();

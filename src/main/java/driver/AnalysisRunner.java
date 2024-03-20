@@ -44,7 +44,8 @@ public class AnalysisRunner<S extends State>  implements Runnable {
             options.widenIterations,
             options.stateType,
             this.widenSteps,
-            OrdererFactory.get(options.orderer));
+            OrdererFactory.get(options.orderer),
+            options.reduceOutput);
         this.outputStateReports = options.outputStateReports;
     }
 

@@ -27,5 +27,13 @@ public abstract class NumericalAnalysisCommand extends AnalysisCommand {
             converter = OrdererTypeConverter.class)
     protected OrdererType orderer;
 
+    @Option(names = {"--reduce"},
+        description = "Reduce each output state before printing",
+        required = false,
+        defaultValue = "true",
+        fallbackValue = "true",
+        negatable = true)
+    protected boolean reduceOutput;
+
     public abstract Integer call() throws Exception;
 }

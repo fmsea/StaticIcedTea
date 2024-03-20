@@ -24,6 +24,7 @@ public class StartMinZoneNumericalCommand extends NumericalAnalysisCommand {
             .withWidenSteps(widenSteps)
             .withStateType(MinZoneState.class)
             .withOrderer(orderer)
+            .withReduceOutput(reduceOutput)
             .build();
         Runnable runner = new MinZoneAnalysisRunner(options);
         runner.run();

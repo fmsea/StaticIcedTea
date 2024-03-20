@@ -24,6 +24,7 @@ public class StartZoneNumericalCommand extends NumericalAnalysisCommand {
             .withWidenSteps(widenSteps)
             .withStateType(ZoneState.class)
             .withOrderer(orderer)
+            .withReduceOutput(reduceOutput)
             .build();
         Runnable runner = new ZoneAnalysisRunner(options);
         runner.run();
