@@ -68,6 +68,10 @@ public class Interval32Box implements Comparable<Interval32Box> {
         this(lowerBound, upperBound, !areValidBounds(lowerBound, upperBound));
     }
 
+    public Interval32Box copy() {
+        return new Interval32Box(this);
+    }
+
     private Interval32Box(Optional<Integer> lowerBound, Optional<Integer> upperBound, boolean bottom) {
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
