@@ -11,8 +11,12 @@ import soot.jimple.IntConstant;
 
 public class Constraint implements Comparable<Constraint> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Constraint.class);
-    private Optional<Integer> bound;
+    private final Optional<Integer> bound;
     private boolean bottom = false;
+
+    public Constraint(Optional<Integer> bound) {
+        this(bound, false);
+    }
 
     public Constraint(Optional<Integer> bound, boolean bottom) {
         if (bound == null) {
@@ -76,16 +80,6 @@ public class Constraint implements Comparable<Constraint> {
         return c;
     }
 
-    public void makeTop() {
-        this.bottom = false;
-        this.bound = Optional.empty();
-    }
-
-    public void makeBottom() {
-        this.bottom = true;
-        this.bound = Optional.empty();
-    }
-
     public Stream<Constraint> stream() {
         if (this.isTop()) {
             return Stream.of();
@@ -112,15 +106,41 @@ public class Constraint implements Comparable<Constraint> {
 
     public static Constraint add(Constraint x,
                                  Constraint y) {
-        Constraint z = x.copy();
-        z.add(y);
+        Constraint z;
+        if (x.isBottom() || y.isBottom()) {
+            z = Constraint.BOT();
+        } else if (x.isTop() || y.isTop()) {
+            z = Constraint.TOP();
+        } else {
+            try {
+                Optional<Integer> b = x.bound.flatMap(xb -> y.bound.map(yb -> Math.addExact(xb, yb)));
+                z = new Constraint(b);
+            } catch (ArithmeticException ex) {
+                LOGGER.debug("[x = {}, y = {}]", x, y);
+                LOGGER.trace("Overflowed!", ex);
+                z = Constraint.TOP();
+            }
+        }
         return z;
     }
 
     public static Constraint subtract(Constraint x,
                                       Constraint y) {
-        Constraint z = x.copy();
-        z.subtract(y);
+        Constraint z;
+        if (x.isBottom() || y.isBottom()) {
+            z = Constraint.BOT();
+        } else if (x.isTop() || y.isTop()) {
+            z = Constraint.TOP();
+        } else {
+            try {
+                Optional<Integer> b = x.bound.flatMap(xb -> y.bound.map(yb -> Math.subtractExact(xb, yb)));
+                z = new Constraint(b);
+            } catch (ArithmeticException ex) {
+                LOGGER.debug("[x = {}, y = {}]", x, y);
+                LOGGER.trace("Overflowed!", ex);
+                z = Constraint.TOP();
+            }
+        }
         return z;
     }
 
@@ -134,76 +154,38 @@ public class Constraint implements Comparable<Constraint> {
 
     public static Constraint multiply(Constraint x,
                                       Constraint y) {
-        Constraint z = x.copy();
-        z.multiply(y);
+        Constraint z;
+        if (x.isBottom() || y.isBottom()) {
+            z = Constraint.BOT();
+        } else if (x.isTop() || y.isTop()) {
+            z = Constraint.TOP();
+        } else {
+            try {
+                Optional<Integer> b = x.bound.flatMap(xb -> y.bound.map(yb -> Math.multiplyExact(xb, yb)));
+                z = new Constraint(b);
+            } catch (ArithmeticException ex) {
+                LOGGER.debug("[x = {}, y = {}]", x, y);
+                LOGGER.trace("Overflowed!", ex);
+                z = Constraint.TOP();
+            }
+        }
         return z;
     }
 
     public static Constraint divide(Constraint x,
                                     Constraint y) {
-        Constraint z = x.copy();
-        z.divide(y);
+        Constraint z;
+        if (x.isBottom() || y.isBottom()) {
+            z = Constraint.BOT();
+        } else if (x.isTop() || y.isTop()) {
+            z = Constraint.TOP();
+        } else if (y.bound.map(b -> b == 0).orElse(false)) {
+            z = Constraint.TOP();
+        } else {
+            Optional<Integer> b = x.bound.flatMap(xb -> y.bound.map(yb -> xb / yb));
+            z = new Constraint(b);
+        }
         return z;
-    }
-
-    public Constraint add(Constraint c) {
-        if (this.isBottom() || c.isBottom()) {
-            this.makeBottom();
-        } else if (this.isTop() || c.isTop()) {
-            this.makeTop();
-        } else {
-            try {
-                this.bound = this.bound.flatMap(t -> c.bound.map(b -> Math.addExact(t, b)));
-            } catch (ArithmeticException ex) {
-                LOGGER.debug("[this = {}, c = {}]", this, c);
-                LOGGER.trace("Overflowed!", ex);
-                this.makeTop();
-            }
-        }
-        return this;
-    }
-
-    public Constraint subtract(Constraint c) {
-        if (this.isBottom() || c.isBottom()) {
-            this.makeBottom();
-        } else if (this.isTop() || c.isTop()) {
-            this.makeTop();
-        } else {
-            try {
-                this.bound = this.bound.flatMap(t -> c.bound.map(b -> Math.subtractExact(t, b)));
-            } catch (ArithmeticException ex) {
-                this.makeTop();
-            }
-        }
-        return this;
-    }
-
-    public Constraint multiply(Constraint c) {
-        if (this.isBottom() || c.isBottom()) {
-            this.makeBottom();
-        } else if (this.isTop() || c.isTop()) {
-            this.makeTop();
-        } else {
-            try {
-                this.bound = this.bound.flatMap(t -> c.bound.map(b -> Math.multiplyExact(t, b)));
-            } catch (ArithmeticException ex) {
-                this.makeTop();
-            }
-        }
-        return this;
-    }
-
-    public Constraint divide(Constraint c) {
-        if (this.isBottom() || c.isBottom()) {
-            this.makeBottom();
-        } else if (this.isTop() || c.isTop()) {
-            this.makeTop();
-        } else if (c.bound.map(b -> b == 0).orElse(false)) {
-            this.makeTop();
-        } else {
-            this.bound = this.bound.flatMap(t -> c.bound.map(b -> t / b));
-        }
-        return this;
     }
 
     public static int compare(Constraint A, Constraint B) {

@@ -12,30 +12,6 @@ class BotConstraint extends Constraint {
         return "⟘";
     }
 
-    private Constraint combine(Constraint c) {
-        return this;
-    }
-
-    @Override
-    public Constraint add(Constraint c) {
-        return this;
-    }
-
-    @Override
-    public Constraint subtract(Constraint c) {
-        return this;
-    }
-
-    @Override
-    public Constraint multiply(Constraint c) {
-        return this;
-    }
-
-    @Override
-    public Constraint divide(Constraint c) {
-        return this;
-    }
-
     @Override
     public boolean equals(Object o) {
         boolean equal = false;

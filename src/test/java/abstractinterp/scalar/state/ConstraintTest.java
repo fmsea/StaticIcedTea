@@ -32,30 +32,6 @@ public class ConstraintTest {
     }
 
     @Test
-    void testMakeBottom() {
-        {
-            Constraint x = Constraint.of(0);
-            x.makeBottom();
-            assertAll(() -> assertTrue(x.isBottom()),
-                      () -> assertTrue(x.bound().isEmpty()));
-        }
-
-        {
-            Constraint x = Constraint.TOP();
-            x.makeBottom();
-            assertAll(() -> assertTrue(x.isBottom()),
-                      () -> assertTrue(x.bound().isEmpty()));
-        }
-
-        {
-            Constraint x = Constraint.BOT();
-            x.makeBottom();
-            assertAll(() -> assertTrue(x.isBottom()),
-                      () -> assertTrue(x.bound().isEmpty()));
-        }
-    }
-
-    @Test
     void testAddition() {
         {
             Constraint x = Constraint.of(0);
