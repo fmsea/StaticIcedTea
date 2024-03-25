@@ -1,0 +1,14 @@
+i0	i1	i2
+2 if i1 <= i0 goto return i0:<test.Example: int swap(int)>
+fall	i0	i1	true
+
+branch	i0	i1	true
+
+3 i2 = i1:<test.Example: int swap(int)>
+fall	i2	true
+
+4 i1 = i0:<test.Example: int swap(int)>
+fall	i1	true
+
+5 i0 = i2:<test.Example: int swap(int)>
+fall	i0	true
