@@ -20,7 +20,7 @@ unsat
 6 i1 = i2 + i3:<test.Fibonacci: int fibonacci(int)>
 fall through
 sat
-unsat
+sat
 7 i2 = i3:<test.Fibonacci: int fibonacci(int)>
 fall through
 sat

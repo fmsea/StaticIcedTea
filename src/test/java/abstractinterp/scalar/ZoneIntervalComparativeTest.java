@@ -1,30 +1,22 @@
 package abstractinterp.scalar;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.BufferedReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import abstractinterp.scalar.state.IntervalBoxState;
 import abstractinterp.scalar.state.ZoneState;
 import abstractinterp.scalar.state.providers.JimpleProvider;
-import processing.Smt2Format;
 import solver.SolverFactory;
 import solver.SolverWrapper;
 import soot.Body;
@@ -62,158 +54,52 @@ public class ZoneIntervalComparativeTest extends AbstractNumericalTest {
         Scene.v().loadNecessaryClasses();
     }
 
-    @Test
-    void testConstantValue() {
-        Body body = JimpleProvider.constantJimpleMethod("z3_constant_test");
+    private static Stream<Arguments> comparisons() {
+        return Stream.of(
+            Arguments.arguments(
+                JimpleProvider.constantJimpleMethod("z3_constant_test"),
+                "pado01.int.constantValuePropagation.smt.out"),
+            Arguments.arguments(
+                JimpleProvider.binaryArithmaticMethod("z3ConstantMath"),
+                "pado01.int.constantMathPropagation.smt.out"),
+            Arguments.arguments(
+                JimpleProvider.simpleIfStatement("z3_simpleIf"),
+                "pado01.int.branching.smt.out"),
+            Arguments.arguments(
+                JimpleProvider.simpleLoopStatement("z3_simple_loop"),
+                "pado01.int.looping.smt.out"),
+            Arguments.arguments(
+                JimpleProvider.example5(),
+                "pado01.int.example5.smt.out"),
+            Arguments.arguments(
+                JimpleProvider.nonsense(),
+                "pado01.int.nonsenseExample.smt.out"),
+            Arguments.arguments(
+                JimpleProvider.neqLoop(),
+                "pado01.int.neqLoop.smt.out"),
+            Arguments.arguments(
+                JimpleProvider.ballonGetArrow(),
+                "pado01.int.getArrowSubset.smt.out"),
+            Arguments.arguments(
+                JimpleProvider.intervalComparison(),
+                "pado01.int.intervalComparison.smt.out"),
+            Arguments.arguments(
+                JimpleProvider.fibonacci(),
+                "pado01.int.fibonacci.smt.out"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("comparisons")
+    void ZoneIntervalComparisonTest(Body body, String resourceFile) {
         IntegerAnalysis zoneAnalysis = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
         IntegerAnalysis intervalAnalysis = new IntegerAnalysis(this.solver, body, 2, IntervalBoxState.class);
         zoneAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
-        String expected = readResourcesFile("pado01.int.constantValuePropagation.smt.out");
-        assertTrue(runComparison(generateReport(zoneAnalysis),
-                                 generateReport(intervalAnalysis),
-                                 expected));
-    }
-
-    @Test
-    void testConstantArithmatic() {
-        Body body = JimpleProvider.binaryArithmaticMethod("z3ConstantMath");
-        IntegerAnalysis zoneAnalysis = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
-        IntegerAnalysis intervalAnalysis = new IntegerAnalysis(this.solver, body, 2, IntervalBoxState.class);
-        zoneAnalysis.runAnalysis();
-        intervalAnalysis.runAnalysis();
-        String expected = readResourcesFile("pado01.int.constantMathPropagation.smt.out");
-        assertTrue(runComparison(generateReport(zoneAnalysis),
-                                 generateReport(intervalAnalysis),
-                                 expected));
-    }
-
-    @Test
-    void testBranchingStatement() {
-        Body body = JimpleProvider.simpleIfStatement("z3_simpleIf");
-        IntegerAnalysis zoneAnalysis = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
-        IntegerAnalysis intervalAnalysis = new IntegerAnalysis(this.solver, body, 2, IntervalBoxState.class);
-        zoneAnalysis.runAnalysis();
-        intervalAnalysis.runAnalysis();
-        String expected = readResourcesFile("pado01.int.branching.smt.out");
-        assertTrue(runComparison(generateReport(zoneAnalysis),
-                                 generateReport(intervalAnalysis),
-                                 expected));
-    }
-
-    @Test
-    void testLoopingStatement() {
-        Body body = JimpleProvider.simpleLoopStatement("z3_simple_loop");
-        IntegerAnalysis zoneAnalysis = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
-        IntegerAnalysis intervalAnalysis = new IntegerAnalysis(this.solver, body, 2, IntervalBoxState.class);
-        zoneAnalysis.runAnalysis();
-        intervalAnalysis.runAnalysis();
-        String expected = readResourcesFile("pado01.int.looping.smt.out");
-        assertTrue(runComparison(generateReport(zoneAnalysis),
-                                 generateReport(intervalAnalysis),
-                                 expected));
-    }
-
-    @Test
-    void testExample5() {
-        Body body = JimpleProvider.example5();
-        IntegerAnalysis zoneAnalysis = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
-        IntegerAnalysis intervalAnalysis = new IntegerAnalysis(this.solver, body, 2, IntervalBoxState.class);
-        zoneAnalysis.runAnalysis();
-        intervalAnalysis.runAnalysis();
-        String expected = readResourcesFile("pado01.int.example5.smt.out");
-        assertTrue(runComparison(generateReport(zoneAnalysis),
-                                 generateReport(intervalAnalysis),
-                                 expected));
-    }
-
-    @Test
-    void testNonsenseExample() {
-        Body body = JimpleProvider.nonsense();
-        IntegerAnalysis zoneAnalysis = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
-        IntegerAnalysis intervalAnalysis = new IntegerAnalysis(this.solver, body, 2, IntervalBoxState.class);
-        zoneAnalysis.runAnalysis();
-        intervalAnalysis.runAnalysis();
-        String expected = readResourcesFile("pado01.int.nonsenseExample.smt.out");
-        assertTrue(runComparison(generateReport(zoneAnalysis),
-                                 generateReport(intervalAnalysis),
-                                 expected));
-    }
-
-    @Test
-    void testNeqLoop() {
-        Body body = JimpleProvider.neqLoop();
-        IntegerAnalysis zoneAnalysis = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
-        IntegerAnalysis intervalAnalysis = new IntegerAnalysis(this.solver, body, 2, IntervalBoxState.class);
-        zoneAnalysis.runAnalysis();
-        intervalAnalysis.runAnalysis();
-        String expected = readResourcesFile("pado01.int.neqLoop.smt.out");
-        assertTrue(runComparison(generateReport(zoneAnalysis),
-                                 generateReport(intervalAnalysis),
-                                 expected));
-    }
-
-    @Test
-    void testGetArrowSubset() {
-        Body body = JimpleProvider.ballonGetArrow();
-        IntegerAnalysis zoneAnalysis = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
-        IntegerAnalysis intervalAnalysis = new IntegerAnalysis(this.solver, body, 2, IntervalBoxState.class);
-        zoneAnalysis.runAnalysis();
-        intervalAnalysis.runAnalysis();
-        String expected = readResourcesFile("pado01.int.getArrowSubset.smt.out");
-        assertTrue(runComparison(generateReport(zoneAnalysis),
-                                 generateReport(intervalAnalysis),
-                                 expected));
-    }
-
-    @Test
-    void testIntervalComparison() {
-        Body body = JimpleProvider.intervalComparison();
-        IntegerAnalysis zoneAnalysis = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
-        IntegerAnalysis intervalAnalysis = new IntegerAnalysis(this.solver, body, 2, IntervalBoxState.class);
-        zoneAnalysis.runAnalysis();
-        intervalAnalysis.runAnalysis();
-        String expected = readResourcesFile("pado01.int.intervalComparison.smt.out");
-        assertTrue(runComparison(generateReport(zoneAnalysis),
-                                 generateReport(intervalAnalysis),
-                                 expected));
-    }
-
-    @Test
-    void testFibonacci() {
-        Body body = JimpleProvider.fibonacci();
-        IntegerAnalysis zoneAnalysis = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
-        IntegerAnalysis intervalAnalysis = new IntegerAnalysis(this.solver, body, 2, IntervalBoxState.class);
-        zoneAnalysis.runAnalysis();
-        intervalAnalysis.runAnalysis();
-        String expected = readResourcesFile("pado01.int.fibonacci.smt.out");
-        assertTrue(runComparison(generateReport(zoneAnalysis),
-                                 generateReport(intervalAnalysis),
-                                 expected));
-    }
-
-    private boolean runComparison(String left, String right, String oracle) {
-        Reader leftReader = new StringReader(left);
-        Reader rightReader = new StringReader(right);
-        try {
-            Writer writer = new FileWriter(this.z3TestFile.toFile());
-            Smt2Format.SMT2Format(leftReader, rightReader, writer);
-            Process z3 = Runtime.getRuntime().exec(new String[] {"z3",
-                                                                 "-smt2",
-                                                                 this.z3TestFile.toString()});
-            z3.waitFor(60l, TimeUnit.SECONDS);
-            String output = new BufferedReader(new InputStreamReader(z3.getInputStream(),
-                                                                     StandardCharsets.UTF_8))
-                .lines()
-                .collect(Collectors.joining("\n"));
-            assertEquals(oracle, output);
-            return true;
-        } catch (IOException ex) {
-            ex.printStackTrace(System.err);
-            return false;
-        } catch (InterruptedException ex) {
-            ex.printStackTrace(System.err);
-            return false;
-        }
+        String expected = readResourcesFile(resourceFile);
+        assertTrue(runComparison(
+            generateReport(zoneAnalysis),
+            generateReport(intervalAnalysis),
+            expected,
+            this.z3TestFile));
     }
 }
