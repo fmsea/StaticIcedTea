@@ -283,7 +283,7 @@ public class SolverWrapperZ3 implements SolverWrapper {
             try {
                 ret = ctx.mkUnaryMinus(evaluateExpr(expr.getOp()));
             } catch (Z3Exception ex) {
-                LOGGER.error("error in evaluateExpr", ex.getMessage());
+                LOGGER.error("error in evaluateExpr: {}", ex.getMessage());
             }
         } else {
             LOGGER.error("Cannot process singleton {} of {}", v, v.getClass());

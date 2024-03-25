@@ -226,7 +226,7 @@ public class ZoneDifferenceBoundedMatrix {
                 this.setConstraint(i, j, Constraint.min(this.matrix[i][j], other.matrix[i][j]));
             });
         LOGGER.debug("finished computing intersection");
-        LOGGER.trace("⊓ result:", this);
+        LOGGER.trace("⊓ result: {}", this);
     }
 
     public static ZoneDifferenceBoundedMatrix intersect(ZoneDifferenceBoundedMatrix m1,
