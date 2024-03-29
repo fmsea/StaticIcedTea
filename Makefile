@@ -4,7 +4,7 @@ GIT_COMMIT:=$(shell git rev-parse --short=16 HEAD)
 all: package
 
 $(JARFILE):
-	mvn --batch-mode package
+	mvn --batch-mode verify
 
 .PHONY: package
 package: dfa-smt dfa-analysis dfa-z3
