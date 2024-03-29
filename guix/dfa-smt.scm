@@ -96,7 +96,8 @@ exec ~a/bin/java -Xms4g \\
    (description "A simple wrapper script for the DFA analysis framework.")
    (license #f)))
 
-(packages->manifest (list dfa-smt-jar
+(packages->manifest (list bash
+                          dfa-smt-jar
                           `(,openjdk11 "jdk")
                           z3-with-java
                           entry-script
