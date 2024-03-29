@@ -5,10 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,8 +33,8 @@ public abstract class NumericalAnalysisTest {
     protected void teardown() {
         try (Stream<Path> dirStream = Files.walk(this.testOutputDir)) {
             dirStream
-                .map(Path::toFile)
                 .sorted(Comparator.reverseOrder())
+                .map(Path::toFile)
                 .forEach(File::delete);
         } catch (IOException ex) {
             System.err.println(ex);
