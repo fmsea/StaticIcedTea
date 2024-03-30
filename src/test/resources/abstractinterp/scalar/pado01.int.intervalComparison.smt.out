@@ -1,7 +1,7 @@
 1 u0 = x0:<test.ints: int compareIntervals()>
 fall through
 sat
-unknown
+unsat
 2 if x0 < 20 goto (branch):<test.ints: int compareIntervals()>
 fall through
 sat

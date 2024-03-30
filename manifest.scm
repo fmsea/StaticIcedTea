@@ -24,7 +24,7 @@
   (package
    (inherit z3)
    (name "z3")
-   (version "4.8.10")
+   (version "4.8.12")
    (home-page "https://github.com/Z3Prover/z3")
    (source (origin
             (method git-fetch)
@@ -33,7 +33,7 @@
             (file-name (git-file-name name version))
             (sha256
              (base32
-              "1w1ym2l0gipvjx322npw7lhclv8rslq58gnj0d9i96masi3gbycf"))))
+              "1wbcdc7h3mag8infspvxxja2hiz4igjwxzvss2kqar1rjj4ivfx0"))))
    (native-inputs
     `(("which" ,which)
       ("python" ,python-wrapper)
