@@ -7,7 +7,7 @@ $(JARFILE):
 	mvn --batch-mode verify
 
 .PHONY: package
-package: dfa-smt dfa-analysis dfa-z3
+package: $(JAR_FILE) dfa-smt dfa-analysis dfa-z3
 
 .PHONY: dfa-smt
 dfa-smt: dfa-smt-$(GIT_COMMIT).tar.gz dfa-smt-$(GIT_COMMIT).squashfs
