@@ -31,8 +31,9 @@ dependency-reduced-pom.xml
 slurm-*.out
 slurm-*.err
 
-# Ignore Guix Pack
+# Ignore Guix Packs
 dfa-*.tar.gz
+dfa-*.squashfs
 
 # Ignore Z3 Test files
 *.z3

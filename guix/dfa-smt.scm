@@ -26,40 +26,6 @@
    (description "The whole enchilada")
    (license #f)))
 
-(define artifacts
-  (let ((select-java-files (lambda (file _)
-                             (not (or (string-match ".+/Neq/.+.java" file)
-                                      (string-match ".+/newV.java" file))))))
-    (package
-     (name "artifacts-for-analysis")
-     (version "0")
-     (source (local-file "../analysis/artifacts"
-                         #:recursive? #t
-                         #:select? select-java-files))
-     (build-system ant-build-system)
-     (arguments
-      `(#:jar-name "artifacts.jar"
-        #:source-dir "./"
-        #:tests? #false
-        ))
-     (home-page "https://github.com/BoiseState/DFA_SMT")
-     (synopsis "A set of programs for analysis")
-     (description "The set of benchmark programs used for analysis")
-     (license #f))))
-
-(define domains
-  (package
-   (name "predicate-domains")
-   (version "0")
-   (source (local-file "../analysis/ExperimentData" #:recursive? #t))
-   (build-system copy-build-system)
-   (arguments
-    '(#:install-plan '(("domains" "share/PredicateDomains"))))
-   (home-page "https://github.com/BoiseState/DFA_SMT")
-   (synopsis "Predefined predicate domains for analysis")
-   (description "Set of predefined predicate domains")
-   (license #f)))
-
 (define entry-script
   (package
    (name "entry-script")
@@ -100,6 +66,4 @@ exec ~a/bin/java -Xms4g \\
                           dfa-smt-jar
                           `(,openjdk11 "jdk")
                           z3-with-java
-                          entry-script
-                          artifacts
-                          domains))
+                          entry-script))
