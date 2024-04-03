@@ -10,13 +10,13 @@ $(JARFILE):
 package: $(JAR_FILE) dfa-smt dfa-analysis dfa-z3 dfa-artifacts
 
 .PHONY: dfa-smt
-dfa-smt: dfa-smt-$(GIT_COMMIT).tar.gz dfa-smt-$(GIT_COMMIT).squashfs
+dfa-smt: dfa-smt-$(GIT_COMMIT).squashfs
 
 .PHONY: dfa-analysis
-dfa-analysis: dfa-analysis-$(GIT_COMMIT).tar.gz dfa-analysis-$(GIT_COMMIT).squashfs
+dfa-analysis: dfa-analysis-$(GIT_COMMIT).squashfs
 
 .PHONY: dfa-z3
-dfa-z3: dfa-z3-$(GIT_COMMIT).tar.gz dfa-z3-$(GIT_COMMIT).squashfs
+dfa-z3: dfa-z3-$(GIT_COMMIT).squashfs
 
 .PHONY: dfa-artifacts
 dfa-artifacts: dfa-artifacts-$(GIT_COMMIT).tar.gz
