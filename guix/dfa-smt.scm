@@ -49,6 +49,7 @@
                (format #t "#!~a/bin/sh
 export LD_LIBRARY_PATH=~a/lib/
 exec ~a/bin/java -Xms4g \\
+     -Xmx64g \\
      -XX:+UseG1GC \\
      -XX:+UseStringDeduplication \\
      -XX:+UseNUMA \\
