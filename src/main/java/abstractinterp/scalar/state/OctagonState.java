@@ -21,7 +21,9 @@ import soot.Value;
 import soot.jimple.BinopExpr;
 import tadr.TADR;
 import tadr.visitors.OctagonChangedVariableVisitor;
+import tadr.visitors.VariableVisitor;
 import util.Pair;
+import util.Properties;
 import util.Streams;
 
 public abstract class OctagonState implements State {
@@ -33,6 +35,7 @@ public abstract class OctagonState implements State {
     protected final int N;
     protected final OctagonUpdater updater;
     protected final OctagonUpdater refiner;
+    protected final VariableVisitor variableVisitor = new VariableVisitor();
     protected final OctagonChangedVariableVisitor deltaVisitor = new OctagonChangedVariableVisitor();
     private static Logger LOGGER = LoggerFactory.getLogger(OctagonState.class);
 
@@ -364,19 +367,33 @@ public abstract class OctagonState implements State {
     }
 
     public Set<Local> getChangedVariables(BinaryOperatorType type, Value left, Value right) {
-        return TADR.from(type, TADR.from(left), TADR.from(right))
-            .map(expr -> expr.accept(deltaVisitor))
-            .orElse(Set.of());
+        var assignment = TADR.from(type, TADR.from(left), TADR.from(right));
+        if (Properties.OutputMinimumChangedVariables) {
+            return assignment.map(expr -> expr.accept(deltaVisitor))
+                .orElse(Set.of());
+        } else {
+            return assignment.map(expr -> expr.accept(variableVisitor))
+                .orElse(Set.of());
+        }
     }
 
     public Set<Local> getChangedVariables(PredicateType type, Value left, Value right) {
-        return TADR.from(type, TADR.from(left), TADR.from(right))
-            .map(expr -> expr.accept(deltaVisitor))
-            .orElse(Set.of());
+        var compar = TADR.from(type, TADR.from(left), TADR.from(right));
+        if (Properties.OutputMinimumChangedVariables) {
+            return compar.map(expr -> expr.accept(deltaVisitor))
+                .orElse(Set.of());
+        } else {
+            return compar.map(expr -> expr.accept(variableVisitor))
+                .orElse(Set.of());
+        }
     }
 
     public Set<Local> getChangedVariables(Value value) {
-        return TADR.from(value).accept(deltaVisitor);
+        if (Properties.OutputMinimumChangedVariables) {
+            return TADR.from(value).accept(deltaVisitor);
+        } else {
+            return TADR.from(value).accept(variableVisitor);
+        }
     }
 
 }

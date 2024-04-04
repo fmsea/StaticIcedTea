@@ -8,4 +8,6 @@ public class Properties {
     }
 
     public static OctagonIncrementalClosureAlgorithm IncrementalClosureAlgorithm = OctagonIncrementalClosureAlgorithm.SEARCH;
+
+    public static boolean OutputMinimumChangedVariables = true;
 }

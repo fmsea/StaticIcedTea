@@ -35,5 +35,13 @@ public abstract class NumericalAnalysisCommand extends AnalysisCommand {
         negatable = true)
     protected boolean reduceOutput;
 
+    @Option(names = {"--min-delta-vars"},
+        description = "Output minimum changed variables, can be negated",
+        required = false,
+        defaultValue = "true",
+        fallbackValue = "true",
+        negatable = true)
+    protected boolean outputMinimum;
+
     public abstract Integer call() throws Exception;
 }

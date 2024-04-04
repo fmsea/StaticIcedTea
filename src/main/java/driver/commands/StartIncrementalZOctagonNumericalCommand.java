@@ -17,6 +17,7 @@ public class StartIncrementalZOctagonNumericalCommand extends NumericalAnalysisC
     public Integer call() throws Exception {
         SootInitialization.initializeSoot(className, classpath);
         Properties.IncrementalClosureAlgorithm = Properties.OctagonIncrementalClosureAlgorithm.CHAWDHARY;
+        Properties.OutputMinimumChangedVariables = outputMinimum;
         AnalysisOptions options = new AnalysisOptionsBuilder()
             .withClassName(className)
             .withMethodId(methodId)

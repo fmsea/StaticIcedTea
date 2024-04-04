@@ -17,6 +17,7 @@ public class StartDeferredIncrementalOctagonNumericalCommand extends NumericalAn
     public Integer call() throws Exception {
         SootInitialization.initializeSoot(className, classpath);
         Properties.IncrementalClosureAlgorithm = Properties.OctagonIncrementalClosureAlgorithm.SEARCH;
+        Properties.OutputMinimumChangedVariables = outputMinimum;
         AnalysisOptions options = new AnalysisOptionsBuilder()
             .withClassName(className)
             .withMethodId(methodId)
