@@ -1,31 +1,33 @@
 package abstractinterp.scalar.state;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import abstractinterp.scalar.state.util.GraphProjection;
+import solver.SolverWrapper;
 import soot.Local;
 import soot.Value;
-import soot.grimp.Grimp;
 import soot.jimple.BinopExpr;
 import soot.jimple.IntConstant;
 import soot.jimple.LongConstant;
 import soot.jimple.internal.JNegExpr;
-
-import abstractinterp.scalar.state.util.GraphProjection;
-import solver.SolverWrapper;
+import tadr.TADR;
+import tadr.visitors.VariableVisitor;
+import tadr.visitors.ZoneChangedVariableVisitor;
+import util.Properties;
 
 public class IncZoneState implements State {
 
     protected ZoneDifferenceBoundedMatrix matrix;
+    private final ZoneChangedVariableVisitor deltaVisitor = new ZoneChangedVariableVisitor();
+    private final VariableVisitor variableVisitor = new VariableVisitor();
     private static Logger LOGGER = LoggerFactory.getLogger(IncZoneState.class);
     public static final Local ZERO = Variable.ZERO;
 
@@ -801,56 +803,32 @@ public class IncZoneState implements State {
     }
 
     public Set<Local> getChangedVariables(BinaryOperatorType op, Value left, Value right) {
-        if (left instanceof Local && right instanceof Local) {
-            return Set.of();
-        } else if (left instanceof Local) {
-            switch (op) {
-            case ADDITION:
-            case SUBTRACTION:
-                return Set.of((Local) left);
-            default:
-                return Set.of();
-            }
-        } else if (right instanceof Local) {
-            switch (op) {
-            case ADDITION:
-                return Set.of((Local) right);
-            default:
-                return Set.of();
-            }
+        var assignment = TADR.from(op, TADR.from(left), TADR.from(right));
+        if (Properties.OutputMinimumChangedVariables) {
+            return assignment.map(expr -> expr.accept(deltaVisitor))
+                .orElse(Set.of());
+        } else {
+            return assignment.map(expr -> expr.accept(variableVisitor))
+                .orElse(Set.of());
         }
-        return Set.of();
     }
 
     public Set<Local> getChangedVariables(Value rhs) {
-        if (rhs instanceof Local) {
-            return Set.of((Local)rhs);
-        } else if (rhs instanceof JNegExpr && ((JNegExpr)rhs).getOp() instanceof Local) {
-            return Set.of((Local)((JNegExpr)rhs).getOp());
+        if (Properties.OutputMinimumChangedVariables) {
+            return TADR.from(rhs).accept(deltaVisitor);
         } else {
-            return Set.of();
+            return TADR.from(rhs).accept(variableVisitor);
         }
     }
 
     public Set<Local> getChangedVariables(PredicateType predicate, Value left, Value right) {
-        if (left instanceof Local && right instanceof Local) {
-            switch (predicate) {
-            case Le:
-            case Lt:
-                return Set.of((Local) left);
-            case Ge:
-            case Gt:
-                return Set.of((Local) right);
-            case Eq:
-            case Ne:
-            default:
-                return Set.of((Local) left, (Local) right);
-            }
-        } else if (left instanceof Local) {
-            return Set.of((Local) left);
-        } else if (right instanceof Local) {
-            return Set.of((Local) right);
+        var compar = TADR.from(predicate, TADR.from(left), TADR.from(right));
+        if (Properties.OutputMinimumChangedVariables) {
+            return compar.map(expr -> expr.accept(deltaVisitor))
+                .orElse(Set.of());
+        } else {
+            return compar.map(expr -> expr.accept(variableVisitor))
+                .orElse(Set.of());
         }
-        return Set.of();
     }
 }
