@@ -28,6 +28,7 @@ import abstractinterp.scalar.state.PredicateType;
 public class MethodStatsAnalysis {
 
     private enum Statistics {
+        VARIABLES,
         ASSIGNMENT_STATEMENTS,
         BITWISE_OPERATIONS,
         BRANCHES,
@@ -58,6 +59,7 @@ public class MethodStatsAnalysis {
         for (Statistics s : Statistics.values()) {
             this.counts.put(s, 0);
         }
+        this.counts.put(Statistics.VARIABLES, this.body.getLocalCount());
     }
 
     public void runAnalysis() {
