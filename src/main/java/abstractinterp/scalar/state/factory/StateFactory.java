@@ -4,6 +4,7 @@ import java.util.Set;
 
 import abstractinterp.scalar.state.DefaultOctagonState;
 import abstractinterp.scalar.state.DeferredIncrementalOctagonState;
+import abstractinterp.scalar.state.DeferredOctagonState;
 import abstractinterp.scalar.state.IncZoneState;
 import abstractinterp.scalar.state.IncZoneStateWithChangePriority;
 import abstractinterp.scalar.state.IncrementalOctagonState;
@@ -34,6 +35,8 @@ public interface StateFactory<S extends State> {
             return new DeferredIncrementalOctagonStateFactory();
         } else if (type == IncrementalOctagonState.class) {
             return new IncrementalOctagonStateFactory();
+        } else if (type == DeferredOctagonState.class) {
+            return new DeferredOctagonStateFactory();
         } else if (type == OctagonState.class || type == DefaultOctagonState.class) {
             return new DefaultOctagonStateFactory();
         } else {

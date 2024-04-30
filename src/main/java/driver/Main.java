@@ -11,6 +11,7 @@ import driver.commands.Smt2FormatIdentifiersCommand;
 import driver.commands.Smt2GraphsCommand;
 import driver.commands.StartClassEnumeratorCommand;
 import driver.commands.StartDeferredIncrementalOctagonNumericalCommand;
+import driver.commands.StartDeferredOctagonNumericalCommand;
 import driver.commands.StartIncZoneNumericalCommand;
 import driver.commands.StartIncZoneWithChangePriorityNumericalCommand;
 import driver.commands.StartIncrementalOctagonNumericalCommand;
@@ -42,6 +43,7 @@ import picocli.CommandLine.Command;
              StartMinZoneNumericalCommand.class,
              StartMaxZoneNumericalCommand.class,
              StartOctagonNumericalCommand.class,
+             StartDeferredOctagonNumericalCommand.class,
              StartIncrementalOctagonNumericalCommand.class,
              StartIncrementalZOctagonNumericalCommand.class,
              StartDeferredIncrementalOctagonNumericalCommand.class,
