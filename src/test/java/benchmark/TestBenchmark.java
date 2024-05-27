@@ -47,11 +47,11 @@ public class TestBenchmark {
         new Runner(opt).run();
     }
 
-    @Benchmark public void OctagonDeferredIncrementalClosure(RandomClosedOctagonState state, ConstraintState c, Blackhole bh) {
-        bh.consume(state.matrix.incrementalClosure(
-            c.thunks.stream().map(t -> ConstraintUpdateThunk.of(t.s % state.N, t.t % state.N, t.c)).collect(Collectors.toSet())
-        ));
-    }
+    // @Benchmark public void OctagonDeferredIncrementalClosure(RandomClosedOctagonState state, ConstraintState c, Blackhole bh) {
+    //     bh.consume(state.matrix.incrementalClosure(
+    //         c.thunks.stream().map(t -> ConstraintUpdateThunk.of(t.s % state.N, t.t % state.N, t.c)).collect(Collectors.toSet())
+    //     ));
+    // }
 
     // @Benchmark public void OctagonDeferredIncrementalZClosure(RandomClosedOctagonState state, Blackhole bh) {
     //     bh.consume(state.matrix.incrementalZClosure(
@@ -66,12 +66,12 @@ public class TestBenchmark {
     //     ));
     // }
 
-    @Benchmark public void OctagonRegularIncrementalClosure(RandomClosedOctagonState state, ConstraintState c, Blackhole bh) {
-        bh.consume(
-            c.thunks.stream().<Supplier<Boolean>>map(t -> () -> state.matrix.putIncremental(t.s % state.N, t.t % state.N, t.c))
-                .map(e -> e.get())
-                .reduce((a, b) -> a && b));
-    }
+    // @Benchmark public void OctagonRegularIncrementalClosure(RandomClosedOctagonState state, ConstraintState c, Blackhole bh) {
+    //     bh.consume(
+    //         c.thunks.stream().<Supplier<Boolean>>map(t -> () -> state.matrix.putIncremental(t.s % state.N, t.t % state.N, t.c))
+    //             .map(e -> e.get())
+    //             .reduce((a, b) -> a && b));
+    // }
 
     // @Benchmark public void OctagonRegularIncrementalZClosure(RandomClosedOctagonState state, ConstraintState c, Blackhole bh) {
     //     Properties.IncrementalClosureAlgorithm = Properties.OctagonIncrementalClosureAlgorithm.CHAWDHARY;
@@ -81,15 +81,28 @@ public class TestBenchmark {
     //             .reduce((a, b) -> a && b));
     // }
 
-    @Benchmark public void LargeFWClosure(RandomClosedOctagonState state, ConstraintState c, Blackhole bh) {
-        c.thunks.stream().forEach(t -> {
-            state.matrix.putConstraint(t.s % state.N, t.t % state.N, t.c);
-            bh.consume(state.matrix.canonicalize());
-        });
-    }
+    // @Benchmark public void LargeFWClosure(RandomClosedOctagonState state, ConstraintState c, Blackhole bh) {
+    //     c.thunks.stream().forEach(t -> {
+    //         state.matrix.putConstraint(t.s % state.N, t.t % state.N, t.c);
+    //         bh.consume(state.matrix.canonicalize());
+    //     });
+    // }
 
-    @Benchmark public void LargeDeferredFWClosure(RandomClosedOctagonState state, ConstraintState c, Blackhole bh) {
+    // @Benchmark public void LargeDeferredFWClosure(RandomClosedOctagonState state, ConstraintState c, Blackhole bh) {
+    //     c.thunks.stream().forEach(t -> state.matrix.putConstraint(t.s % state.N, t.t % state.N, t.c));
+    //     bh.consume(state.matrix.computeClosure());
+    // }
+
+    @Benchmark public void ZoneFullClosure(RandomClosedZoneState state, ConstraintState c, Blackhole bh) {
         c.thunks.stream().forEach(t -> state.matrix.putConstraint(t.s % state.N, t.t % state.N, t.c));
         bh.consume(state.matrix.computeClosure());
+    }
+
+    @Benchmark public void ZoneIncrementalClosure(RandomClosedZoneState state, ConstraintState c, Blackhole bh) {
+        bh.consume(
+            c.thunks.stream()
+                .<Supplier<Boolean>>map(t -> () -> state.matrix.putIncremental(t.s % state.N, t.t % state.N, t.c))
+                .map(e -> e.get())
+                .reduce((a, b) -> a && b));
     }
 }

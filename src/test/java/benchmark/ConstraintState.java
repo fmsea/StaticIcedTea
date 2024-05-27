@@ -12,7 +12,7 @@ import abstractinterp.scalar.state.providers.ConstraintUpdateThunkProvider;
 
 @State(Scope.Thread)
 public class ConstraintState {
-    @Param({"6"})
+    @Param({"1"})
     int count;
 
     Set<ConstraintUpdateThunk> thunks;

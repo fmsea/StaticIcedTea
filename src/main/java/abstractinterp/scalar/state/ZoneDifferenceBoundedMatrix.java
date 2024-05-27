@@ -165,7 +165,7 @@ public class ZoneDifferenceBoundedMatrix {
         return this.putConstraint(i, j, constraint, matrix);
     }
 
-    protected boolean putConstraint(int i, int j, Constraint c) {
+    public boolean putConstraint(int i, int j, Constraint c) {
         return this.putConstraint(i, j, c, this);
     }
 
@@ -177,6 +177,12 @@ public class ZoneDifferenceBoundedMatrix {
             added = true;
         }
         return added;
+    }
+
+    public boolean putIncremental(int i, int j, Constraint constraint) {
+        Local s = this.indicesToLocals.get(i);
+        Local t = this.indicesToLocals.get(j);
+        return putIncremental(s, t, constraint);
     }
 
     public boolean putIncremental(Local source, Local target, Constraint constraint) {
