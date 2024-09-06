@@ -1,4 +1,4 @@
-(define-module (DFA_SMT guix dfa-artifacts)
+(define-module (StaticIcedTea guix dfa-artifacts)
   #:use-module (ice-9 regex)
   #:use-module (guix packages)
   #:use-module (guix gexp)
@@ -27,7 +27,7 @@
         #:source-dir "./"
         #:tests? #false
         ))
-     (home-page "https://github.com/BoiseState/DFA_SMT")
+     (home-page "https://github.com/fmsea/StaticIcedTea")
      (synopsis "A set of programs for analysis")
      (description "The set of benchmark programs used for analysis")
      (license #f))))
@@ -40,7 +40,7 @@
    (build-system copy-build-system)
    (arguments
     '(#:install-plan '(("domains" "share/PredicateDomains"))))
-   (home-page "https://github.com/BoiseState/DFA_SMT")
+   (home-page "https://github.com/fmsea/StaticIcedTea")
    (synopsis "Predefined predicate domains for analysis")
    (description "Set of predefined predicate domains")
    (license #f)))

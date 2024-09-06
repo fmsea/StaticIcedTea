@@ -18,7 +18,7 @@
   #:use-module (gnu packages python-science)
   #:use-module (gnu packages python-xyz)
   #:use-module (gnu packages statistics)
-  #:export (z3-with-java openjdk11 %dfa-manifest))
+  #:export (z3-with-java openjdk11 %project-manifest))
 
 (define z3-with-java
   (package
@@ -75,12 +75,12 @@
             (separator #f)
             (files (list "")))))))
 
-(define %dfa-manifest
+(define %project-manifest
   (packages->manifest
-   (list glibc
+   (list ;; glibc
          `(,openjdk11 "jdk")
          maven
-         bash
+         ;; bash
          gnuplot
          parallel
          python-wrapper
@@ -93,4 +93,4 @@
          util-linux
          z3-with-java)))
 
-%dfa-manifest
+%project-manifest

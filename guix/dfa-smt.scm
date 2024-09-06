@@ -1,4 +1,4 @@
-(define-module (DFA_SMT guix dfa-smt)
+(define-module (StaticIcedTea guix dfa-smt)
   #:use-module (ice-9 regex)
   #:use-module (guix packages)
   #:use-module (guix gexp)
@@ -13,15 +13,15 @@
   #:use-module ((gnu packages java) #:prefix java:)
   #:use-module (manifest))
 
-(define dfa-smt-jar
+(define sit-jar
   (package
-   (name "dfa-smt-jar")
+   (name "sit-jar")
    (version "1.0-SNAPSHOT")
-   (source (local-file "../target/DFA_SMT-1.0-SNAPSHOT.jar"))
+   (source (local-file "../target/StaticIcedTea-1.0-SNAPSHOT.jar"))
    (build-system copy-build-system)
    (arguments
-    '(#:install-plan '(("DFA_SMT-1.0-SNAPSHOT.jar" "lib/DFA_SMT.jar"))))
-   (home-page "https://github.com/BoiseState/DFA_SMT")
+    '(#:install-plan '(("StaticIcedTea-1.0-SNAPSHOT.jar" "lib/StaticIcedTea.jar"))))
+   (home-page "https://github.com/fmsea/StaticIcedTea")
    (synopsis "The JAR file for executing analyses.")
    (description "The whole enchilada")
    (license #f)))
@@ -40,7 +40,7 @@
          (use-modules (guix build utils))
          (let ((bash #$(this-package-native-input "bash-minimal"))
                (jdk #$(this-package-native-input "openjdk"))
-               (dfa-jar #$(this-package-native-input "dfa-smt-jar"))
+               (dfa-jar #$(this-package-native-input "sit-jar"))
                (z3 #$(this-package-native-input "z3"))
                (bin (string-append #$output "/bin/")))
            (mkdir-p bin)
@@ -53,18 +53,18 @@ exec ~a/bin/java -Xms4g \\
      -XX:+UseG1GC \\
      -XX:+UseStringDeduplication \\
      -XX:+UseNUMA \\
-     -jar ~a/lib/DFA_SMT.jar \\
+     -jar ~a/lib/StaticIcedTea.jar \\
      $@" bash z3 jdk dfa-jar)))
            (chmod (string-append bin "dfa") #o755)))))
    (native-inputs
-    (list bash-minimal z3-with-java openjdk11 dfa-smt-jar))
-   (home-page "https://github.com/BoiseState/DFA_SMT")
+    (list bash-minimal z3-with-java openjdk11 sit-jar))
+   (home-page "https://github.com/fmsea/StaticIcedTea")
    (synopsis "Wrapper script for DFA analysis framework")
    (description "A simple wrapper script for the DFA analysis framework.")
    (license #f)))
 
 (packages->manifest (list bash
-                          dfa-smt-jar
+                          sit-jar
                           `(,openjdk11 "jdk")
                           z3-with-java
                           entry-script))

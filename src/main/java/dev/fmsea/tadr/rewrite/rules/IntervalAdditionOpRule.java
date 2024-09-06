@@ -1,0 +1,44 @@
+package dev.fmsea.tadr.rewrite.rules;
+
+import java.util.function.Function;
+import java.util.stream.Stream;
+
+import dev.fmsea.absint.scalar.state.Interval32Box;
+import soot.Local;
+import dev.fmsea.tadr.AdditionOp;
+import dev.fmsea.tadr.TADR;
+import dev.fmsea.tadr.Variable;
+
+public class IntervalAdditionOpRule extends RewriteRule {
+
+    private final IntervalFolder folder = new IntervalFolder();
+
+    public boolean canRewrite(TADR expr) {
+        return (expr instanceof AdditionOp);
+    }
+
+    public Stream<TADR> rewrite(TADR expr, Function<Local, Interval32Box> lookup) {
+        return rewrite((AdditionOp)expr, lookup);
+    }
+
+    public Stream<TADR> rewrite(AdditionOp expr, Function<Local, Interval32Box> lookup) {
+        if (expr.left instanceof Variable) {
+            Local l = ((Variable)expr.left).variable;
+            Interval32Box val = lookup.apply(l);
+            return Stream.of(TADR.newAddExpr(TADR.newValue(val), expr.right))
+                .flatMap(e -> rewrite(e, lookup));
+        } else if (expr.right instanceof Variable) {
+            Local r = ((Variable)expr.right).variable;
+            Interval32Box val = lookup.apply(r);
+            return Stream.of(TADR.newAddExpr(expr.left, TADR.newValue(val)))
+                .flatMap(e -> rewrite(e, lookup));
+        } else {
+            return Stream.of(expr.accept(folder));
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Interval +";
+    }
+}

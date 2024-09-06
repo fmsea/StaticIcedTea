@@ -1,4 +1,4 @@
-(define-module (DFA_SMT guix dfa-analysis)
+(define-module (StaticIcedTea guix dfa-analysis)
   #:use-module (guix profiles)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages maths)

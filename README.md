@@ -1,4 +1,4 @@
-# DFA SMT #
+# StaticIcedTea #
 
 ## Dependencies and environment ##
 
@@ -97,7 +97,7 @@ To enable exports of graph states during analysis, set
 For example,
 
 ```bash
-DFA_EXPORT_GRAPH_STATES=true java -jar ./target/DFA_SMT-1.0-SNAPSHOT.jar \
+DFA_EXPORT_GRAPH_STATES=true java -jar ./target/StaticIcedTea-1.0-SNAPSHOT.jar \
     inczone-numerical \
     --classpath=./analysis/artifacts \
     --output=$(mktemp -d) \

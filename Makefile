@@ -1,4 +1,4 @@
-JARFILE=./target/DFA_SMT-1.0-SNAPSHOT.jar
+JARFILE=./target/StaticIcedTea-1.0-SNAPSHOT.jar
 GIT_COMMIT:=$(shell git rev-parse --short=16 HEAD)
 .PHONY: all
 all: package
