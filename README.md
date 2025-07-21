@@ -180,6 +180,14 @@ Test that it works by using something like the following:
 > Unfortunately, this does not work since Borah does not support user
 > namespaces.
 
+## License ##
+
+This project and its software--- except where plainly stated otherwise, are
+released AS-IS, WITHOUT WARRANTY, as Free and Open Source Software under the
+terms and conditions of The GNU Public License 3.0.  You should have received a
+copy of the [license text][gpl] with your distribution.  If not, please read
+about the GPL: https://www.gnu.org/licenses/gpl-3.0.
+
 ## References ##
 
 [nix]: https://nixos.org/
@@ -191,3 +199,5 @@ Test that it works by using something like the following:
 [lorri]: https://github.com/nix-community/lorri
 
 [guix]: https://guix.gnu.org/
+
+[gpl]: https://www.gnu.org/licenses/gpl-3.0
