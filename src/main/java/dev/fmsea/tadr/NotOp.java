@@ -7,10 +7,6 @@ public class NotOp extends TADR {
         this.expr = expr;
     }
 
-    public String toSmt() {
-        return String.format("(not %s)", this.expr.toSmt());
-    }
-
     public <R> R accept(TADR.Visitor<R> visitor) {
         return visitor.visitNotOp(this);
     }

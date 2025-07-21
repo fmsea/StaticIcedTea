@@ -5,10 +5,6 @@ public class LeCmp extends BinaryOp {
         super(left, right);
     }
 
-    public String toSmt() {
-        return String.format("(<= %s %s)", left.toSmt(), right.toSmt());
-    }
-
     @Override
     public <R> R accept(TADR.Visitor<R> visitor) {
         return visitor.visitLeCmp(this);

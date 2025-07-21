@@ -9,14 +9,6 @@ public class Value extends TADR {
         this.number = number;
     }
 
-    public String toSmt() {
-        if (this.number.isSingleton() && this.number.lowerBoundOrElse() < 0) {
-            return String.format("(- %s)", this.number.lowerBoundOrElse() * -1);
-        } else {
-            return this.number.toString();
-        }
-    }
-
     public <R> R accept(TADR.Visitor<R> visitor) {
         return visitor.visitValue(this);
     }

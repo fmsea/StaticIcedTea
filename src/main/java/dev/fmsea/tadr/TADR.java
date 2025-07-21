@@ -5,6 +5,7 @@ import java.util.Optional;
 import dev.fmsea.absint.scalar.state.BinaryOperatorType;
 import dev.fmsea.absint.scalar.state.Interval32Box;
 import dev.fmsea.absint.scalar.state.PredicateType;
+import dev.fmsea.tadr.visitors.SmtConverter;
 import soot.Local;
 import soot.jimple.DoubleConstant;
 import soot.jimple.FloatConstant;
@@ -38,7 +39,9 @@ public abstract class TADR {
         return this.toSmt();
     }
 
-    public abstract String toSmt();
+    public String toSmt() {
+        return this.accept(new SmtConverter());
+    }
 
     @Override
     public boolean equals(Object o) {
