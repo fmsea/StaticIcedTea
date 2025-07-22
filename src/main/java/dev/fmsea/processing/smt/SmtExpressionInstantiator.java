@@ -1,5 +1,7 @@
 package dev.fmsea.processing.smt;
 
+import java.util.stream.Collectors;
+
 import dev.fmsea.common.Locals;
 import soot.Local;
 
@@ -7,19 +9,17 @@ public class SmtExpressionInstantiator extends SmtExpressionBaseVisitor<SmtExpre
 
     @Override
     public SmtExpression visitAnd(SmtExpressionParser.AndContext ctx) {
-        AndSmtExpression andExpr = new AndSmtExpression();
-        for (SmtExpressionParser.ExprContext exprCtx : ctx.expr()) {
-            andExpr.addExpression(visit(exprCtx));
-        }
+        AndSmtExpression andExpr = new AndSmtExpression(ctx.expr().stream()
+            .map(exprCtx -> visit(exprCtx))
+            .collect(Collectors.toList()));
         return andExpr;
     }
 
     @Override
     public SmtExpression visitOr(SmtExpressionParser.OrContext ctx) {
-        OrSmtExpression orExpr = new OrSmtExpression();
-        for (SmtExpressionParser.ExprContext exprCtx : ctx.expr()) {
-            orExpr.addExpression(visit(exprCtx));
-        }
+        OrSmtExpression orExpr = new OrSmtExpression(ctx.expr().stream()
+            .map(exprCtx -> visit(exprCtx))
+            .collect(Collectors.toList()));
         return orExpr;
     }
 

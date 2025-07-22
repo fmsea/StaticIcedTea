@@ -1,5 +1,6 @@
 package dev.fmsea.util;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -10,6 +11,10 @@ public class Sets {
         return Stream.concat(left.stream(),
                              right.stream())
             .collect(Collectors.toSet());
+    }
+
+    public static <T> Set<T> union(Collection<Set<T>> xs) {
+        return xs.stream().reduce(Sets::union).orElse(Set.of());
     }
 
     public static <T> Set<T> difference(Set<T> left, Set<T> right) {

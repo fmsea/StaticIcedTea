@@ -7,19 +7,11 @@ import soot.Local;
 
 public class Identifier extends SmtExpression {
 
-    private Local identifier;
+    public final Local identifier;
 
     public Identifier(Local identifier) {
         super();
         this.identifier = identifier;
-    }
-
-    public Set<Local> getLocals() {
-        return Set.of(identifier);
-    }
-
-    public String toSmt2() {
-        return this.identifier.toString();
     }
 
     public Optional<String> toSmt2(Local id) {
@@ -43,13 +35,7 @@ public class Identifier extends SmtExpression {
         return variables.contains(this.identifier) && variables.size() == 1;
     }
 
-    public int getPredicateCount() {
-        return 0;
-    }
-
-    public SmtGraph toGraph() {
-        SmtGraph graph = SmtGraph.empty();
-        graph.addEdge(this.identifier, this.identifier, this);
-        return graph;
+    public <R> R accept(SmtExpression.Visitor<R> visitor) {
+        return visitor.visitIdentifier(this);
     }
 }

@@ -6,9 +6,7 @@ public class SubtractionSmtExpression extends BinopSmtExpression {
         super(left, right);
     }
 
-    public String toSmt2() {
-        return String.format("(- %s %s)",
-                             this.left.toSmt2(),
-                             this.right.toSmt2());
+    public <R> R accept(SmtExpression.Visitor<R> visitor) {
+        return visitor.visitSubtractionExpr(this);
     }
 }

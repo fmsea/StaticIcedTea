@@ -92,7 +92,7 @@ public class SmtGraph {
     }
 
     private Graph<Local, DefaultEdge> computeConnectedClosure() {
-        Graph<Local, DefaultEdge> graph = new AsUndirectedGraph(this.graph);
+        Graph<Local, DefaultEdge> graph = new AsUndirectedGraph<>(this.graph);
         ManyToManyShortestPathsAlgorithm<Local, DefaultEdge> alg =
             new DijkstraManyToManyShortestPaths<>(graph);
         ManyToManyShortestPathsAlgorithm.ManyToManyShortestPaths<Local, DefaultEdge> paths =
@@ -109,7 +109,7 @@ public class SmtGraph {
     }
 
     public Map<Local, Set<Local>> connectedProjection() {
-        Graph<Local, DefaultEdge> graph = new AsUndirectedGraph(this.graph);
+        Graph<Local, DefaultEdge> graph = new AsUndirectedGraph<>(this.graph);
         Map<Local, Set<Local>> connected = new HashMap<>();
         ManyToManyShortestPathsAlgorithm<Local, DefaultEdge> alg =
             new DijkstraManyToManyShortestPaths<>(graph);

@@ -1,30 +1,24 @@
 package dev.fmsea.processing.smt;
 
-import java.util.Set;
-import java.util.Map;
-import java.util.Optional;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.stream.Stream;
-import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.function.Executable;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
-import soot.Local;
-import soot.Value;
-
-import dev.fmsea.common.Locals;
-import dev.fmsea.processing.providers.SmtExpressionProvider;
 import dev.fmsea.processing.providers.SmtExpressionIdentityProvider;
 import dev.fmsea.processing.providers.SmtExpressionReachableIdentityProvider;
 import dev.fmsea.processing.providers.SmtExpressionToSmt2Provider;
 import dev.fmsea.processing.providers.SmtExpressionToSmt2SelectionProvider;
 import dev.fmsea.processing.providers.SmtExpressionToStringProvider;
+import soot.Local;
 
 public class SmtExpressionTest {
 

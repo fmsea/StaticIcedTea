@@ -6,9 +6,7 @@ public class ModulusSmtExpression extends BinopSmtExpression {
         super(left, right);
     }
 
-    public String toSmt2() {
-        return String.format("(mod %s %s)",
-                             this.left.toSmt2(),
-                             this.right.toSmt2());
+    public <R> R accept(SmtExpression.Visitor<R> visitor) {
+        return visitor.visitModulusExpr(this);
     }
 }

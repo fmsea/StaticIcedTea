@@ -7,7 +7,7 @@ import soot.Local;
 
 public class NotSmtExpression extends SmtExpression {
 
-    private SmtExpression expr;
+    public final SmtExpression expr;
 
     public NotSmtExpression(SmtExpression expr) {
         super();
@@ -37,5 +37,9 @@ public class NotSmtExpression extends SmtExpression {
 
     public SmtGraph toGraph() {
         return this.expr.toGraph();
+    }
+
+    public <R> R accept(SmtExpression.Visitor<R> visitor) {
+        return visitor.visitNotExpr(this);
     }
 }

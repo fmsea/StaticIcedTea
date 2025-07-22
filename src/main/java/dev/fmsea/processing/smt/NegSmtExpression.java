@@ -6,7 +6,7 @@ import java.util.Set;
 import soot.Local;
 
 public class NegSmtExpression extends SmtExpression {
-    private SmtExpression expr;
+    public final SmtExpression expr;
 
     public NegSmtExpression(SmtExpression expr) {
         super();
@@ -37,5 +37,9 @@ public class NegSmtExpression extends SmtExpression {
 
     public SmtGraph toGraph() {
         return this.expr.toGraph();
+    }
+
+    public <R> R accept(SmtExpression.Visitor<R> visitor) {
+        return visitor.visitNegExpr(this);
     }
 }

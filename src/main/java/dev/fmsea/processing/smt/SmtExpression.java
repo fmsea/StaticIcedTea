@@ -8,10 +8,40 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import dev.fmsea.processing.Smt2UnionType;
+import dev.fmsea.processing.smt.visitors.ContainsAllVisitor;
+import dev.fmsea.processing.smt.visitors.ContainsLocalVisitor;
+import dev.fmsea.processing.smt.visitors.LocalsVisitor;
+import dev.fmsea.processing.smt.visitors.PredicateCounter;
+import dev.fmsea.processing.smt.visitors.SmtConverter;
+import dev.fmsea.processing.smt.visitors.SmtGraphConverter;
+import dev.fmsea.processing.smt.visitors.SubSmtConverter;
 import dev.fmsea.util.Sets;
 import soot.Local;
 
 public abstract class SmtExpression {
+
+    public interface Visitor<R> {
+        R visitFalse(FalseSmtExpression falsy);
+        R visitTrue(TrueSmtExpression truthy);
+        R visitAndExpr(AndSmtExpression expr);
+        R visitOrExpr(OrSmtExpression expr);
+        R visitAdditionExpr(AdditionSmtExpression expr);
+        R visitSubtractionExpr(SubtractionSmtExpression expr);
+        R visitMultiplicationExpr(MultiplicationSmtExpression expr);
+        R visitDivisionExpr(DivisionSmtExpression expr);
+        R visitModulusExpr(ModulusSmtExpression expr);
+        R visitEqExpr(EqSmtExpression expr);
+        R visitLeExpr(LeSmtExpression expr);
+        R visitLtExpr(LtSmtExpression expr);
+        R visitGeExpr(GeSmtExpression expr);
+        R visitGtExpr(GtSmtExpression expr);
+        R visitNegExpr(NegSmtExpression expr);
+        R visitNotExpr(NotSmtExpression expr);
+        R visitIdentifier(Identifier identifier);
+        R visitNumber(Number number);
+    }
+
+    public abstract <R> R accept(Visitor<R> visitor);
 
     public static SmtExpression TRUE() {
         return new TrueSmtExpression();
@@ -21,7 +51,9 @@ public abstract class SmtExpression {
         return new FalseSmtExpression();
     }
 
-    public abstract Set<Local> getLocals();
+    public Set<Local> getLocals() {
+        return this.accept(new LocalsVisitor());
+    }
 
     public Set<Local> getLocals(Local id) {
         return this.getConnectedVariables().get(id);
@@ -31,11 +63,17 @@ public abstract class SmtExpression {
         return this.toSmt2();
     }
 
-    public abstract String toSmt2();
+    public String toSmt2() {
+        return this.accept(new SmtConverter());
+    }
 
-    public abstract Optional<String> toSmt2(Set<Local> variables);
+    public Optional<String> toSmt2(Set<Local> variables) {
+        return this.accept(new SubSmtConverter(variables));
+    }
 
-    public abstract int getPredicateCount();
+    public int getPredicateCount() {
+        return this.accept(new PredicateCounter());
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -164,12 +202,14 @@ public abstract class SmtExpression {
     }
 
     public boolean contains(Local identifier) {
-        return this.getLocals().contains(identifier);
+        return this.accept(new ContainsLocalVisitor(identifier));
     }
 
     public boolean containsAll(Set<Local> variables) {
-        return this.getLocals().containsAll(variables);
+        return this.accept(new ContainsAllVisitor(variables));
     }
 
-    public abstract SmtGraph toGraph();
+    public SmtGraph toGraph() {
+        return this.accept(new SmtGraphConverter());
+    }
 }

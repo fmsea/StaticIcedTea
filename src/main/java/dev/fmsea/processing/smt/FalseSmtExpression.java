@@ -42,4 +42,8 @@ public class FalseSmtExpression extends SmtExpression {
     public SmtGraph toGraph() {
         return SmtGraph.empty();
     }
+
+    public <R> R accept(SmtExpression.Visitor<R> visitor) {
+        return visitor.visitFalse(this);
+    }
 }
