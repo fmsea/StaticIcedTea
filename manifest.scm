@@ -9,15 +9,9 @@
   #:use-module (gnu packages base)
   #:use-module (gnu packages bash)
   #:use-module ((gnu packages java) #:prefix java:)
-  #:use-module (gnu packages linux)
   #:use-module (gnu packages maven)
   #:use-module (gnu packages maths)
-  #:use-module (gnu packages machine-learning)
-  #:use-module (gnu packages parallel)
   #:use-module (gnu packages python)
-  #:use-module (gnu packages python-science)
-  #:use-module (gnu packages python-xyz)
-  #:use-module (gnu packages statistics)
   #:export (z3-with-java openjdk11 %project-manifest))
 
 (define z3-with-java
@@ -77,20 +71,8 @@
 
 (define %project-manifest
   (packages->manifest
-   (list ;; glibc
-         `(,openjdk11 "jdk")
+   (list `(,openjdk11 "jdk")
          maven
-         ;; bash
-         gnuplot
-         parallel
-         python-wrapper
-         python-matplotlib
-         python-pandas
-         python-scikit-learn
-         python-scipy
-         python-statsmodels
-         python-numpy
-         util-linux
          z3-with-java)))
 
 %project-manifest
