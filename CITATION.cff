@@ -1,0 +1,72 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+preferred-citation:
+  authors:
+  - family-names: "Ballou"
+    given-names: "Kenny"
+    orcid: https://orcid.org/0000−0002−6032−474X
+  - family-names: "Sherman"
+    given-names: "Elena"
+    orcid: https://orcid.org/0000−0003−4522−9725
+  title: "StaticIcedTea"
+  type: software
+  year: 2025
+  version: "1.0.0"
+references:
+  - authors:
+    - family-names: "Sherman"
+      given-names: "Elena"
+      orcid: https://orcid.org/0000−0003−4522−9725
+    - family-names: "Dwyer"
+      given-names: "Matthew B."
+    title: "Exploiting Domain and Program Structure to Synthesize Efficient and Precise Data Flow Analyses (T)"
+    journal: "2015 30th IEEE/ACM International Conference on Automated Software Engineering (ASE)"
+    doi: 10.1109/ase.2015.41
+    year: 2015
+    type: article
+  - authors:
+    - family-names: "Sherman"
+      given-names: "Elena"
+      orcid: https://orcid.org/0000−0003−4522−9725
+    title: "Redesigning Soot's Data-Flow Analysis Framework for Abstract Interpretation"
+    journal: "Companion Proceedings for the ISSTA/ECOOP 2018 Workshops"
+    type: article
+    year: 2018
+    month: 11
+    doi: 10.1145/3236454.3236506
+  - authors:
+    - family-names: "Ballou"
+      given-names: "Kenny"
+      orcid: https://orcid.org/0000−0002−6032−474X
+    - family-names: "Sherman"
+      given-names: "Elena"
+      orcid: https://orcid.org/0000−0003−4522−9725
+    title: "Incremental Transitive Closure for Zonal Abstract Domain"
+    journal: "NASA Formal Methods"
+    year: 2022
+    month: 5
+    doi: 10.1007/978-3-031-06773-0_43
+  - authors:
+    - family-names: "Ballou"
+      given-names: "Kenny"
+      orcid: https://orcid.org/0000−0002−6032−474X
+    - family-names: "Sherman"
+      given-names: "Elena"
+      orcid: https://orcid.org/0000−0003−4522−9725
+    title: "Identifying Minimal Changes in the Zone Abstract Domain"
+    journal: "Theoretical Aspects of Software Engineering"
+    year: 2023
+    month: 7
+    doi: 10.1007/978-3-031-35257-7_13
+  - authors:
+    - family-names: "Ballou"
+      given-names: "Kenny"
+      orcid: https://orcid.org/0000−0002−6032−474X
+    - family-names: "Sherman"
+      given-names: "Elena"
+      orcid: https://orcid.org/0000−0003−4522−9725
+    title: "Minimally Comparing Relational Abstract Domains"
+    journal: "Automated Technology for Verification and Analysis"
+    year: 2023
+    month: 10
+    doi: 10.1007/978-3-031-45332-8_8

@@ -48,7 +48,7 @@ Download the Z3 sources and build the project for your machine.
 ```bash
 git clone git://github.com/Z3Prover/z3.git
 cd z3
-git checkout z3-4.8.10
+git checkout z3-4.8.12
 python scripts/mk_make.py --java
 cd build
 make
@@ -179,6 +179,17 @@ Test that it works by using something like the following:
 
 > Unfortunately, this does not work since Borah does not support user
 > namespaces.
+
+## Acknowledgments #
+
+This project was developed with support from the U.S. National Science
+Foundation under award CCF-19-42044.
+
+### Authors ###
+
+- [Elena Sherman](https://github.com/esherman77)
+
+- [Kenny Ballou](https://github.com/kennyballou)
 
 ## License ##
 
