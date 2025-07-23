@@ -25,11 +25,11 @@ public class OctagonDifferenceBoundedMatrixProperties {
                 return IntStream.range(0, m.N).boxed().flatMap(i -> {
                         return IntStream.range(0, m.N).boxed().flatMap(j -> {
                                 if (i == j) {
-                                    return Stream.of(() -> assertEquals(Constraint.of(0),
+                                    return Stream.<Executable>of(() -> assertEquals(Constraint.of(0),
                                         m.getConstraint(i, i),
                                         "self loop was not zero"));
                                 } else {
-                                    return Stream.of(() -> assertTrue(Constraint.compare(m.getConstraint(i, j),
+                                    return Stream.<Executable>of(() -> assertTrue(Constraint.compare(m.getConstraint(i, j),
                                         Constraint.add(m.getConstraint(i, k),
                                             m.getConstraint(k, j))) <= 0,
                                         () -> String.format("closure is not closed: k = %d, i = %d, j = %d [%s > %s + %s = (%s)]",
@@ -57,8 +57,8 @@ public class OctagonDifferenceBoundedMatrixProperties {
                       .boxed()
                       .flatMap(i -> {
                               return IntStream.range(0, N).boxed().flatMap(j -> {
-                                      return Stream.of(() -> assertEquals(m.getConstraint(i, j),
-                                                                          m.getConstraint(j ^ 1, i ^ 1)));
+                                      return Stream.<Executable>of(() -> assertEquals(m.getConstraint(i, j),
+                                          m.getConstraint(j ^ 1, i ^ 1)));
                                   });
                           }));
         }
@@ -81,8 +81,8 @@ public class OctagonDifferenceBoundedMatrixProperties {
                       .boxed()
                       .flatMap(i -> {
                               return IntStream.range(0, N).boxed().flatMap(j -> {
-                                      return Stream.of(() -> assertEquals(m.getConstraint(i, j),
-                                                                          m.getConstraint(j ^ 1, i ^ 1)));
+                                      return Stream.<Executable>of(() -> assertEquals(m.getConstraint(i, j),
+                                          m.getConstraint(j ^ 1, i ^ 1)));
                                   });
                           }));
         }
@@ -116,12 +116,12 @@ public class OctagonDifferenceBoundedMatrixProperties {
                                             return IntStream.range(0, N).boxed().flatMap(i -> {
                                                     return IntStream.range(0, N).boxed().flatMap(j -> {
                                                             if (i == j) {
-                                                                return Stream.of(() -> assertEquals(Constraint.of(0),
-                                                                                                    m.getConstraint(i, j)));
+                                                                return Stream.<Executable>of(() -> assertEquals(Constraint.of(0),
+                                                                    m.getConstraint(i, j)));
                                                             } else {
-                                                                return Stream.of(() -> assertTrue(Constraint.compare(m.getConstraint(i, j),
-                                                                                                                     Constraint.add(m.getConstraint(i, k),
-                                                                                                                                    m.getConstraint(k, j))) <= 0));
+                                                                return Stream.<Executable>of(() -> assertTrue(Constraint.compare(m.getConstraint(i, j),
+                                                                    Constraint.add(m.getConstraint(i, k),
+                                                                        m.getConstraint(k, j))) <= 0));
                                                             }
                                                         });
                                                 });
