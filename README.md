@@ -1,5 +1,7 @@
 # StaticIcedTea #
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16693791.svg)](https://doi.org/10.5281/zenodo.16693791)
+
 ## Dependencies and environment ##
 
 * Java 11

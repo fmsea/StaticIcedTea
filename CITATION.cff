@@ -12,6 +12,7 @@ preferred-citation:
   type: software
   year: 2025
   version: "1.0.0"
+  doi: 10.5281/zenodo.16693789
 references:
   - authors:
     - family-names: "Sherman"
