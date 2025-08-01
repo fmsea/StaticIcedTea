@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import java.util.stream.Collectors;
 
 import soot.Local;
@@ -84,6 +85,25 @@ public class AnalysisSMTReport {
 
     public Optional<Set<Local>> getBranchChangedVariables(String statement) {
         return Optional.ofNullable(this.branchChangedVariables.get(statement));
+    }
+
+    public Optional<Set<String>> getFallExprs() {
+        return Optional.ofNullable(this.fallThroughSmtExpressions.values().stream()
+            .filter(expr -> expr != null)
+            .collect(Collectors.toSet()));
+    }
+
+    public Optional<Set<String>> getBranchExprs() {
+        return Optional.ofNullable(this.branchOutSmtExpressions.values().stream()
+            .filter(expr -> expr != null)
+            .collect(Collectors.toSet()));
+    }
+
+    public Optional<Set<String>> getAllExprs() {
+        return Optional.ofNullable(Stream.concat(
+            this.getFallExprs().stream().flatMap(exprs -> exprs.stream()),
+            this.getBranchExprs().stream().flatMap(exprs -> exprs.stream()))
+            .collect(Collectors.toSet()));
     }
 
     @Override

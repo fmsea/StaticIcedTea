@@ -269,7 +269,20 @@ public class Smt2ReaderTest {
                       () -> assertEquals(Optional.of(Set.of(Locals.get("$z0"))),
                                          report.getFallChangedVariables("5 $z0 = 0:<test.Base64: boolean isPad(byte)>")),
                       () -> assertEquals(Optional.empty(),
-                                         report.getFallChangedVariables("6 return $z0:<test.Base64: boolean isPad(byte)>")));
+                                         report.getFallChangedVariables("6 return $z0:<test.Base64: boolean isPad(byte)>")),
+                      () -> assertEquals(Optional.of(Set.of("(= b0 61)",
+                                                            "(and (= $z0 1) (= b0 61))",
+                                                            "(= $z0 0)",
+                                                            "(and (>= $z0 0) (< $z0 0) (>= b0 0) (< b0 0))")),
+                                         report.getFallExprs()),
+                      () -> assertEquals(Optional.of(Set.of("(and (= $z0 1)\n\t(= b0 61))")),
+                                         report.getBranchExprs()),
+                      () -> assertEquals(Optional.of(Set.of("(and (= $z0 1)\n\t(= b0 61))",
+                                                            "(= b0 61)",
+                                                            "(and (= $z0 1) (= b0 61))",
+                                                            "(= $z0 0)",
+                                                            "(and (>= $z0 0) (< $z0 0) (>= b0 0) (< b0 0))")),
+                                         report.getAllExprs()));
         }
     }
 
@@ -285,7 +298,13 @@ public class Smt2ReaderTest {
                   () -> assertEquals(Optional.of(Set.of(Locals.get("l0"))),
                                      report.getFallChangedVariables("4 if l0 >= 3 goto l3 = 6")),
                   () -> assertEquals(Optional.of("false"),
-                                     report.getFallThrough("4 if l0 >= 3 goto l3 = 6")));
+                                     report.getFallThrough("4 if l0 >= 3 goto l3 = 6")),
+                  () -> assertEquals(Optional.of(Set.of("false")),
+                                     report.getFallExprs()),
+                  () -> assertEquals(Optional.of(Set.of()),
+                                     report.getBranchExprs()),
+                  () -> assertEquals(Optional.of(Set.of("false")),
+                                     report.getAllExprs()));
     }
 
     @Test
@@ -304,6 +323,12 @@ public class Smt2ReaderTest {
                   () -> assertEquals(Optional.empty(),
                                      report.getBranchChangedVariables("7 test-statement")),
                   () -> assertEquals(Optional.of("true"),
-                                     report.getBranchOut("7 test-statement")));
+                                     report.getBranchOut("7 test-statement")),
+                  () -> assertEquals(Optional.of(Set.of("true")),
+                                     report.getFallExprs()),
+                  () -> assertEquals(Optional.of(Set.of("true")),
+                                     report.getBranchExprs()),
+                  () -> assertEquals(Optional.of(Set.of("true")),
+                                     report.getAllExprs()));
     }
 }
