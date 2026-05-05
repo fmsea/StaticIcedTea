@@ -31,14 +31,14 @@ public class IntervalProjectionRewriter implements TADR.Visitor<Stream<TADR>> {
         this.env = env;
     }
 
-    public Stream<TADR> visitEqCmp(EqCmp expr) {
+    public Stream<TADR> visit(EqCmp expr) {
         return expr.right.accept(this)
             .flatMap(right -> Stream.<TADR>of(
                 TADR.newLeExpr(expr.left, right),
                 TADR.newGeExpr(expr.left, right)));
     }
 
-    public Stream<TADR> visitLeCmp(LeCmp expr) {
+    public Stream<TADR> visit(LeCmp expr) {
         if (expr.left instanceof Variable && expr.right instanceof Variable) {
             return Stream.concat(
                 expr.left.accept(this)
@@ -51,7 +51,7 @@ public class IntervalProjectionRewriter implements TADR.Visitor<Stream<TADR>> {
         }
     }
 
-    public Stream<TADR> visitLtCmp(LtCmp expr) {
+    public Stream<TADR> visit(LtCmp expr) {
         if (expr.left instanceof Variable && expr.right instanceof Variable) {
             return Stream.concat(
                 expr.left.accept(this)
@@ -64,7 +64,7 @@ public class IntervalProjectionRewriter implements TADR.Visitor<Stream<TADR>> {
         }
     }
 
-    public Stream<TADR> visitGeCmp(GeCmp expr) {
+    public Stream<TADR> visit(GeCmp expr) {
         if (expr.left instanceof Variable && expr.right instanceof Variable) {
             return Stream.concat(
                 expr.left.accept(this)
@@ -77,7 +77,7 @@ public class IntervalProjectionRewriter implements TADR.Visitor<Stream<TADR>> {
         }
     }
 
-    public Stream<TADR> visitGtCmp(GtCmp expr) {
+    public Stream<TADR> visit(GtCmp expr) {
         if (expr.left instanceof Variable && expr.right instanceof Variable) {
             return Stream.concat(
                 expr.left.accept(this)
@@ -90,19 +90,19 @@ public class IntervalProjectionRewriter implements TADR.Visitor<Stream<TADR>> {
         }
     }
 
-    public Stream<TADR> visitNeCmp(NeCmp expr) {
+    public Stream<TADR> visit(NeCmp expr) {
         return Stream.of(expr);
     }
 
-    public Stream<TADR> visitNegOp(NegOp expr) {
+    public Stream<TADR> visit(NegOp expr) {
         return expr.expr.accept(this).map(e -> TADR.newNegExpr(e));
     }
 
-    public Stream<TADR> visitNotOp(NotOp expr) {
+    public Stream<TADR> visit(NotOp expr) {
         return Stream.of(expr);
     }
 
-    public Stream<TADR> visitAdditionOp(AdditionOp expr) {
+    public Stream<TADR> visit(AdditionOp expr) {
         return expr.left.accept(this)
             .flatMap(left -> {
                 return expr.right.accept(this).map(right -> {
@@ -111,7 +111,7 @@ public class IntervalProjectionRewriter implements TADR.Visitor<Stream<TADR>> {
             });
     }
 
-    public Stream<TADR> visitSubtractionOp(SubtractionOp expr) {
+    public Stream<TADR> visit(SubtractionOp expr) {
         return expr.left.accept(this)
             .flatMap(left -> {
                 return expr.right.accept(this).map(right -> {
@@ -120,7 +120,7 @@ public class IntervalProjectionRewriter implements TADR.Visitor<Stream<TADR>> {
             });
     }
 
-    public Stream<TADR> visitMultiplicationOp(MultiplicationOp expr) {
+    public Stream<TADR> visit(MultiplicationOp expr) {
         return expr.left.accept(this)
             .flatMap(left -> {
                 return expr.right.accept(this).map(right -> {
@@ -129,7 +129,7 @@ public class IntervalProjectionRewriter implements TADR.Visitor<Stream<TADR>> {
             });
     }
 
-    public Stream<TADR> visitDivisionOp(DivisionOp expr) {
+    public Stream<TADR> visit(DivisionOp expr) {
         return expr.left.accept(this)
             .flatMap(left -> {
                 return expr.right.accept(this).map(right -> {
@@ -138,11 +138,11 @@ public class IntervalProjectionRewriter implements TADR.Visitor<Stream<TADR>> {
             });
     }
 
-    public Stream<TADR> visitVariable(Variable variable) {
+    public Stream<TADR> visit(Variable variable) {
         return Stream.of(TADR.newValue(env.apply(variable.variable)));
     }
 
-    public Stream<TADR> visitValue(Value value) {
+    public Stream<TADR> visit(Value value) {
         return Stream.of(value);
     }
 }

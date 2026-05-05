@@ -8,6 +8,6 @@ public class NegOp extends TADR {
     }
 
     public <R> R accept(TADR.Visitor<R> visitor) {
-        return visitor.visitNegOp(this);
+        return visitor.visit(this);
     }
 }

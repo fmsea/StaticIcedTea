@@ -29,59 +29,59 @@ public class VariableVisitor implements TADR.Visitor<Set<Local>> {
             expr.right.accept(this).stream())
             .collect(Collectors.toSet());
     }
-    public Set<Local> visitEqCmp(EqCmp expr) {
+    public Set<Local> visit(EqCmp expr) {
         return visitBinaryOp(expr);
     }
 
-    public Set<Local> visitLeCmp(LeCmp expr) {
+    public Set<Local> visit(LeCmp expr) {
         return visitBinaryOp(expr);
     }
 
-    public Set<Local> visitLtCmp(LtCmp expr) {
+    public Set<Local> visit(LtCmp expr) {
         return visitBinaryOp(expr);
     }
 
-    public Set<Local> visitGeCmp(GeCmp expr) {
+    public Set<Local> visit(GeCmp expr) {
         return visitBinaryOp(expr);
     }
 
-    public Set<Local> visitGtCmp(GtCmp expr) {
+    public Set<Local> visit(GtCmp expr) {
         return visitBinaryOp(expr);
     }
 
-    public Set<Local> visitNeCmp(NeCmp expr) {
+    public Set<Local> visit(NeCmp expr) {
         return visitBinaryOp(expr);
     }
 
-    public Set<Local> visitNegOp(NegOp expr) {
+    public Set<Local> visit(NegOp expr) {
         return expr.expr.accept(this);
     }
 
-    public Set<Local> visitNotOp(NotOp expr) {
+    public Set<Local> visit(NotOp expr) {
         return expr.expr.accept(this);
     }
 
-    public Set<Local> visitAdditionOp(AdditionOp expr) {
+    public Set<Local> visit(AdditionOp expr) {
         return visitBinaryOp(expr);
     }
 
-    public Set<Local> visitSubtractionOp(SubtractionOp expr) {
+    public Set<Local> visit(SubtractionOp expr) {
         return visitBinaryOp(expr);
     }
 
-    public Set<Local> visitMultiplicationOp(MultiplicationOp expr) {
+    public Set<Local> visit(MultiplicationOp expr) {
         return visitBinaryOp(expr);
     }
 
-    public Set<Local> visitDivisionOp(DivisionOp expr) {
+    public Set<Local> visit(DivisionOp expr) {
         return visitBinaryOp(expr);
     }
 
-    public Set<Local> visitVariable(Variable variable) {
+    public Set<Local> visit(Variable variable) {
         return Set.of(variable.variable);
     }
 
-    public Set<Local> visitValue(Value value) {
+    public Set<Local> visit(Value value) {
         return Set.of();
     }
 }

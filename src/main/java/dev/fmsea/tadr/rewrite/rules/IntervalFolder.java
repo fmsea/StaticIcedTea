@@ -23,53 +23,53 @@ public class IntervalFolder implements TADR.Visitor<TADR> {
     public IntervalFolder() {
     }
 
-    public TADR visitEqCmp(EqCmp expr) {
+    public TADR visit(EqCmp expr) {
         return TADR.newEqExpr(
             expr.left.accept(this),
             expr.right.accept(this));
     }
 
-    public TADR visitLeCmp(LeCmp expr) {
+    public TADR visit(LeCmp expr) {
         return TADR.newLeExpr(
             expr.left.accept(this),
             expr.right.accept(this));
     }
 
-    public TADR visitLtCmp(LtCmp expr) {
+    public TADR visit(LtCmp expr) {
         return TADR.newLtExpr(
             expr.left.accept(this),
             expr.right.accept(this));
     }
 
-    public TADR visitGeCmp(GeCmp expr) {
+    public TADR visit(GeCmp expr) {
         return TADR.newGeExpr(
             expr.left.accept(this),
             expr.right.accept(this));
     }
 
-    public TADR visitGtCmp(GtCmp expr) {
+    public TADR visit(GtCmp expr) {
         return TADR.newGtExpr(
             expr.left.accept(this),
             expr.right.accept(this));
     }
 
-    public TADR visitNeCmp(NeCmp expr) {
+    public TADR visit(NeCmp expr) {
         return TADR.newNeExpr(
             expr.left.accept(this),
             expr.right.accept(this));
     }
 
-    public TADR visitNegOp(NegOp expr) {
+    public TADR visit(NegOp expr) {
         return TADR.newNegExpr(
             expr.expr.accept(this));
     }
 
-    public TADR visitNotOp(NotOp expr) {
+    public TADR visit(NotOp expr) {
         return TADR.newNotExpr(
             expr.expr.accept(this));
     }
 
-    public TADR visitAdditionOp(AdditionOp expr) {
+    public TADR visit(AdditionOp expr) {
         TADR leftExpr = expr.left.accept(this);
         TADR rightExpr = expr.right.accept(this);
         if (leftExpr instanceof Value && rightExpr instanceof Value) {
@@ -97,7 +97,7 @@ public class IntervalFolder implements TADR.Visitor<TADR> {
         }
     }
 
-    public TADR visitSubtractionOp(SubtractionOp expr) {
+    public TADR visit(SubtractionOp expr) {
         TADR leftExpr = expr.left.accept(this);
         TADR rightExpr = expr.right.accept(this);
         if (leftExpr instanceof Value && rightExpr instanceof Value) {
@@ -125,7 +125,7 @@ public class IntervalFolder implements TADR.Visitor<TADR> {
         }
     }
 
-    public TADR visitMultiplicationOp(MultiplicationOp expr) {
+    public TADR visit(MultiplicationOp expr) {
         TADR leftExpr = expr.left.accept(this);
         TADR rightExpr = expr.right.accept(this);
         if (leftExpr instanceof Value && rightExpr instanceof Value) {
@@ -153,7 +153,7 @@ public class IntervalFolder implements TADR.Visitor<TADR> {
         }
     }
 
-    public TADR visitDivisionOp(DivisionOp expr) {
+    public TADR visit(DivisionOp expr) {
         TADR leftExpr = expr.left.accept(this);
         TADR rightExpr = expr.right.accept(this);
         if (leftExpr instanceof Value && rightExpr instanceof Value) {
@@ -180,11 +180,11 @@ public class IntervalFolder implements TADR.Visitor<TADR> {
             return expr;
         }
     }
-    public TADR visitVariable(Variable variable) {
+    public TADR visit(Variable variable) {
         return variable;
     }
 
-    public TADR visitValue(Value value) {
+    public TADR visit(Value value) {
         return value;
     }
 }

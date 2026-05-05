@@ -23,59 +23,59 @@ public class ReassignmentIntervalFilter implements TADR.Visitor<Boolean> {
         return expr.right instanceof Value;
     }
 
-    public Boolean visitEqCmp(EqCmp expr) {
+    public Boolean visit(EqCmp expr) {
         return visitBinaryOp(expr);
     }
 
-    public Boolean visitLeCmp(LeCmp expr) {
+    public Boolean visit(LeCmp expr) {
         return visitBinaryOp(expr);
     }
 
-    public Boolean visitLtCmp(LtCmp expr) {
+    public Boolean visit(LtCmp expr) {
         return visitBinaryOp(expr);
     }
 
-    public Boolean visitGeCmp(GeCmp expr) {
+    public Boolean visit(GeCmp expr) {
         return visitBinaryOp(expr);
     }
 
-    public Boolean visitGtCmp(GtCmp expr) {
+    public Boolean visit(GtCmp expr) {
         return visitBinaryOp(expr);
     }
 
-    public Boolean visitNeCmp(NeCmp expr) {
+    public Boolean visit(NeCmp expr) {
         return false;
     }
 
-    public Boolean visitNegOp(NegOp expr) {
+    public Boolean visit(NegOp expr) {
         return false;
     }
 
-    public Boolean visitNotOp(NotOp expr) {
+    public Boolean visit(NotOp expr) {
         return false;
     }
 
-    public Boolean visitAdditionOp(AdditionOp expr) {
+    public Boolean visit(AdditionOp expr) {
         return false;
     }
 
-    public Boolean visitSubtractionOp(SubtractionOp expr) {
+    public Boolean visit(SubtractionOp expr) {
         return false;
     }
 
-    public Boolean visitMultiplicationOp(MultiplicationOp expr) {
+    public Boolean visit(MultiplicationOp expr) {
         return false;
     }
 
-    public Boolean visitDivisionOp(DivisionOp expr) {
+    public Boolean visit(DivisionOp expr) {
         return false;
     }
 
-    public Boolean visitVariable(Variable variable) {
+    public Boolean visit(Variable variable) {
         return false;
     }
 
-    public Boolean visitValue(Value value) {
+    public Boolean visit(Value value) {
         return false;
     }
 }

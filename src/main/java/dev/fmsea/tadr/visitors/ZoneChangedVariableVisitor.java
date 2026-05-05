@@ -23,14 +23,14 @@ import soot.Local;
 
 public class ZoneChangedVariableVisitor implements TADR.Visitor<Set<Local>> {
 
-    public Set<Local> visitEqCmp(EqCmp expr) {
+    public Set<Local> visit(EqCmp expr) {
         return Stream.concat(
             expr.left.accept(this).stream(),
             expr.right.accept(this).stream())
             .collect(Collectors.toSet());
     }
 
-    public Set<Local> visitLeCmp(LeCmp expr) {
+    public Set<Local> visit(LeCmp expr) {
         Set<Local> left = expr.left.accept(this);
         Set<Local> right = expr.right.accept(this);
         if (!left.isEmpty()) {
@@ -40,7 +40,7 @@ public class ZoneChangedVariableVisitor implements TADR.Visitor<Set<Local>> {
         }
     }
 
-    public Set<Local> visitLtCmp(LtCmp expr) {
+    public Set<Local> visit(LtCmp expr) {
         Set<Local> left = expr.left.accept(this);
         Set<Local> right = expr.right.accept(this);
         if (!left.isEmpty()) {
@@ -50,7 +50,7 @@ public class ZoneChangedVariableVisitor implements TADR.Visitor<Set<Local>> {
         }
     }
 
-    public Set<Local> visitGeCmp(GeCmp expr) {
+    public Set<Local> visit(GeCmp expr) {
         Set<Local> left = expr.left.accept(this);
         Set<Local> right = expr.right.accept(this);
         if (!right.isEmpty()) {
@@ -60,7 +60,7 @@ public class ZoneChangedVariableVisitor implements TADR.Visitor<Set<Local>> {
         }
     }
 
-    public Set<Local> visitGtCmp(GtCmp expr) {
+    public Set<Local> visit(GtCmp expr) {
         Set<Local> left = expr.left.accept(this);
         Set<Local> right = expr.right.accept(this);
         if (!right.isEmpty()) {
@@ -70,22 +70,22 @@ public class ZoneChangedVariableVisitor implements TADR.Visitor<Set<Local>> {
         }
     }
 
-    public Set<Local> visitNeCmp(NeCmp expr) {
+    public Set<Local> visit(NeCmp expr) {
         return Stream.concat(
             expr.left.accept(this).stream(),
             expr.right.accept(this).stream())
             .collect(Collectors.toSet());
     }
 
-    public Set<Local> visitNegOp(NegOp expr) {
+    public Set<Local> visit(NegOp expr) {
         return expr.expr.accept(this);
     }
 
-    public Set<Local> visitNotOp(NotOp expr) {
+    public Set<Local> visit(NotOp expr) {
         return expr.expr.accept(this);
     }
 
-    public Set<Local> visitAdditionOp(AdditionOp expr) {
+    public Set<Local> visit(AdditionOp expr) {
         Set<Local> left = expr.left.accept(this);
         Set<Local> right = expr.right.accept(this);
         if (!left.isEmpty() && !right.isEmpty()) {
@@ -97,7 +97,7 @@ public class ZoneChangedVariableVisitor implements TADR.Visitor<Set<Local>> {
         }
     }
 
-    public Set<Local> visitSubtractionOp(SubtractionOp expr) {
+    public Set<Local> visit(SubtractionOp expr) {
         Set<Local> left = expr.left.accept(this);
         Set<Local> right = expr.right.accept(this);
         if (!left.isEmpty() && !right.isEmpty()) {
@@ -109,19 +109,19 @@ public class ZoneChangedVariableVisitor implements TADR.Visitor<Set<Local>> {
         }
     }
 
-    public Set<Local> visitMultiplicationOp(MultiplicationOp expr) {
+    public Set<Local> visit(MultiplicationOp expr) {
         return Set.of();
     }
 
-    public Set<Local> visitDivisionOp(DivisionOp expr) {
+    public Set<Local> visit(DivisionOp expr) {
         return Set.of();
     }
 
-    public Set<Local> visitVariable(Variable variable) {
+    public Set<Local> visit(Variable variable) {
         return Set.of(variable.variable);
     }
 
-    public Set<Local> visitValue(Value value) {
+    public Set<Local> visit(Value value) {
         return Set.of();
     }
 }

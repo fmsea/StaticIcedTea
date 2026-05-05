@@ -7,6 +7,6 @@ public class GeCmp extends BinaryOp {
 
     @Override
     public <R> R accept(TADR.Visitor<R> visitor) {
-        return visitor.visitGeCmp(this);
+        return visitor.visit(this);
     }
 }

@@ -17,20 +17,20 @@ import soot.jimple.NullConstant;
 public abstract class TADR {
 
     public interface Visitor<R> {
-        R visitEqCmp(EqCmp expr);
-        R visitLeCmp(LeCmp expr);
-        R visitLtCmp(LtCmp expr);
-        R visitGeCmp(GeCmp expr);
-        R visitGtCmp(GtCmp expr);
-        R visitNeCmp(NeCmp expr);
-        R visitNegOp(NegOp expr);
-        R visitNotOp(NotOp expr);
-        R visitAdditionOp(AdditionOp expr);
-        R visitSubtractionOp(SubtractionOp expr);
-        R visitMultiplicationOp(MultiplicationOp expr);
-        R visitDivisionOp(DivisionOp expr);
-        R visitVariable(Variable variable);
-        R visitValue(Value value);
+        R visit(EqCmp expr);
+        R visit(LeCmp expr);
+        R visit(LtCmp expr);
+        R visit(GeCmp expr);
+        R visit(GtCmp expr);
+        R visit(NeCmp expr);
+        R visit(NegOp expr);
+        R visit(NotOp expr);
+        R visit(AdditionOp expr);
+        R visit(SubtractionOp expr);
+        R visit(MultiplicationOp expr);
+        R visit(DivisionOp expr);
+        R visit(Variable variable);
+        R visit(Value value);
     }
 
     public abstract <R> R accept(Visitor<R> visitor);

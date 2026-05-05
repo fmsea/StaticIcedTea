@@ -18,79 +18,79 @@ import dev.fmsea.tadr.Variable;
 
 public class SmtConverter implements TADR.Visitor<String> {
 
-    public String visitEqCmp(EqCmp expr) {
+    public String visit(EqCmp expr) {
         return String.format("(= %s %s)",
             expr.left.accept(this),
             expr.right.accept(this));
     }
 
-    public String visitLeCmp(LeCmp expr) {
+    public String visit(LeCmp expr) {
         return String.format("(<= %s %s)",
             expr.left.accept(this),
             expr.right.accept(this));
     }
 
-    public String visitLtCmp(LtCmp expr) {
+    public String visit(LtCmp expr) {
         return String.format("(< %s %s)",
             expr.left.accept(this),
             expr.right.accept(this));
     }
 
-    public String visitGeCmp(GeCmp expr) {
+    public String visit(GeCmp expr) {
         return String.format("(>= %s %s)",
             expr.left.accept(this),
             expr.right.accept(this));
     }
 
-    public String visitGtCmp(GtCmp expr) {
+    public String visit(GtCmp expr) {
         return String.format("(> %s %s)",
             expr.left.accept(this),
             expr.right.accept(this));
     }
 
-    public String visitNeCmp(NeCmp expr) {
+    public String visit(NeCmp expr) {
         return String.format("(not (= %s %s))",
             expr.left.accept(this),
             expr.right.accept(this));
     }
 
-    public String visitNegOp(NegOp expr) {
+    public String visit(NegOp expr) {
         return String.format("(- %s)", expr.expr.accept(this));
     }
 
-    public String visitNotOp(NotOp expr) {
+    public String visit(NotOp expr) {
         return String.format("(not %s)", expr.expr.accept(this));
     }
 
-    public String visitAdditionOp(AdditionOp expr) {
+    public String visit(AdditionOp expr) {
         return String.format("(+ %s %s)",
             expr.left.accept(this),
             expr.right.accept(this));
     }
 
-    public String visitSubtractionOp(SubtractionOp expr) {
+    public String visit(SubtractionOp expr) {
         return String.format("(- %s %s)",
             expr.left.accept(this),
             expr.right.accept(this));
     }
 
-    public String visitMultiplicationOp(MultiplicationOp expr) {
+    public String visit(MultiplicationOp expr) {
         return String.format("(* %s %s)",
             expr.left.accept(this),
             expr.right.accept(this));
     }
 
-    public String visitDivisionOp(DivisionOp expr) {
+    public String visit(DivisionOp expr) {
         return String.format("(div %s %s)",
             expr.left.accept(this),
             expr.right.accept(this));
     }
 
-    public String visitVariable(Variable variable) {
+    public String visit(Variable variable) {
         return variable.variable.toString();
     }
 
-    public String visitValue(Value value) {
+    public String visit(Value value) {
         if (value.number.isSingleton() && value.number.lowerBoundOrElse() < 0) {
             return String.format("(- %s)", value.number.lowerBoundOrElse() * -1);
         } else {

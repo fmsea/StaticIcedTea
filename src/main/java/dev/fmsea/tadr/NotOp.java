@@ -8,6 +8,6 @@ public class NotOp extends TADR {
     }
 
     public <R> R accept(TADR.Visitor<R> visitor) {
-        return visitor.visitNotOp(this);
+        return visitor.visit(this);
     }
 }

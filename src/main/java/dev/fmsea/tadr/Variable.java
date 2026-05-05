@@ -10,6 +10,6 @@ public class Variable extends TADR {
     }
 
     public <R> R accept(TADR.Visitor<R> visitor) {
-        return visitor.visitVariable(this);
+        return visitor.visit(this);
     }
 }

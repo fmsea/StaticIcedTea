@@ -24,7 +24,7 @@ public class ReassignmentVisitor implements TADR.Visitor<Boolean> {
     private Variable variable;
     private VariableVisitor variableCounts = new VariableVisitor();
 
-    public Boolean visitEqCmp(EqCmp expr) {
+    public Boolean visit(EqCmp expr) {
         Set<Local> right = expr.right.accept(variableCounts);
         if (expr.left instanceof Variable) {
             this.variable = (Variable)expr.left;
@@ -34,55 +34,55 @@ public class ReassignmentVisitor implements TADR.Visitor<Boolean> {
         }
     }
 
-    public Boolean visitLeCmp(LeCmp expr) {
+    public Boolean visit(LeCmp expr) {
         return false;
     }
 
-    public Boolean visitLtCmp(LtCmp expr) {
+    public Boolean visit(LtCmp expr) {
         return false;
     }
 
-    public Boolean visitGeCmp(GeCmp expr) {
+    public Boolean visit(GeCmp expr) {
         return false;
     }
 
-    public Boolean visitGtCmp(GtCmp expr) {
+    public Boolean visit(GtCmp expr) {
         return false;
     }
 
-    public Boolean visitNeCmp(NeCmp expr) {
+    public Boolean visit(NeCmp expr) {
         return false;
     }
 
-    public Boolean visitNegOp(NegOp expr) {
+    public Boolean visit(NegOp expr) {
         return false;
     }
 
-    public Boolean visitNotOp(NotOp expr) {
+    public Boolean visit(NotOp expr) {
         return false;
     }
 
-    public Boolean visitAdditionOp(AdditionOp expr) {
+    public Boolean visit(AdditionOp expr) {
         return expr.left.accept(this) || expr.right.accept(this);
     }
 
-    public Boolean visitSubtractionOp(SubtractionOp expr) {
+    public Boolean visit(SubtractionOp expr) {
         return expr.left.accept(this) || expr.right.accept(this);
     }
 
-    public Boolean visitMultiplicationOp(MultiplicationOp expr) {
+    public Boolean visit(MultiplicationOp expr) {
         return expr.left.accept(this) || expr.right.accept(this);
     }
 
-    public Boolean visitDivisionOp(DivisionOp expr) {
+    public Boolean visit(DivisionOp expr) {
         return false;
     }
 
-    public Boolean visitVariable(Variable variable) {
+    public Boolean visit(Variable variable) {
         return this.variable.equals(variable);
     }
 
-    public Boolean visitValue(Value value) {
+    public Boolean visit(Value value) {
         return false;
     }
 }

@@ -7,6 +7,6 @@ public class MultiplicationOp extends BinaryOp {
 
     @Override
     public <R> R accept(TADR.Visitor<R> visitor) {
-        return visitor.visitMultiplicationOp(this);
+        return visitor.visit(this);
     }
 }

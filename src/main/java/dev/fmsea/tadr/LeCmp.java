@@ -7,6 +7,6 @@ public class LeCmp extends BinaryOp {
 
     @Override
     public <R> R accept(TADR.Visitor<R> visitor) {
-        return visitor.visitLeCmp(this);
+        return visitor.visit(this);
     }
 }

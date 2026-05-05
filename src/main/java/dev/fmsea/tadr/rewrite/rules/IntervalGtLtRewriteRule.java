@@ -25,15 +25,15 @@ import dev.fmsea.tadr.Value;
 
 public class IntervalGtLtRewriteRule implements TADR.Visitor<TADR> {
 
-    public TADR visitEqCmp(EqCmp expr) {
+    public TADR visit(EqCmp expr) {
         return expr;
     }
 
-    public TADR visitLeCmp(LeCmp expr) {
+    public TADR visit(LeCmp expr) {
         return expr;
     }
 
-    public TADR visitLtCmp(LtCmp expr) {
+    public TADR visit(LtCmp expr) {
         TADR right = expr.right.accept(this);
         if (right instanceof Value) {
             Interval32Box val = ((Value)right).number;
@@ -47,11 +47,11 @@ public class IntervalGtLtRewriteRule implements TADR.Visitor<TADR> {
         }
     }
 
-    public TADR visitGeCmp(GeCmp expr) {
+    public TADR visit(GeCmp expr) {
         return expr;
     }
 
-    public TADR visitGtCmp(GtCmp expr) {
+    public TADR visit(GtCmp expr) {
         TADR right = expr.right.accept(this);
         if (right instanceof Value) {
             Interval32Box val = ((Value)right).number;
@@ -65,40 +65,40 @@ public class IntervalGtLtRewriteRule implements TADR.Visitor<TADR> {
         }
     }
 
-    public TADR visitNeCmp(NeCmp expr) {
+    public TADR visit(NeCmp expr) {
         return expr;
     }
 
-    public TADR visitNegOp(NegOp expr) {
+    public TADR visit(NegOp expr) {
         return expr;
     }
 
-    public TADR visitNotOp(NotOp expr) {
+    public TADR visit(NotOp expr) {
         return expr;
     }
 
-    public TADR visitAdditionOp(AdditionOp expr) {
+    public TADR visit(AdditionOp expr) {
         return expr;
     }
 
-    public TADR visitSubtractionOp(SubtractionOp expr) {
+    public TADR visit(SubtractionOp expr) {
         return expr;
     }
 
-    public TADR visitMultiplicationOp(MultiplicationOp expr) {
+    public TADR visit(MultiplicationOp expr) {
         return expr;
     }
 
-    public TADR visitDivisionOp(DivisionOp expr) {
+    public TADR visit(DivisionOp expr) {
         return expr;
     }
 
-    public TADR visitVariable(Variable variable) {
+    public TADR visit(Variable variable) {
         System.exit(-42); // die!
         return variable;
     }
 
-    public TADR visitValue(Value value) {
+    public TADR visit(Value value) {
         return value;
     }
 }

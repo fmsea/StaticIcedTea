@@ -10,6 +10,6 @@ public class Value extends TADR {
     }
 
     public <R> R accept(TADR.Visitor<R> visitor) {
-        return visitor.visitValue(this);
+        return visitor.visit(this);
     }
 }
