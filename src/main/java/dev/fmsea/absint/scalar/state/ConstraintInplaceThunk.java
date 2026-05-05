@@ -17,7 +17,7 @@ public class ConstraintInplaceThunk extends ConstraintThunk {
     }
 
     public <R> R accept(ConstraintThunk.Visitor<R> visitor, OctagonDifferenceBoundedMatrix m, OctagonDifferenceBoundedMatrix in) {
-        return visitor.visitInplaceThunk(this, m, in);
+        return visitor.visit(this, m, in);
     }
 
     public static ConstraintInplaceThunk of(int s, Constraint c) {

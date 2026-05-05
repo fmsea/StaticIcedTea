@@ -13,7 +13,7 @@ public class DefaultOctagonThunkVisitor implements ConstraintThunk.Visitor<Boole
 
     protected static Logger LOGGER = LoggerFactory.getLogger("<Thunk Visitor>");
 
-    public Boolean visitThunk(ConstraintUpdateThunk thunk, OctagonDifferenceBoundedMatrix m, OctagonDifferenceBoundedMatrix in) {
+    public Boolean visit(ConstraintUpdateThunk thunk, OctagonDifferenceBoundedMatrix m, OctagonDifferenceBoundedMatrix in) {
         LOGGER.debug("applying the following thunk: {}", thunk);
         LOGGER.debug("apply to this matrix: {}", m);
         LOGGER.debug("considering this input matrix: {}", m);
@@ -22,13 +22,13 @@ public class DefaultOctagonThunkVisitor implements ConstraintThunk.Visitor<Boole
         return true;
     }
 
-    public Boolean visitForgetThunk(ConstraintForgetThunk thunk, OctagonDifferenceBoundedMatrix m, OctagonDifferenceBoundedMatrix in) {
+    public Boolean visit(ConstraintForgetThunk thunk, OctagonDifferenceBoundedMatrix m, OctagonDifferenceBoundedMatrix in) {
         m.forgetConstraints(thunk.i);
         m.forgetConstraints(thunk.ibar);
         return true;
     }
 
-    public Boolean visitInplaceThunk(ConstraintInplaceThunk thunk, OctagonDifferenceBoundedMatrix m, OctagonDifferenceBoundedMatrix in) {
+    public Boolean visit(ConstraintInplaceThunk thunk, OctagonDifferenceBoundedMatrix m, OctagonDifferenceBoundedMatrix in) {
         LOGGER.debug("applying the following reassignment thunk: {}", thunk);
         LOGGER.trace("Before Application: {}", m);
         m.addInterval(thunk.s, thunk.c, in);

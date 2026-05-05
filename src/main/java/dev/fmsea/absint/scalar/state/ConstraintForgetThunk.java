@@ -14,7 +14,7 @@ public class ConstraintForgetThunk extends ConstraintThunk {
     }
 
     public <R> R accept(ConstraintThunk.Visitor<R> visitor, OctagonDifferenceBoundedMatrix m, OctagonDifferenceBoundedMatrix in) {
-        return visitor.visitForgetThunk(this, m, in);
+        return visitor.visit(this, m, in);
     }
 
     public static ConstraintForgetThunk of(int i) {

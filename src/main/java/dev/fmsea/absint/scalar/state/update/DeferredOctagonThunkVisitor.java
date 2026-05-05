@@ -20,7 +20,7 @@ public class DeferredOctagonThunkVisitor extends DefaultOctagonThunkVisitor {
     }
 
     @Override
-    public Boolean visitThunk(ConstraintUpdateThunk thunk, OctagonDifferenceBoundedMatrix m, OctagonDifferenceBoundedMatrix in) {
+    public Boolean visit(ConstraintUpdateThunk thunk, OctagonDifferenceBoundedMatrix m, OctagonDifferenceBoundedMatrix in) {
         LOGGER.debug("updates before new thunk: {}", this.updates);
         this.updates.add(thunk);
         LOGGER.debug("Added thunk to updates: {}", this.updates);

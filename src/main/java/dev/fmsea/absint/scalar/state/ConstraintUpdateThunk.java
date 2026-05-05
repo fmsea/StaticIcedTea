@@ -16,7 +16,7 @@ public class ConstraintUpdateThunk extends ConstraintThunk {
     }
 
     public <R> R accept(ConstraintThunk.Visitor<R> visitor, OctagonDifferenceBoundedMatrix m, OctagonDifferenceBoundedMatrix in) {
-        return visitor.visitThunk(this, m, in);
+        return visitor.visit(this, m, in);
     }
 
     public static ConstraintUpdateThunk of(int s, int t, Constraint c) {
