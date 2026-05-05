@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
+import org.junit.jupiter.params.support.ParameterDeclarations;
 
 import dev.fmsea.absint.scalar.state.OctagonStateBuilder;
 import dev.fmsea.absint.scalar.state.factory.OctagonStateFactory;
@@ -33,7 +34,7 @@ public abstract class ReducedSMTOctagonProvider implements ArgumentsProvider {
     }
 
     @Override
-    public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
+    public Stream<? extends Arguments> provideArguments(ParameterDeclarations parameters, ExtensionContext context) throws Exception {
         return Stream.of(
             Arguments.of(new OctagonStateBuilder(this.factory, this.locals, true).build(), "true"),
             Arguments.of(new OctagonStateBuilder(this.factory, this.locals, false).build(), "false"),

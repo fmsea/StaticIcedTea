@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
+import org.junit.jupiter.params.support.ParameterDeclarations;
 
 import dev.fmsea.common.Locals;
 import soot.grimp.Grimp;
@@ -15,7 +16,7 @@ import soot.jimple.IntConstant;
 public class SmtExpressionProvider implements ArgumentsProvider {
 
     @Override
-    public Stream<? extends Arguments> provideArguments(ExtensionContext context)
+    public Stream<? extends Arguments> provideArguments(ParameterDeclarations parameters, ExtensionContext context)
         throws Exception {
 
         Grimp g = Grimp.v();

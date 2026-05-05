@@ -2,13 +2,15 @@ package dev.fmsea.tadr.providers;
 
 import java.util.List;
 import java.util.stream.Stream;
+
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
+import org.junit.jupiter.params.support.ParameterDeclarations;
 
 public class BoxRewriteProvider implements ArgumentsProvider {
     @Override
-    public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
+    public Stream<? extends Arguments> provideArguments(ParameterDeclarations parameters, ExtensionContext context) throws Exception {
         // [x1 ↦ 1, x2 ↦ 3, x3 ↦ 2]
         return Stream.of(
             List.of("(= x1 3)", "(<= x1 3) (>= x1 3)", "1"),

@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
+import org.junit.jupiter.params.support.ParameterDeclarations;
 
 import dev.fmsea.processing.Smt2FormatType;
 import dev.fmsea.util.ResourceFileUtility;
@@ -22,7 +23,7 @@ public class FormatReachableTestProvider implements ArgumentsProvider {
     }
 
     @Override
-    public Stream<? extends Arguments> provideArguments(ExtensionContext context)
+    public Stream<? extends Arguments> provideArguments(ParameterDeclarations paramters, ExtensionContext context)
         throws Exception {
 
         return Stream.of(Arguments.arguments(getReader("dev/fmsea/processing/reachable/format.basic.1.in"),

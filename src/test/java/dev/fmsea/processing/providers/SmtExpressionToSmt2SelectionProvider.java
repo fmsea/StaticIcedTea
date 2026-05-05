@@ -7,13 +7,14 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
+import org.junit.jupiter.params.support.ParameterDeclarations;
 
 import dev.fmsea.common.Locals;
 
 public class SmtExpressionToSmt2SelectionProvider implements ArgumentsProvider {
 
     @Override
-    public Stream<? extends Arguments> provideArguments(ExtensionContext context)
+    public Stream<? extends Arguments> provideArguments(ParameterDeclarations parameters, ExtensionContext context)
         throws Exception {
 
         return Stream.of(Arguments.arguments("(= i52 0)",
