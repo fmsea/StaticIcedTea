@@ -100,20 +100,6 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>3.0.0</version>
-        <configuration>
-          <executable>java</executable>
-          <arguments>
-            <argument>-classpath</argument>
-            <classpath />
-            <argument>dev.fmsea.driver.Main</argument>
-            <argument>interval-numerical</argument>
-          </arguments>
-        </configuration>
-      </plugin>
-      <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
         <version>0.8.14</version>
