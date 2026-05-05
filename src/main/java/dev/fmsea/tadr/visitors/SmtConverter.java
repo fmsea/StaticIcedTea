@@ -11,12 +11,19 @@ import dev.fmsea.tadr.MultiplicationOp;
 import dev.fmsea.tadr.NeCmp;
 import dev.fmsea.tadr.NegOp;
 import dev.fmsea.tadr.NotOp;
+import dev.fmsea.tadr.PrimeAssign;
 import dev.fmsea.tadr.SubtractionOp;
 import dev.fmsea.tadr.TADR;
 import dev.fmsea.tadr.Value;
 import dev.fmsea.tadr.Variable;
 
 public class SmtConverter implements TADR.Visitor<String> {
+
+    public String visit(PrimeAssign expr) {
+        return String.format("(:= %s %s)",
+            expr.variable.accept(this),
+            expr.constant.accept(this));
+    }
 
     public String visit(EqCmp expr) {
         return String.format("(= %s %s)",

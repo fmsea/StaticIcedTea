@@ -51,7 +51,8 @@ public class DefaultOctagonUpdater extends OctagonUpdater {
         if (expr.accept(reassignmentQuery)) {
             return super.update(expr, env, indexer);
         } else {
-            return Stream.concat(this.forgetConstraints(indexer.apply(left)),
+            return Stream.concat(
+                this.forgetConstraints(indexer.apply(left)),
                 super.update(expr, env, indexer));
         }
     }

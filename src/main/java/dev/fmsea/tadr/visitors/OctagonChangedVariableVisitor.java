@@ -15,6 +15,7 @@ import dev.fmsea.tadr.MultiplicationOp;
 import dev.fmsea.tadr.NeCmp;
 import dev.fmsea.tadr.NegOp;
 import dev.fmsea.tadr.NotOp;
+import dev.fmsea.tadr.PrimeAssign;
 import dev.fmsea.tadr.SubtractionOp;
 import dev.fmsea.tadr.TADR;
 import dev.fmsea.tadr.Value;
@@ -22,6 +23,10 @@ import dev.fmsea.tadr.Variable;
 import soot.Local;
 
 public class OctagonChangedVariableVisitor implements TADR.Visitor<Set<Local>> {
+
+    public Set<Local> visit(PrimeAssign expr) {
+        return Set.of(expr.variable.variable);
+    }
 
     public Set<Local> visit(EqCmp expr) {
         return Stream.concat(

@@ -5,10 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +20,6 @@ import soot.Local;
 public class OctagonSumExprRuleTest extends OctagonRuleTest {
 
     private static final int N = 8;
-    private static Set<Local> locals;
     private static Local[] xs;
     private final OctagonSumExprRule rule = new OctagonSumExprRule();
     private final DefaultOctagonThunkVisitor visitor = new DefaultOctagonThunkVisitor();
@@ -37,7 +32,6 @@ public class OctagonSumExprRuleTest extends OctagonRuleTest {
             Locals.get("x3"),
             Locals.get("x4"),
         };
-        locals = Stream.of(xs).collect(Collectors.toSet());
     }
 
     @Test

@@ -5,10 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -17,13 +13,13 @@ import dev.fmsea.absint.scalar.state.OctagonDifferenceBoundedMatrix;
 import dev.fmsea.absint.scalar.state.OctagonDifferenceBoundedMatrixBuilder;
 import dev.fmsea.absint.scalar.state.update.DefaultOctagonThunkVisitor;
 import dev.fmsea.common.Locals;
+import dev.fmsea.tadr.TADR;
 import dev.fmsea.tadr.TADRReader;
 import soot.Local;
 
 public class OctagonReassignmentSumExprRuleTest extends OctagonRuleTest {
 
     private static final int N = 8;
-    private static Set<Local> locals;
     private static Local[] xs;
     private final OctagonInplaceAddExprRule rule = new OctagonInplaceAddExprRule();
     private final DefaultOctagonThunkVisitor visitor = new DefaultOctagonThunkVisitor();
@@ -36,15 +32,16 @@ public class OctagonReassignmentSumExprRuleTest extends OctagonRuleTest {
             Locals.get("x3"),
             Locals.get("x4"),
         };
-        locals = Stream.of(xs).collect(Collectors.toSet());
     }
 
     @Test
     public void testCanUpdateExpressions() {
         assertAll(
-            () -> assertTrue(rule.canUpdate(TADRReader.parse("(<= x1 (+ x1 1))"))),
-            () -> assertTrue(rule.canUpdate(TADRReader.parse("(<= x1 (+ 1 x1))"))),
-            () -> assertTrue(rule.canUpdate(TADRReader.parse("(<= x1 (- x1 1))"))),
+            () -> assertTrue(rule.canUpdate(TADR.newReassignment(TADR.newVariable(xs[0]),
+                TADR.newValue(2)))),
+            () -> assertFalse(rule.canUpdate(TADRReader.parse("(<= x1 (+ x1 1))"))),
+            () -> assertFalse(rule.canUpdate(TADRReader.parse("(<= x1 (+ 1 x1))"))),
+            () -> assertFalse(rule.canUpdate(TADRReader.parse("(<= x1 (- x1 1))"))),
             () -> assertFalse(rule.canUpdate(TADRReader.parse("(<= x1 (- 1 x1))"))),
             () -> assertFalse(rule.canUpdate(TADRReader.parse("(<= x1 (+ x2 1))"))),
             () -> assertFalse(rule.canUpdate(TADRReader.parse("(>= x1 (+ x1 1))"))),
@@ -61,7 +58,9 @@ public class OctagonReassignmentSumExprRuleTest extends OctagonRuleTest {
             .setConstraint(3, 1, Constraint.of(2))
             .close()
             .build();
-        var thunks = rule.update(TADRReader.parse("(<= x1 (+ x1 2))"), OctagonRuleTest::lookup);
+        var thunks = rule.update(
+            TADR.newReassignment(TADR.newVariable(xs[0]), TADR.newValue(2)),
+            OctagonRuleTest::lookup);
         assertAll(
             () -> assertTrue(thunks.map(t -> t.accept(visitor, m, m)).reduce((a, b) -> a && b).orElse(false)),
             () -> assertEquals(Constraint.of(8), m.getConstraint(0, 1)),

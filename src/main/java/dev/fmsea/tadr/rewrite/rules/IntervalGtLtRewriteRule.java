@@ -1,12 +1,6 @@
 package dev.fmsea.tadr.rewrite.rules;
 
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import dev.fmsea.absint.scalar.state.Interval32Box;
-import soot.Local;
 import dev.fmsea.tadr.AdditionOp;
 import dev.fmsea.tadr.DivisionOp;
 import dev.fmsea.tadr.EqCmp;
@@ -18,12 +12,17 @@ import dev.fmsea.tadr.MultiplicationOp;
 import dev.fmsea.tadr.NeCmp;
 import dev.fmsea.tadr.NegOp;
 import dev.fmsea.tadr.NotOp;
+import dev.fmsea.tadr.PrimeAssign;
 import dev.fmsea.tadr.SubtractionOp;
 import dev.fmsea.tadr.TADR;
-import dev.fmsea.tadr.Variable;
 import dev.fmsea.tadr.Value;
+import dev.fmsea.tadr.Variable;
 
 public class IntervalGtLtRewriteRule implements TADR.Visitor<TADR> {
+
+    public TADR visit(PrimeAssign expr) {
+        return expr;
+    }
 
     public TADR visit(EqCmp expr) {
         return expr;

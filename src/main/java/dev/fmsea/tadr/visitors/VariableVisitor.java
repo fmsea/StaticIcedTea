@@ -16,6 +16,7 @@ import dev.fmsea.tadr.MultiplicationOp;
 import dev.fmsea.tadr.NeCmp;
 import dev.fmsea.tadr.NegOp;
 import dev.fmsea.tadr.NotOp;
+import dev.fmsea.tadr.PrimeAssign;
 import dev.fmsea.tadr.SubtractionOp;
 import dev.fmsea.tadr.TADR;
 import dev.fmsea.tadr.Value;
@@ -29,6 +30,11 @@ public class VariableVisitor implements TADR.Visitor<Set<Local>> {
             expr.right.accept(this).stream())
             .collect(Collectors.toSet());
     }
+
+    public Set<Local> visit(PrimeAssign expr) {
+        return Set.of(expr.variable.variable);
+    }
+
     public Set<Local> visit(EqCmp expr) {
         return visitBinaryOp(expr);
     }

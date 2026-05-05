@@ -17,6 +17,7 @@ import soot.jimple.NullConstant;
 public abstract class TADR {
 
     public interface Visitor<R> {
+        R visit(PrimeAssign expr);
         R visit(EqCmp expr);
         R visit(LeCmp expr);
         R visit(LtCmp expr);
@@ -111,6 +112,10 @@ public abstract class TADR {
 
     public static Variable newVariable(Local variable) {
         return new Variable(variable);
+    }
+
+    public static PrimeAssign newReassignment(Variable variable, Value value) {
+        return new PrimeAssign(variable, value);
     }
 
     public static AdditionOp newAddExpr(TADR left, TADR right) {

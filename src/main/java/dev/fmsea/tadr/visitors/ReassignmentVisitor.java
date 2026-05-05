@@ -13,6 +13,7 @@ import dev.fmsea.tadr.MultiplicationOp;
 import dev.fmsea.tadr.NeCmp;
 import dev.fmsea.tadr.NegOp;
 import dev.fmsea.tadr.NotOp;
+import dev.fmsea.tadr.PrimeAssign;
 import dev.fmsea.tadr.SubtractionOp;
 import dev.fmsea.tadr.TADR;
 import dev.fmsea.tadr.Value;
@@ -23,6 +24,11 @@ public class ReassignmentVisitor implements TADR.Visitor<Boolean> {
 
     private Variable variable;
     private VariableVisitor variableCounts = new VariableVisitor();
+
+    public Boolean visit(PrimeAssign expr) {
+        // I mean, yes, but we're past that.
+        return false;
+    }
 
     public Boolean visit(EqCmp expr) {
         Set<Local> right = expr.right.accept(variableCounts);
