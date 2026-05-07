@@ -11,6 +11,8 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import dev.fmsea.absint.scalar.state.factory.OctagonDifferenceBoundedMatrixFactory;
+import dev.fmsea.absint.scalar.state.factory.OctagonDifferenceBoundedMatrixType;
 import dev.fmsea.absint.scalar.state.update.DefaultOctagonRefiner;
 import dev.fmsea.absint.scalar.state.update.DefaultOctagonUpdater;
 import dev.fmsea.absint.scalar.state.update.OctagonUpdater;
@@ -32,6 +34,7 @@ public abstract class OctagonState implements State {
     protected final Map<Local, Pair<Integer, Integer>> localsToIndices;
     protected final Map<Integer, Local> indicesToLocals;
     protected OctagonDifferenceBoundedMatrix matrix;
+    protected final OctagonDifferenceBoundedMatrixFactory dbmFactory;
     protected final int N;
     protected final OctagonUpdater updater;
     protected final OctagonUpdater refiner;
@@ -50,6 +53,10 @@ public abstract class OctagonState implements State {
     }
 
     public OctagonState(Set<Local> locals, boolean top, OctagonUpdater updater, OctagonUpdater refiner) {
+        this(locals, top, updater, refiner, new OctagonDifferenceBoundedMatrixFactory(OctagonDifferenceBoundedMatrixType.DEFAULT));
+    }
+
+    public OctagonState(Set<Local> locals, boolean top, OctagonUpdater updater, OctagonUpdater refiner, OctagonDifferenceBoundedMatrixFactory factory) {
         this.locals = Collections.unmodifiableSet(locals);
         this.N = this.locals.size() * 2;
         this.localsToIndices = Streams.zipToMap(this.locals.stream().sorted((a, b) -> a.toString().compareTo(b.toString())),
@@ -66,7 +73,8 @@ public abstract class OctagonState implements State {
         LOGGER.trace("the map between locals to indices: {}", this.indicesToLocals);
         this.updater = updater;
         this.refiner = refiner;
-        this.matrix = new OctagonDifferenceBoundedMatrix(N, top);
+        this.dbmFactory = factory;
+        this.matrix = factory.mk(N, top);
     }
 
     public OctagonState(OctagonState copyMe) {

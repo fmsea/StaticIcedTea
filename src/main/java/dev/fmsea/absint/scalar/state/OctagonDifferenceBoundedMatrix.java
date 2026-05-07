@@ -192,6 +192,13 @@ public class OctagonDifferenceBoundedMatrix {
     //     throw new UnsupportedOperationException();
     // }
 
+    /** return whether we should close/update this edge
+     *
+     */
+    protected boolean closureShouldUpdate(int i, int j, Constraint shortPath, Constraint longPath) {
+        return Constraint.compare(shortPath, longPath) > 0;
+    }
+
     public boolean incrementalClosure(int si, int ti, Constraint d) {
         return this.incrementalClosure(List.of(ConstraintUpdateThunk.of(si, ti, d)));
     }
@@ -226,7 +233,7 @@ public class OctagonDifferenceBoundedMatrix {
             for (Integer c : worklist) {
                 for (ConstraintUpdateThunk thunk : thunks) {
                     Constraint longPath = Constraint.add(this.matrix[i][thunk.s], this.matrix[thunk.s][c]);
-                    if (Constraint.compare(this.matrix[i][c], longPath) > 0) {
+                    if (closureShouldUpdate(i, c, this.matrix[i][c], longPath)) {
                         this.setConstraint(i, c, longPath);
                     }
                 }
@@ -444,7 +451,9 @@ public class OctagonDifferenceBoundedMatrix {
                 Constraint t = Constraint.divide(Constraint.add(this.matrix[i][i ^ 1],
                                                                 this.matrix[j ^ 1][j]),
                                                  two);
-                this.matrix[i][j] = Constraint.min(this.matrix[i][j], t);
+                if (closureShouldUpdate(i, j, this.matrix[i][j], t)) {
+                    this.matrix[i][j] = Constraint.min(this.matrix[i][j], t);
+                }
             }
         }
 

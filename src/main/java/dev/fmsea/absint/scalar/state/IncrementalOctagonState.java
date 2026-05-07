@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import dev.fmsea.absint.scalar.state.factory.OctagonDifferenceBoundedMatrixFactory;
 import dev.fmsea.absint.scalar.state.update.IncrementalOctagonRefineThunkVisitor;
 import dev.fmsea.absint.scalar.state.update.IncrementalOctagonRefiner;
 import dev.fmsea.absint.scalar.state.update.IncrementalOctagonThunkVisitor;
@@ -31,6 +32,14 @@ public class IncrementalOctagonState extends OctagonState {
 
     public IncrementalOctagonState(Set<Local> locals, boolean top, OctagonUpdater updater, OctagonUpdater refiner) {
         super(locals, top, updater, refiner);
+    }
+
+    public IncrementalOctagonState(Set<Local> locals,
+                                   boolean top,
+                                   OctagonUpdater updater,
+                                   OctagonUpdater refiner,
+                                   OctagonDifferenceBoundedMatrixFactory dbmFactory) {
+        super(locals, top, updater, refiner, dbmFactory);
     }
 
     public IncrementalOctagonState(Set<Local> locals, OctagonDifferenceBoundedMatrix m) {
