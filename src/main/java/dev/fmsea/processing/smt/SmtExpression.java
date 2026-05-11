@@ -12,6 +12,7 @@ import dev.fmsea.processing.smt.visitors.ContainsAllVisitor;
 import dev.fmsea.processing.smt.visitors.ContainsLocalVisitor;
 import dev.fmsea.processing.smt.visitors.LocalsVisitor;
 import dev.fmsea.processing.smt.visitors.PredicateCounter;
+import dev.fmsea.processing.smt.visitors.ProjectionSmtConverter;
 import dev.fmsea.processing.smt.visitors.SmtConverter;
 import dev.fmsea.processing.smt.visitors.SmtGraphConverter;
 import dev.fmsea.processing.smt.visitors.SubSmtConverter;
@@ -69,6 +70,10 @@ public abstract class SmtExpression {
 
     public Optional<String> toSmt2(Set<Local> variables) {
         return this.accept(new SubSmtConverter(variables));
+    }
+
+    public Optional<String> toProjectedSmt2(Set<Local> variables) {
+        return this.accept(new ProjectionSmtConverter(variables));
     }
 
     public int getPredicateCount() {

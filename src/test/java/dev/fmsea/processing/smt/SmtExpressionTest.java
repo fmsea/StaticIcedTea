@@ -15,6 +15,7 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import dev.fmsea.processing.providers.SmtExpressionIdentityProvider;
 import dev.fmsea.processing.providers.SmtExpressionReachableIdentityProvider;
+import dev.fmsea.processing.providers.SmtExpressionToSmt2ProjectionProvider;
 import dev.fmsea.processing.providers.SmtExpressionToSmt2Provider;
 import dev.fmsea.processing.providers.SmtExpressionToSmt2SelectionProvider;
 import dev.fmsea.processing.providers.SmtExpressionToStringProvider;
@@ -86,6 +87,18 @@ public class SmtExpressionTest {
         try {
             SmtExpression expr = SmtExpressionReader.parse(smtExpression);
             assertEquals(smtExpression, expr.toString());
+        } catch (Exception ex) {
+            ex.printStackTrace(System.err);
+            assertTrue(false);
+        }
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(SmtExpressionToSmt2ProjectionProvider.class)
+    void test2SmtProjection(String smtExpression, Set<Local> variables, Optional<String> expected) {
+        try {
+            SmtExpression expr = SmtExpressionReader.parse(smtExpression);
+            assertEquals(expected, expr.toProjectedSmt2(variables));
         } catch (Exception ex) {
             ex.printStackTrace(System.err);
             assertTrue(false);
