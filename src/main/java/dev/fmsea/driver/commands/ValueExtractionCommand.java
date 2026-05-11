@@ -13,7 +13,7 @@ import picocli.CommandLine.Option;
          description = "Extract predicates from provided method")
 public class ValueExtractionCommand extends JimpleCommand implements Callable<Integer> {
     @Option(names = {"-o", "--output"},
-            description = "OUtput file path for results",
+            description = "Output file path for results",
             required = true)
     private Path outputResultsPath;
 
