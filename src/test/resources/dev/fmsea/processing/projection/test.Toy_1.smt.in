@@ -1,0 +1,11 @@
+$i2	b0	i1	r0
+3 b0 = 42:<test.Toy: int neExample(int)>
+fall	b0	(and (<= b0 42) (>= b0 42))
+4 if i1 == 0 goto (branch):<test.Toy: int neExample(int)>
+fall	(and (<= b0 42) (>= b0 42))
+branch	i1	(and (<= b0 42) (<= i1 0) (>= b0 42) (>= i1 0))
+6 if i1 != b0 goto return 0:<test.Toy: int neExample(int)>
+fall	b0	i1	false
+branch	(and (<= b0 42) (<= i1 0) (>= b0 42) (>= i1 0))
+7 $i2 = b0 * b0:<test.Toy: int neExample(int)>
+fall	$i2	b0	false

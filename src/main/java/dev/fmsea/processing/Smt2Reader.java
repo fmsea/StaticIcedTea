@@ -49,6 +49,27 @@ public class Smt2Reader {
         return identifiers;
     }
 
+    public static SmtReport fromAnalysisReport(AnalysisSMTReport report) {
+        Set<String> statements = report.statements();
+        Set<Local> variables = report.variables();
+        Map<String, String> fallThroughExprs = report.fallExpressions();
+        Map<String, String> branchOutExprs = report.branchExpressions();
+        Map<String, Set<Local>> fallVariables = report.fallVariables();
+        Map<String, Set<Local>> fallChangedVariables = report.fallChangedVariables();
+        Map<String, Set<Local>> branchVariables = report.branchVariables();
+        Map<String, Set<Local>> branchChangedVariables = report.branchChangedVariables();
+        return new SmtReport.SmtReportBuilder()
+            .withStatements(statements)
+            .withVariables(variables)
+            .withStringyFallExpressions(fallThroughExprs)
+            .withStringyBranchExpressions(branchOutExprs)
+            .withFallVariables(fallVariables)
+            .withFallChangedVariables(fallChangedVariables)
+            .withBranchVariables(branchVariables)
+            .withBranchChangedVariables(branchChangedVariables)
+            .build();
+    }
+
     public static AnalysisSMTReport parse(Reader reader) {
         Set<String> statements = new HashSet<>();
         Set<Local> variables = new HashSet<>();

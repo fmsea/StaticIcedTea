@@ -9,6 +9,7 @@ import dev.fmsea.driver.commands.Smt2FormatDirectoryCommand;
 import dev.fmsea.driver.commands.Smt2FormatFullCommand;
 import dev.fmsea.driver.commands.Smt2FormatIdentifiersCommand;
 import dev.fmsea.driver.commands.Smt2GraphsCommand;
+import dev.fmsea.driver.commands.Smt2ProjectionCommand;
 import dev.fmsea.driver.commands.StartClassEnumeratorCommand;
 import dev.fmsea.driver.commands.StartDeferredIncrementalOctagonNumericalCommand;
 import dev.fmsea.driver.commands.StartDeferredOctagonNumericalCommand;
@@ -54,6 +55,7 @@ import picocli.CommandLine.Command;
              Smt2FormatIdentifiersCommand.class,
              Smt2FormatDirectoryCommand.class,
              Smt2GraphsCommand.class,
+             Smt2ProjectionCommand.class,
              ValueExtractionCommand.class,
              VariablePredicateCounterCommand.class,
          })

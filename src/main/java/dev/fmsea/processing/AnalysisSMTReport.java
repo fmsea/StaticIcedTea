@@ -1,11 +1,11 @@
 package dev.fmsea.processing;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import soot.Local;
@@ -62,6 +62,30 @@ public class AnalysisSMTReport {
         return Collections.unmodifiableSet(this.statements);
     }
 
+    public Map<String, String> fallExpressions() {
+        return this.fallThroughSmtExpressions;
+    }
+
+    public Map<String, Set<Local>> fallVariables() {
+        return this.fallVariables;
+    }
+
+    public Map<String, Set<Local>> fallChangedVariables() {
+        return this.fallChangedVariables;
+    }
+
+    public Map<String, String> branchExpressions() {
+        return this.branchOutSmtExpressions;
+    }
+
+    public Map<String, Set<Local>> branchVariables() {
+        return this.branchVariables;
+    }
+
+    public Map<String, Set<Local>> branchChangedVariables() {
+        return this.branchChangedVariables;
+    }
+
     public Optional<String> getFallThrough(String statement) {
         return Optional.ofNullable(this.fallThroughSmtExpressions.get(statement));
     }
@@ -94,7 +118,9 @@ public class AnalysisSMTReport {
         }
         sb.append(this.variables.stream().map(v -> v.toString()).sorted().collect(Collectors.joining("\t")));
         sb.append("\n");
-        this.statements.stream().sorted().forEach(statement -> {
+        this.statements.stream()
+            .sorted(AnalysisSMTReport::compareStatements)
+            .forEach(statement -> {
                 sb.append(statement);
                 sb.append("\n");
                 Optional<String> fall = this.getFallThrough(statement);
@@ -119,5 +145,20 @@ public class AnalysisSMTReport {
                     });
             });
         return sb.toString();
+    }
+
+    /** Sort statements according to their numerical prefix
+     */
+    public static int compareStatements(String stmtOne, String stmtTwo) {
+        Pattern STATEMENT_LINE = Pattern.compile("^(?<ord>[0-9]+).*$");
+        Matcher m1 = STATEMENT_LINE.matcher(stmtOne);
+        Matcher m2 = STATEMENT_LINE.matcher(stmtTwo);
+        if (!(m1.matches() && m2.matches())) {
+            // Fall back to string comparison
+            return stmtOne.compareTo(stmtTwo);
+        }
+        int stmt1 = Integer.parseInt(m1.group("ord"));
+        int stmt2 = Integer.parseInt(m2.group("ord"));
+        return Integer.compare(stmt1, stmt2);
     }
 }

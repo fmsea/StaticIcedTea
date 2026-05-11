@@ -29,6 +29,12 @@ public class Locals {
             .collect(Collectors.toSet());
     }
 
+    public static Set<Local> map(Collection<String> ids) {
+        return ids.stream()
+            .map(id -> Locals.get(id))
+            .collect(Collectors.toSet());
+    }
+
     public static Collection<Local> values() {
         return Collections.unmodifiableCollection(locals.values());
     }
