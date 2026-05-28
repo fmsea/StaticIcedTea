@@ -7,6 +7,9 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import dev.fmsea.picotelem.engine.PicoTelemetryEngine;
+import dev.fmsea.picotelem.factory.PicoTelemetryFactory;
+import dev.fmsea.picotelem.model.SmtUnionEvent;
 import dev.fmsea.processing.Smt2UnionType;
 import dev.fmsea.processing.smt.visitors.ContainsAllVisitor;
 import dev.fmsea.processing.smt.visitors.ContainsLocalVisitor;
@@ -176,6 +179,7 @@ public abstract class SmtExpression {
         int s2sup = 0;
         int neither = 0;
         double proportion;
+        PicoTelemetryEngine telemetry = PicoTelemetryFactory.getTelemetryEngine();
         Set<Local> v1 = leftChanged;
         Set<Local> v2 = rightChanged;
         Set<Local> s1 = connective.apply(left, v1);
@@ -202,7 +206,7 @@ public abstract class SmtExpression {
             current = Sets.union(s1, s2);
         }
         proportion = current.size() / variables;
-        System.err.println(String.format("union\t%d\t%d\t%d\t%f", s1sup, s2sup, neither, proportion));
+        telemetry.record(new SmtUnionEvent(s1sup, s2sup, neither, proportion));
         return current;
     }
 
