@@ -31,7 +31,8 @@ public class ForwardBranchedFlowIntervalNumericalBoxTest {
                                                        new HashSet<>(),
                                                        2,
                                                        null,
-                                                       new IntervalBoxStateFactory());
+                                                       new IntervalBoxStateFactory(),
+                                                       null);
     }
 
     @AfterEach

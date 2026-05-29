@@ -55,8 +55,18 @@ public class OctagonZoneComparativeTest extends AbstractNumericalTest {
     @ParameterizedTest
     @ArgumentsSource(OctagonZoneComparisonProvider.class)
     void OctagonsZoneComparisonTest(Body body, String resourceFile) {
-        IntegerAnalysis octagonAnalysis = new IntegerAnalysis(this.solver, body, 2, DefaultOctagonState.class);
-        IntegerAnalysis zoneAnalysis = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
+        IntegerAnalysis octagonAnalysis = new IntegerAnalysisBuilder()
+            .withSolver(this.solver)
+            .withBody(body)
+            .withIterations(2)
+            .withType(DefaultOctagonState.class)
+            .build();
+        IntegerAnalysis zoneAnalysis = new IntegerAnalysisBuilder()
+            .withSolver(this.solver)
+            .withBody(body)
+            .withIterations(2)
+            .withType(ZoneState.class)
+            .build();
         octagonAnalysis.runAnalysis();
         zoneAnalysis.runAnalysis();
         String expected = readResourcesFile(resourceFile);

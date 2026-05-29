@@ -23,7 +23,11 @@ public class IncZoneNumericalTest extends AbstractNumericalTest {
     @ParameterizedTest
     @ArgumentsSource(ZonesNumericalProvider.class)
     public void testAnalysis(Body body, String resourceOracle) {
-        IntegerAnalysis  analysis = new IntegerAnalysis(body, 2, IncZoneState.class);
+        IntegerAnalysis  analysis = new IntegerAnalysisBuilder()
+            .withBody(body)
+            .withIterations(2)
+            .withType(IncZoneState.class)
+            .build();
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile(resourceOracle);

@@ -98,7 +98,12 @@ public class IntervalNumericalZ3Test extends AbstractNumericalTest {
     }
 
     private boolean runAnalysis(Body body, String oracle, String expectedZ3Output) {
-        IntegerAnalysis analysis = new IntegerAnalysis(this.solver, body, 2, IntervalBoxState.class);
+        IntegerAnalysis analysis = new IntegerAnalysisBuilder()
+            .withSolver(this.solver)
+            .withBody(body)
+            .withIterations(2)
+            .withType(IntervalBoxState.class)
+            .build();
         analysis.runAnalysis();
         Reader actual = new StringReader(generateReport(analysis));
         Reader expected = new StringReader(oracle);

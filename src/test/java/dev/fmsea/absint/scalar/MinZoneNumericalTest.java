@@ -23,7 +23,11 @@ public class MinZoneNumericalTest extends AbstractNumericalTest {
     @ParameterizedTest
     @ArgumentsSource(ZonesNumericalProvider.class)
     public void testIntervalNumericalAnalysis(Body body, String resourceOracle) {
-        IntegerAnalysis  analysis = new IntegerAnalysis(body, 2, MinZoneState.class);
+        IntegerAnalysis  analysis = new IntegerAnalysisBuilder()
+            .withBody(body)
+            .withIterations(2)
+            .withType(MinZoneState.class)
+            .build();
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile(resourceOracle);

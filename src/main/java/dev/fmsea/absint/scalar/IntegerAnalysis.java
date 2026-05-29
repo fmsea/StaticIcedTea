@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 import dev.fmsea.absint.scalar.state.State;
 import dev.fmsea.absint.scalar.state.factory.StateFactory;
-import dev.fmsea.solver.SolverFactory;
 import dev.fmsea.solver.SolverWrapper;
 import soot.Body;
 import soot.Local;
@@ -26,7 +25,6 @@ import soot.jimple.toolkits.annotation.logic.Loop;
 import soot.toolkits.graph.ExceptionalUnitGraph;
 import soot.toolkits.graph.LoopNestTree;
 import soot.toolkits.graph.Orderer;
-import soot.toolkits.graph.PseudoTopologicalOrderer;
 import soot.toolkits.graph.UnitGraph;
 
 public class IntegerAnalysis implements Analysis {
@@ -37,37 +35,6 @@ public class IntegerAnalysis implements Analysis {
     private SolverWrapper solver;
     private Set<Local> locals;
     private final boolean reduceOutput;
-
-    public IntegerAnalysis(Body b, int iterations, Class<?> type) {
-        this(SolverFactory.getSolver(), b, iterations, type, Set.of());
-    }
-
-    public IntegerAnalysis(Body b, int iterations, Class<?> type, Set<Integer> widenSteps) {
-        this(SolverFactory.getSolver(), b, iterations, type, widenSteps);
-    }
-
-    public IntegerAnalysis(SolverWrapper solver, Body b, int iterations, Class<?> type) {
-        this(solver, b, iterations, type, Set.of());
-    }
-
-    public IntegerAnalysis(
-        SolverWrapper solver,
-        Body b,
-        int iterations,
-        Class<?> type,
-        Set<Integer> widenSteps) {
-        this(solver, b, iterations, type, widenSteps, new PseudoTopologicalOrderer<>());
-    }
-
-    public IntegerAnalysis(
-        SolverWrapper solver,
-        Body b,
-        int iterations,
-        Class<?> type,
-        Set<Integer> widenSteps,
-        Orderer<Unit> orderer) {
-        this(solver, b, iterations, type, widenSteps, orderer, true);
-    }
 
     public IntegerAnalysis(
         SolverWrapper solver,

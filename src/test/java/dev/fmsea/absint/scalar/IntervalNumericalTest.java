@@ -23,7 +23,11 @@ public class IntervalNumericalTest extends AbstractNumericalTest {
     @ParameterizedTest
     @ArgumentsSource(IntervalNumericalProvider.class)
     public void testIntervalNumericalAnalysis(Body body, String resourceOracle) {
-        IntegerAnalysis  analysis = new IntegerAnalysis(body, 2, IntervalBoxState.class);
+        IntegerAnalysis  analysis = new IntegerAnalysisBuilder()
+            .withBody(body)
+            .withIterations(2)
+            .withType(IntervalBoxState.class)
+            .build();
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile(resourceOracle);

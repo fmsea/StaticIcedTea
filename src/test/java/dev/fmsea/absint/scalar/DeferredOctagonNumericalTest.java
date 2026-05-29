@@ -23,7 +23,11 @@ public class DeferredOctagonNumericalTest extends AbstractNumericalTest {
     @ParameterizedTest
     @ArgumentsSource(OctagonNumericalProvider.class)
     public void testIntervalNumericalAnalysis(Body body, String resourceOracle) {
-        IntegerAnalysis  analysis = new IntegerAnalysis(body, 2, DeferredOctagonState.class);
+        IntegerAnalysis  analysis = new IntegerAnalysisBuilder()
+            .withBody(body)
+            .withIterations(2)
+            .withType(DeferredOctagonState.class)
+            .build();
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile(resourceOracle);

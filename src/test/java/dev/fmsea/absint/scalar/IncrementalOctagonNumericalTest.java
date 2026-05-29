@@ -23,7 +23,11 @@ public class IncrementalOctagonNumericalTest extends AbstractNumericalTest {
     @ParameterizedTest
     @ArgumentsSource(OctagonNumericalProvider.class)
     public void testNumericalAnalysis(Body body, String resourceOracle) {
-        IntegerAnalysis  analysis = new IntegerAnalysis(body, 2, IncrementalOctagonState.class);
+        IntegerAnalysis  analysis = new IntegerAnalysisBuilder()
+            .withBody(body)
+            .withIterations(2)
+            .withType(IncrementalOctagonState.class)
+            .build();
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile(resourceOracle);

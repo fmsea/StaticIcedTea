@@ -23,7 +23,11 @@ public class MaxZoneNumericalTest extends AbstractNumericalTest {
     @ParameterizedTest
     @ArgumentsSource(ZonesNumericalProvider.class)
     public void testAnalysis(Body body, String resourceOracle) {
-        IntegerAnalysis  analysis = new IntegerAnalysis(body, 2, MaxZoneState.class);
+        IntegerAnalysis  analysis = new IntegerAnalysisBuilder()
+            .withBody(body)
+            .withIterations(2)
+            .withType(MaxZoneState.class)
+            .build();
         analysis.runAnalysis();
         String actual = generateReport(analysis).trim();
         String expected = readResourcesFile(resourceOracle);

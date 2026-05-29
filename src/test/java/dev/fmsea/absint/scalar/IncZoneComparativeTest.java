@@ -91,8 +91,18 @@ public class IncZoneComparativeTest extends AbstractNumericalTest {
     @ParameterizedTest
     @MethodSource("comparisons")
     void IncZoneZoneComparisonTest(Body body, String resourceFile) {
-        IntegerAnalysis zoneAnalysis = new IntegerAnalysis(this.solver, body, 2, IncZoneState.class);
-        IntegerAnalysis intervalAnalysis = new IntegerAnalysis(this.solver, body, 2, ZoneState.class);
+        IntegerAnalysis zoneAnalysis = new IntegerAnalysisBuilder()
+            .withSolver(this.solver)
+            .withBody(body)
+            .withIterations(2)
+            .withType(IncZoneState.class)
+            .build();
+        IntegerAnalysis intervalAnalysis = new IntegerAnalysisBuilder()
+            .withSolver(this.solver)
+            .withBody(body)
+            .withIterations(2)
+            .withType(ZoneState.class)
+            .build();
         zoneAnalysis.runAnalysis();
         intervalAnalysis.runAnalysis();
         String expected = readResourcesFile(resourceFile);
