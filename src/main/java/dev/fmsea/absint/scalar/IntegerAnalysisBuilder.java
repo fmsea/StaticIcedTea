@@ -3,6 +3,9 @@ package dev.fmsea.absint.scalar;
 import java.util.Optional;
 import java.util.Set;
 
+import dev.fmsea.picotelem.PicoTelemOptionsBuilder;
+import dev.fmsea.picotelem.engine.PicoTelemetryEngine;
+import dev.fmsea.picotelem.factory.PicoTelemetryFactory;
 import dev.fmsea.solver.SolverFactory;
 import dev.fmsea.solver.SolverWrapper;
 import soot.toolkits.graph.Orderer;
@@ -18,6 +21,7 @@ public class IntegerAnalysisBuilder {
     private Class<?> type;
     private Optional<Set<Integer>> widenSteps = Optional.empty();
     private Optional<Orderer<Unit>> orderer = Optional.empty();
+    private Optional<PicoTelemetryEngine> telemetry = Optional.empty();
 
     public IntegerAnalysisBuilder() {
     }
@@ -47,6 +51,11 @@ public class IntegerAnalysisBuilder {
         return this;
     }
 
+    public IntegerAnalysisBuilder withTelemetry(PicoTelemetryEngine telemetry) {
+        this.telemetry = Optional.ofNullable(telemetry);
+        return this;
+    }
+
     public IntegerAnalysis build() {
         return new IntegerAnalysis(
             this.solver.orElse(SolverFactory.getSolver()),
@@ -55,6 +64,7 @@ public class IntegerAnalysisBuilder {
             this.type,
             this.widenSteps.orElse(Set.of()),
             this.orderer.orElse(new PseudoTopologicalOrderer<>()),
-            this.reduceOutput);
+            this.reduceOutput,
+            this.telemetry.orElse(PicoTelemetryFactory.getTelemetryEngine(new PicoTelemOptionsBuilder().build())));
     }
 }

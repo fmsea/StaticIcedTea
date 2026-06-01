@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import dev.fmsea.driver.util.OrdererType;
+import dev.fmsea.picotelem.engine.PicoTelemetryEngine;
 
 public class AnalysisOptionsBuilder {
     private String className;
@@ -16,6 +17,7 @@ public class AnalysisOptionsBuilder {
     private Optional<Set<Integer>> widenSteps;
     private OrdererType orderer;
     private boolean reduceOutput;
+    private PicoTelemetryEngine telemetry;
 
     public AnalysisOptionsBuilder() {
         this.outputStateReports = true;
@@ -69,6 +71,11 @@ public class AnalysisOptionsBuilder {
         return this;
     }
 
+    public AnalysisOptionsBuilder withTelemetry(PicoTelemetryEngine telemetry) {
+        this.telemetry = telemetry;
+        return this;
+    }
+
     public AnalysisOptions build() {
         return new AnalysisOptions(
             this.stateType,
@@ -79,6 +86,7 @@ public class AnalysisOptionsBuilder {
             this.widenIterations,
             this.widenSteps,
             this.orderer,
-            this.reduceOutput);
+            this.reduceOutput,
+            this.telemetry);
     }
 }

@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import dev.fmsea.absint.scalar.state.State;
 import dev.fmsea.absint.scalar.state.factory.StateFactory;
+import dev.fmsea.picotelem.engine.PicoTelemetryEngine;
 import dev.fmsea.solver.SolverWrapper;
 import soot.Body;
 import soot.Local;
@@ -43,7 +44,8 @@ public class IntegerAnalysis implements Analysis {
         Class<?> type,
         Set<Integer> widenSteps,
         Orderer<Unit> orderer,
-        boolean reduceOutput) {
+        boolean reduceOutput,
+        PicoTelemetryEngine telemetry) {
         this.solver = solver;
         this.b = b;
         this.g = new ExceptionalUnitGraph(b);
@@ -76,7 +78,8 @@ public class IntegerAnalysis implements Analysis {
             iterations,
             locals,
             widenSteps,
-            StateFactory.getFactory(type));
+            StateFactory.getFactory(type),
+            telemetry);
 
         // setup the flows
         for (Unit node : order) {

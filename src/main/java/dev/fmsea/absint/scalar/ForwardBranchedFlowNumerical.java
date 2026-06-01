@@ -12,6 +12,9 @@ import dev.fmsea.absint.scalar.state.DeferredCmpMap;
 import dev.fmsea.absint.scalar.state.PredicateType;
 import dev.fmsea.absint.scalar.state.State;
 import dev.fmsea.absint.scalar.state.factory.StateFactory;
+import dev.fmsea.picotelem.engine.PicoTelemetryEngine;
+import dev.fmsea.picotelem.model.AnalysisPrecisionEvent;
+import dev.fmsea.picotelem.model.PrecisionLevel;
 import soot.Local;
 import soot.Unit;
 import soot.Value;
@@ -31,6 +34,7 @@ public class ForwardBranchedFlowNumerical<S extends State>
     protected Set<Local> variables;
     private StateFactory<S> stateFactory;
     private DeferredCmpMap deferredComparisons;
+    private PicoTelemetryEngine telemetry;
 
     public ForwardBranchedFlowNumerical(DirectedGraph<Unit> graph,
                                         List<Unit> order,
@@ -40,7 +44,8 @@ public class ForwardBranchedFlowNumerical<S extends State>
                                         Set<Unit> wideningNodes,
                                         int iters,
                                         Set<Local> locals,
-                                        StateFactory<S> stateFactory) {
+                                        StateFactory<S> stateFactory,
+                                        PicoTelemetryEngine telemetry) {
         this(graph,
              order,
              unitToBeforeFlow,
@@ -50,7 +55,8 @@ public class ForwardBranchedFlowNumerical<S extends State>
              iters,
              locals,
              Set.of(),
-             stateFactory);
+             stateFactory,
+             telemetry);
     }
 
     public ForwardBranchedFlowNumerical(DirectedGraph<Unit> graph,
@@ -62,7 +68,8 @@ public class ForwardBranchedFlowNumerical<S extends State>
                                         int iters,
                                         Set<Local> locals,
                                         Set<Integer> widenSteps,
-                                        StateFactory<S> stateFactory) {
+                                        StateFactory<S> stateFactory,
+                                        PicoTelemetryEngine telemetry) {
         super(graph,
               order,
               unitToBeforeFlow,
@@ -74,6 +81,7 @@ public class ForwardBranchedFlowNumerical<S extends State>
         this.variables = locals;
         this.stateFactory = stateFactory;
         this.deferredComparisons = new DeferredCmpMap();
+        this.telemetry = telemetry;
     }
 
     /** Widen flows
@@ -168,6 +176,7 @@ public class ForwardBranchedFlowNumerical<S extends State>
                 LOGGER.trace("[in state: {}, out state: {}]", in, ifStmtFall);
                 LOGGER.trace("fall changed: {} [unit = {}]", fallChanged, s);
                 this.minChangedVariables.putFall(s, fallChanged);
+                this.telemetry.record(new AnalysisPrecisionEvent(s.toString(), PrecisionLevel.from(fallChanged)));
             }
         } else if (s instanceof IfStmt) {
             IfStmt stmt = (IfStmt)s;
@@ -242,6 +251,8 @@ public class ForwardBranchedFlowNumerical<S extends State>
         LOGGER.trace("branch changed: {} [unit = {}]", branchChanged, s);
         this.minChangedVariables.putFall(s, fallChanged);
         this.minChangedVariables.putBranch(s, branchChanged);
+        this.telemetry.record(new AnalysisPrecisionEvent("[fall through] " + s.toString(), PrecisionLevel.from(fallChanged)));
+        this.telemetry.record(new AnalysisPrecisionEvent("[branch out]" + s.toString(), PrecisionLevel.from(branchChanged)));
     }
 
     public static boolean isIntType(Value val) {

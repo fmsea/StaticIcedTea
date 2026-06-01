@@ -4,8 +4,8 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
 
-import dev.fmsea.absint.scalar.state.State;
 import dev.fmsea.driver.util.OrdererType;
+import dev.fmsea.picotelem.engine.PicoTelemetryEngine;
 
 public class AnalysisOptions {
 
@@ -18,6 +18,7 @@ public class AnalysisOptions {
     public final Optional<Set<Integer>> widenSteps;
     public final OrdererType orderer;
     public final boolean reduceOutput;
+    public final PicoTelemetryEngine telemetry;
 
     public AnalysisOptions(
         Class<?> stateType,
@@ -28,7 +29,8 @@ public class AnalysisOptions {
         int widenIterations,
         Optional<Set<Integer>> widenSteps,
         OrdererType orderer,
-        boolean reduceOutput) {
+        boolean reduceOutput,
+        PicoTelemetryEngine telemetry) {
 
         this.stateType = stateType;
         this.className = className;
@@ -39,5 +41,6 @@ public class AnalysisOptions {
         this.widenSteps = widenSteps;
         this.orderer = orderer;
         this.reduceOutput = reduceOutput;
+        this.telemetry = telemetry;
     }
 }
