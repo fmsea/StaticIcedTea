@@ -42,6 +42,7 @@ public class ZonotopalInferenceParserTests {
             Arguments.of("v0 + v1 < 0"),
             Arguments.of("v0 - v1 > 0"),
             Arguments.of("v0 + v1 > 0"),
+            Arguments.of("-v0 - v1 <= 3"),
             Arguments.of("v0 >= -1345"),
             Arguments.of("v0 <= -13234")
         );

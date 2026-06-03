@@ -11,6 +11,7 @@ import dev.fmsea.inference.Identifier;
 import dev.fmsea.inference.InvariantExpression;
 import dev.fmsea.inference.LeqInvariant;
 import dev.fmsea.inference.LtInvariant;
+import dev.fmsea.inference.NegIdentifier;
 import dev.fmsea.inference.Numeral;
 import dev.fmsea.inference.SumExpression;
 
@@ -24,6 +25,11 @@ public class ToStringVisitor implements InvariantExpression.Visitor<String> {
 
     public String visit(Identifier identifier) {
         return identifier.identifier.toString();
+    }
+
+    public String visit(NegIdentifier neg) {
+        return String.format("-%s",
+            neg.identifier.accept(this));
     }
 
     public String visit(Numeral numeral) {
