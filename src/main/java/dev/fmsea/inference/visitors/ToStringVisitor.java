@@ -1,5 +1,8 @@
 package dev.fmsea.inference.visitors;
 
+import java.util.stream.Collectors;
+
+import dev.fmsea.inference.AndExpression;
 import dev.fmsea.inference.DiffExpression;
 import dev.fmsea.inference.EqInvariant;
 import dev.fmsea.inference.GeqInvariant;
@@ -12,6 +15,12 @@ import dev.fmsea.inference.Numeral;
 import dev.fmsea.inference.SumExpression;
 
 public class ToStringVisitor implements InvariantExpression.Visitor<String> {
+
+    public String visit(AndExpression and) {
+        return and.asConjuncts()
+            .map(expr -> expr.accept(this))
+            .collect(Collectors.joining(" && "));
+    }
 
     public String visit(Identifier identifier) {
         return identifier.identifier.toString();

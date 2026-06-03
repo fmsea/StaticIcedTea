@@ -1,11 +1,15 @@
 package dev.fmsea.inference;
 
+import java.util.List;
+import java.util.stream.Stream;
+
 import dev.fmsea.common.Locals;
 import dev.fmsea.inference.visitors.ToStringVisitor;
 
 public abstract class InvariantExpression {
 
     public interface Visitor<R> {
+        R visit(AndExpression and);
         R visit(NegIdentifier negIdentifier);
         R visit(Identifier identifier);
         R visit(Numeral numeral);
@@ -22,6 +26,18 @@ public abstract class InvariantExpression {
 
     public String toString() {
         return this.accept(new ToStringVisitor());
+    }
+
+    public Stream<InvariantExpression> asConjuncts() {
+        return Stream.of(this);
+    }
+
+    public static AndExpression newAnd(InvariantExpression... exprs) {
+        return new AndExpression(exprs);
+    }
+
+    public static AndExpression newAnd(List<InvariantExpression> exprs) {
+        return new AndExpression(exprs);
     }
 
     public static Numeral newNumeral(int value) {
