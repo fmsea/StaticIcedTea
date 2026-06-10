@@ -2,8 +2,8 @@ package dev.fmsea.absint.scalar.state;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,9 +19,11 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import dev.fmsea.absint.ConstraintType;
 import dev.fmsea.absint.scalar.state.util.GraphProjection;
 import dev.fmsea.util.Pair;
 import dev.fmsea.util.Properties;
+import dev.fmsea.util.Sets;
 
 public class OctagonDifferenceBoundedMatrix {
 
@@ -716,6 +718,37 @@ public class OctagonDifferenceBoundedMatrix {
                 });
         }
         return graph;
+    }
+
+    public Map<ConstraintType, Set<Integer>> queryConstraintTypes() {
+        Map<Integer, ConstraintType> map = new HashMap<>();
+
+        for (int i = 0; i < N; i += 2) {
+            map.put(i, ConstraintType.INTERVAL);
+        }
+
+        for (int i = 0; i < N; i += 2) {
+            for (int j = i; j < N; j += 2) {
+                int ibar = i ^ 1;
+                int jbar = j ^ 1;
+                if (i == j || i == jbar || j == ibar) {
+                    continue;
+                }
+                if (!this.matrix[i][j].isTop() || !this.matrix[j][i].isTop()) {
+                    map.computeIfPresent(i, (k, v) -> v == ConstraintType.OCTAGONAL ? ConstraintType.OCTAGONAL : ConstraintType.ZONAL);
+                    map.computeIfPresent(j, (k, v) -> v == ConstraintType.OCTAGONAL ? ConstraintType.OCTAGONAL : ConstraintType.ZONAL);
+                }
+                if (!this.matrix[ibar][j].isTop() || !this.matrix[i][jbar].isTop()) {
+                    map.put(i, ConstraintType.OCTAGONAL);
+                    map.put(j, ConstraintType.OCTAGONAL);
+                }
+            }
+        }
+
+        return map.entrySet()
+            .stream()
+            .map(kv -> Map.entry(kv.getValue(), Set.of(kv.getKey())))
+            .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue, Sets::union));
     }
 
     @Override public boolean equals(Object o) {

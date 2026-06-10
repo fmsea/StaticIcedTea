@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import dev.fmsea.absint.ConstraintType;
 import dev.fmsea.absint.scalar.state.factory.OctagonDifferenceBoundedMatrixFactory;
 import dev.fmsea.absint.scalar.state.factory.OctagonDifferenceBoundedMatrixType;
 import dev.fmsea.absint.scalar.state.update.DefaultOctagonRefiner;
@@ -404,4 +405,16 @@ public abstract class OctagonState implements State {
         }
     }
 
+    public Map<ConstraintType, Set<Local>> queryConstraintTypes() {
+        return this.matrix.queryConstraintTypes()
+            .entrySet()
+            .stream()
+            .map(kv -> Map.entry(
+                kv.getKey(),
+                kv.getValue()
+                    .stream()
+                    .map(i -> indicesToLocals.get(i))
+                    .collect(Collectors.toSet())))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
 }
