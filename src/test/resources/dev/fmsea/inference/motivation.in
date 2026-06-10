@@ -1,0 +1,6 @@
+3	Motivation.example
+4	Motivation.example	v1 >= 0
+5	Motivation.example	v0 - v1 <= 2	v1 - v0 <= -2
+6	Motivation.example	v1 <= -1
+7	Motivation.example	v0 - v1 <= 4	v1 - v0 <= -4
+8	Motivation.example	v0 - v1 <= 4	v1 - v0 <= -2

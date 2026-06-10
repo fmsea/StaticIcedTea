@@ -3,6 +3,7 @@ package dev.fmsea.driver;
 import java.util.concurrent.Callable;
 
 import dev.fmsea.driver.commands.GenerateOctagonsCommand;
+import dev.fmsea.driver.commands.InferDomainsCommand;
 import dev.fmsea.driver.commands.PrintJimpleCommand;
 import dev.fmsea.driver.commands.Smt2FormatCommand;
 import dev.fmsea.driver.commands.Smt2FormatDirectoryCommand;
@@ -36,6 +37,7 @@ import picocli.CommandLine.Command;
          subcommands = {
              PrintJimpleCommand.class,
              GenerateOctagonsCommand.class,
+             InferDomainsCommand.class,
              StartIntervalNumericalCommand.class,
              StartPredicateNumericalCommand.class,
              StartIncZoneNumericalCommand.class,

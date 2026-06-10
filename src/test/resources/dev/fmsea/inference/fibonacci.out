@@ -1,0 +1,25 @@
+7	Fibonacci.fibonacci	v0 == v2	v0 <= 0	v0 >= 0	v1 <= 1	v1 >= 1	v0 - v1 <= -1	v1 - v0 <= 1
+v0	INTERVAL
+v1	INTERVAL
+v2	INTERVAL
+8	Fibonacci.fibonacci	v4 >= 0	v1 - v2 <= 1	v2 - v1 <= 0	v4 - v3 <= -1
+v1	ZONAL
+v2	ZONAL
+v3	ZONAL
+v4	ZONAL
+9	Fibonacci.fibonacci	v4 >= 0	v4 - v3 <= -1
+v3	ZONAL
+v4	ZONAL
+10	Fibonacci.fibonacci	v0 == v1	v4 >= 0	v4 - v3 <= -1
+v0	ZONAL
+v1	ZONAL
+v3	ZONAL
+v4	ZONAL
+11	Fibonacci.fibonacci	v1 == v2	v4 >= 0	v4 - v3 <= -1
+v1	ZONAL
+v2	ZONAL
+v3	ZONAL
+v4	ZONAL
+12	Fibonacci.fibonacci	v1 - v2 <= 1	v2 - v1 <= 0
+v1	ZONAL
+v2	ZONAL
