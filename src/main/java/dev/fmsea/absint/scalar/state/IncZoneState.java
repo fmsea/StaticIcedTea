@@ -1,5 +1,6 @@
 package dev.fmsea.absint.scalar.state;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BinaryOperator;
@@ -10,18 +11,19 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import dev.fmsea.absint.ConstraintType;
 import dev.fmsea.absint.scalar.state.util.GraphProjection;
 import dev.fmsea.solver.SolverWrapper;
+import dev.fmsea.tadr.TADR;
+import dev.fmsea.tadr.visitors.VariableVisitor;
+import dev.fmsea.tadr.visitors.ZoneChangedVariableVisitor;
+import dev.fmsea.util.Properties;
 import soot.Local;
 import soot.Value;
 import soot.jimple.BinopExpr;
 import soot.jimple.IntConstant;
 import soot.jimple.LongConstant;
 import soot.jimple.internal.JNegExpr;
-import dev.fmsea.tadr.TADR;
-import dev.fmsea.tadr.visitors.VariableVisitor;
-import dev.fmsea.tadr.visitors.ZoneChangedVariableVisitor;
-import dev.fmsea.util.Properties;
 
 public class IncZoneState implements State {
 
@@ -830,5 +832,9 @@ public class IncZoneState implements State {
             return compar.map(expr -> expr.accept(variableVisitor))
                 .orElse(Set.of());
         }
+    }
+
+    public Map<ConstraintType, Set<Local>> queryConstraintTypes() {
+        return Map.of(ConstraintType.ZONAL, this.matrix.getLocals());
     }
 }

@@ -1,6 +1,7 @@
 package dev.fmsea.absint.scalar.state;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BinaryOperator;
@@ -9,6 +10,7 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import dev.fmsea.absint.ConstraintType;
 import dev.fmsea.absint.scalar.state.util.GraphProjection;
 import dev.fmsea.solver.SolverWrapper;
 import soot.Local;
@@ -819,5 +821,9 @@ public class ZoneState implements State {
             return Set.of((Local) right);
         }
         return Set.of();
+    }
+
+    public Map<ConstraintType, Set<Local>> queryConstraintTypes() {
+        return Map.of(ConstraintType.ZONAL, this.matrix.getLocals());
     }
 }

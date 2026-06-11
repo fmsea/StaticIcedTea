@@ -1,27 +1,24 @@
 package dev.fmsea.absint.scalar.state;
 
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import dev.fmsea.absint.ConstraintType;
+import dev.fmsea.absint.scalar.state.util.GraphProjection;
+import dev.fmsea.solver.SolverWrapper;
 import soot.Local;
 import soot.Value;
-import soot.grimp.Grimp;
 import soot.jimple.BinopExpr;
 import soot.jimple.IntConstant;
 import soot.jimple.LongConstant;
 import soot.jimple.internal.JNegExpr;
-
-import dev.fmsea.absint.scalar.state.util.GraphProjection;
-import dev.fmsea.solver.SolverWrapper;
 
 public class MinZoneState implements State {
 
@@ -832,5 +829,9 @@ public class MinZoneState implements State {
             return Set.of((Local) right);
         }
         return Set.of();
+    }
+
+    public Map<ConstraintType, Set<Local>> queryConstraintTypes() {
+        return Map.of(ConstraintType.ZONAL, this.matrix.getLocals());
     }
 }

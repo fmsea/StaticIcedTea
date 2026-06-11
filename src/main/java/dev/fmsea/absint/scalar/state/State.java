@@ -1,8 +1,10 @@
 package dev.fmsea.absint.scalar.state;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import dev.fmsea.absint.ConstraintType;
 import dev.fmsea.absint.scalar.state.util.GraphProjection;
 import dev.fmsea.solver.SolverWrapper;
 import soot.Local;
@@ -41,4 +43,5 @@ public interface State {
     public Set<Local> getChangedVariables(BinaryOperatorType op, Value left, Value right);
     public Set<Local> getChangedVariables(Value rhs);
     public Set<Local> getChangedVariables(PredicateType predicate, Value left, Value right);
+    public Map<ConstraintType, Set<Local>> queryConstraintTypes();
 }
