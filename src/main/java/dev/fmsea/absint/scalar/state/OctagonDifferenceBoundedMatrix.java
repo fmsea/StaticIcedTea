@@ -728,15 +728,15 @@ public class OctagonDifferenceBoundedMatrix {
         }
 
         for (int i = 0; i < N; i += 2) {
-            for (int j = i; j < N; j += 2) {
+            for (int j = i + 2; j < N; j += 2) {
                 int ibar = i ^ 1;
                 int jbar = j ^ 1;
                 if (i == j || i == jbar || j == ibar) {
                     continue;
                 }
                 if (!this.matrix[i][j].isTop() || !this.matrix[j][i].isTop()) {
-                    map.computeIfPresent(i, (k, v) -> v == ConstraintType.OCTAGONAL ? ConstraintType.OCTAGONAL : ConstraintType.ZONAL);
-                    map.computeIfPresent(j, (k, v) -> v == ConstraintType.OCTAGONAL ? ConstraintType.OCTAGONAL : ConstraintType.ZONAL);
+                    map.computeIfPresent(i, (k, v) -> ConstraintType.ZONAL.compareTo(v) <= 0 ? v : ConstraintType.ZONAL);
+                    map.computeIfPresent(j, (k, v) -> ConstraintType.ZONAL.compareTo(v) <= 0 ? v : ConstraintType.ZONAL);
                 }
                 if (!this.matrix[ibar][j].isTop() || !this.matrix[i][jbar].isTop()) {
                     map.put(i, ConstraintType.OCTAGONAL);
