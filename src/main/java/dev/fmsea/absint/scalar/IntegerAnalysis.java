@@ -14,10 +14,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import dev.fmsea.absint.ConstraintType;
 import dev.fmsea.absint.scalar.state.State;
 import dev.fmsea.absint.scalar.state.factory.StateFactory;
 import dev.fmsea.picotelem.engine.PicoTelemetryEngine;
 import dev.fmsea.solver.SolverWrapper;
+import dev.fmsea.util.IOThrowableConsumer;
 import soot.Body;
 import soot.Local;
 import soot.Trap;
@@ -128,6 +130,53 @@ public class IntegerAnalysis implements Analysis {
             for (State branch : branches) {
                 String branchOutput = Paths.get(output.toString(), String.format("/%d-branch.dot", stmtCount)).toString();
                 branch.toGraph().toDot(branchOutput);
+            }
+        }
+    }
+
+    public void reportConstraintTypes(Writer writer) throws IOException {
+        IOThrowableConsumer<Map.Entry<ConstraintType, Set<Local>>> variableWriter = kv -> {
+            kv.getValue().stream()
+                .map(Local::toString)
+                .sorted()
+                .forEach(v -> {
+                try {
+                    writer.write(String.format("%s\t%s\n",
+                        v,
+                        kv.getKey().toString()));
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            });
+        };
+        int stmtCount = 0;
+        for (Unit u : this.g.getBody().getUnits()) {
+            stmtCount++;
+            if (this.analysis.getFallMinChangedVariables(u).isPresent()) {
+            writer.write(String.valueOf(stmtCount));
+            writer.write(" ");
+            writer.write(u.toString());
+            writer.write(":");
+            writer.write("\n");
+            writer.write("fall\n");
+            State state = analysis.getFallFlowAfter(u);
+            state.queryConstraintTypes()
+                .entrySet()
+                .stream()
+                .forEach(kv -> variableWriter.accept(kv));
+            } else {
+            }
+            List<State> branches = analysis.getBranchFlowAfter(u);
+            for (State branch : branches) {
+                Set<Local> branchDeltaVars = this.analysis.getBranchMinChangedVariables(u).orElse(Set.of());
+                if (branchDeltaVars.isEmpty()) {
+                    continue;
+                }
+                writer.write("branch\n");
+                branch.queryConstraintTypes()
+                    .entrySet()
+                    .stream()
+                    .forEach(kv -> variableWriter.accept(kv));
             }
         }
     }

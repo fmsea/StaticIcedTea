@@ -6,6 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,10 +16,10 @@ import dev.fmsea.absint.scalar.IntegerAnalysis;
 import dev.fmsea.driver.util.OrdererFactory;
 import dev.fmsea.driver.util.SootInitialization;
 import dev.fmsea.solver.SolverFactory;
-import soot.Body;
-import soot.SootMethod;
 import dev.fmsea.util.AnalysisTimer;
 import dev.fmsea.util.Configuration;
+import soot.Body;
+import soot.SootMethod;
 
 public class AnalysisRunner  implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(AnalysisRunner.class);
@@ -28,6 +30,7 @@ public class AnalysisRunner  implements Runnable {
     private final Body body;
     private final IntegerAnalysis analysis;
     private final boolean outputStateReports;
+    private final boolean outputConstraintTypes;
     private final Set<Integer> widenSteps;
 
     public AnalysisRunner(AnalysisOptions options) {
@@ -37,6 +40,7 @@ public class AnalysisRunner  implements Runnable {
         this.sootMethod = SootInitialization.getSootMethod(className, methodId);
         this.body = this.sootMethod.retrieveActiveBody();
         this.widenSteps = options.widenSteps.orElse(Set.of());
+        this.outputConstraintTypes = options.outputConstraintTypes;
         this.analysis = new IntegerAnalysis(
             SolverFactory.getSolver(),
             this.body,
@@ -63,11 +67,24 @@ public class AnalysisRunner  implements Runnable {
         } else {
             LOGGER.info("Skipping report generation...");
         }
+
+        if (this.outputConstraintTypes) {
+            AnalysisTimer.time((s) -> {
+                reportConstraintTypes();
+            }, "constraint types report took {} ms");
+        } else {
+            LOGGER.info("Skipping constraint types report...");
+        }
     }
+
+    protected String reportBasename() {
+        return String.format("%s_%d", this.className, this.methodId);
+    }
+
 
     protected void report() {
         File fullSmt = Path.of(this.outputResultsPath.toString(),
-                               String.format("%s_%d.smt.out", this.className, this.methodId)).toFile();
+            String.format("%s.smt.out", this.reportBasename())).toFile();
         File dir = this.outputResultsPath.toFile();
         dir.mkdirs();
 
@@ -89,5 +106,22 @@ public class AnalysisRunner  implements Runnable {
                     this.analysis.generateGraphOutputs(graphOutputDir);
                 }
             });
+    }
+
+    protected void reportConstraintTypes() {
+        File constraintTypes = Path.of(this.outputResultsPath.toString(),
+            String.format("%s.constraint.types", this.reportBasename())).toFile();
+        File dir = this.outputResultsPath.toFile();
+        dir.mkdirs();
+
+        try (FileWriter fw = new FileWriter(constraintTypes);
+             BufferedWriter buf = new BufferedWriter(fw)) {
+            this.analysis.reportConstraintTypes(buf);
+            buf.flush();
+        } catch (IOException ex) {
+            LOGGER.error("Unable to write constraint type report to file: {}", ex.getMessage());
+            LOGGER.trace("Stack trace: {}",
+                Stream.of(ex.getStackTrace()).map(st -> st.toString()).collect(Collectors.joining("\n")));
+        }
     }
 }

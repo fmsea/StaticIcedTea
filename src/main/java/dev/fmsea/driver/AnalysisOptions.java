@@ -14,6 +14,7 @@ public class AnalysisOptions {
     public final int methodId;
     public final Path outputResultsPath;
     public final boolean outputStateReports;
+    public final boolean outputConstraintTypes;
     public final int widenIterations;
     public final Optional<Set<Integer>> widenSteps;
     public final OrdererType orderer;
@@ -26,6 +27,7 @@ public class AnalysisOptions {
         int methodId,
         Path outputResultsPath,
         boolean outputStateReports,
+        boolean outputConstraintTypes,
         int widenIterations,
         Optional<Set<Integer>> widenSteps,
         OrdererType orderer,
@@ -37,6 +39,7 @@ public class AnalysisOptions {
         this.methodId = methodId;
         this.outputResultsPath = outputResultsPath;
         this.outputStateReports = outputStateReports;
+        this.outputConstraintTypes = outputConstraintTypes;
         this.widenIterations = widenIterations;
         this.widenSteps = widenSteps;
         this.orderer = orderer;

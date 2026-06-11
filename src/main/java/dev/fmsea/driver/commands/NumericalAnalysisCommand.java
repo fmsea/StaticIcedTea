@@ -43,5 +43,12 @@ public abstract class NumericalAnalysisCommand extends AnalysisCommand {
         negatable = true)
     protected boolean outputMinimum;
 
+    @Option(names = "--constraints",
+            description = "Whether to report constraint types",
+            required = false,
+            defaultValue = "false",
+            fallbackValue = "false")
+    protected boolean outputConstraintTypes;
+
     public abstract Integer call() throws Exception;
 }

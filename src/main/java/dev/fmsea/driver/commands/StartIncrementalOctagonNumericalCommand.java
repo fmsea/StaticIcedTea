@@ -33,6 +33,7 @@ public class StartIncrementalOctagonNumericalCommand extends NumericalAnalysisCo
             .withMethodId(methodId)
             .withOutputResultsPath(outputResultsPath)
             .withOutputStateReports(outputReport)
+            .withOutputConstraintTypesReport(outputConstraintTypes)
             .withWidenIterations(widenIterations)
             .withWidenSteps(widenSteps)
             .withStateType(IncrementalOctagonState.class)

@@ -12,6 +12,7 @@ public class AnalysisOptionsBuilder {
     private int methodId;
     private Path outputResultsPath;
     private boolean outputStateReports;
+    private boolean outputConstraintTypes;
     private int widenIterations;
     private Class<?> stateType;
     private Optional<Set<Integer>> widenSteps;
@@ -21,6 +22,7 @@ public class AnalysisOptionsBuilder {
 
     public AnalysisOptionsBuilder() {
         this.outputStateReports = true;
+        this.outputConstraintTypes = false;
         this.widenIterations = 2;
         this.widenSteps = Optional.empty();
         this.orderer = OrdererType.PseudoTopological;
@@ -38,6 +40,11 @@ public class AnalysisOptionsBuilder {
 
     public AnalysisOptionsBuilder withOutputResultsPath(Path outputResultsPath) {
         this.outputResultsPath = outputResultsPath;
+        return this;
+    }
+
+    public AnalysisOptionsBuilder withOutputConstraintTypesReport(boolean flag) {
+        this.outputConstraintTypes = flag;
         return this;
     }
 
@@ -83,6 +90,7 @@ public class AnalysisOptionsBuilder {
             this.methodId,
             this.outputResultsPath,
             this.outputStateReports,
+            this.outputConstraintTypes,
             this.widenIterations,
             this.widenSteps,
             this.orderer,
