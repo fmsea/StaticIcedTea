@@ -724,10 +724,14 @@ public class OctagonDifferenceBoundedMatrix {
         Map<Integer, ConstraintType> map = new HashMap<>();
 
         for (int i = 0; i < N; i += 2) {
+            map.put(i, ConstraintType.UNBOUND);
+        }
+
+        for (int i = 0; i < N; i += 2) {
             int ibar = i ^ 1;
             if (!this.matrix[i][ibar].isTop() && this.isConstant(i, ibar)) {
                 map.put(i, ConstraintType.CONSTANT);
-            } else {
+            } else if (!(this.matrix[i][ibar].isTop() && this.matrix[ibar][i].isTop())) {
                 map.put(i, ConstraintType.INTERVAL);
             }
         }

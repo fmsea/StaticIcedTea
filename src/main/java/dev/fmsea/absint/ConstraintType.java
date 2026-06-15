@@ -1,6 +1,7 @@
 package dev.fmsea.absint;
 
 public enum ConstraintType {
+    UNBOUND,
     CONSTANT,
     INTERVAL,
     ZONAL,
@@ -16,8 +17,9 @@ public enum ConstraintType {
                 return "ZONAL";
             case OCTAGONAL:
                 return "OCTAGONAL";
+            case UNBOUND:
             default:
-                return "UNKNOWN";
+                return "UNBOUND";
         }
     }
 }
