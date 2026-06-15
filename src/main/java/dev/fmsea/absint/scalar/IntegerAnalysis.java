@@ -39,6 +39,7 @@ public class IntegerAnalysis implements Analysis {
     private Set<Local> locals;
     private final boolean reduceOutput;
 
+    @SuppressWarnings("unchecked")
     public IntegerAnalysis(
         SolverWrapper solver,
         Body b,
