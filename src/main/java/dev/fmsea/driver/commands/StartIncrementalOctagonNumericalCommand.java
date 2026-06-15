@@ -40,6 +40,7 @@ public class StartIncrementalOctagonNumericalCommand extends NumericalAnalysisCo
             .withOrderer(orderer)
             .withReduceOutput(reduceOutput)
             .withTelemetry(PicoTelemetryFactory.getTelemetryEngine(telemetryOptions))
+            .withReportInflow(reportInflow)
             .build();
         Runnable runner = new AnalysisRunner(options);
         runner.run();

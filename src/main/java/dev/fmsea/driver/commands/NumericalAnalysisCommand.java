@@ -27,6 +27,14 @@ public abstract class NumericalAnalysisCommand extends AnalysisCommand {
             converter = OrdererTypeConverter.class)
     protected OrdererType orderer;
 
+    @Option(names={"--report-inflow"},
+        description="Whether to print inflow information.  " +
+                    "This option currently implies all statements " +
+                    "are printed regardless of changed variables.",
+        defaultValue="false",
+        fallbackValue="false")
+    protected boolean reportInflow;
+
     @Option(names = {"--reduce"},
         description = "Reduce each output state before printing",
         required = false,

@@ -19,6 +19,7 @@ public class AnalysisOptionsBuilder {
     private OrdererType orderer;
     private boolean reduceOutput;
     private PicoTelemetryEngine telemetry;
+    private boolean reportInflow;
 
     public AnalysisOptionsBuilder() {
         this.outputStateReports = true;
@@ -83,6 +84,11 @@ public class AnalysisOptionsBuilder {
         return this;
     }
 
+    public AnalysisOptionsBuilder withReportInflow(boolean reportInflow) {
+        this.reportInflow = reportInflow;
+        return this;
+    }
+
     public AnalysisOptions build() {
         return new AnalysisOptions(
             this.stateType,
@@ -95,6 +101,7 @@ public class AnalysisOptionsBuilder {
             this.widenSteps,
             this.orderer,
             this.reduceOutput,
-            this.telemetry);
+            this.telemetry,
+            this.reportInflow);
     }
 }

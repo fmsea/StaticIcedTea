@@ -8,10 +8,10 @@ import dev.fmsea.picotelem.engine.PicoTelemetryEngine;
 import dev.fmsea.picotelem.factory.PicoTelemetryFactory;
 import dev.fmsea.solver.SolverFactory;
 import dev.fmsea.solver.SolverWrapper;
-import soot.toolkits.graph.Orderer;
-import soot.toolkits.graph.PseudoTopologicalOrderer;
 import soot.Body;
 import soot.Unit;
+import soot.toolkits.graph.Orderer;
+import soot.toolkits.graph.PseudoTopologicalOrderer;
 
 public class IntegerAnalysisBuilder {
     private int iterations;
@@ -22,6 +22,7 @@ public class IntegerAnalysisBuilder {
     private Optional<Set<Integer>> widenSteps = Optional.empty();
     private Optional<Orderer<Unit>> orderer = Optional.empty();
     private Optional<PicoTelemetryEngine> telemetry = Optional.empty();
+    private boolean reportInflow;
 
     public IntegerAnalysisBuilder() {
     }
@@ -56,15 +57,45 @@ public class IntegerAnalysisBuilder {
         return this;
     }
 
+    public IntegerAnalysisBuilder withWidenSteps(Set<Integer> steps) {
+        return this.withWidenSteps(Optional.ofNullable(steps));
+    }
+
+    public IntegerAnalysisBuilder withWidenSteps(Optional<Set<Integer>> steps) {
+        this.widenSteps = steps;
+        return this;
+    }
+
+    public IntegerAnalysisBuilder withOrderer(Orderer<Unit> orderer) {
+        this.orderer = Optional.ofNullable(orderer);
+        return this;
+    }
+
+    public IntegerAnalysisBuilder withReportInflow(boolean reportInflow) {
+        this.reportInflow = reportInflow;
+        return this;
+    }
+
     public IntegerAnalysis build() {
-        return new IntegerAnalysis(
-            this.solver.orElse(SolverFactory.getSolver()),
-            this.b,
-            this.iterations,
-            this.type,
-            this.widenSteps.orElse(Set.of()),
-            this.orderer.orElse(new PseudoTopologicalOrderer<>()),
-            this.reduceOutput,
-            this.telemetry.orElse(PicoTelemetryFactory.getTelemetryEngine(new PicoTelemOptionsBuilder().build())));
+        if (reportInflow) {
+            return new IntegerAnalysisWithInflow(this.solver.orElse(SolverFactory.getSolver()),
+                this.b,
+                this.iterations,
+                this.type,
+                this.widenSteps.orElse(Set.of()),
+                this.orderer.orElse(new PseudoTopologicalOrderer<>()),
+                this.reduceOutput,
+                this.telemetry.orElse(PicoTelemetryFactory.getTelemetryEngine(new PicoTelemOptionsBuilder().build())));
+        } else {
+            return new IntegerAnalysis(
+                this.solver.orElse(SolverFactory.getSolver()),
+                this.b,
+                this.iterations,
+                this.type,
+                this.widenSteps.orElse(Set.of()),
+                this.orderer.orElse(new PseudoTopologicalOrderer<>()),
+                this.reduceOutput,
+                this.telemetry.orElse(PicoTelemetryFactory.getTelemetryEngine(new PicoTelemOptionsBuilder().build())));
+        }
     }
 }

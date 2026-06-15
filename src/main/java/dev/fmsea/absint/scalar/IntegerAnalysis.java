@@ -33,11 +33,11 @@ import soot.toolkits.graph.UnitGraph;
 public class IntegerAnalysis implements Analysis {
 
     protected Body b;
-    UnitGraph g;
-    ForwardBranchedFlowNumerical<State> analysis;
-    private SolverWrapper solver;
-    private Set<Local> locals;
-    private final boolean reduceOutput;
+    protected UnitGraph g;
+    protected ForwardBranchedFlowNumerical<State> analysis;
+    protected SolverWrapper solver;
+    protected Set<Local> locals;
+    protected final boolean reduceOutput;
 
     @SuppressWarnings("unchecked")
     public IntegerAnalysis(
@@ -49,6 +49,7 @@ public class IntegerAnalysis implements Analysis {
         Orderer<Unit> orderer,
         boolean reduceOutput,
         PicoTelemetryEngine telemetry) {
+
         this.solver = solver;
         this.b = b;
         this.g = new ExceptionalUnitGraph(b);
@@ -154,14 +155,13 @@ public class IntegerAnalysis implements Analysis {
         for (Unit u : this.g.getBody().getUnits()) {
             stmtCount++;
             if (this.analysis.getFallMinChangedVariables(u).isPresent()) {
-
                 writeUnitSignature(writer, u, stmtCount);
                 writer.write("fall\n");
                 State state = analysis.getFallFlowAfter(u);
                 state.queryConstraintTypes()
-                .entrySet()
-                .stream()
-                .forEach(kv -> variableWriter.accept(kv));
+                    .entrySet()
+                    .stream()
+                    .forEach(kv -> variableWriter.accept(kv));
             } else {
             }
             List<State> branches = analysis.getBranchFlowAfter(u);

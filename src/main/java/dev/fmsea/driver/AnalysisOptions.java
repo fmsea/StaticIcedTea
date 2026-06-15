@@ -20,6 +20,7 @@ public class AnalysisOptions {
     public final OrdererType orderer;
     public final boolean reduceOutput;
     public final PicoTelemetryEngine telemetry;
+    public final boolean reportInflow;
 
     public AnalysisOptions(
         Class<?> stateType,
@@ -32,7 +33,8 @@ public class AnalysisOptions {
         Optional<Set<Integer>> widenSteps,
         OrdererType orderer,
         boolean reduceOutput,
-        PicoTelemetryEngine telemetry) {
+        PicoTelemetryEngine telemetry,
+        boolean reportInflow) {
 
         this.stateType = stateType;
         this.className = className;
@@ -45,5 +47,6 @@ public class AnalysisOptions {
         this.orderer = orderer;
         this.reduceOutput = reduceOutput;
         this.telemetry = telemetry;
+        this.reportInflow = reportInflow;
     }
 }

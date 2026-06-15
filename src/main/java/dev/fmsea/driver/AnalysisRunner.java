@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import dev.fmsea.absint.scalar.IntegerAnalysis;
+import dev.fmsea.absint.scalar.IntegerAnalysisBuilder;
 import dev.fmsea.driver.util.OrdererFactory;
 import dev.fmsea.driver.util.SootInitialization;
 import dev.fmsea.solver.SolverFactory;
@@ -23,15 +24,15 @@ import soot.SootMethod;
 
 public class AnalysisRunner  implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(AnalysisRunner.class);
-    private final String className;
-    private final int methodId;
-    private final Path outputResultsPath;
-    private final SootMethod sootMethod;
-    private final Body body;
-    private final IntegerAnalysis analysis;
-    private final boolean outputStateReports;
-    private final boolean outputConstraintTypes;
-    private final Set<Integer> widenSteps;
+    protected final String className;
+    protected final int methodId;
+    protected final Path outputResultsPath;
+    protected final SootMethod sootMethod;
+    protected final Body body;
+    protected final IntegerAnalysis analysis;
+    protected final boolean outputStateReports;
+    protected final boolean outputConstraintTypes;
+    protected final Set<Integer> widenSteps;
 
     public AnalysisRunner(AnalysisOptions options) {
         this.className = options.className;
@@ -41,16 +42,18 @@ public class AnalysisRunner  implements Runnable {
         this.body = this.sootMethod.retrieveActiveBody();
         this.widenSteps = options.widenSteps.orElse(Set.of());
         this.outputConstraintTypes = options.outputConstraintTypes;
-        this.analysis = new IntegerAnalysis(
-            SolverFactory.getSolver(),
-            this.body,
-            options.widenIterations,
-            options.stateType,
-            this.widenSteps,
-            OrdererFactory.get(options.orderer),
-            options.reduceOutput,
-            options.telemetry);
         this.outputStateReports = options.outputStateReports;
+        this.analysis = new IntegerAnalysisBuilder()
+            .withSolver(SolverFactory.getSolver())
+            .withBody(this.body)
+            .withIterations(options.widenIterations)
+            .withWidenSteps(options.widenSteps)
+            .withReducedOutput(options.reduceOutput)
+            .withType(options.stateType)
+            .withOrderer(OrdererFactory.get(options.orderer))
+            .withTelemetry(options.telemetry)
+            .withReportInflow(this.outputConstraintTypes)
+            .build();
     }
 
     public void run() {
