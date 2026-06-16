@@ -154,14 +154,11 @@ public class IntegerAnalysis implements Analysis {
         for (Unit u : this.g.getBody().getUnits()) {
             stmtCount++;
             if (this.analysis.getFallMinChangedVariables(u).isPresent()) {
-            writer.write(String.valueOf(stmtCount));
-            writer.write(" ");
-            writer.write(u.toString());
-            writer.write(":");
-            writer.write("\n");
-            writer.write("fall\n");
-            State state = analysis.getFallFlowAfter(u);
-            state.queryConstraintTypes()
+
+                writeUnitSignature(writer, u, stmtCount);
+                writer.write("fall\n");
+                State state = analysis.getFallFlowAfter(u);
+                state.queryConstraintTypes()
                 .entrySet()
                 .stream()
                 .forEach(kv -> variableWriter.accept(kv));
@@ -186,22 +183,26 @@ public class IntegerAnalysis implements Analysis {
         return this.analysis.getChangedVariables();
     }
 
+    protected void writeUnitSignature(Writer writer, Unit u, int stmtCount) throws IOException {
+        String methodSignature = this.b.getMethod().getSignature();
+        writer.write(String.valueOf(stmtCount));
+        writer.write(" ");
+        writer.write(u.toString());
+        writer.write(":");
+        writer.write(methodSignature);
+        writer.write('\n');
+    }
+
     public void writeReport(Writer writer) throws IOException {
         writer.write(this.locals.stream().map(l -> l.toString()).sorted().collect(Collectors.joining("\t")));
         writer.write("\n");
         Set<Unit> outputStmt = this.analysis.getOutputStatements();
         Map<Unit, Set<Local>> variables = this.getChangedVariables();
-        String methodSignature = this.b.getMethod().getSignature();
         int stmtCount = 0;
         for (Unit u : this.g.getBody().getUnits()) {
             stmtCount++;
             if (outputStmt.contains(u) && variables.get(u).size() > 0) {
-                writer.write(String.valueOf(stmtCount));
-                writer.write(" ");
-                writer.write(u.toString());
-                writer.write(":");
-                writer.write(methodSignature);
-                writer.write('\n');
+                writeUnitSignature(writer, u, stmtCount);
                 State state = analysis.getFallFlowAfter(u);
                 writer.write("fall\t");
                 writer.write(this.analysis.getFallMinChangedVariables(u)
