@@ -113,7 +113,13 @@ public class OctagonRewriteProvider implements ArgumentsProvider {
             List.of("(>= x1 x2)", "(<= x2 (+ x1 0)) (<= x2 1) (>= x1 3)", "99"),
             List.of("(not (= x1 0))", "(not (= x1 0))", "100"),
             List.of("(not (= 0 x2))", "(not (= 0 x2))", "101"),
-            List.of("(not (= x1 x2))", "(not (= x1 x2))", "102")
+            List.of("(not (= x1 x2))", "(not (= x1 x2))", "102"),
+            List.of("(<= 0 x1)", "(<= 0 1) (>= x1 0)", "103"),
+            List.of("(<= 1 x1)", "(<= 1 1) (>= x1 1)", "104"),
+            List.of("(>= 0 x1)", "(<= x1 0) (>= 0 1)", "105"),
+            List.of("(>= 1 x1)", "(<= x1 1) (>= 1 1)", "106"),
+            List.of("(> 0 x1)", "(<= x1 1) (>= 0 2)", "107"),
+            List.of("(< 0 x1)", "(<= 0 0) (>= x1 (- 1))", "108")
         ).map(l -> Arguments.arguments(l.toArray()));
     }
 }

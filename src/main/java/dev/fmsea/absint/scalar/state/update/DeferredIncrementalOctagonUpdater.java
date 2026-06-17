@@ -9,11 +9,13 @@ import dev.fmsea.absint.scalar.state.update.rules.OctagonIntervalLeUpdateRule;
 import dev.fmsea.absint.scalar.state.update.rules.OctagonNegativeDiffExprRule;
 import dev.fmsea.absint.scalar.state.update.rules.OctagonNotEqualRule;
 import dev.fmsea.absint.scalar.state.update.rules.OctagonSumExprRule;
+import dev.fmsea.absint.scalar.state.update.rules.TrivialExpressionFilterRule;
 
 public class DeferredIncrementalOctagonUpdater extends IncrementalOctagonUpdater {
 
     public DeferredIncrementalOctagonUpdater() {
         super(Set.of(
+            new TrivialExpressionFilterRule(),
             new OctagonNotEqualRule(),
             new OctagonInplaceAddExprRule(),
             new OctagonSumExprRule(),

@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 import dev.fmsea.absint.scalar.state.Interval32Box;
 import dev.fmsea.tadr.TADR;
+import dev.fmsea.tadr.rewrite.rules.GeLeNormalizationRewriteRule;
 import dev.fmsea.tadr.rewrite.rules.IntervalRewriteRule;
 import dev.fmsea.tadr.rewrite.rules.OctagonEqRewriteRule;
 import dev.fmsea.tadr.rewrite.rules.OctagonGeRewriteRule;
@@ -25,6 +26,7 @@ public class OctagonRewriter extends Rewriter {
     public OctagonRewriter() {
         super(Set.of(
             new IntervalRewriteRule(),
+            new GeLeNormalizationRewriteRule(),
             new OctagonReassignmentEqRewriteRule(),
             new OctagonEqRewriteRule(),
             new OctagonLeRewriteRule(),

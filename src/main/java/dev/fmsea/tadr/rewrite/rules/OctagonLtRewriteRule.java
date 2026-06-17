@@ -15,6 +15,7 @@ public class OctagonLtRewriteRule extends RewriteRule {
     private final Set<RewriteRule> rules = Set.of(
         RewriteRule.compose(new LtMultiplicationOpRule(), this),
         RewriteRule.compose(new LtDivisionOpRule(), this),
+        new LtRewriteRule(),
         new LtVariableRule(),
         new OctagonLtAdditionRule(),
         new OctagonLtSubtractionRule()
@@ -22,7 +23,8 @@ public class OctagonLtRewriteRule extends RewriteRule {
 
     public boolean canRewrite(TADR expr) {
         return ((expr instanceof LtCmp) &&
-                (((LtCmp)expr).left instanceof Variable));
+                (((LtCmp)expr).left instanceof Variable ||
+                 ((LtCmp)expr).right instanceof Variable));
     }
 
     public Stream<TADR> rewrite(TADR expr, Function<Local, Interval32Box> lookup) {

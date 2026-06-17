@@ -15,12 +15,13 @@ import dev.fmsea.absint.scalar.state.update.rules.OctagonNegativeDiffExprRule;
 import dev.fmsea.absint.scalar.state.update.rules.OctagonNotEqualRule;
 import dev.fmsea.absint.scalar.state.update.rules.OctagonSumExprRule;
 import dev.fmsea.absint.scalar.state.update.rules.OctagonUpdateRule;
-import soot.Local;
+import dev.fmsea.absint.scalar.state.update.rules.TrivialExpressionFilterRule;
 import dev.fmsea.tadr.BinaryOp;
 import dev.fmsea.tadr.TADR;
 import dev.fmsea.tadr.Variable;
 import dev.fmsea.tadr.visitors.ReassignmentVisitor;
 import dev.fmsea.util.Pair;
+import soot.Local;
 
 public class DefaultOctagonUpdater extends OctagonUpdater {
 
@@ -28,6 +29,7 @@ public class DefaultOctagonUpdater extends OctagonUpdater {
 
     public DefaultOctagonUpdater() {
         this(Set.of(
+            new TrivialExpressionFilterRule(),
             new OctagonNotEqualRule(),
             new OctagonInplaceAddExprRule(),
             new OctagonSumExprRule(),
