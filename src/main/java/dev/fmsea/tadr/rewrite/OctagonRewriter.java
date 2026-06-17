@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import dev.fmsea.absint.scalar.state.Interval32Box;
-import soot.Local;
 import dev.fmsea.tadr.TADR;
 import dev.fmsea.tadr.rewrite.rules.IntervalRewriteRule;
 import dev.fmsea.tadr.rewrite.rules.OctagonEqRewriteRule;
@@ -17,6 +16,7 @@ import dev.fmsea.tadr.rewrite.rules.OctagonLtRewriteRule;
 import dev.fmsea.tadr.rewrite.rules.OctagonReassignmentEqRewriteRule;
 import dev.fmsea.tadr.rewrite.rules.OctagonReassignmentFilter;
 import dev.fmsea.tadr.visitors.ReassignmentVisitor;
+import soot.Local;
 
 public class OctagonRewriter extends Rewriter {
 

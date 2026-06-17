@@ -4,10 +4,10 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import dev.fmsea.absint.scalar.state.Interval32Box;
-import soot.Local;
 import dev.fmsea.tadr.LtCmp;
 import dev.fmsea.tadr.TADR;
 import dev.fmsea.tadr.Variable;
+import soot.Local;
 
 public class LtVariableRule extends RewriteRule {
     public boolean canRewrite(TADR expr) {

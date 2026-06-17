@@ -1,15 +1,12 @@
 package dev.fmsea.tadr.rewrite.rules;
 
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import dev.fmsea.tadr.TADR;
-import dev.fmsea.tadr.GtCmp;
-import dev.fmsea.tadr.Value;
-import dev.fmsea.tadr.Variable;
 
 import dev.fmsea.absint.scalar.state.Interval32Box;
-
+import dev.fmsea.tadr.GtCmp;
+import dev.fmsea.tadr.TADR;
+import dev.fmsea.tadr.Variable;
 import soot.Local;
 
 public class GtVariableRule extends RewriteRule {
