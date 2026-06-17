@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.concurrent.Callable;
 
 import dev.fmsea.processing.InferDomains;
+import dev.fmsea.util.AnalysisTimer;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
@@ -25,7 +26,7 @@ public class InferDomainsCommand implements Callable<Integer> {
         try (FileReader reader = new FileReader(inputFile.toFile());
              BufferedReader bufRd = new BufferedReader(reader);
              BufferedWriter bufWr = new BufferedWriter(new OutputStreamWriter(System.out));) {
-            InferDomains.inferDomains(bufRd, bufWr);
+            AnalysisTimer.time((s) -> InferDomains.inferDomains(bufRd, bufWr));
         } catch (IOException ex) {
         }
         return 0;
